@@ -1,0 +1,322 @@
+#######################################################
+# Author: Timothy Tickle
+# Description: Class to Allow Support Vector Machine 
+# analysis and to contain associated scripts.
+#######################################################
+
+__author__ = "Timothy Tickle"
+__copyright__ = "Copyright 2011"
+__credits__ = ["Timothy Tickle"]
+__license__ = "GPL"
+__version__ = "1.0"
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
+
+#Libraries
+import Constants
+import CommandLine
+import FileIO
+import math
+import os
+import ValidateData
+import Utility_File
+
+#This allows one to use distance metrics with Kmediods
+class SVM:
+
+    #SVM programs to call
+    c_SVM_SCALE = "svm-scale"
+    c_SVM_SCALE_LOCATION = "./external/libsvm-3.11/python/"+c_SVM_SCALE+".py"
+    c_SVM_TRAIN = "svm-train"
+    c_SVM_TRAIN_LOCATION = "/usr/bin/"+c_SVM_TRAIN
+    c_SVM_PREDICT = "svm-predict"
+    c_SVM_PREDICT_LOCATION = "/usr/bin/"+c_SVM_PREDICT
+    c_GRID_LOCATION = "./external/libsvm-3.11/tools/grid.py"
+    c_GNUPLOT = "/usr/bin/gnuplot"
+
+    #SVM Parameters
+    c_LOG_C = "-log2c"
+    c_LINEAR_KERNEL = "0"
+    c_C_SVC = "0"
+    c_SVC_PROBABILITY_ESTIMATES = "1"
+
+    #File extensions
+    c_SCALED_FILE_EXT = ".scaled"
+    c_SCALING_PARAMETERS = ".range"
+    c_CV_FILE_EXT = ".cv.out"
+    c_CV_IMAGE_EXT = ".cv.png"
+    c_MODEL_FILE_EXT = ".model"
+    c_PREDICT_FILE_EXT = ".predict"
+    c_SCALED_FOR_PREDICTION_FILE_EXT = ".scaledForpredict"
+
+    #Dictionary keywords for files
+    c_KEYWORD_INPUT_FILE = "INPUT"
+    c_KEYWORD_SCALED_FILE = "SCALED"
+    c_KEYWORD_RANGE_FILE = "RANGE"
+    c_KEYWORD_CV_OUT_FILE = "CV_OUT"
+    c_KEYWORD_CV_PNG_FILE = "CV_PNG"
+    c_KEYWORD_MODEL_FILE = "MODEL"
+    c_KEYWORD_PREDICTION_SCALED_FILE = "SCALED_FOR_PREDICTION"
+    c_KEYWORD_PREDICTION_FILE = "PREDICTION"
+    c_COST_VALUE = "C"
+    c_ACCURACY = "ACCURACY"
+
+    #Creates a model using a linear SVM
+    #1. Scales data if indicated
+    #2. Uses cross validation to define the gamma, cost, and range
+    #3. Uses the optimal gamma to create a model
+    #@params tempInputFileName String Must be a valid file  and must have data in rows in the format 
+    #<label> <index1>:<value1> <index2>:<value2> ...
+    #This method crates a system of outputfiles.
+    #@params tempScaling -1 or 0 indicates that scaling should be performed on the data first.
+    #The given value 0 or -1 will be used as the lower bound for scaling.
+    #1 is always used for the upper bound.
+    #This will perform X scaling not y.
+    #A Scaled file will be saved with the extension ".scaled"
+    #Given this is a linear kernel the process should be invariant to scale but this is given as an option.
+    #@params tempPrediction Indicates prediction should occur.
+    def createLinearModel(self, tempInputFileName=None, tempScaling=None, tempLogC="-1,2,1", tempCrossValidationFold = 10, tempProbabilistic=False):
+        #ValidateData
+        if(not ValidateData.ValidateData.isValidFileName(tempInputFileName)):
+            print "".join(["SVM.createLinearModel: ","The input file ",tempInputFileName," is not a valid file name."])
+            return False
+
+        #TODO Need to validate
+        costList = tempLogC.split(",")
+
+        #Get file prefix
+        fileNamePrefix = Utility_File.Utility_File.getFileNamePrefix(tempInputFileName)
+
+        #Create output file names
+        inputFile = "\""+tempInputFileName+"\""
+        scaledFile = "\""+fileNamePrefix+self.c_SCALED_FILE_EXT+"\""
+        rangeFile = "\""+fileNamePrefix+self.c_SCALING_PARAMETERS+"\""
+        cvOutFile = "\""+fileNamePrefix+self.c_CV_FILE_EXT+"\""
+        cvImageFile = "\""+fileNamePrefix+self.c_CV_IMAGE_EXT+"\""
+        modelFile = "\""+fileNamePrefix+self.c_MODEL_FILE_EXT+"\""
+
+        #Dict contains generated files for return value and later reference
+        generatedFiles = dict()
+        generatedFiles[self.c_KEYWORD_INPUT_FILE] = tempInputFileName
+
+        #Create Commandline interface
+        shell = CommandLine.CommandLine()
+
+        #Scale data
+        if((tempScaling == -1)or(tempScaling == 0)):
+            cmd = [self.c_SVM_SCALE,"-l",str(tempScaling),"-u","1","-s",rangeFile,inputFile,">",scaledFile]
+            print cmd
+            noError = shell.runPipedCommandLine(tempCommand = cmd)
+            if(noError == False):
+                print "".join(["Received error during scaling. Command=",cmd])
+                return False
+            generatedFiles[self.c_KEYWORD_SCALED_FILE] = scaledFile.strip("\"")
+            generatedFiles[self.c_KEYWORD_RANGE_FILE] = rangeFile.strip("\"")
+        
+        #Cross validate for the c and g parameters
+        #If scaling was used, use the scaled file, otherwise use the orginal file.
+        if((tempScaling == -1)or(tempScaling == 0)):
+            #Indicate file to perform CV on
+            cv_file = scaledFile
+        else:
+            cv_file = inputFile
+
+        #Perform cross validation
+        #Holds the highest cost
+        bestCost = 0.0
+        #Holds the associated accuracy
+        highestAccuracy = -1
+        writeCrossValidationFile = FileIO.FileIO(cvOutFile.strip("\""),False, True, True)
+        for cost in costList:
+            cost = math.pow(2,int(cost))
+            cmd = ["\""+self.c_SVM_TRAIN_LOCATION+"\"","-s",self.c_C_SVC,"-t",self.c_LINEAR_KERNEL,"-c",str(cost),"-v",str(tempCrossValidationFold),"-q",cv_file]
+            print "Cross Validation"
+            print cmd
+            result = shell.runPipedCommandLine(tempCommand = cmd)
+
+            #TODO This is not very clean
+            accuracy = result[0].split(" = ")
+            if(len(accuracy) == 2):
+                accuracy = accuracy[1][:-2]
+            else:
+                accuracy = False
+                break
+
+            writeCrossValidationFile.writeToFile("".join(["Cost=",str(cost)," with ",str(accuracy),"% Cross Validation Accuracy\n"]))
+
+            #Get best cost parameter
+            if(not accuracy == False):
+                if(highestAccuracy < float(accuracy)):
+                    bestCost = cost
+                    highestAccuracy = float(accuracy)
+        writeCrossValidationFile.close()
+
+        if(accuracy == False):
+            print "".join(["Received error during cross validation on scaled file. Command=",cmd])
+            return False
+
+        generatedFiles[self.c_COST_VALUE] = str(math.log(bestCost,2))
+        generatedFiles[self.c_ACCURACY] = str(highestAccuracy)
+        generatedFiles[self.c_KEYWORD_CV_OUT_FILE] = cvOutFile.strip("\"")
+        generatedFiles[self.c_KEYWORD_CV_PNG_FILE] = cvImageFile.strip("\"")
+
+        #Create model
+        if(tempProbabilistic):
+            cmd = ["\""+self.c_SVM_TRAIN_LOCATION+"\"","-s",self.c_C_SVC,"-t",self.c_LINEAR_KERNEL,"-c",str(bestCost),"-b",self.c_SVC_PROBABILITY_ESTIMATES,scaledFile,modelFile]
+        else:
+            cmd = ["\""+self.c_SVM_TRAIN_LOCATION+"\"","-s",self.c_C_SVC,"-t",self.c_LINEAR_KERNEL,"-c",str(bestCost),scaledFile,modelFile]
+        print cmd
+        noError = shell.runPipedCommandLine(tempCommand = cmd)
+        if(noError == False):
+            print "".join(["Received error during cross validation on scaled file. Command=",str(cmd)])
+            return False
+        generatedFiles[self.c_KEYWORD_MODEL_FILE] = modelFile.strip("\"")
+
+        #Return generated files
+        return generatedFiles
+
+    def predictFromLinearModel(self, tempDataFileName=None, tempModelFileName=None, tempRangeFileName=None, tempProbabilistic=False):
+        #ValidateData
+        if(not ValidateData.ValidateData.isValidFileName(tempDataFileName)):
+            print "".join(["The data file ",tempDataFileName," is not a valid file name."])
+            return False
+        if(not ValidateData.ValidateData.isValidString(tempModelFileName)):
+            print "".join(["The model file ",tempModelFileName," is not a valid file name."])
+            return False
+        if(not ValidateData.ValidateData.isValidString(tempRangeFileName)):
+            print "".join(["The range file ",tempRangeFileName," is not a valid file name."])
+            return False
+
+        #Get file prefix
+        dataFileNamePrefix = Utility_File.Utility_File.getFileNamePrefix(tempDataFileName)
+
+        #Associated files
+        generatedFiles = dict()
+
+        #Create output file names
+        modelFile = "\""+tempModelFileName+"\""
+        dataFile = "\""+tempDataFileName+"\""
+        scaledFile = "\""+dataFileNamePrefix+self.c_SCALED_FOR_PREDICTION_FILE_EXT+"\""
+        rangeFile = "\""+tempRangeFileName+"\""
+        predictFile = "\""+dataFileNamePrefix+self.c_PREDICT_FILE_EXT+"\""
+
+        #Create Commandline interface
+        shell = CommandLine.CommandLine()
+
+        #Scale data
+        cmd = [self.c_SVM_SCALE,"-r",rangeFile,dataFile,">",scaledFile]
+        print "SCALE "+str(cmd)
+        noError = shell.runPipedCommandLine(tempCommand = cmd)
+        if(noError == False):
+            print "".join(["Received error during scaling. Command=",cmd])
+            return False
+        generatedFiles[self.c_KEYWORD_PREDICTION_SCALED_FILE] = scaledFile.strip("\"")
+        
+        #Predict data
+        if(tempProbabilistic):
+            cmd = [self.c_SVM_PREDICT_LOCATION,"-b",self.c_SVC_PROBABILITY_ESTIMATES,scaledFile,modelFile,predictFile]
+        else:
+            cmd = [self.c_SVM_PREDICT_LOCATION,scaledFile,modelFile,predictFile]
+        print "PREDICT "+str(cmd)
+        noError = shell.runPipedCommandLine(tempCommand = cmd)
+        if(noError == False):
+            print "".join(["Received error during cross validation on scaled file. Command=",cmd])
+            return False
+        generatedFiles[self.c_KEYWORD_PREDICTION_FILE] = predictFile.strip("\"")
+        return generatedFiles
+
+    #Converts abundance files to input SVM files.
+    #@tempInputFile Abundance file to read (should be a standard Qiime output abundance table)
+    #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
+    #@tempDelimiter Delimiter of the Abundance table
+    #@tempLabels Ordered labels to use to classify the samples in the abundance table
+    #@tempFirstDataRow The index of the first row in the abundance table representing data
+    #@tempSkipFirstColumn Boolean Indicates to skip the first column (true) (for instance if it contains taxonomy identifiers)
+    #@tempNormalize Boolean to indicate if the abundance data should be normalized (true) before creating the file (normalized by total sample abundance)
+    @staticmethod
+    def convertAbundanceFileToSVMFile(tempInputFile=None, tempOutputSVMFile=None, tempDelimiter=None, tempLabels=None, tempFirstDataRow=None, tempSkipFirstColumn = True, tempNormalize=None):
+        #Validate parameters
+        if(not ValidateData.ValidateData.isValidFileName(tempInputFile)):
+            print "Error, file not valid. File:"+str(tempInputFile)
+            return False
+        if(not ValidateData.ValidateData.isValidString(tempOutputSVMFile)):
+            print "Error, file not valid. File:"+str(tempOutputSVMFile)
+            return False
+        if(not ValidateData.ValidateData.isValidStringType(tempDelimiter)):
+            print "Error, tempDelimiter was invalid. Value ="+str(tempDelimiter)
+            return False
+        if(not ValidateData.ValidateData.isValidList(tempLabels)):
+            print "Error, tempNameRow was invalid. Value ="+str(tempLabels)
+            return False
+        if(not ValidateData.ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
+            print "Error, tempFirstDataRow was invalid. Value ="+str(tempFirstDataRow)
+            return False
+        if(not ValidateData.ValidateData.isValidBoolean(tempNormalize)):
+            print "Error, tempNormalize was invalid. Value ="+str(tempNormalize)
+            return False
+        if(not ValidateData.ValidateData.isValidBoolean(tempSkipFirstColumn)):
+            print "Error, tempSkipFirstColumn was invalid. Value ="+str(tempSkipFirstColumn)
+            return False
+
+        #Read in file
+        inputRead = FileIO.FileIO(tempInputFile,True, False, False)
+        contents = inputRead.readFullFile()
+        inputRead.close()
+
+        #If output file exists, delete
+        if(os.path.exists(tempOutputSVMFile)):
+            os.remove(tempOutputSVMFile)
+
+        #Turn to lines of the file
+        contents = contents.replace("\"","")
+        contents = contents.split(Constants.Constants.ENDLINE)
+
+        #Run through data and create a list of column lists
+        columnCount = len(contents[tempFirstDataRow].split(tempDelimiter))
+        startingColumn = 0
+        if(tempSkipFirstColumn == True):
+            columnCount = columnCount - 1
+            startingColumn = 1
+
+        #Create data matrix
+        dataMatrix = list()
+
+        #Add labels
+        for labelIndex in xrange(0,len(tempLabels)):
+            dataMatrix.append([str(tempLabels[labelIndex])])
+
+        if(tempNormalize==True):
+            #Add data as numeric and normalize
+            for lineIndex in xrange(tempFirstDataRow,len(contents)):
+                columns = contents[lineIndex].split(tempDelimiter)
+                for columnIndex in xrange(startingColumn,len(columns)):
+                    dataMatrix[columnIndex-startingColumn].append(float(columns[columnIndex]))
+            
+            #Write to file
+            output = FileIO.FileIO(tempOutputSVMFile,False,True,True)
+            for numericData in dataMatrix:
+                outputString = str(numericData[0])
+                dataNoLabel=numericData[1:]
+
+                columnSum = sum(dataNoLabel)
+                for normalizedDataIndex in xrange(0,len(dataNoLabel)):
+                    if(columnSum > 0):
+                        outputString = "".join([outputString," ",str(normalizedDataIndex+1),":",str(dataNoLabel[normalizedDataIndex]/columnSum)])
+                    else:
+                        outputString = "".join([outputString," ",str(normalizedDataIndex+1),":",str(dataNoLabel[normalizedDataIndex])])
+                output.writeToFile(outputString+"\n")
+            output.close()
+            return True
+        else:
+            #Add data
+            for lineIndex in xrange(tempFirstDataRow,len(contents)):
+                columns = contents[lineIndex].split(tempDelimiter)
+                for columnIndex in xrange(startingColumn,len(columns)):
+                    dataMatrix[columnIndex-startingColumn].append("".join([str(lineIndex+1-tempFirstDataRow),":",str(columns[columnIndex])]))
+
+            #Output file
+            output = FileIO.FileIO(tempOutputSVMFile,False,True,True)
+            [output.writeToFile(" ".join(dataColumn)+"\n") for dataColumn in dataMatrix]
+            output.close()
+            return True
