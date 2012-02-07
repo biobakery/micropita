@@ -47,9 +47,6 @@ class PCoATest(unittest.TestCase):
         #Plot
         analysis.plot(tempPlotName="./testData/PCoA/testPCoAFromArray.png")
 
-        #Plot data
-#        analysis.plot()
-
         #Generate result
         result = ""
 

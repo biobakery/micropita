@@ -30,7 +30,6 @@ import re
 import scipy.cluster.hierarchy as hcluster
 from SVM import SVM
 import sys
-from Utility_File import Utility_File
 from ValidateData import ValidateData
 
 
@@ -68,18 +67,23 @@ class MicroPITA:
     c_strTaxa = "Taxa_Defined"
 
     #Technique Names
-    c_DIVERSITY_1 = "".join([c_strDiversity," I"])
-    c_DIVERSITY_2 = "".join([c_strDiversity," C"])
-    c_EXTREME_DISSIMILARITY_1 = "".join([c_strExtremeDissimilarity," B"])
-    c_EXTREME_DISSIMILARITY_2 = "".join([c_strExtremeDissimilarity," U"])
-    c_EXTREME_DISSIMILARITY_3 = "".join([c_strExtremeDissimilarity," W"])
-    c_REPRESENTATIVE_DISSIMILARITY_1 = "".join([c_strRepresentativeDissimilarity," B"])
-    c_REPRESENTATIVE_DISSIMILARITY_2 = "".join([c_strRepresentativeDissimilarity," U"])
-    c_REPRESENTATIVE_DISSIMILARITY_3 = "".join([c_strRepresentativeDissimilarity," W"])
+    c_DIVERSITY_1 = "".join([c_strDiversity,"_I"])
+    c_DIVERSITY_2 = "".join([c_strDiversity,"_C"])
+    c_EXTREME_DISSIMILARITY_1 = "".join([c_strExtremeDissimilarity,"_B"])
+    c_EXTREME_DISSIMILARITY_2 = "".join([c_strExtremeDissimilarity,"_U"])
+    c_EXTREME_DISSIMILARITY_3 = "".join([c_strExtremeDissimilarity,"_W"])
+    c_REPRESENTATIVE_DISSIMILARITY_1 = "".join([c_strRepresentativeDissimilarity,"_B"])
+    c_REPRESENTATIVE_DISSIMILARITY_2 = "".join([c_strRepresentativeDissimilarity,"_U"])
+    c_REPRESENTATIVE_DISSIMILARITY_3 = "".join([c_strRepresentativeDissimilarity,"_W"])
     c_RANDOM = c_strRandom
     c_USER_RANKED = c_strTaxa
     c_SVM_CLOSE = c_strDiscriminant
     c_SVM_FAR = c_strDistinct
+
+    #Converts ecology metrics into standardized method selection names
+    convertAMetricDiversity = {c_INV_SIMPSON_A_DIVERSITY:c_DIVERSITY_1, c_CHAO1_A_DIVERSITY:c_DIVERSITY_2}
+    convertBMetricRepresentative = {c_BRAY_CURTIS_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_1, c_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_2, c_WEIGHTED_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_3}
+    convertBMetricExtreme = {c_INVERSE_BRAY_CURTIS_B_DIVERSITY:c_EXTREME_DISSIMILARITY_1, c_INVERSE_UNIFRAC_B_DIVERSITY:c_EXTREME_DISSIMILARITY_2, c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY:c_EXTREME_DISSIMILARITY_3}
 
     #Used to store scores and pvalues
     c_SCORE_INDEX = 0
@@ -537,7 +541,7 @@ class MicroPITA:
             print "RunMicroPITA.runSVM: Prediction files were false."
         return modelFiles
 
-    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strSelectionTechnique=None, iSampleSelectionCount=0):
+    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, strSelectionTechnique=None):
         #microPITA object
         microPITA = MicroPITA()
 
@@ -564,27 +568,38 @@ class MicroPITA:
         diversityMetricsBetaNoNormalize = []#microPITA.c_UNIFRAC_B_DIVERSITY]#, microPITA.c_WEIGHTED_UNIFRAC_B_DIVERSITY]
         inverseDiversityMetricsBetaNoNormalize = []
 
+        #Targeted taxa
+        userDefinedTaxa = []
+
         #Perform different flows flags
         c_RUN_MAX_DIVERSITY_1 = False
-        if(strSelectionTechnique == microPITA.c_strDiversity):
+        if(microPITA.c_strDiversity in strSelectionTechnique):
             c_RUN_MAX_DIVERSITY_1 = True
         c_RUN_REPRESENTIVE_DISSIMILARITY_2 = False
-        if(strSelectionTechnique == microPITA.c_strRepresentativeDissimilarity):
+        if(microPITA.c_strRepresentativeDissimilarity in strSelectionTechnique):
             c_RUN_REPRESENTIVE_DISSIMILARITY_2 = True
         c_RUN_MAX_DISSIMILARITY_3 = False
-        if(strSelectionTechnique == microPITA.c_strExtremeDissimilarity):
+        if(microPITA.c_strExtremeDissimilarity in strSelectionTechnique):
             c_RUN_MAX_DISSIMILARITY_3 = True
         c_RUN_RANK_AVERAGE_USER_4 = False
-        if(strSelectionTechnique == microPITA.c_strTaxa):
+        if(microPITA.c_strTaxa in strSelectionTechnique):
             c_RUN_RANK_AVERAGE_USER_4 = True
+            if(strUserDefinedTaxaFile == None):
+                c_RUN_RANK_AVERAGE_USER_4 = False
+                print("Error No taxa file was given for taxa selection.")
+            #Read in taxa list, break down to lines and filter out empty strings
+            fhndlTaxaInput = open(strUserDefinedTaxaFile,'r')
+            userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
+            fhndlTaxaInput.close()
+
         c_RUN_RANDOM_5 = False
-        if(strSelectionTechnique == microPITA.c_strRandom):
+        if(microPITA.c_strRandom in strSelectionTechnique):
             c_RUN_RANDOM_5 = True
         c_RUN_DISTINCT = False
-        if(strSelectionTechnique == microPITA.c_strDistinct):
+        if(microPITA.c_strDistinct in strSelectionTechnique):
             c_RUN_DISTINCT = True
         c_RUN_DISCRIMINANT = False
-        if(strSelectionTechnique == microPITA.c_strDiscriminant):
+        if(microPITA.c_strDiscriminant in strSelectionTechnique):
             c_RUN_DISCRIMINANT = True
 
         #Abundance table object to read in and manage data
@@ -592,7 +607,7 @@ class MicroPITA:
 
         #Input file path components
         inputFileComponents = os.path.split(strInputAbundanceFile)
-        inputFilePrefix = Utility_File.getFileNamePrefix(strInputAbundanceFile)
+        inputFilePrefix = inputFileComponents[0]
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
@@ -637,7 +652,8 @@ class MicroPITA:
                 mostDiverseAlphaSamplesIndexesNoNorm = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=sampleNames, tempTopAmount=sampleSelectionCount)
                 #Add to results
                 for index in xrange(0,len(diversityMetricsAlphaNoNormalize)):
-                    selectedSamples[diversityMetricsAlphaNoNormalize[index]] = mostDiverseAlphaSamplesIndexesNoNorm[index]
+                    astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlphaNoNormalize[index]]
+                    selectedSamples[astrSelectionMethod] = mostDiverseAlphaSamplesIndexesNoNorm[index]
 
             if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
                 #Run KMedoids with custom distance metric in unnormalized space
@@ -648,7 +664,8 @@ class MicroPITA:
                     medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=transposedAbundance, tempMetric=bMetric, tempSampleNames=sampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
 
                     if(not medoidSamples == False):
-                        selectedSamples[bMetric]=medoidSamples
+                        astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
+                        selectedSamples[astrSelectionMethod]=medoidSamples
 
             if(c_RUN_MAX_DISSIMILARITY_3):
                 #Run HClust with inverse custom distance metric in unnormalized space
@@ -666,7 +683,8 @@ class MicroPITA:
 
                     #Add selected samples
                     if(not extremeSamples == False):
-                        selectedSamples[bMetric] = extremeSamples
+                        astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
+                        selectedSamples[astrSelectionMethod] = extremeSamples
 
         print("Selected Samples 1,2,3a")
         print(selectedSamples)
@@ -690,7 +708,8 @@ class MicroPITA:
 
             #Add to results
             for index in xrange(0,len(diversityMetricsAlpha)):
-                selectedSamples[diversityMetricsAlpha[index]] = mostDiverseAlphaSamplesIndexes[index]
+                astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlpha[index]]
+                selectedSamples[astrSelectionMethod] = mostDiverseAlphaSamplesIndexes[index]
 
         print("Selected Samples 1b")
         print(selectedSamples)
@@ -710,7 +729,8 @@ class MicroPITA:
                     medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=transposedAbundance, tempMetric=bMetric, tempSampleNames=sampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
 
                     if(not medoidSamples == False):
-                        selectedSamples[bMetric] = medoidSamples
+                        astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
+                        selectedSamples[astrSelectionMethod] = medoidSamples
 
             #Get extreme selection using clusters, tiling
             if(c_RUN_MAX_DISSIMILARITY_3):
@@ -725,7 +745,8 @@ class MicroPITA:
 
                     #Add selected samples
                     if(not extremeSamples == False):
-                        selectedSamples[bMetric] = extremeSamples
+                        astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
+                        selectedSamples[astrSelectionMethod] = extremeSamples
 
         print("Selected Samples 2,3b")
         print(selectedSamples)
@@ -736,20 +757,14 @@ class MicroPITA:
         #Returns [(sample name,average,rank)]
         if(c_RUN_RANK_AVERAGE_USER_4):
 
-            if(False):
-                #Rank the samples
-                userRankedSamples = microPITA.getRankAverageSamples(tempMatrix=microPITA.reduceToTaxa(tempMatrix=abundance, tempTaxa=userDefinedTaxa))
-
-                #Select the top samples
-                topRankedSamples = userRankedSamples[0:(sampleSelectionCount)]
-                topRankedSamplesNames = np.compress([True,False,False],topRankedSamples,axis=1)
-                selectedSamples[microPITA.c_USER_RANKED] = [item for sublist in topRankedSamplesNames for item in sublist]
-            else:
-                userRankedSamples = microPITA.getAverageRanksSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa)
-                #Select the top samples
-                topRankedSamples = userRankedSamples[0:(sampleSelectionCount)]
-                topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
-                selectedSamples[microPITA.c_USER_RANKED] = [item for sublist in topRankedSamplesNames for item in sublist]
+            if(len(userDefinedTaxa) < 1):
+                print("Error Taxa defined selection was requested but no taxa were given.")
+            #Rank the samples
+            userRankedSamples = microPITA.getAverageRanksSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa)
+            #Select the top samples
+            topRankedSamples = userRankedSamples[0:(sampleSelectionCount)]
+            topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
+            selectedSamples[microPITA.c_USER_RANKED] = [item for sublist in topRankedSamplesNames for item in sublist]
 
         print("Selected Samples 4")
         print(selectedSamples)
@@ -769,10 +784,10 @@ class MicroPITA:
         #Expects input file's matrix to be Taxa (row) by Sample (col) with a taxa id column (index=0)
         #TODO Currently uses the lowest index metadata row as the labels
         if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-            #Get file prefix
-            inputFileNamePrefix = Utility_File.getFileNamePrefix(strInputAbundanceFile)
+            #Get file name without extention
+            strTail = os.path.split(strInputAbundanceFile)[1]
             #Run linear SVM
-            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile=inputFileNamePrefix+"-SVM.txt", tempMatrixLabels=metadata[0], tempFirstDataRow=c_FIRST_DATA_ROW, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
+            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[0], tempFirstDataRow=c_FIRST_DATA_ROW, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
             #Read in prediction file and select samples
             #Selecting samples most ambiguous to all hyperplanes
             if(not svmRelatedData == False):
@@ -861,27 +876,27 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 
 #Arguments
 #Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", 
-    nargs = "?", default = sys.stdout, help = "An optional output file" )
+argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
 #Abundance file
-argp.add_argument( "strFileAbund", metavar = "Abundance_file",
-    help = "An abundance table." )
+argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = "An abundance table." )
 #Taxa file
 argp.add_argument( "strFileTaxa", metavar = "Taxa_file",
     help = "A file containing taxa to be used in taxa-directed selection." )
-#Selection parameter
-argp.add_argument( "strSelection", metavar = "Selection_Method", help = "Select technique." )
+#Temporary folder
+argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directory to place temporary and intermediate files.")
 #Select count
 argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
+#Selection parameter
+argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
-    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strSelectionTechnique=args.strSelection, iSampleSelectionCount=args.icount)
+    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=args.icount, strSelectionTechnique=args.strSelection)
     strOutputContent = ""
     for sKey in dictSelectedSamples:
-        strOutputContent = "".join([strOutputContent,sKey,Constants.COLON,Constants.ENDLINE,", ".join(dictSelectedSamples[sKey]),Constants.ENDLINE])
+        strOutputContent = "".join([strOutputContent,sKey,Constants.COLON,", ".join(dictSelectedSamples[sKey]),Constants.ENDLINE])
 
     #Write to file
     if(not strOutputContent == ""):

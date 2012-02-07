@@ -45,9 +45,12 @@ class Constants():
     LOG_TEST_CONFIGURE_FILE = CONFIG_DIRECTORY + "TestConfigureFile.xml"
 
     #File Constants
-    ENDLINE = "\n"
     COLON = ":"
+    COMMA = ","
+    ENDLINE = "\n"
     FASTA_ID_LINE_START = ">"
+    PATH_SEP = "/"
+    QUOTE = "\""
     TAB = '\t'
     WHITE_SPACE = " "
 
