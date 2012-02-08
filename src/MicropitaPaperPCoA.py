@@ -70,6 +70,8 @@ def _main( ):
 
     c_ColorScale = 100
 
+    c_NotSelected = "Not_Selected"
+
     #Read abundance file
     #Abundance table object to read in and manage data
     rawData = AbundanceTable()
@@ -89,26 +91,30 @@ def _main( ):
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
     #Draw known truths
-    #Draw labeling
+    #Draw labeling from metadata
     iMetadataIndex = 0
     for asMetadata in metadata:
         #Get uniqueValues
         acharUniqueValues = list(set(asMetadata))
         iCountUniqueValues = len(acharUniqueValues)
+
         #Get colors
-        atupldColors = [cm.jet(c_ColorScale*iUniqueValueIndex) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+        atupldColors = [PCoA.RGBToHex(cm.jet(c_ColorScale*iUniqueValueIndex)) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+
         #Make label coloring
         atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in asMetadata ]
 
         #Plot
         iMetadataIndex = iMetadataIndex +1
-        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(iMetadataIndex),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape)
+        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(iMetadataIndex),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape, tempColorLabels=asMetadata)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
     for strSelectionMethod in lstrSelection:
         #Colors
         acharColors = []
+        #Labels
+        acharLabels = []
 
         #Color for selected samples in PCoA based on selection method
         charSelectedColor = ""
@@ -138,11 +144,13 @@ def _main( ):
         for strSample in sampleNames:
             if(strSample in astrSelectedSamples):
                 acharColors.append(charSelectedColor)
+                acharLabels.append(astrSelectionMethod[0])
             else:
                 acharColors.append(Constants_Figures.c_charPCOANoSelect)
+                acharLabels.append(c_NotSelected)
 
         #Draw PCoA
-        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape)
+        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempColorLabels=acharLabels, tempLegendLocation="lower left")
 
 if __name__ == "__main__":
     _main( )

@@ -20,6 +20,7 @@ from cogent.cluster.nmds import NMDS
 from scipy.spatial.distance import squareform
 from ValidateData import ValidateData
 from matplotlib import pyplot as plt
+import re
 
 #To run PCoA first load the raw data or distance matrix using the "load" method, 
 #  then use the "run" method to derive points, and then use "plot" to plot the graph.
@@ -141,14 +142,58 @@ class PCoA:
     #@params tempPlotName A valid file path to save the image of the plot
     def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempColorLabels=["Green"], tempShapeLabels=["Circle"], tempLegendLocation="upper right"):
         if(not self.pcoa == None):
+            print("tempColorLabels")
+            print(tempColorLabels)
             adPoints = self.pcoa.getPoints()
+            iPointCount = len(adPoints[:,0])
             imgFigure = plt.figure()
             imgSubplot = imgFigure.add_subplot(111)
-            if(ValidateData.isValidList(tempShape)):
-                if(len(tempShape) == len(adPoints[:,0])):
-                    for iShapeIndex in xrange(0,len(tempShape)):
-                        imgSubplot.scatter(adPoints[:,0][iShapeIndex],adPoints[:,1][iShapeIndex], c=tempColorGrouping[iShapeIndex], marker=tempShape[iShapeIndex])
+            #Plot colors seperately so the legend will pick up on the labels and make a legend
+            if(ValidateData.isValidList(tempColorGrouping)):
+                if len(tempColorGrouping) == iPointCount:
+                    #Get unique colors and plot each individually
+                    acharUniqueColors = list(set(tempColorGrouping))
+                    for iColorIndex in xrange(0,len(acharUniqueColors)):
+                        aiColorPointPositions = self.getIndices(tempColorGrouping,acharUniqueColors[iColorIndex])
+                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiColorPointPositions),self.reduceList(adPoints[:,1],aiColorPointPositions), c=[acharUniqueColors[iColorIndex]], marker=tempShape, label=tempColorLabels[tempColorGrouping.index(acharUniqueColors[iColorIndex])])
             else:
-                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape)
-            imgSubplot.legend(loc=tempLegendLocation)
+                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape, label=tempColorLabels)
+#            if(ValidateData.isValidList(tempShape)):
+#                if(len(tempShape) == len(adPoints[:,0])):
+#                    for iShapeIndex in xrange(0,len(tempShape)):
+#                        imgSubplot.scatter(adPoints[:,0][iShapeIndex],adPoints[:,1][iShapeIndex], c=tempColorGrouping[iShapeIndex], marker=tempShape[iShapeIndex])
+#            else:
+#                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape)
+            imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
             imgFigure.savefig(tempPlotName)
+
+    #TODO put in utilities
+    #Returns the indicies of the element in the array as a list
+    def getIndices(self, aList, dataElement):
+        aretIndices = []
+        for dataIndex in xrange(0,len(aList)):
+            if(aList[dataIndex] == dataElement):
+                aretIndices.append(dataIndex)
+        return aretIndices
+
+    #TODO put in utilities
+    def reduceList(self, aList, dataIndicies):
+        aretList = []
+        for dataIndex in xrange(0,len(dataIndicies)):
+            aretList.append(aList[dataIndicies[dataIndex]])
+        return aretList
+
+    #TODO put in utilities
+    @staticmethod
+    def RGBToHex(adColor, charAlpha = "99"):
+        charR = (hex(int(adColor[0]*255)))[2:]
+        if(str(charR) == "0"):
+            charR = "00"
+        charG = (hex(int(adColor[1]*255)))[2:]
+        if(str(charG) == "0"):
+            charG = "00"
+        charB = (hex(int(adColor[2]*255)))[2:]
+        if(str(charB) == "0"):
+            charB = "00"
+        return "".join(["#",charR, charG, charB])
+
