@@ -17,6 +17,7 @@ from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
 from Constants_Figures import Constants_Figures
+import matplotlib.cm as cm
 from MicroPITA import MicroPITA
 import os
 from PCoA import PCoA
@@ -54,31 +55,58 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 def _main( ):
     args = argp.parse_args( )
 
+    #Analysis object
+    analysis = PCoA()
+
     #Read in selection file
     fHndlInput = open(args.strSelectionFile,'r')
     strSelection = fHndlInput.read()
     fHndlInput.close()
 
+    c_iNameRow = 0
+    c_iFirstDataRow = 2
+    c_fNormalize = True
+    c_fCheckFile = False
+
+    c_ColorScale = 100
+
     #Read abundance file
     #Abundance table object to read in and manage data
     rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=0, tempFirstDataRow=2, tempNormalize=True)
+    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=c_iNameRow, tempFirstDataRow=c_iFirstDataRow, tempNormalize=c_fNormalize)
     sampleNames = abundance.dtype.names[1:]
+
+    #Shapes
+    acharShape = Constants_Figures.c_charPCOAShape
 
     #File path components
     asFilePathPieces = os.path.splitext(args.strOutFile)
 
+    #Generate PCoA
+    #LoadData
+    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=c_iNameRow, tempFirstDataRow=c_iFirstDataRow, tempNormalize=c_fNormalize, tempCheckFile=c_fCheckFile)
+    #Make distance matrix
+    pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
+
     #Draw known truths
     #Draw labeling
+    iMetadataIndex = 0
     for asMetadata in metadata:
-        
-#    print("metadata")
-#    print(metadata)
+        #Get uniqueValues
+        acharUniqueValues = list(set(asMetadata))
+        iCountUniqueValues = len(acharUniqueValues)
+        #Get colors
+        atupldColors = [cm.jet(c_ColorScale*iUniqueValueIndex) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+        #Make label coloring
+        atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in asMetadata ]
+
+        #Plot
+        iMetadataIndex = iMetadataIndex +1
+        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(iMetadataIndex),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
     for strSelectionMethod in lstrSelection:
-
         #Colors
         acharColors = []
 
@@ -113,11 +141,8 @@ def _main( ):
             else:
                 acharColors.append(Constants_Figures.c_charPCOANoSelect)
 
-        #Shapes
-        acharShape = Constants_Figures.c_charPCOAShape
-
-        #Generate PCoA
-        MicropitaPaperPCoA().funcPCoAMethods(strInputFile = args.strFileAbund, strOutputFile = "".join([asFilePathPieces[0],"-",astrSelectionMethod[0],"-",asFilePathPieces[1]]), acharColors = acharColors, charShape = acharShape, fRawData = True, charDelimiter = Constants.TAB, iNameRow = 0, firstDataRow = 2, fNormalize = False, fCheckFile = False)
+        #Draw PCoA
+        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape)
 
 if __name__ == "__main__":
     _main( )

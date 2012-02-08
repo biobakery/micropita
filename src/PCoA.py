@@ -139,7 +139,7 @@ class PCoA:
         return False
 
     #@params tempPlotName A valid file path to save the image of the plot
-    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o'):
+    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempColorLabels=["Green"], tempShapeLabels=["Circle"], tempLegendLocation="upper right"):
         if(not self.pcoa == None):
             adPoints = self.pcoa.getPoints()
             imgFigure = plt.figure()
@@ -150,4 +150,5 @@ class PCoA:
                         imgSubplot.scatter(adPoints[:,0][iShapeIndex],adPoints[:,1][iShapeIndex], c=tempColorGrouping[iShapeIndex], marker=tempShape[iShapeIndex])
             else:
                 imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape)
+            imgSubplot.legend(loc=tempLegendLocation)
             imgFigure.savefig(tempPlotName)
