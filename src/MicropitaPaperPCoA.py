@@ -22,21 +22,6 @@ from MicroPITA import MicroPITA
 import os
 from PCoA import PCoA
 
-class MicropitaPaperPCoA:
-    """
-    Generate PCoA plots
-    """
-
-    def funcPCoAMethods(self, strInputFile = None, strOutputFile = None, acharColors = None, charShape = None, fRawData = True, charDelimiter = Constants.TAB, iNameRow = 0, firstDataRow = 1, fNormalize = True, fCheckFile = True):
-        #Analysis object
-        analysis = PCoA()
-        #LoadData
-        analysis.loadData(tempReadData=strInputFile, tempIsRawData=fRawData, tempDelimiter=charDelimiter, tempNameRow=iNameRow, tempFirstDataRow=firstDataRow, tempNormalize=fNormalize, tempCheckFile=fCheckFile)
-        #Run Analysis
-        pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
-        #Plot
-        analysis.plot(tempPlotName=strOutputFile, tempColorGrouping=acharColors, tempShape=charShape)
-
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperPCoA.py", 
     description = """Creates PCoA plots for MicroPITA results.""" )

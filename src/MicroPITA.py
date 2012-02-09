@@ -832,7 +832,7 @@ class MicroPITA:
                     #Sort sample by summed absolute deviations from the center and take the top N indexes
                     for scurKey in centralDeviation:
                         lcurLabeSamples = centralDeviation[scurKey]
-                        centralDeviation[scurKey] =  sorted(lcurLabeSamples, key=operator.itemgetter(0))
+                        centralDeviation[scurKey] = sorted(lcurLabeSamples, key=operator.itemgetter(0))
 
                     selectedSamplesIndicesClose = list()
                     selectedSamplesIndicesFar = list()

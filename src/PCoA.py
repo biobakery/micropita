@@ -158,12 +158,7 @@ class PCoA:
                         imgSubplot.scatter(self.reduceList(adPoints[:,0],aiColorPointPositions),self.reduceList(adPoints[:,1],aiColorPointPositions), c=[acharUniqueColors[iColorIndex]], marker=tempShape, label=tempColorLabels[tempColorGrouping.index(acharUniqueColors[iColorIndex])])
             else:
                 imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape, label=tempColorLabels)
-#            if(ValidateData.isValidList(tempShape)):
-#                if(len(tempShape) == len(adPoints[:,0])):
-#                    for iShapeIndex in xrange(0,len(tempShape)):
-#                        imgSubplot.scatter(adPoints[:,0][iShapeIndex],adPoints[:,1][iShapeIndex], c=tempColorGrouping[iShapeIndex], marker=tempShape[iShapeIndex])
-#            else:
-#                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape)
+
             imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
             imgFigure.savefig(tempPlotName)
 
