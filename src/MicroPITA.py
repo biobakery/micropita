@@ -19,6 +19,7 @@ import argparse
 from Constants import Constants
 from Diversity import Diversity
 from FileIO import FileIO
+import logging
 import math
 import mlpy
 from MLPYDistanceAdaptor import MLPYDistanceAdaptor
@@ -888,12 +889,28 @@ argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directo
 argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
 #Selection parameter
 argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
+#Optional parameter for logging
+argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
+                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+
+    #Set up logger
+    iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
+    if not isinstance(iLogLevel, int):
+        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
+
+    logging.info("Start microPITA")
     dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=args.icount, strSelectionTechnique=args.strSelection)
+    logging.info("End microPITA")
+
+    logging.debug("".join(["Returned the following samples:",str(dictSelectedSamples)]))
+
     strOutputContent = ""
     for sKey in dictSelectedSamples:
         strOutputContent = "".join([strOutputContent,sKey,Constants.COLON,", ".join(dictSelectedSamples[sKey]),Constants.ENDLINE])
@@ -903,6 +920,7 @@ def _main( ):
         fHndlOutput = open(args.strOutFile,'w')
         fHndlOutput.write(str(strOutputContent))
         fHndlOutput.close()
+    logging.debug("".join(["Selected samples output to file:",args.strOutFile]))
 
 if __name__ == "__main__":
     _main( )
