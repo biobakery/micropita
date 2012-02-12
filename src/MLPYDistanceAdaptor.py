@@ -13,7 +13,6 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #External libraries
-import Diversity
 from scipy.spatial.distance import squareform
 
 #This allows one to use custom distance metrics with Kmediods

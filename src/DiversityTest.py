@@ -13,9 +13,9 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
-import Constants
-import Diversity
-import FileIO
+from Constants import Constants
+from Diversity import Diversity
+from FileIO import FileIO
 import numpy as np
 import unittest
 
@@ -33,7 +33,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.1144"
 
         #Call method
-        result = Diversity.Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -48,7 +48,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.974338"
 
         #Call method
-        result = Diversity.Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -63,7 +63,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -78,7 +78,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -93,7 +93,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1/0.1144
 
         #Call method
-        result = Diversity.Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -108,7 +108,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1/0.974338
 
         #Call method
-        result = Diversity.Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -123,7 +123,7 @@ class DiversityTest(unittest.TestCase):
         answer = False
 
         #Call method
-        result = Diversity.Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -138,7 +138,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -153,7 +153,7 @@ class DiversityTest(unittest.TestCase):
         answer = "2.65980629671"
 
         #Call method
-        result = Diversity.Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -168,7 +168,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.0693716084143"
 
         #Call method
-        result = Diversity.Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -183,7 +183,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -198,7 +198,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -213,7 +213,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333]"
 
         #Call method
-        result = Diversity.Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -230,7 +230,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333  0.14285714  0.2       ]"
 
         #Call method
-        result = Diversity.Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -246,7 +246,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333  0.14285714  0.4         0.2         0.46666667  0.37142857]"
 
         #Call method
-        result = Diversity.Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -261,7 +261,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667]"
 
         #Call method
-        result = Diversity.Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -278,7 +278,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667  0.85714286  0.8       ]"
 
         #Call method
-        result = Diversity.Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -294,7 +294,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667  0.85714286  0.6         0.8         0.53333333  0.62857143]"
 
         #Call method
-        result = Diversity.Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -311,7 +311,7 @@ class DiversityTest(unittest.TestCase):
         answer = 16.25
 
         #Call method
-        result = Diversity.Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -327,7 +327,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -343,7 +343,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -361,7 +361,7 @@ class DiversityTest(unittest.TestCase):
         #[2,0,9]
         #[2,2,2]
         #Translates to this dictionary
-        envs = Constants.Constants.TEST_MICROPITA_DOCUMENTS+"unifracTestData/testQIIMEOTUAbundance.txt"
+        envs = Constants.TEST_MICROPITA_DOCUMENTS+"unifracTestData/testQIIMEOTUAbundance.txt"
 #        envs = {'B':{'sample1':10, 'sample2':2, 'sample3':2},
 #                'C':{'sample1':11,'sample2':0, 'sample3':2},
 #                'D':{'sample1':0, 'sample2':9, 'sample3':2}}
@@ -372,7 +372,7 @@ class DiversityTest(unittest.TestCase):
        [ 0.26666667,  0.2       ,  0.        ]]), ['sample1', 'sample2', 'sample3'])"""
 
         #Call method
-        result = Diversity.Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
+        result = Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
         result = str(result['distance_matrix'])
 
         #Check result against answer
@@ -382,16 +382,16 @@ class DiversityTest(unittest.TestCase):
     def nottestGetUnifracDistanceForGoodCaseHMP(self):
         
         #Newick tree
-        taxTree = Constants.Constants.INPUT_DATA_DIRECTORY+"HMPNewickTreeQiimeFormat/rep_set_v35-NoQuote.tre"
-        readTree = FileIO.FileIO(taxTree,True,False,False)
+        taxTree = Constants.INPUT_DATA_DIRECTORY+"HMPNewickTreeQiimeFormat/rep_set_v35-NoQuote.tre"
+        readTree = FileIO(taxTree,True,False,False)
         taxTree = readTree.readFullFile()
         readTree.close()
 
         #Translates to this dictionary
-        envs = Constants.Constants.INPUT_DATA_DIRECTORY+"HMPQiimeFormatAbundanceTable/otu_table_psn_v35.red.txt"
+        envs = Constants.INPUT_DATA_DIRECTORY+"HMPQiimeFormatAbundanceTable/otu_table_psn_v35.red.txt"
 
         #Call method
-        result = Diversity.Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
+        result = Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
         result = "Ran"
         answer = "Ran"
 

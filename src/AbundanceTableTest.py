@@ -13,12 +13,12 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
-import AbundanceTable
-import Constants
-import FileIO
+from AbundanceTable import AbundanceTable
+from Constants import Constants
+from FileIO import FileIO
 import os
 import unittest
-import Utility_File
+from Utility_File import Utility_File
 
 ##
 #Tests the Blog object
@@ -28,8 +28,8 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"
-        outputFile = Utility_File.Utility_File.getFileNamePrefix(inputFile)+Constants.Constants.OUTPUT_SUFFIX
-        delimiter = Constants.Constants.TAB
+        outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
+        delimiter = Constants.TAB
 
         #Remove output file before the test
         if(os.path.exists(outputFile)):
@@ -39,10 +39,10 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
 
         #Call method
-        AbundanceTable.AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
 
         #Get answer
-        readFile = FileIO.FileIO(outputFile,True,False,False)
+        readFile = FileIO(outputFile,True,False,False)
         result = readFile.readFullFile()
         readFile.close()
 
@@ -53,17 +53,17 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"
-        outputFile = Utility_File.Utility_File.getFileNamePrefix(inputFile)+Constants.Constants.OUTPUT_SUFFIX
-        delimiter = Constants.Constants.WHITE_SPACE
+        outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
+        delimiter = Constants.WHITE_SPACE
 
         #Correct Answer
         answer = "\"TID\" 700098986 700098984 700098982 700098980 700098988 700037470 700037472 700037474 700037476 700037478\n\"STSite\" \"L_Antecubital_fossa\" \"R_Retroauricular_crease\" \"L_Retroauricular_crease\" \"Subgingival_plaque\" \"R_Antecubital_fossa\" \"L_Retroauricular_crease\" \"R_Retroauricular_crease\" \"L_Antecubital_fossa\" \"R_Antecubital_fossa\" \"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\" 1 0 0 12 0 6 0 2 1 0\n\"Bacteria|unclassified|4904\" 0 10 0 43 6 0 23 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\" 3 0 0 29 0 45 0 1 1 0\n\"Bacteria|3417\" 0 45 0 34 3 0 0 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\" 5 0 0 2 0 6 0 1 1 0\n"
 
         #Call method
-        AbundanceTable.AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
 
         #Get answer
-        readFile = FileIO.FileIO(outputFile,True,False,False)
+        readFile = FileIO(outputFile,True,False,False)
         result = readFile.readFullFile()
         readFile.close()
 
@@ -78,11 +78,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         columnNames = []
 
         #Correct Answer
@@ -99,11 +99,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         columnNames = ["700098986"]
 
         #Correct Answer
@@ -120,11 +120,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         columnNames = ["700098986","700098980"]
 
         #Correct Answer
@@ -141,11 +141,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         columnNames = ["700098986","700098984","700098982","700098980","700098988","700037470","700037472","700037474","700037476","700037478"]
 
         #Correct Answer
@@ -162,11 +162,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        microPITA = AbundanceTable.AbundanceTable()
+        microPITA = AbundanceTable()
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
@@ -181,11 +181,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
-        microPITA = AbundanceTable.AbundanceTable()
+        microPITA = AbundanceTable()
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0),\n       ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
@@ -200,11 +200,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"
-        delimiter = Constants.Constants.WHITE_SPACE
+        delimiter = Constants.WHITE_SPACE
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        microPITA = AbundanceTable.AbundanceTable()
+        microPITA = AbundanceTable()
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
@@ -219,9 +219,9 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         stratifyRow = 1
-        table = AbundanceTable.AbundanceTable()
+        table = AbundanceTable()
 
         #Correct Answer is blank indicating no error
         answer = ""
@@ -243,10 +243,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check file creation
         error = ""
         if(os.path.exists(anteriorNaresFileName)):
-            read = FileIO.FileIO(anteriorNaresFileName,True,False,False)
+            read = FileIO(anteriorNaresFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(anteriorNaresFileNameAnswer,True,False,False)
+            read = FileIO(anteriorNaresFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -255,10 +255,10 @@ class AbundanceTableTest(unittest.TestCase):
             error = error + "\nFile count not be found. Path:"+anteriorNaresFileName
 
         if(os.path.exists(lAntecubitalFossaFileName)):
-            read = FileIO.FileIO(lAntecubitalFossaFileName,True,False,False)
+            read = FileIO(lAntecubitalFossaFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(lAntecubitalFossaFileNameAnswer,True,False,False)
+            read = FileIO(lAntecubitalFossaFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -267,10 +267,10 @@ class AbundanceTableTest(unittest.TestCase):
             error = error + "\nFile count not be found. Path:"+lAntecubitalFossaFileName
 
         if(os.path.exists(lRetroauricularCreaseFileName)):
-            read = FileIO.FileIO(lRetroauricularCreaseFileName,True,False,False)
+            read = FileIO(lRetroauricularCreaseFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(lRetroauricularCreaseFileNameAnswer,True,False,False)
+            read = FileIO(lRetroauricularCreaseFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -279,10 +279,10 @@ class AbundanceTableTest(unittest.TestCase):
             error = error + "\nFile count not be found. Path:"+lRetroauricularCreaseFileName
 
         if(os.path.exists(rAntecubitalFossaFileName)):
-            read = FileIO.FileIO(rAntecubitalFossaFileName,True,False,False)
+            read = FileIO(rAntecubitalFossaFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(rAntecubitalFossaFileNameAnswer,True,False,False)
+            read = FileIO(rAntecubitalFossaFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -291,10 +291,10 @@ class AbundanceTableTest(unittest.TestCase):
             error = error + "\nFile count not be found. Path:"+rAntecubitalFossaFileName
 
         if(os.path.exists(rRetroauricularCreaseFileName)):
-            read = FileIO.FileIO(rRetroauricularCreaseFileName,True,False,False)
+            read = FileIO(rRetroauricularCreaseFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(rRetroauricularCreaseFileNameAnswer,True,False,False)
+            read = FileIO(rRetroauricularCreaseFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -303,10 +303,10 @@ class AbundanceTableTest(unittest.TestCase):
             error = error + "\nFile count not be found. Path:"+rRetroauricularCreaseFileName
 
         if(os.path.exists(subgingivalPlaqueFileName)):
-            read = FileIO.FileIO(subgingivalPlaqueFileName,True,False,False)
+            read = FileIO(subgingivalPlaqueFileName,True,False,False)
             contents = read.readFullFile()
             read.close()
-            read = FileIO.FileIO(subgingivalPlaqueFileNameAnswer,True,False,False)
+            read = FileIO(subgingivalPlaqueFileNameAnswer,True,False,False)
             contentsAnswer = read.readFullFile()
             read.close()
             if(not contents == contentsAnswer):
@@ -326,11 +326,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         removeAdornment = False
 
         #Correct Answer
@@ -347,11 +347,11 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable.AbundanceTable()
+        data = AbundanceTable()
         removeAdornment = True
 
         #Correct Answer

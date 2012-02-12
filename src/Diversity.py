@@ -14,13 +14,13 @@ __status__ = "Development"
 
 #Update path
 import sys
-import Constants
+from Constants import Constants
 import numpy as np
-import ValidateData
-if(not Constants.Constants.COGENT_SRC in sys.path):
-    sys.path.append(Constants.Constants.COGENT_SRC)
-if(not Constants.Constants.QIIME_SRC in sys.path):
-    sys.path.append(Constants.Constants.QIIME_SRC)
+from ValidateData import ValidateData
+if(not Constants.COGENT_SRC in sys.path):
+    sys.path.append(Constants.COGENT_SRC)
+if(not Constants.QIIME_SRC in sys.path):
+    sys.path.append(Constants.QIIME_SRC)
 
 #External libraries
 from cogent.maths.stats.alpha_diversity import chao1_uncorrected, chao1_bias_corrected
@@ -76,7 +76,7 @@ class Diversity:
         if(simpsons == 0):
             return False
         #If simpsons is false return false, else return inverse
-        if(not ValidateData.ValidateData.isFalse(simpsons)):
+        if(not ValidateData.isFalse(simpsons)):
             simpsons = 1/simpsons
         return simpsons
 
@@ -161,7 +161,7 @@ class Diversity:
     @staticmethod
     def getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = None):
         bcValue = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = tempSampleTaxaAbundancies)
-        if(not ValidateData.ValidateData.isFalse(bcValue)):
+        if(not ValidateData.isFalse(bcValue)):
             #TODO Since brays curtis can get larger than 1, need to normalize this with a different value
             #TODO Need all inverses to be inverse in a specific way ... maybe multiplicative inverse is better
             return 1-bcValue
@@ -182,7 +182,7 @@ class Diversity:
         #Translate abundances into dict for unifrac
         #The following if clause code is from the qiime script convert_otu_table_to_unifrac_sample_mapping.py
         #Used it in this manner to avoid commandline calls and to tie directly into Qiime
-        if(ValidateData.ValidateData.isValidFileName(tempSampleTaxaAbundancies)):
+        if(ValidateData.isValidFileName(tempSampleTaxaAbundancies)):
             otuReader = open(tempSampleTaxaAbundancies, 'U')
             sample_ids, otu_ids, otu_table_array, lineages = parse_otu_table(otuReader, float)
             envs = format_unifrac_sample_mapping(sample_ids, otu_ids, otu_table_array)
@@ -191,7 +191,7 @@ class Diversity:
             #Convert to a dictionary for unifrac
             envs_Dict = dict()
             for mapping in envs:
-                elements = mapping.split(Constants.Constants.TAB)
+                elements = mapping.split(Constants.TAB)
                 if(len(elements) > 1):
                     if(not elements[0] in envs_Dict):
                         envs_Dict[elements[0]] = dict([[elements[1],int(float(elements[2]))]])

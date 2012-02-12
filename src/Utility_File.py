@@ -9,8 +9,8 @@
 #######################################################
 
 #Import libaries
-import FileIO
-import ValidateData
+from FileIO import FileIO
+from ValidateData import ValidateData
 #import Log
 import os
 import shutil
@@ -36,9 +36,9 @@ class Utility_File():
     def splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName):
 
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempNumberOfLines)):return False
-        if(not ValidateData.ValidateData.isValidString(tempOutputFileName)):return False
-        if(not ValidateData.ValidateData.isValidString(tempReadFileName)):return False
+        if(not ValidateData.isValidPositiveInteger(tempNumberOfLines)):return False
+        if(not ValidateData.isValidString(tempOutputFileName)):return False
+        if(not ValidateData.isValidString(tempReadFileName)):return False
 
         #If file exists
         if(False == os.path.isfile(tempReadFileName)):
@@ -51,12 +51,12 @@ class Utility_File():
         fileWriter = None
         fileReader = None
         try:
-            fileWriter = FileIO.FileIO(outputFileName,False,True,False)
+            fileWriter = FileIO(outputFileName,False,True,False)
         except:
             return False
 
         try:
-            fileReader = FileIO.FileIO(tempReadFileName,True,False,False)
+            fileReader = FileIO(tempReadFileName,True,False,False)
         except:
             fileWriter.close()
             return False
@@ -74,7 +74,7 @@ class Utility_File():
             lineCount = 0
             fileWriter.close()
             outputFileName = Utility_File.incrementFileName(outputFileName)
-            fileWriter = FileIO.FileIO(outputFileName,False,True,False)
+            fileWriter = FileIO(outputFileName,False,True,False)
 
         fileWriter.close()
         fileReader.close()
@@ -90,9 +90,9 @@ class Utility_File():
     def abridgeFile(tempNumberOfLines,tempReadFileName,tempOutputFileName):
 
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempNumberOfLines)):return False
-        if(not ValidateData.ValidateData.isValidString(tempOutputFileName)):return False
-        if(not ValidateData.ValidateData.isValidString(tempReadFileName)):return False
+        if(not ValidateData.isValidPositiveInteger(tempNumberOfLines)):return False
+        if(not ValidateData.isValidString(tempOutputFileName)):return False
+        if(not ValidateData.isValidString(tempReadFileName)):return False
 
         #If file exists
         if(False == os.path.isfile(tempReadFileName)):
@@ -102,12 +102,12 @@ class Utility_File():
         fileWriter = None
         fileReader = None
         try:
-            fileWriter = FileIO.FileIO(tempOutputFileName,False,True,False)
+            fileWriter = FileIO(tempOutputFileName,False,True,False)
         except:
             return False
 
         try:
-            fileReader = FileIO.FileIO(tempReadFileName,True,False,False)
+            fileReader = FileIO(tempReadFileName,True,False,False)
         except:
             fileWriter.close()
             return False
@@ -134,7 +134,7 @@ class Utility_File():
     @staticmethod
     def incrementFileName(tempFileName):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidString(tempFileName)):return False
+        if(not ValidateData.isValidString(tempFileName)):return False
         
         #Split to get extension and body of file name
         fileNamePieces = tempFileName.split(".")
@@ -172,7 +172,7 @@ class Utility_File():
     @staticmethod
     def getFileNamePrefix(tempFileName):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidString(tempFileName)):return False
+        if(not ValidateData.isValidString(tempFileName)):return False
         
         #Split to get extension and body of file name
         fileNamePieces = tempFileName.split(".")
@@ -192,11 +192,11 @@ class Utility_File():
     @staticmethod
     def combineFiles(tempOutputFileName = None, tempListOfFiles = None, tempRemoveHeaderLine = False):
         #check parameters
-        if( not ValidateData.ValidateData.isValidString(tempOutputFileName)):
+        if( not ValidateData.isValidString(tempOutputFileName)):
             return False
-        if( not ValidateData.ValidateData.isValidList(tempListOfFiles)):
+        if( not ValidateData.isValidList(tempListOfFiles)):
             return False
-        if( not ValidateData.ValidateData.isValidBoolean(tempRemoveHeaderLine)):
+        if( not ValidateData.isValidBoolean(tempRemoveHeaderLine)):
             return False
 
         #Create file writers
@@ -230,9 +230,9 @@ class Utility_File():
     @staticmethod
     def areEqual(tempFile1 = None, tempFile2 = None):
         #Check parameters
-        if(not ValidateData.ValidateData.isValidString(tempFile1)):
+        if(not ValidateData.isValidString(tempFile1)):
             return False
-        if(not ValidateData.ValidateData.isValidString(tempFile2)):
+        if(not ValidateData.isValidString(tempFile2)):
             return False
 
         #Check that the files exist
@@ -273,7 +273,7 @@ class Utility_File():
     @staticmethod
     def clearDirectory(tempDirectory = None):
         #Check if is valid parameter
-        if(not ValidateData.ValidateData.isValidString(tempDirectory)):
+        if(not ValidateData.isValidString(tempDirectory)):
             return False
         #Check if is a directory path
         if(not os.path.exists(tempDirectory)):
@@ -293,7 +293,7 @@ class Utility_File():
     @staticmethod
     def fileLineCount(tempDirectory = None):
         #Check if is valid parameter
-        if(not ValidateData.ValidateData.isValidString(tempDirectory)):
+        if(not ValidateData.isValidString(tempDirectory)):
             return False
         #Check if is a directory path
         if(not os.path.exists(tempDirectory)):

@@ -9,7 +9,7 @@
 
 #Import libaries
 from subprocess import call, Popen, PIPE
-import ValidateData
+from ValidateData import ValidateData
 import traceback
 
 ##
@@ -27,7 +27,7 @@ class CommandLine():
     def runCommandLine(self,tempCommand = None):
         print "Command="+str(tempCommand)
         #Makes sure the the input data is a list of strings
-        if(not ValidateData.ValidateData.isValidStringList(tempCommand)):
+        if(not ValidateData.isValidStringList(tempCommand)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempCommand)+"."
             return False
 
@@ -56,7 +56,7 @@ class CommandLine():
     #@return False = Failure or the return code from the subprocess
     def runPipedCommandLine(self,tempCommand = None):
         #Makes sure the the input data is a list of strings
-        if(not ValidateData.ValidateData.isValidStringList(tempCommand)):
+        if(not ValidateData.isValidStringList(tempCommand)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempCommand)+"."
             return False
 
@@ -84,7 +84,7 @@ class CommandLine():
         success = True
 
         #Makes sure the the input data is list of strings
-        if(not ValidateData.ValidateData.isValidStringList(tempArrayOfCommands)):
+        if(not ValidateData.isValidStringList(tempArrayOfCommands)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempArrayOfCommands)+"."
             return False
 

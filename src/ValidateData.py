@@ -9,7 +9,6 @@
 
 #Import local code
 from types import *
-import Constants
 import decimal
 import os
 import re

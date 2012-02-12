@@ -15,8 +15,6 @@ import math
 import numpy as np
 import os
 import random
-import ValidateData
-
 ##
 #Utility function for data generation
 class Utility_Data():
