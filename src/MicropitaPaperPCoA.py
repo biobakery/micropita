@@ -77,21 +77,19 @@ def _main( ):
 
     #Draw known truths
     #Draw labeling from metadata
-    iMetadataIndex = 0
     for asMetadata in metadata:
         #Get uniqueValues
-        acharUniqueValues = list(set(asMetadata))
+        acharUniqueValues = list(set(metadata[asMetadata]))
         iCountUniqueValues = len(acharUniqueValues)
 
         #Get colors
         atupldColors = [PCoA.RGBToHex(cm.jet(c_ColorScale*iUniqueValueIndex)) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
 
         #Make label coloring
-        atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in asMetadata ]
+        atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in metadata[asMetadata] ]
 
         #Plot
-        iMetadataIndex = iMetadataIndex +1
-        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(iMetadataIndex),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape, tempColorLabels=asMetadata)
+        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(asMetadata),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape, tempColorLabels=metadata[asMetadata])
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
