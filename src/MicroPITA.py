@@ -211,14 +211,13 @@ class MicroPITA:
     def getCentralSamplesByKMedoids(self, tempMatrix=None, tempMetric=None, tempSampleNames=None, tempNumberClusters=0, tempNumberSamplesReturned=0):
         #Validate parameters
         if(tempNumberClusters > tempNumberSamplesReturned):
-            print "Number of clusters should be equal to or less than the number samples returned. We will not represent a cluster otherwise."
-#            print "Stop getCentralSamplesByKMedoids -1"
+            logging.error("Number of clusters should be equal to or less than the number samples returned. We will not represent a cluster otherwise.")
             return False
 
         #Count of how many rows
         sampleCount = tempMatrix.shape[0]
         if(tempNumberClusters > sampleCount):
-            print "There are not enough samples to make that many clusters. Cluster number = "+str(tempNumberClusters)+". Sample number = "+str(sampleCount)+"."
+            logging.error("".join(["There are not enough samples to make that many clusters. Cluster number = ",str(tempNumberClusters),". Sample number = ",str(sampleCount),"."]))
             return False
 
         #Samples to return
@@ -234,14 +233,19 @@ class MicroPITA:
         #Get distance matrix
         distanceMatrix=self.getBetaMetric(tempAbundancies=tempMatrix, tempMetric=tempMetric)
         if(ValidateData.isFalse(distanceMatrix)):
-          print "RunMicroPITA.getCentralSamplesByKMedoids::Received false for betaMetrix matrix generation, returning false."
+          logging.error("RunMicroPITA.getCentralSamplesByKMedoids::Received false for betaMetrix matrix generation, returning false.")
           return False
+
+        #Log distance matrix
+        logging.debug("".join(["Distance matrix for representative selection using metric=",str(tempMetric)]))
+
         if(( tempMetric==Diversity.c_UNIFRAC_B_DIVERSITY ) or ( tempMetric==Diversity.c_WEIGHTED_UNIFRAC_B_DIVERSITY )):
           distanceMatrix = distanceMatrix['distance_matrix'][0]
         #TODO make sure you are getting condensed for unifrac and braycurtis
+        #Mane the adaptor for the MLPY Kmediods method to use custom distanc matrices
         distance = MLPYDistanceAdaptor(tempDistanceMatrix=distanceMatrix, tempIsCondensedMatrix=True)
 
-        #Determine clusters/medoids
+        #Create object to determine clusters/medoids
         medoidsMaker = mlpy.Kmedoids(k=tempNumberClusters, dist=distance)
 
         #medoidsData includes(1d numpy array, medoids indexes; 
@@ -254,6 +258,8 @@ class MicroPITA:
         for indexPosition in xrange(0,len(tempMatrix)):
             indicesMatrix.append([indexPosition])
         medoidsData = medoidsMaker.compute(np.array(indicesMatrix))
+        logging.debug("Results from the kmedoid method in representative selection:")
+        logging.debug(str(medoidsData))
 
         #If returning the same amount of clusters and samples
         #Return centroids
@@ -443,7 +449,7 @@ class MicroPITA:
             if(not countRank == 0):
                 sampleRankAverages.append([name,sumRank/countRank])
             else:
-                print("Found no taxa for sample="+str(name))
+                logging.error(""joint(["Found no taxa for sample=",str(name)]))
 
         #Sort based on average
         sampleRankAverages = sorted(sampleRankAverages, key = lambda sampleData: sampleData[1], reverse = True)
@@ -467,7 +473,7 @@ class MicroPITA:
 
         #Validate Number of samples is not negative and not greater than the matrix
         if((tempNumberOfSamplesToReturn < 0) or (tempNumberOfSamplesToReturn > sampleCount)):
-            print "TempNumberOfSamples was not useful for deriving subset. "+str(tempNumberOfSamplesToReturn)
+            logging.error("".join(["TempNumberOfSamples was not useful for deriving subset. ",str(tempNumberOfSamplesToReturn)]))
             return False
 
         #Return the full matrix if they ask for a return matrix where length == original
@@ -533,13 +539,13 @@ class MicroPITA:
             if(not modelFiles == False):
                 predictionFiles = svm.predictFromLinearModel(tempDataFileName=tempOutputSVMFile, tempModelFileName=modelFiles[svm.c_KEYWORD_MODEL_FILE], tempRangeFileName=modelFiles[svm.c_KEYWORD_RANGE_FILE], tempProbabilistic=tempSVMProbabilistic)
             else:
-                print "RunMicroPITA.runSVM: Could not run prediction, model file was false."
+                logging.error("".join(["RunMicroPITA.runSVM: Could not run prediction, model file was false."]))
         #Combine output dictionarys and return
         if(not predictionFiles == False):
             for pKey in predictionFiles:
                 modelFiles[pKey]=(predictionFiles[pKey])
         else:
-            print "RunMicroPITA.runSVM: Prediction files were false."
+            logging.error("RunMicroPITA.runSVM: Prediction files were false.")
         return modelFiles
 
     def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, strSelectionTechnique=None):
@@ -587,7 +593,7 @@ class MicroPITA:
             c_RUN_RANK_AVERAGE_USER_4 = True
             if(strUserDefinedTaxaFile == None):
                 c_RUN_RANK_AVERAGE_USER_4 = False
-                print("Error No taxa file was given for taxa selection.")
+                logging.error("Error No taxa file was given for taxa selection.")
             #Read in taxa list, break down to lines and filter out empty strings
             fhndlTaxaInput = open(strUserDefinedTaxaFile,'r')
             userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
@@ -657,6 +663,7 @@ class MicroPITA:
                     selectedSamples[astrSelectionMethod] = mostDiverseAlphaSamplesIndexesNoNorm[index]
 
             if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
+                logging.info("Performing representative selection on unnormalized data.")
                 #Run KMedoids with custom distance metric in unnormalized space
                 for bMetric in diversityMetricsBetaNoNormalize:
 
@@ -669,6 +676,7 @@ class MicroPITA:
                         selectedSamples[astrSelectionMethod]=medoidSamples
 
             if(c_RUN_MAX_DISSIMILARITY_3):
+                logging.info("Performing extreme selection on unnormalized data.")
                 #Run HClust with inverse custom distance metric in unnormalized space
                 #TODO centralize all transpose needs
                 #TODO transpose is being performed
@@ -687,13 +695,13 @@ class MicroPITA:
                         astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
                         selectedSamples[astrSelectionMethod] = extremeSamples
 
-        print("Selected Samples 1,2,3a")
-        print(selectedSamples)
+        logging.info("Selected Samples 1,2,3a")
+        logging.info(selectedSamples)
 
         #Normalize data at this point
         abundance = rawData.normalizeColumns(tempStructuredArray=abundance, tempColumns=list(sampleNames))
         if(abundance == False):
-            print("Error occured during normalizing data. Stopped.")
+            logging.error("Error occured during normalizing data. Stopped.")
             return False
 
         #Generate alpha metrics and get most diverse
@@ -712,8 +720,8 @@ class MicroPITA:
                 astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlpha[index]]
                 selectedSamples[astrSelectionMethod] = mostDiverseAlphaSamplesIndexes[index]
 
-        print("Selected Samples 1b")
-        print(selectedSamples)
+        logging.info("Selected Samples 1b")
+        logging.info(selectedSamples)
 
         #Generate beta metrics and 
         if((c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
@@ -724,6 +732,7 @@ class MicroPITA:
             #Get center selection using clusters/tiling
             #This will be for beta metrics in normalized space
             if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
+                logging.info("Performing representative selection on normalized data.")
                 for bMetric in diversityMetricsBeta:
 
                     #Get representative dissimilarity samples
@@ -735,6 +744,7 @@ class MicroPITA:
 
             #Get extreme selection using clusters, tiling
             if(c_RUN_MAX_DISSIMILARITY_3):
+                logging.info("Performing extreme selection on normalized data.")
                 #Run KMedoids with inverse custom distance metric in normalized space
                 for bMetric in inverseDiversityMetricsBeta:
 
@@ -749,8 +759,8 @@ class MicroPITA:
                         astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
                         selectedSamples[astrSelectionMethod] = extremeSamples
 
-        print("Selected Samples 2,3b")
-        print(selectedSamples)
+        logging.info("Selected Samples 2,3b")
+        logging.info(selectedSamples)
 
         #Generate selection by the rank average of user defined taxa
         #Expects (Taxa (row) by Samples (column))
@@ -759,7 +769,7 @@ class MicroPITA:
         if(c_RUN_RANK_AVERAGE_USER_4):
 
             if(len(userDefinedTaxa) < 1):
-                print("Error Taxa defined selection was requested but no taxa were given.")
+                logging.error("Error Taxa defined selection was requested but no taxa were given.")
             #Rank the samples
             userRankedSamples = microPITA.getAverageRanksSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa)
             #Select the top samples
@@ -767,8 +777,8 @@ class MicroPITA:
             topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
             selectedSamples[microPITA.c_USER_RANKED] = [item for sublist in topRankedSamplesNames for item in sublist]
 
-        print("Selected Samples 4")
-        print(selectedSamples)
+        logging.info("Selected Samples 4")
+        logging.info(selectedSamples)
 
         #5::Select randomly
         #Expects sampleNames = List of sample names [name, name, name...]
@@ -778,8 +788,8 @@ class MicroPITA:
             randomlySelectedSamples = microPITA.getRandomSamples(tempSamples=sampleNames, tempNumberOfSamplesToReturn=sampleSelectionCount)
             selectedSamples[microPITA.c_RANDOM] = list(randomlySelectedSamples)
 
-        print("Selected Samples 5")
-        print(selectedSamples)
+        logging.info("Selected Samples 5")
+        logging.info(selectedSamples)
 
         #Select supervised (using SVM)
         #Expects input file's matrix to be Taxa (row) by Sample (col) with a taxa id column (index=0)
@@ -867,8 +877,8 @@ class MicroPITA:
                             SVMSamples.append(sampleNames[selectedSampleIndex-1])
                         selectedSamples[microPITA.c_SVM_FAR] = SVMSamples
 
-        print("Selected Samples 6")
-        print(selectedSamples)
+        logging.info("Selected Samples 6")
+        logging.info(selectedSamples)
         return selectedSamples
 
 #Set up arguments reader
