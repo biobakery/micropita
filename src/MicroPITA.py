@@ -414,7 +414,6 @@ class MicroPITA:
             #Sort based on abundance
             ranks = sorted(ranks, key = lambda sampleData: sampleData[1], reverse = True)
 
-
             #Add ranks
             rank = 1
             currentValue = ranks[0][1]
@@ -615,6 +614,7 @@ class MicroPITA:
         abundance,metadata = rawData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=c_COLUMN_NAME_ROW, tempFirstDataRow=c_FIRST_DATA_ROW, tempNormalize=False)
         sampleID = abundance.dtype.names[0]
 
+
         #Get sample names excluding the taxa id column name
         sampleNames = abundance.dtype.names[1:]
 
@@ -762,6 +762,7 @@ class MicroPITA:
                 print("Error Taxa defined selection was requested but no taxa were given.")
             #Rank the samples
             userRankedSamples = microPITA.getAverageRanksSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa)
+
             #Select the top samples
             topRankedSamples = userRankedSamples[0:(sampleSelectionCount)]
             topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)

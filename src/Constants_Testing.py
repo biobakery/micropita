@@ -14,6 +14,11 @@
 #Holds global configuration constants
 class Constants_Testing():
 
+    #Locations
+    c_strTestingRoot = "Testing/"
+    c_strTestingTMP = c_strTestingRoot+"TMP/"
+    c_strTestingData = c_strTestingRoot+"Data/"
+
     #Indexes
     PARAMETER_NAME_POSITION = 0
     PARAMETER_TYPE_POSITION = 1
@@ -42,7 +47,6 @@ class Constants_Testing():
     NEGATIVE_FLOAT = "N_FLOAT"
     POSITIVE_FLOAT_AND_ZERO = "PO_FLOAT"
     NEGATIVE_FLOAT_AND_ZERO = "NO_FLOAT"
-
 
     ##
     #Contructor. Never needs to be used.

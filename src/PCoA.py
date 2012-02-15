@@ -142,8 +142,8 @@ class PCoA:
     #@params tempPlotName A valid file path to save the image of the plot
     def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempColorLabels=["Green"], tempShapeLabels=["Circle"], tempLegendLocation="upper right"):
         if(not self.pcoa == None):
-            print("tempColorLabels")
-            print(tempColorLabels)
+#            print("tempColorLabels")
+#            print(tempColorLabels)
             adPoints = self.pcoa.getPoints()
             iPointCount = len(adPoints[:,0])
             imgFigure = plt.figure()
