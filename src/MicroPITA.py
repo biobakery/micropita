@@ -541,14 +541,9 @@ class MicroPITA:
             print "RunMicroPITA.runSVM: Prediction files were false."
         return modelFiles
 
-    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, strSelectionTechnique=None):
+    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1, strSelectionTechnique=None, iSampleNameRow=0, iFirstDataRow=1):
         #microPITA object
         microPITA = MicroPITA()
-
-        #Constants
-        #Related to input abundance data
-        c_COLUMN_NAME_ROW = 0
-        c_FIRST_DATA_ROW = 2
 
         #SVM parameters
         #Constants associated with the abundance to SVM input file conversion
@@ -611,15 +606,14 @@ class MicroPITA:
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
-        abundance,metadata = rawData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=c_COLUMN_NAME_ROW, tempFirstDataRow=c_FIRST_DATA_ROW, tempNormalize=False)
+        abundance,metadata = rawData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=iSampleNameRow, tempFirstDataRow=iFirstDataRow, tempNormalize=False)
         sampleID = abundance.dtype.names[0]
-
 
         #Get sample names excluding the taxa id column name
         sampleNames = abundance.dtype.names[1:]
 
         sampleSelectionCount = iSampleSelectionCount
-        sampleSVMSelectionCount = iSampleSelectionCount
+        sampleSVMSelectionCount = iSupervisedSampleCount
         #TODO
         clusterCount = iSampleSelectionCount
 
@@ -789,7 +783,7 @@ class MicroPITA:
             #Get file name without extention
             strTail = os.path.split(strInputAbundanceFile)[1]
             #Run linear SVM
-            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[0], tempFirstDataRow=c_FIRST_DATA_ROW, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
+            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[0], tempFirstDataRow=iFirstDataRow, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
             #Read in prediction file and select samples
             #Selecting samples most ambiguous to all hyperplanes
             if(not svmRelatedData == False):
@@ -843,6 +837,8 @@ class MicroPITA:
                     #Get the samples closes to hyperplane
                     #Get samples farthest from hyperplane
                     #Make this balanced to the labels so for each sample label select the sampleSVMSelectionCount count of samples
+                    print("centralDeviation")
+                    print(centralDeviation)
                     for scurKey in centralDeviation:
                         lcurDeviations = centralDeviation[scurKey]
                         iLengthCurDeviations = len(lcurDeviations)
@@ -853,6 +849,10 @@ class MicroPITA:
                         else:
                             selectedSamplesIndicesClose.extend([measurement[1] for measurement in lcurDeviations[0:sampleSVMSelectionCount]])
                             selectedSamplesIndicesFar.extend([measurement[1] for measurement in lcurDeviations[(iLengthCurDeviations-sampleSVMSelectionCount):iLengthCurDeviations]])
+                    print("selectedSamplesIndicesClose")
+                    print(selectedSamplesIndicesClose)
+                    print("selectedSamplesIndicesFar")
+                    print(selectedSamplesIndicesFar)
                     #Take indicies and translate to sample names
                     #TODO A little scary, requires no one mess with the sampleNames...maybe a different way to do this?
                     #Select close to hyperplane
@@ -890,10 +890,18 @@ argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directo
 argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
 #Selection parameter
 argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
-#Optional parameter for logging
+#Optional parameters
+#Logging
 argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
                   help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
+#Abundance associated
+argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
+                  help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
+argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
+                  help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
+argp.add_argument("-s", dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
+                  help= "The count of labeled data to select per label (defualt =1)")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -907,7 +915,7 @@ def _main( ):
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start microPITA")
-    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=args.icount, strSelectionTechnique=args.strSelection)
+    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
     logging.info("End microPITA")
 
     logging.debug("".join(["Returned the following samples:",str(dictSelectedSamples)]))

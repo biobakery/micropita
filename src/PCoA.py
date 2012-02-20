@@ -140,27 +140,125 @@ class PCoA:
         return False
 
     #@params tempPlotName A valid file path to save the image of the plot
-    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempColorLabels=["Green"], tempShapeLabels=["Circle"], tempLegendLocation="upper right"):
+    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempLegendLocation="upper right", tempInvert=True):
         if(not self.pcoa == None):
-#            print("tempColorLabels")
-#            print(tempColorLabels)
+
+            #Get point count
             adPoints = self.pcoa.getPoints()
             iPointCount = len(adPoints[:,0])
+
+            #Check shapes
+            if(ValidateData.isValidList(tempShape)):
+              if not len(tempShape) == iPointCount:
+                print("Error, the list of shapes was given but was not the same size as the points so nothing was plotted.")
+                return
+
+            #Check colors
+            if(ValidateData.isValidList(tempColorGrouping)):
+              if not len(tempColorGrouping) == iPointCount:
+                print("Error, the list of colors was given but was not the same size as the points so nothing was plotted.")
+                return
+
+            #Check sizes
+            if(ValidateData.isValidList(tempShapeSize)):
+              if not len(tempShapeSize) == iPointCount:
+                print("Error, the list of sizes was given but was not the same size as the points so nothing was plotted.")
+                return
+
+            #Get plot object
             imgFigure = plt.figure()
-            imgSubplot = imgFigure.add_subplot(111)
+            imgSubplot = None
+            #Will be set based on inverting
+            charMarkerEdgeColor = 'k'
+
+            #Invert figure
+            if(tempInvert):
+              imgFigure.set_facecolor("black")
+              imgSubplot = imgFigure.add_subplot(111,axisbg='k')
+              imgSubplot.spines['top'].set_color("w")
+              imgSubplot.spines['bottom'].set_color("w")
+              imgSubplot.spines['left'].set_color("w")
+              imgSubplot.spines['right'].set_color("w")
+              imgSubplot.xaxis.label.set_color("w")
+              imgSubplot.yaxis.label.set_color("w")
+              imgSubplot.tick_params(axis='x', colors='w')
+              imgSubplot.tick_params(axis='y', colors='w')
+              charMarkerEdgeColor = 'w'
+            else:
+              imgSubplot = imgFigure.add_subplot(111)
+
             #Plot colors seperately so the legend will pick up on the labels and make a legend
             if(ValidateData.isValidList(tempColorGrouping)):
                 if len(tempColorGrouping) == iPointCount:
                     #Get unique colors and plot each individually
                     acharUniqueColors = list(set(tempColorGrouping))
                     for iColorIndex in xrange(0,len(acharUniqueColors)):
-                        aiColorPointPositions = self.getIndices(tempColorGrouping,acharUniqueColors[iColorIndex])
-                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiColorPointPositions),self.reduceList(adPoints[:,1],aiColorPointPositions), c=[acharUniqueColors[iColorIndex]], marker=tempShape, label=tempColorLabels[tempColorGrouping.index(acharUniqueColors[iColorIndex])])
-            else:
-                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], c=tempColorGrouping, marker=tempShape, label=tempColorLabels)
+                        #Get the color
+                        charColor = acharUniqueColors[iColorIndex]
+                        #Get indices of colors
+                        aiColorPointPositions = self.getIndices(tempColorGrouping,charColor)
 
-            imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
-            imgFigure.savefig(tempPlotName)
+                        #Reduces sizes to indices if a list
+                        reducedSizes = tempShapeSize
+                        #Reduce sizes if a list
+                        if(ValidateData.isValidList(reducedSizes)):
+                          reducedSizes = self.reduceList(reducedSizes,aiColorPointPositions)
+
+                        #Reduce to the current color grouping
+                        aiXPoints = self.reduceList(adPoints[:,0],aiColorPointPositions)
+                        aiYPoints = self.reduceList(adPoints[:,1],aiColorPointPositions)
+
+                        #If the shapes are not a list plot
+                        #Otherwise plot per shape per color (can not plot list of shapes in matplotlib)
+                        reducedShapes = tempShape
+                        if(not ValidateData.isValidList(reducedShapes)):
+                          reducedShapes = reducedShapes[0]
+                          imgSubplot.scatter(aiXPoints,aiYPoints, s=reducedSizes, c=[charColor], marker=reducedShapes, label=tempLabels[tempColorGrouping.index(charColor)], edgecolor=charMarkerEdgeColor)
+                        #Shapes are supplied as a list so plot each shape
+                        else:
+                          #Reduce to shape sof the current colors
+                          reducedShapes = self.reduceList(reducedShapes,aiColorPointPositions)
+                          acharReducedShapesElements = list(set(reducedShapes))
+                          #If there are multiple shapes, plot seperately because one is not allowed to plot them as a list
+                          for aCharShapeElement in acharReducedShapesElements:
+                            #Creat label
+                            strShapeLabel = tempLabels[tempShape.index(aCharShapeElement)]
+                            #Get indices
+                            aiShapeIndices = self.getIndices(reducedShapes,aCharShapeElement)
+                            #Get points per shape
+                            aiXPointsPerShape = self.reduceList(aiXPoints,aiShapeIndices)
+                            aiYPointsPerShape = self.reduceList(aiYPoints,aiShapeIndices)
+                            #Get sizes per shape
+                            #Reduce sizes if a list
+                            reducedSizesPerShape = reducedSizes
+                            if(ValidateData.isValidList(reducedSizes)):
+                              reducedSizesPerShape = self.reduceList(reducedSizes,aiShapeIndices)
+                            #Plot
+                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, label=strShapeLabel, edgecolor=charMarkerEdgeColor)
+
+            elif((not ValidateData.isValidList(tempColorGrouping)) and (ValidateData.isValidList(tempShape))):
+                if len(tempShape) == iPointCount:
+                    #Get unique shapes and plot each individually
+                    acharUniqueShapes = list(set(tempShape))
+                    for iShapeIndex in xrange(0,len(acharUniqueShapes)):
+                        aiShapePointPositions = self.getIndices(tempShape,acharUniqueShapes[iShapeIndex])
+                        #Reduce sizes if needed
+                        reducedSizes = tempShapeSize
+                        if(ValidateData.isValidList(reducedSizes)):
+                          reducedSizes = self.reduceList(reducedSizes,aiShapePointPositions)
+                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiShapePointPositions),self.reduceList(adPoints[:,1],aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
+            else:
+                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], s=tempShapeSize, c=tempColorGrouping, marker=tempShape, label=tempLabels, edgecolor=charMarkerEdgeColor)
+
+            objLegend = imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
+
+            #Invert legend
+            if(tempInvert):
+              objLegend.legendPatch.set_fc('k')
+              objLegend.legendPatch.set_ec('w')
+              plt.setp(objLegend.get_texts(),color='w')
+
+            imgFigure.savefig(tempPlotName, facecolor=imgFigure.get_facecolor())
 
     #TODO put in utilities
     #Returns the indicies of the element in the array as a list
@@ -179,6 +277,7 @@ class PCoA:
         return aretList
 
     #TODO put in utilities
+    #The adColor should be in the range between 0 and 1
     @staticmethod
     def RGBToHex(adColor, charAlpha = "99"):
         charR = (hex(int(adColor[0]*255)))[2:]
@@ -192,3 +291,10 @@ class PCoA:
             charB = "00"
         return "".join(["#",charR, charG, charB])
 
+    @staticmethod
+    def getShapes(intShapeCount):
+      lsShapes = ['o','^','s','D','v','<','>','8','p','h']
+      if intShapeCount > len(lsShapes):
+        print("".join(["Error, PCoA.getShapes. Do not have enough shapes to give. Received request for ",str(intShapeCount)," shapes. Max available shape count is ",str(len(lsShapes)),"."]))
+        return None
+      return lsShapes[0:intShapeCount]

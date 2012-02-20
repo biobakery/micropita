@@ -21,6 +21,7 @@ import matplotlib.cm as cm
 from MicroPITA import MicroPITA
 import os
 from PCoA import PCoA
+from ValidateData import ValidateData
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperPCoA.py", 
@@ -32,8 +33,18 @@ argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = "An abunda
 #Select file
 argp.add_argument( "strSelectionFile", metavar = "Select_file",
     help = "A file containing the samples selected which will be visualized." )
+argp.add_argument( "sSVMPrediction", metavar = "SVM.predict", help = "The name of the input file specifying the SVm prediction." )
+
 #Outputfile
 argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
+
+#Abundance table parameters
+argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
+                  help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
+argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
+                  help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
+argp.add_argument("-r", dest="fNormalize", metavar= "FirstDataRow", default=False, 
+                  help= "Normalize the abundance data before working with it (default=False).")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -48,19 +59,14 @@ def _main( ):
     strSelection = fHndlInput.read()
     fHndlInput.close()
 
-    c_iNameRow = 0
-    c_iFirstDataRow = 2
-    c_fNormalize = True
     c_fCheckFile = False
-
-    c_ColorScale = 100
-
     c_NotSelected = "Not_Selected"
+    c_shapeSize = 40
 
     #Read abundance file
     #Abundance table object to read in and manage data
     rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=c_iNameRow, tempFirstDataRow=c_iFirstDataRow, tempNormalize=c_fNormalize)
+    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=bool(args.fNormalize))
     sampleNames = abundance.dtype.names[1:]
 
     #Shapes
@@ -71,27 +77,30 @@ def _main( ):
 
     #Generate PCoA
     #LoadData
-    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=c_iNameRow, tempFirstDataRow=c_iFirstDataRow, tempNormalize=c_fNormalize, tempCheckFile=c_fCheckFile)
+    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=bool(args.fNormalize), tempCheckFile=c_fCheckFile)
     #Make distance matrix
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
     #Draw known truths
     #Draw labeling from metadata
     iMetadataIndex = 0
+
     for asMetadata in metadata:
-        #Get uniqueValues
-        acharUniqueValues = list(set(asMetadata))
-        iCountUniqueValues = len(acharUniqueValues)
+      plotList(objPCOA=analysis,lsLabelList=asMetadata,strName=str(iMetadataIndex),asFilePathPieces=asFilePathPieces,iSize=c_shapeSize,charForceColor='k')
+      iMetadataIndex = iMetadataIndex + 1
 
-        #Get colors
-        atupldColors = [PCoA.RGBToHex(cm.jet(c_ColorScale*iUniqueValueIndex)) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+    #Read in prediction file is supplied
+    if(not args.sSVMPrediction == None):
+        fHndlInput = open(args.sSVMPrediction,'r')
+        strSVMSelection = fHndlInput.read()
+        fHndlInput.close()
 
-        #Make label coloring
-        atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in asMetadata ]
-
-        #Plot
-        iMetadataIndex = iMetadataIndex +1
-        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata",str(iMetadataIndex),asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=acharShape, tempColorLabels=asMetadata)
+    #Make a list of predictions
+    lsPredictions = list()
+    for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
+        lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
+        lsPredictions.append(lsPredictElements[0])
+    plotList(analysis,lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
@@ -99,7 +108,7 @@ def _main( ):
         #Colors
         acharColors = []
         #Labels
-        acharLabels = []
+        acharSelection = []
 
         #Color for selected samples in PCoA based on selection method
         charSelectedColor = ""
@@ -129,13 +138,67 @@ def _main( ):
         for strSample in sampleNames:
             if(strSample in astrSelectedSamples):
                 acharColors.append(charSelectedColor)
-                acharLabels.append(astrSelectionMethod[0])
+                acharSelection.append(astrSelectionMethod[0])
             else:
                 acharColors.append(Constants_Figures.c_charPCOANoSelect)
-                acharLabels.append(c_NotSelected)
+                acharSelection.append(c_NotSelected)
 
         #Draw PCoA
-        analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempColorLabels=acharLabels, tempLegendLocation="lower left")
+        if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
+          plotList(objPCOA=analysis,lsLabelList=lsPredictions[1:],strName=astrSelectionMethod[0],asFilePathPieces=asFilePathPieces,iSize=c_shapeSize, charForceColor=[acharColors,acharSelection])
+        else:
+          analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left")
+
+#charForceColor if set, automatic coloring will not occur but will occur based on the charForceColor
+#CharForceColor should be a list of selection methods or not selected which will be automatically broken into colors
+#charForceColor must contain the same elements as the lsLabeList
+#Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
+#charForceShapes if set, automatic shapes will not occur
+#Currently can only be a char (forcing effects all markers equally)
+def plotList(objPCOA,lsLabelList,strName,asFilePathPieces,iSize,charForceColor=None,charForceShape=None):
+    #Get uniqueValues for labels
+    acharUniqueValues = list(set(lsLabelList))
+    iCountUniqueValues = len(acharUniqueValues)
+
+    #Set colors
+    atupldLabelColors = None
+
+    #If the coloring is not forced, color so it is based on the labels
+    if charForceColor == None:
+      #Get colors based on labels
+      atupldColors = [PCoA.RGBToHex(cm.jet(float(iUniqueValueIndex)/float(iCountUniqueValues))) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+      #Make label coloring
+      atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
+    #If the coloring is forced, color so it is based on the charForcedColor list
+    elif(ValidateData.isValidList(charForceColor)):
+      atupldLabelColors = charForceColor[0]
+    #If the color is forced but the color does not vary, color all markers are the same.
+    else:
+      atupldLabelColors = charForceColor
+
+    #Set shapes
+    alLabelShapes = None
+    if charForceShape == None:
+      #Get shapes
+      acharShapes = PCoA.getShapes(iCountUniqueValues)
+      if acharShapes == None:
+        return False
+      #Make label shapes
+      alLabelShapes = [ acharShapes[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
+    else:
+      alLabelShapes = acharShapes
+
+    #Check to make sure unique colors are returned
+    if(ValidateData.isValidList(atupldLabelColors)):
+      if not len(acharUniqueValues)==len(list(set(atupldLabelColors))):
+        print("Error, non-uniques colors were generated")
+        print("Labels")
+        print(lsLabelList)
+        print("Colors")
+        print(atupldLabelColors)
+        return False
+    objPCOA.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata-",strName,asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize)
+
 
 if __name__ == "__main__":
     _main( )
