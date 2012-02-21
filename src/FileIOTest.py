@@ -8,8 +8,8 @@
 #######################################################
 
 #Import libaries
-import Constants
-import FileIO
+from Constants import Constants
+from FileIO import FileIO
 import os
 import unittest
 
@@ -21,7 +21,7 @@ class FileIOTest(unittest.TestCase):
     testedFileIO = None
 
     ##Test file name to write to
-    TestFileName = Constants.Constants.TEMPORARY_TEST_FILE
+    TestFileName = Constants.TEMPORARY_TEST_FILE
 
     ##
     #Test the constructor for initialization FileName = valid Read = True, Write = True Append = True
@@ -32,7 +32,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -52,7 +52,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,False)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -73,7 +73,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,True)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -93,7 +93,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,True)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -114,7 +114,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,False,False,True)
+            self.testedFileIO = FileIO(self.TestFileName,False,False,True)
         except IOError, e:
             if not self.testedFileIO == None:
                 self.testedFileIO.close()
@@ -141,7 +141,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,False)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -158,7 +158,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,False)
 
         #Close FileIO
         if not self.testedFileIO == None:
@@ -179,7 +179,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,False,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,False,False,False)
         except IOError, e:
             if not self.testedFileIO == None:
                 self.testedFileIO.close()
@@ -206,7 +206,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,True,True,True)
+            self.testedFileIO = FileIO(None,True,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -236,7 +236,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",True,True,True)
+            self.testedFileIO = FileIO("",True,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -266,7 +266,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",True,True,True)
+            self.testedFileIO = FileIO("    ",True,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -296,7 +296,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(list(),True,True,True)
+            self.testedFileIO = FileIO(list(),True,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -326,7 +326,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,True,True,False)
+            self.testedFileIO = FileIO(None,True,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -356,7 +356,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",True,True,False)
+            self.testedFileIO = FileIO("",True,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -386,7 +386,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",True,True,False)
+            self.testedFileIO = FileIO("    ",True,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -416,7 +416,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,True,False,True)
+            self.testedFileIO = FileIO(None,True,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -446,7 +446,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",True,False,True)
+            self.testedFileIO = FileIO("",True,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -476,7 +476,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",True,False,True)
+            self.testedFileIO = FileIO("    ",True,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -506,7 +506,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,False,True,True)
+            self.testedFileIO = FileIO(None,False,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -536,7 +536,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",False,True,True)
+            self.testedFileIO = FileIO("",False,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -566,7 +566,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",False,True,True)
+            self.testedFileIO = FileIO("    ",False,True,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -596,7 +596,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,False,False,True)
+            self.testedFileIO = FileIO(None,False,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -626,7 +626,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",False,False,True)
+            self.testedFileIO = FileIO("",False,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -656,7 +656,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",False,False,True)
+            self.testedFileIO = FileIO("    ",False,False,True)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -686,7 +686,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,True,False,False)
+            self.testedFileIO = FileIO(None,True,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -716,7 +716,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",True,False,False)
+            self.testedFileIO = FileIO("",True,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -746,7 +746,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",True,False,False)
+            self.testedFileIO = FileIO("    ",True,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -776,7 +776,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,False,True,False)
+            self.testedFileIO = FileIO(None,False,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -806,7 +806,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",False,True,False)
+            self.testedFileIO = FileIO("",False,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -836,7 +836,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",False,True,False)
+            self.testedFileIO = FileIO("    ",False,True,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -866,7 +866,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(None,False,False,False)
+            self.testedFileIO = FileIO(None,False,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -896,7 +896,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("",False,False,False)
+            self.testedFileIO = FileIO("",False,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -926,7 +926,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO("    ",False,False,False)
+            self.testedFileIO = FileIO("    ",False,False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -956,7 +956,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,list(),False,False)
+            self.testedFileIO = FileIO(self.TestFileName,list(),False,False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -986,7 +986,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,False,list(),False)
+            self.testedFileIO = FileIO(self.TestFileName,False,list(),False)
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -1016,7 +1016,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,False,False,list())
+            self.testedFileIO = FileIO(self.TestFileName,False,False,list())
         except ValueError, ve:
             #Close FileIO
             if not self.testedFileIO == None:
@@ -1046,7 +1046,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Actual Answer
         self.actualAnswer = self.testedFileIO.getFileName()
@@ -1072,7 +1072,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Actual Answer
         self.actualAnswer = str(self.testedFileIO)
@@ -1097,7 +1097,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.correctAnswer = True
@@ -1121,7 +1121,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.correctAnswer = True
@@ -1146,7 +1146,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.correctAnswer = None
@@ -1173,7 +1173,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,False)
 
         #Correct answer
         self.correctAnswer = True
@@ -1198,7 +1198,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,False)
 
         #Correct answer
         self.correctAnswer = True
@@ -1222,7 +1222,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1257,7 +1257,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1289,7 +1289,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1323,7 +1323,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1358,7 +1358,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1391,7 +1391,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False, True, True)
+        self.testedFileIO = FileIO(self.TestFileName,False, True, True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1424,7 +1424,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1461,7 +1461,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1495,7 +1495,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1531,7 +1531,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1568,7 +1568,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w').close()
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1603,7 +1603,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,True)
 
         #Correct answer
         self.lineContents = None
@@ -1638,7 +1638,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1674,7 +1674,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1713,7 +1713,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Attempt method
         try:
@@ -1745,7 +1745,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Attempt method
         try:
@@ -1777,7 +1777,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1815,7 +1815,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w')
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1855,7 +1855,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w')
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,False,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1894,7 +1894,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w')
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,False)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1933,7 +1933,7 @@ class FileIOTest(unittest.TestCase):
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
         open(self.TestFileName, 'w')
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,False,True,True)
 
         #Correct answer
         self.lineContents = "This is a test."
@@ -1981,7 +1981,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.actualAnswer = str(self.testedFileIO.readline())
         except IOError:
             #Close FileIO
@@ -2020,7 +2020,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.actualAnswer = str(self.testedFileIO.readline())
         except IOError:
             #Close FileIO
@@ -2059,7 +2059,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.testedFileIO.readline()
             self.actualAnswer = str(self.testedFileIO.readline())
         except IOError:
@@ -2099,7 +2099,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.testedFileIO.readline()
             self.testedFileIO.close()
             self.actualAnswer = self.testedFileIO.readline()
@@ -2140,7 +2140,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.testedFileIO.readline()
             self.testedFileIO._FileIO__file = None
             self.actualAnswer = self.testedFileIO.readline()
@@ -2182,7 +2182,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,False,False)
+            self.testedFileIO = FileIO(self.TestFileName,True,False,False)
             self.testedFileIO.readline()
             self.testedFileIO.readline()
             self.actualAnswer = str(self.testedFileIO.readline())
@@ -2223,7 +2223,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+            self.testedFileIO = FileIO(self.TestFileName,True,True,True)
             self.testedFileIO.readline()
             self.actualAnswer = str(self.testedFileIO.readline())
         except IOError:
@@ -2263,7 +2263,7 @@ class FileIOTest(unittest.TestCase):
 
         #Attempt method
         try:
-            self.testedFileIO = FileIO.FileIO(self.TestFileName,False,True,True)
+            self.testedFileIO = FileIO(self.TestFileName,False,True,True)
             self.testedFileIO.readline()
             self.actualAnswer = self.testedFileIO.readline()
         except IOError:
@@ -2292,7 +2292,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test.This is a test.This is a test."
@@ -2328,7 +2328,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test.This is a test.This is a test."
@@ -2363,7 +2363,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test.This is a test.This is a test."
@@ -2399,7 +2399,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,True)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,True)
 
         #Correct answer
         self.lineContents = "This is a test.This is a test.This is a test."
@@ -2435,7 +2435,7 @@ class FileIOTest(unittest.TestCase):
         #CreateObject
         if os.path.isfile(self.TestFileName):
             os.remove(self.TestFileName)
-        self.testedFileIO = FileIO.FileIO(self.TestFileName,True,True,False)
+        self.testedFileIO = FileIO(self.TestFileName,True,True,False)
 
         #Correct answer
         self.lineContents = "This is a test.This is a test.This is a test."

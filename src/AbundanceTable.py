@@ -13,11 +13,11 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #External libraries
-import Constants
-import FileIO
+from Constants import Constants
+from FileIO import FileIO
 import numpy as np
-import Utility_File
-import ValidateData
+import os
+from ValidateData import ValidateData
 
 class AbundanceTable:
 
@@ -28,33 +28,35 @@ class AbundanceTable:
     #@params tempDelimiter Character. Delimiter for the data
     #@return Return string file path
     @staticmethod
-    def checkRawDataFile(tempReadDataFileName, tempDelimiter = Constants.Constants.TAB):
+    def checkRawDataFile(tempReadDataFileName, tempDelimiter = Constants.TAB):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidFileName(tempReadDataFileName)):
+        if(not ValidateData.isValidFileName(tempReadDataFileName)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(tempReadDataFileName)
             return False
-        if(not ValidateData.ValidateData.isValidStringType(tempDelimiter)):
+        if(not ValidateData.isValidStringType(tempDelimiter)):
             print "AbundanceTable:checkRawDataFile::Error, Delimiter is not a valid string/char type. Delimiter ="+str(tempDelimiter)+"."
             return False
 
         #File to output to
-        outputFile = Utility_File.Utility_File.getFileNamePrefix(tempReadDataFileName)+Constants.Constants.OUTPUT_SUFFIX
+        outputFile = os.path.splitext(tempReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
         #File Reader
-        inputRead = FileIO.FileIO(tempReadDataFileName,True,False,False)
+        inputRead = FileIO(tempReadDataFileName,True,False,False)
         #File writer
-        writeData = FileIO.FileIO(outputFile,False,True,True)
+        writeData = FileIO(outputFile,False,True,True)
 
         #Read lines
         read_data = inputRead.readFullFile()
-        read_data = read_data.split(Constants.Constants.ENDLINE)
-        writeData.writeToFile(read_data[0]+Constants.Constants.ENDLINE)
-        writeData.writeToFile(read_data[1]+Constants.Constants.ENDLINE)
+        read_data = filter(None,read_data.split(Constants.ENDLINE))
+        writeData.writeToFile(read_data[0]+Constants.ENDLINE)
+        writeData.writeToFile(read_data[1]+Constants.ENDLINE)
         #For each line in the table
         for line in read_data[2:]:
             writeToFile = False
             cleanLine = list()
             #Break into delimited elements
-            lineElements = line.split(tempDelimiter)
+            lineElements = filter(None,line.split(tempDelimiter))
 
             #For each element but the first (taxa name)
             #Element check to see if not == zero
@@ -69,7 +71,7 @@ class AbundanceTable:
                     writeToFile = True
             #Write to file
             if(writeToFile):    
-                writeData.writeToFile(lineElements[0]+tempDelimiter+tempDelimiter.join(cleanLine)+Constants.Constants.ENDLINE)
+                writeData.writeToFile(lineElements[0]+tempDelimiter+tempDelimiter.join(cleanLine)+Constants.ENDLINE)
         writeData.close()
         inputRead.close()
         return outputFile
@@ -83,10 +85,10 @@ class AbundanceTable:
     #All columns are returned, this could be no normalization, all normalization or mixed normalized columns.
     def normalizeColumns(self, tempStructuredArray = None, tempColumns = None):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidStructuredArray(tempStructuredArray)):
+        if(not ValidateData.isValidStructuredArray(tempStructuredArray)):
             print "AbundanceTable:normalizeColumns::Error, structured array is not valid. Structured array:"+str(tempStructuredArray)
             return False
-        if(not ValidateData.ValidateData.isValidList(tempColumns)):
+        if(not ValidateData.isValidList(tempColumns)):
             print "AbundanceTable:normalizeColumns::Error, Column name not a valid list. List ="+str(tempColumns)+"."
             return False
 
@@ -105,30 +107,30 @@ class AbundanceTable:
     #@tempDelimiter The delimiter used in the adundance file
     #@tempStratifyByRow The row which contains the metadata to use in stratification. Starts with 0.
     #@return Returns boolean true or false. True indicating completion without detected errors
-    def stratifyAbundanceTableByMetadata(self, tempInputFile = None, tempDelimiter = Constants.Constants.TAB, tempStratifyByRow = 1):
+    def stratifyAbundanceTableByMetadata(self, tempInputFile = None, tempDelimiter = Constants.TAB, tempStratifyByRow = 1):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidFileName(tempInputFile)):
+        if(not ValidateData.isValidFileName(tempInputFile)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, file not valid. File:"+str(tempInputFile)
             return False
-        if(not ValidateData.ValidateData.isValidStringType(tempDelimiter)):
+        if(not ValidateData.isValidStringType(tempDelimiter)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Delimiter is not a valid string/char type. Delimiter ="+str(tempDelimiter)+"."
             return False
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempStratifyByRow, tempZero = True)):
+        if(not ValidateData.isValidPositiveInteger(tempStratifyByRow, tempZero = True)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Stratify by row is not a positive interger. Row ="+str(tempStratifyByRow)+"."
             return False
 
         #Get the base of the file path
-        baseFilePath = Utility_File.Utility_File.getFileNamePrefix(tempInputFile)
+        baseFilePath = os.path.splitext(tempInputFile)[0]
 
         #Read in file
-        inputRead = FileIO.FileIO(tempInputFile,True, False, False)
+        inputRead = FileIO(tempInputFile,True, False, False)
         contents = inputRead.readFullFile()
         inputRead.close()
-        contents = contents.split(Constants.Constants.ENDLINE)
+        contents = filter(None,contents.split(Constants.ENDLINE))
 
         #Collect metadata
         metadataInformation = dict()
-        stratifyByRow = contents[tempStratifyByRow].split(tempDelimiter)
+        stratifyByRow = filter(None,contents[tempStratifyByRow].split(tempDelimiter))
         for metaDataIndex in xrange(1,len(stratifyByRow)):
             metadata = stratifyByRow[metaDataIndex]
             if(not metadata in metadataInformation):
@@ -139,7 +141,7 @@ class AbundanceTable:
         #Stratify data
         stratifiedAbundanceTables = dict()
         for tableRow in contents:
-            row = tableRow.split(tempDelimiter)
+            row = filter(None,tableRow.split(tempDelimiter))
             if(len(row)> 1):
                 for metadata in metadataInformation:
                     columns = metadataInformation[metadata]
@@ -152,8 +154,8 @@ class AbundanceTable:
 
         #Write to file
         for metadata in stratifiedAbundanceTables:
-            write = FileIO.FileIO(baseFilePath+"-by-"+metadata.strip("\"")+".txt",False,True,False)
-            write.writeToFile(Constants.Constants.ENDLINE.join(stratifiedAbundanceTables[metadata]))
+            write = FileIO(baseFilePath+"-by-"+metadata.strip("\"")+".txt",False,True,False)
+            write.writeToFile(Constants.ENDLINE.join(stratifiedAbundanceTables[metadata]))
             write.close()
 
         return True
@@ -168,40 +170,41 @@ class AbundanceTable:
     #@returns [A structured array of all data read, A structured array of the metadata].
     #Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
     #Metadata include the taxa ID column name if one is given
-    def textToStructuredArray(self, tempInputFile = None, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 0, tempNormalize = True):
+    def textToStructuredArray(self, tempInputFile = None, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 0, tempNormalize = True):
     #Validate parameters
-        if(not ValidateData.ValidateData.isValidFileName(tempInputFile)):
+        if(not ValidateData.isValidFileName(tempInputFile)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, input file not valid. File:",str(tempInputFile)])
             return False
-        if(not ValidateData.ValidateData.isValidStringType(tempDelimiter)):
+        if(not ValidateData.isValidStringType(tempDelimiter)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempDelimiter was invalid. Value =",str(tempDelimiter)])
             return False
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempNameRow, tempZero = True)):
+        if(not ValidateData.isValidPositiveInteger(tempNameRow, tempZero = True)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempNameRow was invalid. Value =",str(tempNameRow)])
             return False
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
+        if(not ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempFirstDataRow was invalid. Value =",str(tempFirstDataRow)])
             return False
-        if(not ValidateData.ValidateData.isValidBoolean(tempNormalize)):
+        if(not ValidateData.isValidBoolean(tempNormalize)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempNormalize was invalid. Value =",str(tempNormalize)])
             return False
 
         #Read in file
-        inputRead = FileIO.FileIO(tempInputFile,True, False, False)
+        inputRead = FileIO(tempInputFile,True, False, False)
         contents = inputRead.readFullFile()
         inputRead.close()
 
         #Turn to lines of the file
         contents = contents.replace("\"","")
-        contents = contents.split(Constants.Constants.ENDLINE)
+        contents = filter(None,contents.split(Constants.ENDLINE))
         namesRow = contents[tempNameRow]
-        namesRow = namesRow.split(tempDelimiter)
+        namesRow = filter(None,namesRow.split(tempDelimiter))
 
         #Get metadata lines
-        metadata = list()
+        metadata = dict()
         if((tempFirstDataRow-tempNameRow)>1):
             for line in contents[tempNameRow+1:tempFirstDataRow]:
-                metadata.append(line.split(tempDelimiter)[1:])
+                asmetadataElements = filter(None,line.split(tempDelimiter))
+                metadata[asmetadataElements[0]]=asmetadataElements[1:]
 
         #Build data type object (data name,data type)
         incompleteDataTypeVector = []
@@ -211,7 +214,7 @@ class AbundanceTable:
         #Extract data
         #Create the tuple with the first data row
         rowData = contents[tempFirstDataRow]
-        rowData = rowData.split(tempDelimiter)
+        rowData = filter(None,rowData.split(tempDelimiter))
         taxId = rowData[0]
         longestTaxId = len(taxId)
         sampleReads = rowData[1:]
@@ -223,7 +226,7 @@ class AbundanceTable:
 
         #Add the rest of the rows
         for rowData in contents[tempFirstDataRow+1:]:
-            rowData = rowData.split(tempDelimiter)
+            rowData = filter(None,rowData.split(tempDelimiter))
             taxId = rowData[0]
             tempTaxIdLen = len(taxId)
             if(tempTaxIdLen > longestTaxId):
@@ -234,8 +237,8 @@ class AbundanceTable:
                 tempSampleReads.append(float(reads))
             sampleReads = tempSampleReads
             #Validate data before adding to matrix
-            if(ValidateData.ValidateData.isValidString(taxId)):
-                if(ValidateData.ValidateData.isValidList(sampleReads)):
+            if(ValidateData.isValidString(taxId)):
+                if(ValidateData.isValidList(sampleReads)):
                     if(len(sampleReads)>0):
                         dataMatrix.append(tuple(sampleReads))
 
@@ -271,43 +274,44 @@ class AbundanceTable:
     #@returns [A structured array of all data read, A structured array of the metadata].
     #Samples (column) by Taxa (rows) without the column at index=0 if tempIgnoreIdColumn=True
     #Metadata include the taxa ID column name if one is given
-    def textToArray(self, tempInputFile = None, tempDelimiter = Constants.Constants.TAB, tempIgnoreIdColumn=True, tempNameRow = 0, tempFirstDataRow = 0, tempNormalize = True):
+    def textToArray(self, tempInputFile = None, tempDelimiter = Constants.TAB, tempIgnoreIdColumn=True, tempNameRow = 0, tempFirstDataRow = 0, tempNormalize = True):
     #Validate parameters
-        if(not ValidateData.ValidateData.isValidFileName(tempInputFile)):
+        if(not ValidateData.isValidFileName(tempInputFile)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, input file not valid. File:",str(outputFile)])
             return False
-        if(not ValidateData.ValidateData.isValidStringType(tempDelimiter)):
+        if(not ValidateData.isValidStringType(tempDelimiter)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempDelimiter was invalid. Value =",str(tempDelimiter)])
             return False
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempNameRow, tempZero = True)):
+        if(not ValidateData.isValidPositiveInteger(tempNameRow, tempZero = True)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempNameRow was invalid. Value =",str(tempNameRow)])
             return False
-        if(not ValidateData.ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
+        if(not ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempFirstDataRow was invalid. Value =",str(tempFirstDataRow)])
             return False
-        if(not ValidateData.ValidateData.isValidBoolean(tempNormalize)):
+        if(not ValidateData.isValidBoolean(tempNormalize)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempNormalize was invalid. Value =",str(tempNormalize)])
             return False
-        if(not ValidateData.ValidateData.isValidBoolean(tempIgnoreIdColumn)):
+        if(not ValidateData.isValidBoolean(tempIgnoreIdColumn)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, tempIgnoreIdColumn was invalid. Value =",str(tempIgnoreIdColumn)])
             return False
 
         #Read in file
-        inputRead = FileIO.FileIO(tempInputFile,True, False, False)
+        inputRead = FileIO(tempInputFile,True, False, False)
         contents = inputRead.readFullFile()
         inputRead.close()
 
         #Turn to lines of the file
         contents = contents.replace("\"","")
-        contents = contents.split(Constants.Constants.ENDLINE)
+        contents = filter(None,contents.split(Constants.ENDLINE))
         namesRow = contents[tempNameRow]
-        namesRow = namesRow.split(tempDelimiter)
+        namesRow = filter(None,namesRow.split(tempDelimiter))
 
         #Get metadata lines
-        metadata = list()
+        metadata = dict()
         if((tempFirstDataRow-tempNameRow)>1):
             for line in contents[tempNameRow+1:tempFirstDataRow]:
-                metadata.append(line.split(tempDelimiter)[1:])
+                asMetadataElement=filter(None,line.split(tempDelimiter))
+                metadata[asMetadataElement[0]]=asMetadataElement[1:]
 
         #Build data type object (data name,data type)
         dataTypeVector = []
@@ -322,7 +326,7 @@ class AbundanceTable:
         #Extract data
         #Create the list with the first data row
         rowData = contents[tempFirstDataRow]
-        rowData = rowData.split(tempDelimiter)
+        rowData = filter(None,rowData.split(tempDelimiter))
         #Ignore first column if needed
         if(tempIgnoreIdColumn==True):
             rowData = rowData[1:]
@@ -334,7 +338,7 @@ class AbundanceTable:
 
         #Add the rest of the rows
         for rowData in contents[tempFirstDataRow+1:]:
-            rowData = rowData.split(tempDelimiter)
+            rowData = filter(None,rowData.split(tempDelimiter))
             #Ignore first column if needed
             if(tempIgnoreIdColumn==True):
                 rowData = rowData[1:]
@@ -373,10 +377,10 @@ class AbundanceTable:
     #@return Returns Transposed structured array (list of lists, list=previous columns) with potentially the first column removed.
     def transposeDataMatrix(self,tempMatrix, tempRemoveAdornments=False):
         #Validate parameters
-        if(not ValidateData.ValidateData.isValidStructuredArray(tempMatrix)):
+        if(not ValidateData.isValidStructuredArray(tempMatrix)):
             print "".join(["AbundanceTable:transposeDataMatrix::Error, transposeDataMatrix was an invalid structured array. Value =",str(tempMatrix)])
             return False
-        if(not ValidateData.ValidateData.isValidBoolean(tempRemoveAdornments)):
+        if(not ValidateData.isValidBoolean(tempRemoveAdornments)):
             print "".join(["AbundanceTable:transposeDataMatrix::Error, tempRemoveAdornments was an invalid boolean. Value =",str(tempRemoveAdornments)])
             return False
 

@@ -8,11 +8,11 @@
 #######################################################
 
 #Import local code
-import Constants
-import FileIO
+from Constants import Constants
+from FileIO import FileIO
 import os
 import unittest
-import Utility_File
+from Utility_File import Utility_File
 
 class Utility_FileTest(unittest.TestCase):
 
@@ -28,12 +28,12 @@ class Utility_FileTest(unittest.TestCase):
 
         correctAnswer = True
         error = ""
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
         if(not result):
             error = error + "Received a false in method call."
 
-        readFileLineCount = Utility_File.Utility_File.fileLineCount(tempReadFileName)
-        writeFileLineCount = Utility_File.Utility_File.fileLineCount("./Testing/TestSplitFileOutput_1.txt")
+        readFileLineCount = Utility_File.fileLineCount(tempReadFileName)
+        writeFileLineCount = Utility_File.fileLineCount("./Testing/TestSplitFileOutput_1.txt")
         if(not (readFileLineCount == writeFileLineCount)):
             result = False
             error = error + "Split created a file of line count :"+str(writeFileLineCount)+". From a file of line count :"+str(readFileLineCount)+"."
@@ -44,7 +44,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = None
         correctAnswer = False
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -53,7 +53,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = 456754
         correctAnswer = False
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -62,7 +62,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "                                "
         correctAnswer = False
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -71,7 +71,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = ""
         correctAnswer = False
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -81,7 +81,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple"
         correctAnswer = "simple_1"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -90,7 +90,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_A"
         correctAnswer = "simple_A_1"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -99,7 +99,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_9"
         correctAnswer = "simple_10"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -108,7 +108,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_B_A"
         correctAnswer = "simple_B_A_1"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -117,7 +117,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_D_9"
         correctAnswer = "simple_D_10"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -126,7 +126,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.txt"
         correctAnswer = "simple_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -135,7 +135,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_____.txt"
         correctAnswer = "simple______1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -144,7 +144,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple......txt"
         correctAnswer = "simple....._1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -153,7 +153,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_S.txt"
         correctAnswer = "simple_S_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -162,7 +162,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_5.txt"
         correctAnswer = "simple_6.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -171,7 +171,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_2_S.txt"
         correctAnswer = "simple_2_S_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -180,7 +180,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple_g_5.txt"
         correctAnswer = "simple_g_6.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -189,7 +189,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.txt"
         correctAnswer = "simple.mostly_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -198,7 +198,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly_k.txt"
         correctAnswer = "simple.mostly_k_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -207,7 +207,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly_7.txt"
         correctAnswer = "simple.mostly_8.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -216,7 +216,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly_0_k.txt"
         correctAnswer = "simple.mostly_0_k_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -225,7 +225,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly_0_7.txt"
         correctAnswer = "simple.mostly_0_8.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -234,7 +234,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.notreally.txt"
         correctAnswer = "simple.mostly.notreally_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -243,7 +243,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.notreally_w.txt"
         correctAnswer = "simple.mostly.notreally_w_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -252,7 +252,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.notreally_2.txt"
         correctAnswer = "simple.mostly.notreally_3.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -261,7 +261,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.notreally_0_w.txt"
         correctAnswer = "simple.mostly.notreally_0_w_1.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -270,7 +270,7 @@ class Utility_FileTest(unittest.TestCase):
 
         testString = "simple.mostly.notreally_tyfg_2.txt"
         correctAnswer = "simple.mostly.notreally_tyfg_3.txt"
-        result = Utility_File.Utility_File.incrementFileName(testString)
+        result = Utility_File.incrementFileName(testString)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+correctAnswer+". but received ."+result+".")
 
@@ -283,7 +283,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileForBadCaseNegativeNumberOfLines.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -295,7 +295,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -307,7 +307,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -319,7 +319,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -331,7 +331,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -343,7 +343,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -355,7 +355,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -367,7 +367,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -379,7 +379,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "./Testing/Notta a directory//TestSplitFileOutput.txt"
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -391,7 +391,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = None
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -403,7 +403,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = "                                  "
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -415,7 +415,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = ""
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -427,7 +427,7 @@ class Utility_FileTest(unittest.TestCase):
         tempOutputFileName = 876543
 
         correctAnswer = False
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -444,12 +444,12 @@ class Utility_FileTest(unittest.TestCase):
 
         if os.path.isfile("./Testing/TestSplitFile.txt"):
             os.remove("./Testing/TestSplitFile.txt")
-        fileWriter = FileIO.FileIO("./Testing/TestSplitFile.txt",False,True,True)
+        fileWriter = FileIO("./Testing/TestSplitFile.txt",False,True,True)
         fileWriter.writeToFile(fileData)
         fileWriter.close()
 
         correctAnswer = True
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
         if(not correctAnswer == result):
             hasError = True
             errorMessage = errorMessage + " Did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+"."
@@ -461,7 +461,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 1
         if os.path.isfile("./Testing/TestSplitFileOutput_1.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == fileData:
                 hasError = True
@@ -485,12 +485,12 @@ class Utility_FileTest(unittest.TestCase):
 
         if os.path.isfile("./Testing/TestSplitFile.txt"):
             os.remove("./Testing/TestSplitFile.txt")
-        fileWriter = FileIO.FileIO("./Testing/TestSplitFile.txt",False,True,True)
+        fileWriter = FileIO("./Testing/TestSplitFile.txt",False,True,True)
         fileWriter.writeToFile(fileData)
         fileWriter.close()
 
         correctAnswer = True
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
         if(not correctAnswer == result):
             hasError = True
             errorMessage = errorMessage + " Did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+"."
@@ -502,7 +502,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 1
         if os.path.isfile("./Testing/TestSplitFileOutput_1.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == results1:
                 hasError = True
@@ -517,7 +517,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 2
         if os.path.isfile("./Testing/TestSplitFileOutput_2.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_2.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_2.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == results2:
                 hasError = True
@@ -543,12 +543,12 @@ class Utility_FileTest(unittest.TestCase):
 
         if os.path.isfile("./Testing/TestSplitFile.txt"):
             os.remove("./Testing/TestSplitFile.txt")
-        fileWriter = FileIO.FileIO("./Testing/TestSplitFile.txt",False,True,True)
+        fileWriter = FileIO("./Testing/TestSplitFile.txt",False,True,True)
         fileWriter.writeToFile(fileData)
         fileWriter.close()
 
         correctAnswer = True
-        result = Utility_File.Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
+        result = Utility_File.splitFile(tempNumberOfLines,tempReadFileName,tempOutputFileName)
         if(not correctAnswer == result):
             hasError = True
             errorMessage = errorMessage + " Did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+"."
@@ -560,7 +560,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 1
         if os.path.isfile("./Testing/TestSplitFileOutput_1.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_1.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == results1:
                 hasError = True
@@ -575,7 +575,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 2
         if os.path.isfile("./Testing/TestSplitFileOutput_2.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_2.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_2.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == results2:
                 hasError = True
@@ -590,7 +590,7 @@ class Utility_FileTest(unittest.TestCase):
 
         #Check contents of file 3
         if os.path.isfile("./Testing/TestSplitFileOutput_3.txt"):
-            fileReader = FileIO.FileIO("./Testing/TestSplitFileOutput_3.txt",True, False, False)
+            fileReader = FileIO("./Testing/TestSplitFileOutput_3.txt",True, False, False)
             contents = fileReader.readFullFile()
             if not contents == results3:
                 hasError = True
@@ -610,7 +610,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = False
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -624,7 +624,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = False
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -638,7 +638,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = False
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -652,7 +652,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = False
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -666,7 +666,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = False
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -680,7 +680,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = None
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -694,7 +694,7 @@ class Utility_FileTest(unittest.TestCase):
         tempRemoveHeader = 2
         #Bool
         correctReturn = False
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
@@ -726,7 +726,7 @@ class Utility_FileTest(unittest.TestCase):
             fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -778,7 +778,7 @@ class Utility_FileTest(unittest.TestCase):
             fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -830,7 +830,7 @@ class Utility_FileTest(unittest.TestCase):
             fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -882,7 +882,7 @@ class Utility_FileTest(unittest.TestCase):
             fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
+        result = Utility_File.combineFiles(outputFileName,listOfFiles,tempRemoveHeader)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -913,7 +913,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = False
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -924,7 +924,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = False
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -935,7 +935,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = False
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -946,7 +946,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = False
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -957,7 +957,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = "GoodCase"
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -968,7 +968,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = "GoodCasetxt"
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -979,7 +979,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = "!@#$%^&&*()_+"
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -990,7 +990,7 @@ class Utility_FileTest(unittest.TestCase):
         correctAnswer = "GoodCase."
 
         #Check result return
-        result = Utility_File.Utility_File.getFileNamePrefix(fileName)
+        result = Utility_File.getFileNamePrefix(fileName)
 
         self.assertEquals(correctAnswer, result, methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
@@ -999,7 +999,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "TestCombineFilesOutput.txt"
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 6
         #Indicator if the test is supposed to pass or fail
@@ -1021,7 +1021,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -1049,7 +1049,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "TestCombineFilesOutput.txt"
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 0
         #Indicator if the test is supposed to pass or fail
@@ -1071,7 +1071,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         fileReader = open(outputFileName, 'r')
@@ -1100,7 +1100,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "TestCombineFilesOutput.txt"
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = None
         #Indicator if the test is supposed to pass or fail
@@ -1122,7 +1122,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1138,7 +1138,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "TestCombineFilesOutput.txt"
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = -7
         #Indicator if the test is supposed to pass or fail
@@ -1160,7 +1160,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1176,7 +1176,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "TestCombineFilesOutput.txt"
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = "10"
         #Indicator if the test is supposed to pass or fail
@@ -1198,7 +1198,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1214,7 +1214,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = None
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 5
         #Indicator if the test is supposed to pass or fail
@@ -1236,7 +1236,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1259,7 +1259,7 @@ class Utility_FileTest(unittest.TestCase):
         correctReturn = False
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1273,7 +1273,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = "    "
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 5
         #Indicator if the test is supposed to pass or fail
@@ -1295,7 +1295,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1318,7 +1318,7 @@ class Utility_FileTest(unittest.TestCase):
         correctReturn = False
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1332,7 +1332,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = ""
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 5
         #Indicator if the test is supposed to pass or fail
@@ -1354,7 +1354,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1377,7 +1377,7 @@ class Utility_FileTest(unittest.TestCase):
         correctReturn = False
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1391,7 +1391,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         outputFileName = False
         #String
-        inputFileName = Constants.Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
+        inputFileName = Constants.TEST_ANSWER_DOCUMENTS+methodName+".txt"
 	#Int
         count = 5
         #Indicator if the test is supposed to pass or fail
@@ -1413,7 +1413,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1436,7 +1436,7 @@ class Utility_FileTest(unittest.TestCase):
         correctReturn = False
 
         #Check result return
-        result = Utility_File.Utility_File.abridgeFile(count, inputFileName, outputFileName)
+        result = Utility_File.abridgeFile(count, inputFileName, outputFileName)
 
         #Check result
         if(result):
@@ -1448,9 +1448,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForGoodCase(self):
         methodName = "testAreEqualForGoodCase"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = True
 
@@ -1484,7 +1484,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, fileName2)
+        result = Utility_File.areEqual(fileName1, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1497,7 +1497,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         fileName1 = " "
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1531,7 +1531,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, fileName2)
+        result = Utility_File.areEqual(fileName1, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1544,7 +1544,7 @@ class Utility_FileTest(unittest.TestCase):
         #String
         fileName2 = " "
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1578,7 +1578,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, fileName2)
+        result = Utility_File.areEqual(fileName1, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1589,9 +1589,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseEmpty1(self):
         methodName = "testAreEqualForEmpty1"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1625,7 +1625,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual("", fileName2)
+        result = Utility_File.areEqual("", fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1636,9 +1636,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseEmpty2(self):
         methodName = "testAreEqualForEmpty2"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
 
         correctReturn = False
 
@@ -1672,7 +1672,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, "")
+        result = Utility_File.areEqual(fileName1, "")
 
         #Delete files
         os.remove(fileName1)
@@ -1683,9 +1683,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseNone1(self):
         methodName = "testAreEqualForNone1"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1719,7 +1719,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(None, fileName2)
+        result = Utility_File.areEqual(None, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1730,9 +1730,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseNone2(self):
         methodName = "testAreEqualForNone2"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
 
         correctReturn = False
 
@@ -1766,7 +1766,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, None)
+        result = Utility_File.areEqual(fileName1, None)
 
         #Delete files
         os.remove(fileName1)
@@ -1777,9 +1777,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseType1(self):
         methodName = "testAreEqualForType1"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1813,7 +1813,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(1, fileName2)
+        result = Utility_File.areEqual(1, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1824,9 +1824,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseType2(self):
         methodName = "testAreEqualForType2"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = False
 
@@ -1860,7 +1860,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, list())
+        result = Utility_File.areEqual(fileName1, list())
 
         #Delete files
         os.remove(fileName1)
@@ -1871,9 +1871,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseNotExist1(self):
         methodName = "testAreEqualForNotExist1"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = None
 
@@ -1893,7 +1893,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, fileName2)
+        result = Utility_File.areEqual(fileName1, fileName2)
 
         #Delete files
         os.remove(fileName2)
@@ -1903,9 +1903,9 @@ class Utility_FileTest(unittest.TestCase):
     def testAreEqualForBadCaseNotExist2(self):
         methodName = "testAreEqualForNotExist2"
         #String
-        fileName2 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
+        fileName2 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase1.txt"
         #String
-        fileName1 = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
+        fileName1 = Constants.TEST_DATA_TEMP_DIRECTORY+"testAreEqualForGoodCase2.txt"
 
         correctReturn = None
 
@@ -1925,7 +1925,7 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.close()
 
         #Check result return
-        result = Utility_File.Utility_File.areEqual(fileName1, fileName2)
+        result = Utility_File.areEqual(fileName1, fileName2)
 
         #Delete files
         os.remove(fileName1)
@@ -1935,50 +1935,50 @@ class Utility_FileTest(unittest.TestCase):
     def testClearDirectoryForBadCaseEmptyFileName(self):
         methodName = "testClearDirectoryForBadCaseEmptyFileName"
         tempFileName = ""
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testClearDirectoryForBadCaseBlankFileName(self):
         methodName = "testClearDirectoryForBadCaseBlankFileName"
         tempFileName = "      "
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testClearDirectoryForBadCaseNoneFileName(self):
         methodName = "testClearDirectoryForBadCaseNoneFileName"
         tempFileName = None
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testClearDirectoryForBadCaseWrongTypeFileName(self):
         methodName = "testClearDirectoryForBadCaseWrongTypeFileName"
         tempFileName = 1
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testClearDirectoryForBadCaseWrongFileName(self):
         methodName = "testClearDirectoryForBadCaseWrongFileName"
         tempFileName = "..///ImNotaFile!.what"
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testClearDirectoryForGoodCase(self):
         methodName = "testClearDirectoryForGoodCase"
         correctReturn = True
-        tempFileName = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
+        tempFileName = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
 
         if(not os.path.exists(tempFileName)):
             os.mkdir(tempFileName)
-        fileWriter = open(Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
+        fileWriter = open(Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
         fileWriter.write("I am a header\n")
         fileWriter.close()
 
-        result = Utility_File.Utility_File.clearDirectory(tempDirectory = tempFileName)
+        result = Utility_File.clearDirectory(tempDirectory = tempFileName)
         errorNotFound = os.path.exists(tempFileName)
         error = ""
         if(not errorNotFound):
@@ -1996,48 +1996,48 @@ class Utility_FileTest(unittest.TestCase):
     def testFileLineCountForBadCaseEmptyFileName(self):
         methodName = "testFileLineCountForBadCaseEmptyFileName"
         tempFileName = ""
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = tempFileName)
+        result = Utility_File.fileLineCount(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testFileLineCountForBadCaseBlankFileName(self):
         methodName = "testFileLineCountForBadCaseBlankFileName"
         tempFileName = "      "
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = tempFileName)
+        result = Utility_File.fileLineCount(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testFileLineCountForBadCaseNoneFileName(self):
         methodName = "testFileLineCountForBadCaseNoneFileName"
         tempFileName = None
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = tempFileName)
+        result = Utility_File.fileLineCount(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testFileLineCountForBadCaseWrongTypeFileName(self):
         methodName = "testFileLineCountForBadCaseWrongTypeFileName"
         tempFileName = 1
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = tempFileName)
+        result = Utility_File.fileLineCount(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testFileLineCountForBadCaseWrongFileName(self):
         methodName = "testFileLineCountForBadCaseWrongFileName"
         tempFileName = "..///ImNotaFile!.what"
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = tempFileName)
+        result = Utility_File.fileLineCount(tempDirectory = tempFileName)
         correctReturn = False
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received ."+str(result)+".")
 
     def testFileLineCountForGoodCase10Lines(self):
         methodName = "testFileLineCountForGoodCase10Lines"
         correctReturn = 10
-        tempFileName = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        tempFileName = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
 
         if(not os.path.exists(tempFileName)):
             os.mkdir(tempFileName)
 
-        fileWriter = open(Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
+        fileWriter = open(Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
         fileWriter.write("I am a header\n")
         fileWriter.write("I am a header\n")
         fileWriter.write("I am a header\n")
@@ -2050,21 +2050,21 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.write("I am a header\n")
         fileWriter.close()
 
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
+        result = Utility_File.fileLineCount(tempDirectory = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
 
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received "+str(result)+".")
 
     def testFileLineCountForGoodCase30Lines(self):
         methodName = "testFileLineCountForGoodCase30Lines"
         correctReturn = 30
-        tempFileName = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        tempFileName = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
 
         if(not os.path.exists(tempFileName)):
             os.mkdir(tempFileName)
 
-        fileWriter = open(Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
+        fileWriter = open(Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
         fileWriter.write("I am a header\n")
         fileWriter.write("I am a header\n")
         fileWriter.write("I am a header\n")
@@ -2097,44 +2097,44 @@ class Utility_FileTest(unittest.TestCase):
         fileWriter.write("I am a header\n")
         fileWriter.close()
 
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
+        result = Utility_File.fileLineCount(tempDirectory = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
 
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received "+str(result)+".")
 
     def testFileLineCountForGoodCase0Lines(self):
         methodName = "testFileLineCountForGoodCase10Lines"
         correctReturn = 0
-        tempFileName = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        tempFileName = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
 
         if(not os.path.exists(tempFileName)):
             os.mkdir(tempFileName)
 
-        fileWriter = open(Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
+        fileWriter = open(Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
         fileWriter.close()
 
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
+        result = Utility_File.fileLineCount(tempDirectory = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
 
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received "+str(result)+".")
 
     def testFileLineCountForGoodCase1Lines(self):
         methodName = "testFileLineCountForGoodCase10Lines"
         correctReturn = 1
-        tempFileName = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        tempFileName = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
 
         if(not os.path.exists(tempFileName)):
             os.mkdir(tempFileName)
 
-        fileWriter = open(Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
+        fileWriter = open(Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt", 'w')
         fileWriter.write("I am a header\n")
         fileWriter.close()
 
-        result = Utility_File.Utility_File.fileLineCount(tempDirectory = Constants.Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
+        result = Utility_File.fileLineCount(tempDirectory = Constants.TEST_DATA_TEMP_DIRECTORY+"ClearMe/"+"DeleteMe.txt")
 
-        Utility_File.Utility_File.clearDirectory(Constants.Constants.TEST_DATA_TEMP_DIRECTORY)
+        Utility_File.clearDirectory(Constants.TEST_DATA_TEMP_DIRECTORY)
         self.assertEquals(correctReturn, result, methodName+" did not give correct result. Expected ."+str(correctReturn)+". but received "+str(result)+".")
 
 ##

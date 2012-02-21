@@ -13,9 +13,9 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
-import Diversity
+from Diversity import Diversity
 import mlpy
-import MLPYDistanceAdaptor
+from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
 import unittest
 
@@ -64,7 +64,7 @@ class MLPYDistanceAdaptorTest(unittest.TestCase):
                 distanceMatrix.append(dtw.compute(x[index],x[iindex]))
 
         #Make distance object and set up kMedoids
-        distance = MLPYDistanceAdaptor.MLPYDistanceAdaptor(tempDistanceMatrix=distanceMatrix, tempIsCondensedMatrix=True)
+        distance = MLPYDistanceAdaptor(tempDistanceMatrix=distanceMatrix, tempIsCondensedMatrix=True)
         medoidsMaker = mlpy.Kmedoids(k=tempNumberClusters, dist=distance)
 
         #Build a matrix of lists of indicies to pass to KMediods compute

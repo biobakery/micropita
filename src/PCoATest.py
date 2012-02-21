@@ -18,7 +18,6 @@ from numpy import array
 from PCoA import PCoA
 import os
 import unittest
-import Utility_File
 
 ##
 #Tests the Blog object

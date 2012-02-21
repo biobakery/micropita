@@ -13,19 +13,19 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
-import AbundanceTable
-import CommandLine
-import Constants
-import Diversity
-import FileIO
+from AbundanceTable import AbundanceTable
+from CommandLine import CommandLine
+from Constants import Constants
+from Diversity import Diversity
+from FileIO import FileIO
 import mlpy
-import MLPYDistanceAdaptor
+from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
 import os
 from MicroPITA import MicroPITA
-import SVM
+from SVM import SVM
 import unittest
-import Utility_File
+from Utility_File import Utility_File
 from scikits.learn.cluster import AffinityPropagation
 #TODO Get the new import
 #from scikits.learn.datasets.samples_generator import make_blobs
@@ -39,7 +39,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -47,7 +47,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_SIMPSON_A_DIVERSITY
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -64,7 +64,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -72,7 +72,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_INV_SIMPSON_A_DIVERSITY
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -89,7 +89,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -97,7 +97,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_SHANNON_A_DIVERSITY
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -114,7 +114,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
@@ -122,7 +122,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_CHAO1_A_DIVERSITY
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -140,7 +140,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -148,7 +148,7 @@ class MicroPITATest(unittest.TestCase):
         metric = [microPITA.c_SIMPSON_A_DIVERSITY]
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -165,7 +165,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
@@ -173,7 +173,7 @@ class MicroPITATest(unittest.TestCase):
         metric = [microPITA.c_CHAO1_A_DIVERSITY]
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -191,7 +191,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -199,7 +199,7 @@ class MicroPITATest(unittest.TestCase):
         metric = [microPITA.c_SIMPSON_A_DIVERSITY,microPITA.c_INV_SIMPSON_A_DIVERSITY,microPITA.c_SHANNON_A_DIVERSITY]
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -324,7 +324,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -332,7 +332,7 @@ class MicroPITATest(unittest.TestCase):
         metric = [microPITA.c_SIMPSON_A_DIVERSITY,microPITA.c_INV_SIMPSON_A_DIVERSITY,microPITA.c_SHANNON_A_DIVERSITY]
 
         #Generate data
-        abundance = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
 
@@ -351,7 +351,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -359,7 +359,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_BRAY_CURTIS_B_DIVERSITY
 
         #Generate data
-        rawData = AbundanceTable.AbundanceTable()
+        rawData = AbundanceTable()
         abundance = rawData.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
@@ -380,7 +380,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -388,7 +388,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_BRAY_CURTIS_B_DIVERSITY
 
         #Generate data
-        rawData = AbundanceTable.AbundanceTable()
+        rawData = AbundanceTable()
         abundance = rawData.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
@@ -409,7 +409,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -417,7 +417,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY
 
         #Generate data
-        rawData = AbundanceTable.AbundanceTable()
+        rawData = AbundanceTable()
         abundance = rawData.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
@@ -438,7 +438,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = True
@@ -446,7 +446,7 @@ class MicroPITATest(unittest.TestCase):
         metric = microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY
 
         #Generate data
-        rawData = AbundanceTable.AbundanceTable()
+        rawData = AbundanceTable()
         abundance = rawData.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         abundance = abundance[0]
         sampleNames = abundance.dtype.names[1:]
@@ -491,7 +491,7 @@ class MicroPITATest(unittest.TestCase):
         answer = "['Six', 'One', 'Four']"
 
         #Call method
-        result = microPITA.getCentralSamplesByKMedoids(tempMatrix=data, tempMetric=Diversity.Diversity.c_BRAY_CURTIS_B_DIVERSITY, tempSampleNames = sampleNames, tempNumberClusters = numberClusters, tempNumberSamplesReturned = numberSamplesReturned)
+        result = microPITA.getCentralSamplesByKMedoids(tempMatrix=data, tempMetric=Diversity.c_BRAY_CURTIS_B_DIVERSITY, tempSampleNames = sampleNames, tempNumberClusters = numberClusters, tempNumberSamplesReturned = numberSamplesReturned)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -503,7 +503,7 @@ class MicroPITATest(unittest.TestCase):
         microPITA=MicroPITA.MicroPITA()
 
         #Abundance table object to read in and manage data
-        rawData = AbundanceTable.AbundanceTable()
+        rawData = AbundanceTable()
 
         #Prepare data
 ##        inputFile = "./testData/microPITA/extremeDissimilarityTest/hq.otu_04-nul-nul-mtd-trn-flt-by-Blood.txt"
@@ -520,17 +520,17 @@ class MicroPITATest(unittest.TestCase):
         inputFile = "./testData/microPITA/extremeDissimilarityTest/InsilicoNorm.txt"
 
         #Create file names
-        prefix = Utility_File.Utility_File.getFileNamePrefix(inputFile)
+        prefix = Utility_File.getFileNamePrefix(inputFile)
         figureColorFilePath=prefix+"_ExtremeDissimilarityColor.txt"
         figureLabelFilePath=prefix+"_ExtremeDissimilarityLabel.txt"
         figureDataFile = prefix+"_values.txt"
         outputFileName=prefix+"_ExtremeDissimilarity.pdf"
-        delimiter = Constants.Constants.TAB
+        delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         selectCount = 3
         normalize = True
-        abundance,metadata = rawData.textToStructuredArray(tempInputFile=inputFileMicroPITA, tempDelimiter=Constants.Constants.TAB, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=False)
+        abundance,metadata = rawData.textToStructuredArray(tempInputFile=inputFileMicroPITA, tempDelimiter=Constants.TAB, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=False)
         sampleNames = abundance.dtype.names[1:]
         abundance = rawData.normalizeColumns(tempStructuredArray=abundance, tempColumns=list(sampleNames))
         tAbundance = rawData.transposeDataMatrix(tempMatrix=abundance, tempRemoveAdornments=True)
@@ -552,31 +552,31 @@ class MicroPITATest(unittest.TestCase):
         if(os.path.exists(figureDataFile)):
             os.remove(figureDataFile)
         #Create file handle to write to files
-        colorFileWriter = FileIO.FileIO(figureColorFilePath,False,True,True)
-        labelFileWriter = FileIO.FileIO(figureLabelFilePath,False,True,True)
+        colorFileWriter = FileIO(figureColorFilePath,False,True,True)
+        labelFileWriter = FileIO(figureLabelFilePath,False,True,True)
         colorList = list()
         labelList = list()
         for selectedSampleName in selectedSamples:
-            colorList.append(selectedSampleName+Constants.Constants.TAB+"#FF0000")
-            labelList.append(selectedSampleName+Constants.Constants.TAB+selectedSampleName)
-        colorFileWriter.writeToFile(Constants.Constants.ENDLINE.join(colorList))
-        labelFileWriter.writeToFile(Constants.Constants.ENDLINE.join(labelList))
+            colorList.append(selectedSampleName+Constants.TAB+"#FF0000")
+            labelList.append(selectedSampleName+Constants.TAB+selectedSampleName)
+        colorFileWriter.writeToFile(Constants.ENDLINE.join(colorList))
+        labelFileWriter.writeToFile(Constants.ENDLINE.join(labelList))
         colorFileWriter.close()
         labelFileWriter.close()
         #Create data file
-        dataFileReader = FileIO.FileIO(inputFile,True,False,False)
+        dataFileReader = FileIO(inputFile,True,False,False)
         dataContent = dataFileReader.readFullFile()
         dataFileReader.close()
-        dataContent=dataContent.split(Constants.Constants.ENDLINE)
+        dataContent=dataContent.split(Constants.ENDLINE)
         dataWriteContent = [dataContent[0]]
         if(len(dataContent) > 3):
             dataWriteContent.extend(dataContent[2:(len(dataContent)-1)])
-        dataFileWriter = FileIO.FileIO(figureDataFile,False,True,False)
-        dataFileWriter.writeToFile(Constants.Constants.ENDLINE.join(dataWriteContent))
+        dataFileWriter = FileIO(figureDataFile,False,True,False)
+        dataFileWriter.writeToFile(Constants.ENDLINE.join(dataWriteContent))
         dataFileWriter.close()
 
         #Call command
-        CommandLine.CommandLine().runCommandLine(["./external/hclust/hclust.py", "--in", figureDataFile, "--out", outputFileName, "--label2cols", figureColorFilePath, "-l", figureLabelFilePath, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "-d", "correlation", "-f", "braycurtis","-y","0.001"])
+        CommandLine().runCommandLine(["./external/hclust/hclust.py", "--in", figureDataFile, "--out", outputFileName, "--label2cols", figureColorFilePath, "-l", figureLabelFilePath, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "-d", "correlation", "-f", "braycurtis","-y","0.001"])
 
         #Check result against answer
         result = True
@@ -591,7 +591,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        matrix = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904","Bacteria|3417","Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
@@ -611,7 +611,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        matrix = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904"]
 
@@ -631,7 +631,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        matrix = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904","Bacteria|3417","Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72","Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361","Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"]
 
@@ -651,7 +651,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        matrix = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = []
 
@@ -672,7 +672,7 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        matrix = AbundanceTable.AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
 
         #Correct Answer
@@ -791,7 +791,7 @@ class MicroPITATest(unittest.TestCase):
         #Reading file
         inputFile="./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         outputFile="./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.SVM.txt"
-        delimiter=Constants.Constants.TAB
+        delimiter=Constants.TAB
         nameRow=0
         firstDataRow=2
         skipColumn1=True
@@ -806,7 +806,7 @@ class MicroPITATest(unittest.TestCase):
         labels = [0,0,0,0,0,1,1,1,1,1]
 
         #Generate data
-        microPITA.runSVM(tempInputFile=inputFile, tempDelimiter=Constants.Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, tempFirstDataRow=firstDataRow, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
+        microPITA.runSVM(tempInputFile=inputFile, tempDelimiter=Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, tempFirstDataRow=firstDataRow, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
 
         #Get results
         result = ""

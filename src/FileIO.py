@@ -8,7 +8,7 @@
 #######################################################
 
 #Import libaries
-import ValidateData
+from ValidateData import ValidateData
 import os
 
 ##
@@ -38,13 +38,13 @@ class FileIO():
     #@param tempFileAppend Boolean indicator of if data will be appended when writing
     def __init__(self, fileName, tempRead, tempWrite, tempFileAppend):
         #Check parameters
-        if not ValidateData.ValidateData.isValidString(fileName):
+        if not ValidateData.isValidString(fileName):
             raise ValueError, "Error while opening file. File name is invalid :"+str(fileName)+"."
-        if not ValidateData.ValidateData.isValidBoolean(tempRead):
+        if not ValidateData.isValidBoolean(tempRead):
             raise ValueError, "Error while opening file. Read file is invalid :"+str(tempRead)+"."
-        if not ValidateData.ValidateData.isValidBoolean(tempWrite):
+        if not ValidateData.isValidBoolean(tempWrite):
             raise ValueError, "Error while opening file. Write file is invalid :"+str(tempWrite)+"."
-        if not ValidateData.ValidateData.isValidBoolean(tempFileAppend):
+        if not ValidateData.isValidBoolean(tempFileAppend):
             raise ValueError, "Error while opening file. File Append is invalid :"+str(tempFileAppend)+"."
 
         #Set variables
@@ -89,7 +89,7 @@ class FileIO():
     def writeToFile(self, tempData):
         if not self.__write:
             return False
-        if (not ValidateData.ValidateData.isValidString(tempData)) or (self.__file == None):
+        if (not ValidateData.isValidString(tempData)) or (self.__file == None):
             return False
 
         #Write to file
