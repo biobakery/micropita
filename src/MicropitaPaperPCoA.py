@@ -113,23 +113,25 @@ def _main( ):
 
         #Color for selected samples in PCoA based on selection method
         charSelectedColor = ""
+        objColors = Constants_Figures()
+        objColors.invertColors(fInvert=c_fInvert)
         astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
         if astrSelectionMethod[0] == MicroPITA.c_DIVERSITY_1:
-            charSelectedColor = Constants_Figures.c_charPCOADiversityInvS
+            charSelectedColor = objColors.c_charPCOADiversityInvS
         elif astrSelectionMethod[0] == MicroPITA.c_DIVERSITY_2:
-            charSelectedColor = Constants_Figures.c_charPCOADiversityChao1
+            charSelectedColor = objColors.c_charPCOADiversityChao1
         elif astrSelectionMethod[0] == MicroPITA.c_EXTREME_DISSIMILARITY_1:
-            charSelectedColor = Constants_Figures.c_charPCOAExtreme
+            charSelectedColor = objColors.c_charPCOAExtreme
         elif astrSelectionMethod[0] == MicroPITA.c_SVM_CLOSE:
-            charSelectedColor = Constants_Figures.c_charPCOADiscriminant
+            charSelectedColor = objColors.c_charPCOADiscriminant
         elif astrSelectionMethod[0] == MicroPITA.c_SVM_FAR:
-            charSelectedColor = Constants_Figures.c_charPCOADistinctColor
+            charSelectedColor = objColors.c_charPCOADistinctColor
         elif astrSelectionMethod[0] == MicroPITA.c_RANDOM:
-            charSelectedColor = Constants_Figures.c_charPCOARandom
+            charSelectedColor = objColors.c_charPCOARandom
         elif astrSelectionMethod[0] == MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:
-            charSelectedColor = Constants_Figures.c_charPCOARepresentative
+            charSelectedColor = objColors.c_charPCOARepresentative
         elif astrSelectionMethod[0] == MicroPITA.c_USER_RANKED:
-            charSelectedColor = Constants_Figures.c_charPCOATaxa
+            charSelectedColor = objColors.c_charPCOATaxa
 
         #Parse samples
         astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
@@ -141,7 +143,7 @@ def _main( ):
                 acharColors.append(charSelectedColor)
                 acharSelection.append(astrSelectionMethod[0])
             else:
-                acharColors.append(Constants_Figures.c_charPCOANoSelect)
+                acharColors.append(objColors.c_charPCOANoSelect)
                 acharSelection.append(c_NotSelected)
 
         #Draw PCoA

@@ -15,6 +15,7 @@ __status__ = "Development"
 #External libraries
 from AbundanceTable import AbundanceTable
 from Constants import Constants
+from Constants_Figures import Constants_Figures
 from Diversity import Diversity
 from cogent.cluster.nmds import NMDS
 from scipy.spatial.distance import squareform
@@ -166,28 +167,25 @@ class PCoA:
 
             #Get plot object
             imgFigure = plt.figure()
-            imgSubplot = None
-            #Will be set based on inverting
-            charMarkerEdgeColor = 'k'
 
-            #Invert figure
-            if(tempInvert):
-              imgFigure.set_facecolor("black")
-              imgSubplot = imgFigure.add_subplot(111,axisbg='k')
-              imgSubplot.set_xlabel("Dimension 1")
-              imgSubplot.set_ylabel("Dimension 2")
-              imgSubplot.spines['top'].set_color("w")
-              imgSubplot.spines['bottom'].set_color("w")
-              imgSubplot.spines['left'].set_color("w")
-              imgSubplot.spines['right'].set_color("w")
-              imgSubplot.xaxis.label.set_color("w")
-              imgSubplot.yaxis.label.set_color("w")
-              imgSubplot.tick_params(axis='x', colors='w')
-              imgSubplot.tick_params(axis='y', colors='w')
-              charMarkerEdgeColor = 'w'
-            else:
-              imgSubplot = imgFigure.add_subplot(111)
-              imgFigure.set_facecolor("white")
+            #Get plot colors
+            objColors = Constants_Figures()
+            objColors.invertColors(fInvert=tempInvert)
+
+            #Color/Invert figure
+            imgFigure.set_facecolor(objColors.c_strBackgroundColorWord)
+            imgSubplot = imgFigure.add_subplot(111,axisbg=objColors.c_strBackgroundColorLetter)
+            imgSubplot.set_xlabel("Dimension 1")
+            imgSubplot.set_ylabel("Dimension 2")
+            imgSubplot.spines['top'].set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.spines['bottom'].set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.spines['left'].set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.spines['right'].set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.xaxis.label.set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.yaxis.label.set_color(objColors.c_strDetailsColorLetter)
+            imgSubplot.tick_params(axis='x', colors=objColors.c_strDetailsColorLetter)
+            imgSubplot.tick_params(axis='y', colors=objColors.c_strDetailsColorLetter)
+            charMarkerEdgeColor = objColors.c_strDetailsColorLetter
 
             #Plot colors seperately so the legend will pick up on the labels and make a legend
             if(ValidateData.isValidList(tempColorGrouping)):
@@ -259,9 +257,9 @@ class PCoA:
 
             #Invert legend
             if(tempInvert):
-              objLegend.legendPatch.set_fc('k')
-              objLegend.legendPatch.set_ec('w')
-              plt.setp(objLegend.get_texts(),color='w')
+              objLegend.legendPatch.set_fc(objColors.c_strBackgroundColorWord)
+              objLegend.legendPatch.set_ec(objColors.c_strDetailsColorLetter)
+              plt.setp(objLegend.get_texts(),color=objColors.c_strDetailsColorLetter)
 
             imgFigure.savefig(tempPlotName, facecolor=imgFigure.get_facecolor())
 

@@ -556,7 +556,7 @@ class MicroPITA:
         c_SVM_SCALING_LOWER_BOUND = 0
 
         #Diversity metrics to run
-        diversityMetricsAlpha = [microPITA.c_INV_SIMPSON_A_DIVERSITY, microPITA.c_CHAO1_A_DIVERSITY]
+        diversityMetricsAlpha = [microPITA.c_INV_SIMPSON_A_DIVERSITY]#, microPITA.c_CHAO1_A_DIVERSITY]
         diversityMetricsAlphaNoNormalize = [microPITA.c_CHAO1_A_DIVERSITY]
         diversityMetricsBeta = [microPITA.c_BRAY_CURTIS_B_DIVERSITY]
         inverseDiversityMetricsBeta = [microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY]
