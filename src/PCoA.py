@@ -140,9 +140,8 @@ class PCoA:
         return False
 
     #@params tempPlotName A valid file path to save the image of the plot
-    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempLegendLocation="upper right", tempInvert=True):
+    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempLegendLocation="upper right", tempInvert=False):
         if(not self.pcoa == None):
-
             #Get point count
             adPoints = self.pcoa.getPoints()
             iPointCount = len(adPoints[:,0])
@@ -175,6 +174,8 @@ class PCoA:
             if(tempInvert):
               imgFigure.set_facecolor("black")
               imgSubplot = imgFigure.add_subplot(111,axisbg='k')
+              imgSubplot.set_xlabel("Dimension 1")
+              imgSubplot.set_ylabel("Dimension 2")
               imgSubplot.spines['top'].set_color("w")
               imgSubplot.spines['bottom'].set_color("w")
               imgSubplot.spines['left'].set_color("w")
@@ -186,6 +187,7 @@ class PCoA:
               charMarkerEdgeColor = 'w'
             else:
               imgSubplot = imgFigure.add_subplot(111)
+              imgFigure.set_facecolor("white")
 
             #Plot colors seperately so the legend will pick up on the labels and make a legend
             if(ValidateData.isValidList(tempColorGrouping)):
@@ -197,6 +199,9 @@ class PCoA:
                         charColor = acharUniqueColors[iColorIndex]
                         #Get indices of colors
                         aiColorPointPositions = self.getIndices(tempColorGrouping,charColor)
+
+                        #Reduce the labels by color
+                        acharLabelsByColor = self.reduceList(tempLabels,aiColorPointPositions)
 
                         #Reduces sizes to indices if a list
                         reducedSizes = tempShapeSize
@@ -221,10 +226,10 @@ class PCoA:
                           acharReducedShapesElements = list(set(reducedShapes))
                           #If there are multiple shapes, plot seperately because one is not allowed to plot them as a list
                           for aCharShapeElement in acharReducedShapesElements:
-                            #Creat label
-                            strShapeLabel = tempLabels[tempShape.index(aCharShapeElement)]
                             #Get indices
                             aiShapeIndices = self.getIndices(reducedShapes,aCharShapeElement)
+                            #Reduce label to shapes
+                            strShapeLabel = self.reduceList(acharLabelsByColor,aiShapeIndices)
                             #Get points per shape
                             aiXPointsPerShape = self.reduceList(aiXPoints,aiShapeIndices)
                             aiYPointsPerShape = self.reduceList(aiYPoints,aiShapeIndices)
@@ -234,7 +239,7 @@ class PCoA:
                             if(ValidateData.isValidList(reducedSizes)):
                               reducedSizesPerShape = self.reduceList(reducedSizes,aiShapeIndices)
                             #Plot
-                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, label=strShapeLabel, edgecolor=charMarkerEdgeColor)
+                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, label=strShapeLabel[0], edgecolor=charMarkerEdgeColor)
 
             elif((not ValidateData.isValidList(tempColorGrouping)) and (ValidateData.isValidList(tempShape))):
                 if len(tempShape) == iPointCount:
