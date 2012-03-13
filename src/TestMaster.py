@@ -17,22 +17,22 @@ import unittest
 
 #Import test libraries
 #import AbundanceTableTest
-import CladogramTest
+#import CladogramTest
 #import DiversityTest
 #import MLPYDistanceAdaptorTest
 #import PCoATest
-#import MicroPITATest
+import MicroPITATest
 #import SVMTest
 #import TimerTest
 #import Utility_MathTest
 
 suite = unittest.TestSuite()
 #suite.addTest(AbundanceTableTest.suite())
-suite.addTest(CladogramTest.suite())
+#suite.addTest(CladogramTest.suite())
 #suite.addTest(DiversityTest.suite())
 #suite.addTest(MLPYDistanceAdaptorTest.suite())
 #suite.addTest(PCoATest.suite())
-#suite.addTest(MicroPITATest.suite())
+suite.addTest(MicroPITATest.suite())
 #suite.addTest(SVMTest.suite())
 #suite.addTest(TimerTest.suite())
 #suite.addTest(Utility_MathTest.suite())

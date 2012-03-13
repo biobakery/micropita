@@ -27,7 +27,7 @@ from cogent.maths.stats.alpha_diversity import chao1_uncorrected, chao1_bias_cor
 from cogent.maths.unifrac.fast_unifrac import fast_unifrac
 from cogent.maths.unifrac.fast_tree import UniFracTreeNode, count_envs
 from cogent.parse.tree import DndParser
-from qiime.format import format_unifrac_sample_mapping
+#from qiime.format import format_unifrac_sample_mapping
 from qiime.parse import parse_otu_table
 from scipy.spatial.distance import pdist
 

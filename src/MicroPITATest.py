@@ -38,7 +38,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetAlphaMetricForGoodCaseAbridgedData1(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -63,7 +63,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetAlphaMetricForGoodCaseAbridgedData2(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -88,7 +88,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetAlphaMetricForGoodCaseAbridgedData3(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -113,7 +113,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetAlphaMetricForGoodCaseAbridgedData4(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -139,7 +139,7 @@ class MicroPITATest(unittest.TestCase):
     def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData1Metric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -164,12 +164,12 @@ class MicroPITATest(unittest.TestCase):
     def testBuildAlphaMetricsMatrixForGoodCaseAbridgedDataChaoMetric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        microPITA = MicroPITA.MicroPITA()
+        microPITA = MicroPITA()
         metric = [microPITA.c_CHAO1_A_DIVERSITY]
 
         #Generate data
@@ -178,7 +178,7 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abundance.dtype.names[1:]
 
         #Get results
-        result = buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+        result = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
 
         #Correct Answer
         answer = "[[3, 2, 0, 5, 2, 3, 1, 5.0, 5, 0]]"
@@ -190,7 +190,7 @@ class MicroPITATest(unittest.TestCase):
     def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData3Metric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -323,7 +323,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetTopRankedSamplesForGoodCaseAbridgedData3Metric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -350,7 +350,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetBetaMetricForGoodCaseBrayCurtisMetric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -379,7 +379,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetBetaMetricForGoodCaseBrayCurtisMetric4(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -408,7 +408,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetBetaMetricForGoodCaseInvBrayCurtisMetric(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -437,7 +437,7 @@ class MicroPITATest(unittest.TestCase):
     def testGetBetaMetricForGoodCaseInvBrayCurtisMetric4(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -500,7 +500,7 @@ class MicroPITATest(unittest.TestCase):
     def nottestSelectRepresentativeSamplesFromHClust(self):
 
         #Micropita object
-        microPITA=MicroPITA.MicroPITA()
+        microPITA=MicroPITA()
 
         #Abundance table object to read in and manage data
         rawData = AbundanceTable()
@@ -516,8 +516,8 @@ class MicroPITATest(unittest.TestCase):
 ##        inputFile = "./testData/microPITA/extremeDissimilarityTest/lq.phylotype_04-nul-nul-mtd-trn-flt-by-Vaginal_introitus.txt"
 ##        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
 ##        inputFile = "./testData/microPITA/extremeDissimilarityTest/lq.phylotype_04-nul-nul-mtd-trn-flt-by-Palatine_Tonsils.txt"
-        inputFileMicroPITA = "./testData/microPITA/extremeDissimilarityTest/Insilico.txt"
-        inputFile = "./testData/microPITA/extremeDissimilarityTest/InsilicoNorm.txt"
+        inputFileMicroPITA = "./input/micropita/src/Testing/Data/microPITA/extremeDissimilarityTest/Insilico.txt"
+        inputFile = "./input/micropita/src/Testing/Data/microPITA/extremeDissimilarityTest/InsilicoNorm.txt"
 
         #Create file names
         prefix = Utility_File.getFileNamePrefix(inputFile)
@@ -590,7 +590,7 @@ class MicroPITATest(unittest.TestCase):
         microPITA = MicroPITA()
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904","Bacteria|3417","Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
@@ -607,10 +607,10 @@ class MicroPITATest(unittest.TestCase):
     def testReduceToTaxaForGoodCase1(self):
 
         #Micropita object
-        microPITA = MicroPITA.MicroPITA()
+        microPITA = MicroPITA()
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904"]
@@ -630,7 +630,7 @@ class MicroPITATest(unittest.TestCase):
         microPITA = MicroPITA()
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = ["Bacteria|unclassified|4904","Bacteria|3417","Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72","Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361","Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"]
@@ -650,7 +650,7 @@ class MicroPITATest(unittest.TestCase):
         microPITA = MicroPITA()
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
         taxa = []
@@ -664,25 +664,92 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    ##### GetRankAverageSamples
-    def testRankAverageSamplesForGoodCase5(self):
+#    ##### GetRankAverageSamples
+#    def testRankAverageSamplesForGoodCase5(self):
+#
+#        #Micropita object
+#        microPITA = MicroPITA()
+#
+#        #Inputs
+#        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+#        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+#        matrix = matrix[0]
+#
+#        #Correct Answer
+#        answer = "[['700098980', 24.0, 1], ['700037470', 11.4, 2], ['700098984', 11.0, 3], ['700037472', 4.5999999999999996, 4], ['700098986', 1.8, 5], ['700098988', 1.8, 5], ['700037476', 1.0, 6], ['700037474', 0.80000000000000004, 7], ['700098982', 0.0, 8], ['700037478', 0.0, 8]]"
+#
+#        #Call method
+#        result = microPITA.getRankAverageSamples(tempMatrix = matrix)
+#
+#        #Check result against answer
+#        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    ##### GetAverageRankSamples
+    def testAverageRankSamplesForGoodCase1(self):
 
         #Micropita object
         microPITA = MicroPITA()
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
         matrix = matrix[0]
 
+        #Taxa to look for
+        lsTaxa = ["Bacteria|3417"]
+
         #Correct Answer
-        answer = "[['700098980', 24.0, 1], ['700037470', 11.4, 2], ['700098984', 11.0, 3], ['700037472', 4.5999999999999996, 4], ['700098986', 1.8, 5], ['700098988', 1.8, 5], ['700037476', 1.0, 6], ['700037474', 0.80000000000000004, 7], ['700098982', 0.0, 8], ['700037478', 0.0, 8]]"
+        answer = "[['700098986', 4.0], ['700037470', 3.0], ['700037474', 3.0], ['700098980', 2.0], ['700098988', 2.0], ['700037472', 2.0], ['700098984', 1.0], ['700098982', 1.0], ['700037476', 1.0], ['700037478', 1.0]]"
 
         #Call method
-        result = microPITA.getRankAverageSamples(tempMatrix = matrix)
+        result = microPITA.getAverageRanksSamples(tempMatrix = matrix, tempTargetedTaxa= lsTaxa)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testAverageRankSamplesForGoodCase2(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+        matrix = matrix[0]
+
+        #Taxa to look for
+        lsTaxa = ["Bacteria|unclassified|4904","Bacteria|3417"]
+
+        #Correct Answer
+        answer = "[['700098986', 4.0], ['700037470', 3.0], ['700037474', 3.0], ['700098984', 1.5], ['700098980', 1.5], ['700098988', 1.5], ['700037472', 1.5], ['700098982', 1.0], ['700037476', 1.0], ['700037478', 1.0]]"
+
+        #Call method
+        result = microPITA.getAverageRanksSamples(tempMatrix = matrix, tempTargetedTaxa= lsTaxa)
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+#    def testSelectedTargetedTaxaForGoodCase1(self):
+
+        #Micropita object
+#        microPITA = MicroPITA()
+
+        #Inputs
+#        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+#        matrix = AbundanceTable().textToStructuredArray(tempInputFile = inputFile, tempDelimiter = Constants.TAB, tempNameRow = 0, tempFirstDataRow = 2, tempNormalize = False)
+#        matrix = matrix[0]
+
+        #Taxa to look for
+#        lsTaxa = ["Bacteria|3417"]
+
+        #Correct Answer
+#        answer = "[['700098986', 4.0], ['700037470', 3.0], ['700037474', 3.0], ['700098980', 2.0], ['700098988', 2.0], ['700037472', 2.0], ['700098984', 1.0], ['700098982', 1.0], ['700037476', 1.0], ['700037478', 1.0]]"
+
+        #Call method
+#        result = microPITA.selectTargetedTaxaSamples(tempMatrix = matrix, tempTargetedTaxa= lsTaxa)
+
+        #Check result against answer
+#        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
     ##### GetRandomSamples
     def testGetRandomSamplesForGoodCase1of10Samples(self):
@@ -789,8 +856,8 @@ class MicroPITATest(unittest.TestCase):
 
         #Inputs
         #Reading file
-        inputFile="./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        outputFile="./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.SVM.txt"
+        inputFile="./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        outputFile="./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.SVM.txt"
         delimiter=Constants.TAB
         nameRow=0
         firstDataRow=2

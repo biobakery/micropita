@@ -151,6 +151,12 @@ class PCoA:
             if(ValidateData.isValidList(tempShape)):
               if not len(tempShape) == iPointCount:
                 print("Error, the list of shapes was given but was not the same size as the points so nothing was plotted.")
+                print("tempShape")
+                print(tempShape)
+                print("iPointCount")
+                print(iPointCount)
+                print("adPoints")
+                print(adPoints)
                 return
 
             #Check colors

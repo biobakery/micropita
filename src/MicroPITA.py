@@ -351,41 +351,41 @@ class MicroPITA:
     #Allows ties
     #@param tempMatrix [taxa (row) x sample(column)] Matrix with first column as a taxa id column which is ignored
     #@return [(sample name,average,rank)]
-    def getRankAverageSamples(self, tempMatrix = None):
-        #Validate Matrix
-
-        #List to return with [(sample name,average,rank)]
-        rankAverageSamplesReturn = []
-        
-        #Get sample names
-        sampleNames = tempMatrix.dtype.names[1:]
-
-        #For each sample name get average and add to return list
-        for name in sampleNames:
-            rankAverageSamplesReturn.append([name,np.average(tempMatrix[name]),-1])
-
-        #Sort based on average
-        rankAverageSamplesReturn = sorted(rankAverageSamplesReturn, key = lambda sampleData: sampleData[1], reverse = True)
-
-        #Add ranks
-        rank = 1
-        currentValue = rankAverageSamplesReturn[0][1]
-        for sampleData in rankAverageSamplesReturn:
-            sampleAverage = sampleData[1]
-            #Error samples are out of order
-            if(sampleAverage > currentValue):
-                return False
-            #Allow ties
-            if(sampleAverage == currentValue):
-                sampleData[2] = rank
-            else:
-                #Update/set rank and value
-                currentValue = sampleAverage
-                rank = rank + 1
-                sampleData[2] = rank
-
-        #return
-        return rankAverageSamplesReturn
+#    def getRankAverageSamples(self, tempMatrix = None):
+#        #Validate Matrix
+#
+#        #List to return with [(sample name,average,rank)]
+#        rankAverageSamplesReturn = []
+#        
+#        #Get sample names
+#        sampleNames = tempMatrix.dtype.names[1:]
+#
+#        #For each sample name get average and add to return list
+#        for name in sampleNames:
+#            rankAverageSamplesReturn.append([name,np.average(tempMatrix[name]),-1])
+#
+#        #Sort based on average
+#        rankAverageSamplesReturn = sorted(rankAverageSamplesReturn, key = lambda sampleData: sampleData[1], reverse = True)
+#
+#        #Add ranks
+#        rank = 1
+#        currentValue = rankAverageSamplesReturn[0][1]
+#        for sampleData in rankAverageSamplesReturn:
+#            sampleAverage = sampleData[1]
+#            #Error samples are out of order
+#            if(sampleAverage > currentValue):
+#                return False
+#            #Allow ties
+#            if(sampleAverage == currentValue):
+#                sampleData[2] = rank
+#            else:
+#                #Update/set rank and value
+#                currentValue = sampleAverage
+#                rank = rank + 1
+#                sampleData[2] = rank
+#
+#        #return
+#        return rankAverageSamplesReturn
 
 #TODO TEST AND CHECK
     #Ranks the taxa by abundance and then averages thier ranks in the samples
@@ -396,7 +396,6 @@ class MicroPITA:
     #@param tempTargetedTaxa list of string names of taxa which are measured after ranking against the full sample.
     #@return [(sample name,average rank)]
     def getAverageRanksSamples(self, tempMatrix, tempTargetedTaxa):
-        #Validate Matrix
 
         #Sample rank averages [[sample,average rank of selected taxa]]
         #Returned
@@ -439,22 +438,36 @@ class MicroPITA:
 
             #Get average ranks
             sumRank = 0
-            countRank = 0
+            countRank = 0.0
             for rankData in ranks:
                if(rankData[0] in tempTargetedTaxa):
-                   sumRank = sumRank + rankData[1] 
-                   countRank = countRank + 1
+                   sumRank = sumRank + rankData[2] 
+                   countRank = countRank + 1.0
+
             #Save average rank by sample name
             if(not countRank == 0):
                 sampleRankAverages.append([name,sumRank/countRank])
+                print([name,sumRank/countRank])
             else:
-                logging.error(""joint(["Found no taxa for sample=",str(name)]))
+                logging.error("".join(["Found no taxa for sample=",str(name)]))
 
         #Sort based on average
         sampleRankAverages = sorted(sampleRankAverages, key = lambda sampleData: sampleData[1], reverse = True)
             
         #return
         return sampleRankAverages
+
+    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount):
+      if(len(tempTargetedTaxa) < 1):
+        logging.error("Error Taxa defined selection was requested but no taxa were given.")
+      #Rank the samples
+      userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa)
+
+      #Select the top samples
+#      topRankedSamples = userRankedSamples[0:(sampleSelectionCount-1):]
+      topRankedSamples = userRankedSamples[(sampleSelectionCount*-1):]
+      topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
+      return [item for sublist in topRankedSamplesNames for item in sublist]
 
 ####Group 5## Random
 
@@ -547,7 +560,7 @@ class MicroPITA:
             logging.error("RunMicroPITA.runSVM: Prediction files were false.")
         return modelFiles
 
-    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1, strSelectionTechnique=None, iSampleNameRow=0, iFirstDataRow=1):
+    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1, strSelectionTechnique=None, strLabel=None, iSampleNameRow=0, iFirstDataRow=1):
         #microPITA object
         microPITA = MicroPITA()
 
@@ -562,7 +575,8 @@ class MicroPITA:
         c_SVM_SCALING_LOWER_BOUND = 0
 
         #Diversity metrics to run
-        diversityMetricsAlpha = [microPITA.c_INV_SIMPSON_A_DIVERSITY]#, microPITA.c_CHAO1_A_DIVERSITY]
+        #TODO make diversity metrics seperable
+        diversityMetricsAlpha = []#microPITA.c_INV_SIMPSON_A_DIVERSITY]
         diversityMetricsAlphaNoNormalize = [microPITA.c_CHAO1_A_DIVERSITY]
         diversityMetricsBeta = [microPITA.c_BRAY_CURTIS_B_DIVERSITY]
         inverseDiversityMetricsBeta = [microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY]
@@ -597,10 +611,10 @@ class MicroPITA:
         if(microPITA.c_strRandom in strSelectionTechnique):
             c_RUN_RANDOM_5 = True
         c_RUN_DISTINCT = False
-        if(microPITA.c_strDistinct in strSelectionTechnique):
+        if((microPITA.c_strDistinct in strSelectionTechnique) and (not strLabel == None)):
             c_RUN_DISTINCT = True
         c_RUN_DISCRIMINANT = False
-        if(microPITA.c_strDiscriminant in strSelectionTechnique):
+        if((microPITA.c_strDiscriminant in strSelectionTechnique) and (not strLabel == None)):
             c_RUN_DISCRIMINANT = True
 
         #Abundance table object to read in and manage data
@@ -761,17 +775,7 @@ class MicroPITA:
         #Expects a column 0 of taxa id that is skipped
         #Returns [(sample name,average,rank)]
         if(c_RUN_RANK_AVERAGE_USER_4):
-
-            if(len(userDefinedTaxa) < 1):
-                logging.error("Error Taxa defined selection was requested but no taxa were given.")
-            #Rank the samples
-            userRankedSamples = microPITA.getAverageRanksSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa)
-
-            #Select the top samples
-            topRankedSamples = userRankedSamples[0:(sampleSelectionCount)]
-            topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
-            selectedSamples[microPITA.c_USER_RANKED] = [item for sublist in topRankedSamplesNames for item in sublist]
-
+            selectedSamples[microPITA.c_USER_RANKED] = microPITA.selectTargetedTaxaSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount)
         logging.info("Selected Samples 4")
         logging.info(selectedSamples)
 
@@ -788,12 +792,11 @@ class MicroPITA:
 
         #Select supervised (using SVM)
         #Expects input file's matrix to be Taxa (row) by Sample (col) with a taxa id column (index=0)
-        #TODO Currently uses the lowest index metadata row as the labels
         if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
             #Get file name without extention
             strTail = os.path.split(strInputAbundanceFile)[1]
             #Run linear SVM
-            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[0], tempFirstDataRow=iFirstDataRow, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
+            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[strLabel], tempFirstDataRow=iFirstDataRow, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
             #Read in prediction file and select samples
             #Selecting samples most ambiguous to all hyperplanes
             if(not svmRelatedData == False):
@@ -912,6 +915,10 @@ argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1
                   help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
 argp.add_argument("-s", dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
                   help= "The count of labeled data to select per label (defualt =1)")
+#SVM label
+#Label parameter to be used with SVM
+argp.add_argument("-p", dest="strLabel", metavar= "Label", default="", 
+                  help= "The name of the phenotype data row on which to perform supervised methods.")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -925,7 +932,7 @@ def _main( ):
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start microPITA")
-    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
+    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel, strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
     logging.info("End microPITA")
 
     logging.debug("".join(["Returned the following samples:",str(dictSelectedSamples)]))
