@@ -23,6 +23,7 @@ from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
 import os
 from MicroPITA import MicroPITA
+import re
 from SVM import SVM
 import unittest
 from Utility_File import Utility_File
@@ -850,6 +851,31 @@ class MicroPITATest(unittest.TestCase):
 
         #Check result against answer
         self.assertEqual(str(foundError),str(answer),"".join([str(self),"::",str(errorString),"."]))
+
+    def testFuncStratifyDataByMetadataForGoodCase3Metadata(self):
+        
+        #Inputs
+        tdata = [("Name1",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15),("Name2",16,17,18,19,20,21,22,23,24,25,26,27,28,29,30),("Name3",31,32,33,34,35,36,37,38,39,40,41,42,43,44,45)]
+        dtype=[('id','a5'),('x1',int),('x2',int),('x3',int),('x4',int),('x5',int),('x6',int),('x7',int),('x8',int),('x9',int),('x10',int),('x11',int),('x12',int),('x13',int),('x14',int),('x15',int)]
+        rawAbundance = np.array(tdata, dtype=dtype)
+
+        lsMetadata = ["three","three","one","one","two","one","one","three","two","one","one","two","two","three","two"]
+
+        #Correct Answer
+        answer = "{'one': array([(3, 4, 6, 7, 10, 11),(18, 19, 21, 22, 25, 26),(33, 34, 36, 37, 40, 41)], "
+        answer = answer + "dtype=[('x3', '<i8'), ('x4', '<i8'), ('x6', '<i8'), ('x7', '<i8'), ('x10', '<i8'), ('x11', '<i8')]),"
+        answer = answer + "'three': array([(1, 2, 8, 14), (16, 17, 23, 29), (31, 32, 38, 44)], "
+        answer = answer + "dtype=[('x1', '<i8'), ('x2', '<i8'), ('x8', '<i8'), ('x14', '<i8')]),"
+        answer = answer + "'two': array([(5, 9, 12, 13, 15), (20, 24, 27, 28, 30), (35, 39, 42, 43, 45)], "
+        answer = answer + "dtype=[('x5', '<i8'), ('x9', '<i8'), ('x12', '<i8'), ('x13', '<i8'), ('x15', '<i8')])}"
+        answer = re.sub(r'\s+',"",answer)
+
+        #Call method
+        result = MicroPITA().funcStratifyByMetadata(lsMetadata, rawAbundance)
+        result = re.sub(r'\s+',"", str(result))
+
+        #Check result against answer
+        self.assertEqual(result,str(answer).strip(' \t\n\r'),"".join([str(self),"::Expected="+str(answer)+".but received="+str(result)+"."]))
 
     ##### RunSVM
     def nottestRunSVM(self):

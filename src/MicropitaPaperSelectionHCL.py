@@ -19,6 +19,7 @@ from CommandLine import CommandLine
 from Constants import Constants
 from Constants_Figures import Constants_Figures
 from FileIO import FileIO
+import logging
 from MicroPITA import MicroPITA
 import numpy as np
 import os
@@ -125,6 +126,12 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperSelectionHCL.py",
     description = """Generates an HCL of the selected samples (row) and selection method (columns).""" )
 
 #Arguments
+#Logging
+argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
+                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
+argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
+	help = "Invert the image to a black background (default=False)." )
 #Select file
 argp.add_argument( "strSelectionFile", metavar = "Select_file",
     help = "A file containing the samples selected which will be visualized." )
@@ -140,6 +147,14 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+
+    #Set up logger
+    iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
+    if not isinstance(iLogLevel, int):
+        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
+
+    logging.info("Start MicropitaPaperSelectionHCL")
 
     mHCL = MicropitaPaperSelectionHCL()
 
@@ -161,6 +176,8 @@ def _main( ):
         mHCL.generateColorFile(args.strOutHCLColorFile, args.strOutHCLLabelFile)
         #Hierarchical cluster absence presence metrix matrix
         CommandLine().runCommandLine([args.strHCLLoc, "--in", args.strOutHCLDataFile, "--out", args.strOutFigure, "--label2cols", args.strOutHCLColorFile, "-l", args.strOutHCLLabelFile, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1"])
+
+    logging.info("Stop MicropitaPaperSelectionHCL")
 
 if __name__ == "__main__":
     _main( )

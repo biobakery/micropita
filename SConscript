@@ -1,3 +1,4 @@
+import re
 import sfle
 import sys
 
@@ -7,8 +8,6 @@ c_strDataFile = sfle.d(fileDirInput, "data")
 
 pE = DefaultEnvironment( )
 
-#Invert
-c_fInvert = "False"
 #Normalize
 c_NormalizePCOA = "False"
 
@@ -28,16 +27,43 @@ c_strSufCircStyle = ".CStyle"
 c_strSufCircTick = ".CTick"
 c_strSufCircHighlight = ".CHLight"
 c_strSufCircCircle = ".CCircle"
+c_strSufConfig = ".config"
+c_strSufCircStyleInv = "-invert.CStyle"
 c_strSufMicropita = ".txt"
 c_strSufPredict = "-SVM.predict"
 
+#Special characters
+c_strConfigFileHeaderChar = "["
+c_strConfigFileCommentChar = "#"
 c_strExtDelim = "."
 c_strPathDelim = "/"
 
-#The label used to determine the phenotype
-#TODO make so I dont have to do this
-strLabel = "dx"
-#strLabel = "BMI"
+#Scons Configuration file headers
+c_strConfigAbundanceFilter = "[Abundance Filter]"
+c_strConfigAbundanceFilterPercentile = "[Abundance Filter Percentile]"
+c_strConfigAbundanceFilterPercent = "[Abundance Filter Percent Above Percentile]"
+c_strConfigCladeFilter = "[Clade Filter]"
+c_strConfigCladeFilterMeasure = "[Clade Level to Measure]"
+c_strConfigCladeFilterLevel = "[Clade Level to Filter]"
+c_strConfigCladeFilterMinSize = "[Minimum Clade Size]"
+c_strConfigDataRow = "[Data Name Row Index]"
+c_strConfigEnrichmentMeasurement = "[Taxa or OTU Enrichment Measurement]"
+c_strConfigHighlightClades = "[Higlight Clades]"
+c_strConfigInputFile = "[Input File]"
+c_strConfigInvertImage = "[Invert Image]"
+c_strConfigLabels = "[Labels]"
+c_strConfigLogging = "[Logging]"
+c_strConfigNormalizeAbundance = "[Normalize Abundance]"
+c_strConfigRoot = "[Root]"
+c_strConfigSampleRow = "[Sample Name Row Index]"
+c_strConfigSelection = "[Selection]"
+c_strConfigSelectedTaxa = "[Selected Taxa]"
+c_strConfigSelectionTechniques = "[Selection Techniques]"
+c_strConfigStratifiedCount = "[Stratified Count]"
+c_strConfigSupervisedLabel = "[Supervised Label]"
+c_strConfigSupervisedCount = "[Supervised Selection Count]"
+c_strConfigUnsupervisedCount = "[Unsupervised Selection Count]"
+c_strConfigUnsupervisedStratify = "[Stratify by Metadata]"
 
 #None generated output micropita files
 #c_fileIBDWGSSelectionManual = File(sfle.d(fileDirInput,"IBDWGSSelection.txt"))
@@ -84,42 +110,51 @@ c_strRepresentativeDissimilarity = "Representative"
 c_strSVM = [c_strDiscriminant,c_strDistinct]
 c_strTaxa = "Taxa_Defined"
 #c_lstrAllSelectionMethods = [c_strRandom,c_strTaxa,c_strDiversity,c_strRepresentativeDissimilarity,c_strExtremeDissimilarity,c_strDiscriminant,c_strDistinct]
-c_lstrAllSelectionMethods = [c_strTaxa,c_strDiversity,c_strRepresentativeDissimilarity,c_strExtremeDissimilarity,c_strDiscriminant,c_strDistinct]
-
-#Logging level
-c_strLoggingLevel = "DEBUG"
+#c_lstrAllSelectionMethods = [c_strTaxa,c_strDiversity,c_strRepresentativeDissimilarity,c_strExtremeDissimilarity,c_strDiscriminant,c_strDistinct]
 
 ##Start flow
 #Scripts to call
 ##Call micropita to run
-def funcMicroPita( iN, strParameters, strLabel ):
-  def funcRet( target, source, env, iN = iN, strParameters = strParameters, strLabel = strLabel ):
+def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify, strTaxaFile, lsSelectionMethods):
+  def funcMicroPitaRet( target, source, env, iUnsupervisedCount=iUnsupervisedCount, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, 
+                        iSupervisedCount=iSupervisedCount, strSupervisedLabel=strSupervisedLabel, strUnsupervisedStratify=strUnsupervisedStratify, strTaxaFile=strTaxaFile, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strTaxa = astrSs[0], astrSs[1], astrSs[2]
-    aArgs = [iN]+c_lstrAllSelectionMethods
-    return sfle.ex( [strProg]+["-l", c_strLoggingLevel, strParameters,strLabel]+[strT, strAbnd, strTaxa, fileDirTmp] + aArgs)
-  return funcRet
+    aArgs = [iUnsupervisedCount]+lsSelectionMethods
+    return sfle.ex( [strProg]+[strLoggingLevel, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify]+[strT, strAbnd, strTaxaFile, fileDirTmp] + aArgs)
+  return funcMicroPitaRet
 
 ##Create figures
 #Visualize output with PCoA (Figure 1A)
-def funcPCoASelectionMethods( target, source, env ):
-	strT, astrSs = sfle.ts( target, source )
-	strProg, strAbnd, strSelection, strPrediction = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
-	return sfle.ex([strProg]+["-n","0","-d","2","-r",c_NormalizePCOA,"-i",c_fInvert]+[ strAbnd, strSelection, strPrediction, strT])
+def funcPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, iInvert ):
+  def funcPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, iInvert=iInvert):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strAbnd, strSelection, strPrediction = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
+    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,iNormalize,iInvert]+[ strAbnd, strSelection, strPrediction, strT])
+  return funcPCoARet
 
 #Visualize selected output with HCL (Figure 1B)
-def funcHCLSelectionMethods( target, source, env ):
-	strT, astrSs = sfle.ts( target, source )
-	strProg, strSelection = astrSs[0], astrSs[1]
-        strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
-	return sfle.ex([strProg, strSelection, c_progHC, strData, strColor, strLabel, strT])
+def funcHCLSelectionMethods( strLoggingLevel, iInvert ):
+  def funcHCLSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, iInvert=iInvert ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strSelection = astrSs[0], astrSs[1]
+    strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
+    return sfle.ex([strProg, strLoggingLevel, iInvert, strSelection, c_progHC, strData, strColor, strLabel, strT])
+  return funcHCLSelectionRet
 
 #Visualize selected output with Cladogram (Figure 2)
-def funcCladogramSelectionMethods( target, source, env ):
-	strT, astrSs = sfle.ts( target, source )
-	strProg, strSelection, strAbundance, strStyleFile, strTargetedTaxa = astrSs[0], astrSs[1], astrSs[2], astrSs[3], astrSs[4]
-        strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
-	return sfle.ex([strProg] + ["-t",strTargetedTaxa, "-i",c_fInvert] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+def funcCladogramSelectionMethods( strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
+                                   strAbundanceFilterPercentile, strAbundanceFitlerPercent):
+
+  def funcCladogramSelectionRet( target, source, env, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
+                                 strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
+                                 strAbundanceFitlerPercent=strAbundanceFitlerPercent):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strSelection, strAbundance, strStyleFile, strTargetedTaxa = astrSs[0], astrSs[1], astrSs[2], astrSs[3], astrSs[4]
+    strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
+    return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
+                               strAbundanceFilterPercentile, strAbundanceFitlerPercent] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+  return funcCladogramSelectionRet
 
 ###Start process
 #Read in all input files in the input directory
@@ -129,17 +164,76 @@ lFileInputFiles = Glob( sfle.d( fileDirInput, "*" ) )
 lMicropitaFiles = []
 for fileName in lFileInputFiles:
   strPathPieces = [filter(None,strPathPiece) for strPathPiece in (fileName.get_abspath().split(c_strExtDelim))]
-  if c_strExtDelim+strPathPieces[-1] == c_strSufMicropita:
+  if c_strExtDelim+strPathPieces[-1] == c_strSufConfig:
     lMicropitaFiles.append(fileName)
 
-for fileMicropita in lMicropitaFiles:
-  sAbundanceFileName = fileMicropita.get_abspath().split(c_strPathDelim)[-1]
-  sFileBase = sAbundanceFileName.split(c_strExtDelim)[0]
+print("lMicropitaFiles")
+print([strFile.get_abspath() for strFile in lMicropitaFiles])
+
+#Read in each config file
+#An use thier contents to perform analysis
+for fileConfigMicropita in lMicropitaFiles:
+  print("fileConfigMicropita")
+  print(fileConfigMicropita)
+
+  #Get Contents of config file
+  sFileConfiguration = dict()
+  #Set defaults
+  sFileConfiguration[c_strConfigSelectedTaxa]="None"
+  sFileContents = list()
+  with open(fileConfigMicropita.get_abspath()) as f:
+    sFileContents = f.read()
+    sFileContents = filter(None,re.split("\n",sFileContents))
+
+  #Parse config file
+  iIndex = 0
+  iLengthContents = len(sFileContents)
+  #All lines
+  while iIndex < iLengthContents:
+    sLine = sFileContents[iIndex]
+    #Header lines
+    if(sLine[0] == c_strConfigFileHeaderChar):
+      strConfigKey = sLine
+      iIndex = iIndex + 1
+      if(iIndex < iLengthContents):
+        sLine = sFileContents[iIndex]
+        lsConfigData = list()
+        #Contents of headers which are not headers
+        while((iIndex < iLengthContents) and (not sLine[0] == c_strConfigFileHeaderChar)):
+          #Ignore comments
+          if(not sLine[0] == c_strConfigFileCommentChar):
+            lsConfigData.append(sLine)
+          iIndex = iIndex + 1
+          if iIndex < iLengthContents:
+            sLine = sFileContents[iIndex]
+        if(len(lsConfigData) > 0):
+          sFileConfiguration[strConfigKey]=lsConfigData[0]
+    else:
+      iIndex = iIndex + 1
+
+  #Common configurations
+  lsSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniques]))
+  strInvertImage = sFileConfiguration[c_strConfigInvertImage]
+  if strInvertImage.lower()=="true":
+    c_fileCladogramStyleFile = File(sfle.d( fileDirInput, "microPITA"+c_strSufCircStyleInv ))
+
+  #Update the configurations that can be toggled on or off
+  if sFileConfiguration[c_strConfigCladeFilter].lower() == "false":
+    sFileConfiguration[c_strConfigCladeFilterLevel] = "None"
+    sFileConfiguration[c_strConfigCladeFilterMeasure] = "None"
+    sFileConfiguration[c_strConfigCladeFilterMinSize] = "None"
+
+  if sFileConfiguration[c_strConfigAbundanceFilter].lower() == "false":
+    sFileConfiguration[c_strConfigAbundanceFilterPercentile] = "None"
+    sFileConfiguration[c_strConfigAbundanceFilterPercent] = "None"
+
+  sAbundanceFileName = sFileConfiguration[c_strConfigInputFile]
+  sFileBase = os.path.basename(fileConfigMicropita.get_abspath()).split(c_strExtDelim)[0]
   sOutputDir = sfle.d(fileDirOutput,sFileBase)
   sMicropitaOutput = File(sfle.d(fileDirOutput,c_strPathDelim.join([sFileBase,sAbundanceFileName])))
 
   #Make file names from the input micropita file in the temp directory
-  sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( fileMicropita, c_strSufMicropita, c_strSufPredict )))
+  sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
 
   #Make files from the micropita output file
   sOutputFigure1APCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
@@ -151,15 +245,36 @@ for fileMicropita in lMicropitaFiles:
   for s in (c_strSufSelectedTaxa,c_strSufSelectedTaxa)]
 
   #Run micropita analysis
-  sAbundanceFileName = c_strPathDelim.join(["input",sAbundanceFileName])
-
-  Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName, cCladogramSelectedTaxa] + c_filesSecondarySrc, funcMicroPita(8, "-n 0 -d 2 -s 4 -p", strLabel))
+  sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
+  Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName, cCladogramSelectedTaxa] + c_filesSecondarySrc + [fileConfigMicropita], funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                    sFileConfiguration[c_strConfigUnsupervisedCount],
+                                                                                                                                    " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                    " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                    " ".join(["-s",sFileConfiguration[c_strConfigSupervisedCount]]),
+                                                                                                                                    " ".join(["-p",sFileConfiguration[c_strConfigSupervisedLabel]]),
+                                                                                                                                    " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
+                                                                                                                                    sFileConfiguration[c_strConfigSelectedTaxa],
+                                                                                                                                    lsSelectionMethods))
   #Create figure 1A PCoA
-  Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, fileMicropita, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods)
+  Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                                                " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                                                " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                                                " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                                " ".join(["-i",strInvertImage])))
   #Create figure 1B HCL
   Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
-        funcHCLSelectionMethods)
+        funcHCLSelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]), " ".join(["-i",strInvertImage])))
+
   #Create a cladogram figure 2
   Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
-         sCladogramSizeFile, sCladogramCircleFile], [c_fileProgSelectionCladogramFigure, sMicropitaOutput, fileMicropita, c_fileCladogramStyleFile, cCladogramSelectedTaxa] + ls_srcFig2, 
-        funcCladogramSelectionMethods)
+         sCladogramSizeFile, sCladogramCircleFile], [c_fileProgSelectionCladogramFigure, sMicropitaOutput, sAbundanceFileName, c_fileCladogramStyleFile, cCladogramSelectedTaxa] + ls_srcFig2, 
+         funcCladogramSelectionMethods(" ".join(["-t",sFileConfiguration[c_strConfigSelectedTaxa]]),
+                                       " ".join(["-c",sFileConfiguration[c_strConfigHighlightClades]]),
+                                       " ".join(["-i",strInvertImage]),
+                                       " ".join(["-r",sFileConfiguration[c_strConfigRoot]]),
+                                       " ".join(["-e",sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
+                                       " ".join(["-cfl",sFileConfiguration[c_strConfigCladeFilterLevel]]),
+                                       " ".join(["-cfm",sFileConfiguration[c_strConfigCladeFilterMeasure]]),
+                                       " ".join(["-cfn",sFileConfiguration[c_strConfigCladeFilterMinSize]]),
+                                       " ".join(["-afp",sFileConfiguration[c_strConfigAbundanceFilterPercentile]]),
+                                       " ".join(["-afc",sFileConfiguration[c_strConfigAbundanceFilterPercent]])))

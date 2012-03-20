@@ -17,6 +17,7 @@ from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
 from Constants_Figures import Constants_Figures
+import logging
 import matplotlib.cm as cm
 from MicroPITA import MicroPITA
 import os
@@ -26,6 +27,10 @@ from ValidateData import ValidateData
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperPCoA.py", description = """Creates PCoA plots for MicroPITA results.""" )
 #Arguments
+#Logging
+argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
+                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
 argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
                   help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
 argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
@@ -48,6 +53,14 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+
+    #Set up logger
+    iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
+    if not isinstance(iLogLevel, int):
+        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
+
+    logging.info("Start MicropitaPaperPCoA")
 
     #Analysis object
     analysis = PCoA()
@@ -152,6 +165,8 @@ def _main( ):
         else:
           analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
 
+    logging.info("Stop MicropitaPaperPCoA")
+
 #charForceColor if set, automatic coloring will not occur but will occur based on the charForceColor
 #CharForceColor should be a list of selection methods or not selected which will be automatically broken into colors
 #charForceColor must contain the same elements as the lsLabeList
@@ -188,7 +203,7 @@ def plotList(objPCOA,lsLabelList,strName,asFilePathPieces,iSize,charForceColor=N
     elif(ValidateData.isValidList(charForceColor)):
       atupldLabelColors = charForceColor[0]
       if not len(lsLabelList) == len(charForceColor[1]):
-        print("Error, MicropitaPaperPCoA.plotList. Label and forced color lengths were not the same.") 
+        logging.error("MicropitaPaperPCoA.plotList. Label and forced color lengths were not the same.") 
         return False
       lsLabelList = [ "".join([charForceColor[1][iLabelIndex], "_", lsLabelList[iLabelIndex]]) for iLabelIndex in xrange(0,len(charForceColor[1]))]
     #If the color is forced but the color does not vary, color all markers are the same.
@@ -198,15 +213,15 @@ def plotList(objPCOA,lsLabelList,strName,asFilePathPieces,iSize,charForceColor=N
     #Check to make sure unique colors are returned
     if(ValidateData.isValidList(atupldLabelColors)):
       if not len(acharUniqueValues)==len(list(set(atupldLabelColors))):
-        print("Error, non-uniques colors were generated")
-        print("Labels")
-        print(lsLabelList)
-        print("Colors")
-        print(atupldLabelColors)
+        logging.error("MicropitaPaperPCoA.plotList. Non-uniques colors were generated for "+strName)
+        logging.debug("Labels")
+        logging.debug(lsLabelList)
+        logging.debug("Colors")
+        logging.debug(atupldLabelColors)
         return False
 
-    print("lsLabelList")
-    print(lsLabelList)
+    logging.debug("lsLabelList")
+    logging.debug(lsLabelList)
     objPCOA.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata-",strName,asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
 
 

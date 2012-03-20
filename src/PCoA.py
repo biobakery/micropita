@@ -155,8 +155,8 @@ class PCoA:
                 print(tempShape)
                 print("iPointCount")
                 print(iPointCount)
-                print("adPoints")
-                print(adPoints)
+                print("len adPoints")
+                print(len(adPoints))
                 return
 
             #Check colors
