@@ -713,6 +713,7 @@ class MicroPITA:
                   for curAbundanceRow in curAbundance:
                       lsOutput.append(Constants.TAB.join([str(curAbundanceElement) for curAbundanceElement in curAbundanceRow]))
                   f.write(Constants.ENDLINE.join(lsOutput))
+                  f.close()
 
         #For each stratified abundance block or for the unstratfified abundance
         #Run the unsupervised blocks
