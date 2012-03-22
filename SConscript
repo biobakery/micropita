@@ -12,6 +12,8 @@ pE = DefaultEnvironment( )
 c_NormalizePCOA = "False"
 
 #Extentions
+c_strSufCollectionCurveFigure = "-ColCurv.png"
+c_strSufCollectionCurveText = "-ColCurv.txt"
 c_strSufSelectedTaxa = ".taxa"
 c_strSufPng = ".png"
 c_strSufPCOA = "-PCoA.png"
@@ -40,6 +42,9 @@ c_strConfigFileHeaderChar = "["
 c_strConfigFileCommentChar = "#"
 c_strExtDelim = "."
 c_strPathDelim = "/"
+
+#Directories
+strOutputSummaryFolder = "".join([c_strPathDelim,"Metasummary"])
 
 #The Column that holds the TAXA / OTU IDS
 c_strAbundanceIDCol = "0"
@@ -90,6 +95,7 @@ c_fileProgConstantsFigures = File( sfle.d( fileDirSrc, "Constants_Figures.py" ) 
 c_fileProgDiversity = File( sfle.d( fileDirSrc, "Diversity.py" ) )
 c_fileProgFileIO = File( sfle.d( fileDirSrc, "FileIO.py" ) )
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
+c_fileProgCollectionCurveFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCollectionCurve.py") )
 c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
 c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
 c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
@@ -172,7 +178,22 @@ def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdC
     return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHC, strColor, strLabel, strT])
   return funcHCLStratSelectionRet
 
-#Visualize the input data
+#Create a summary chart with collection curves
+def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert):
+  def funcCollectionCurveSummary( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow, strFirstDataRow=strFirstDataRow, strNormalize=strNormalize, strInvert=strInvert):
+    strFigureT, astrSs = sfle.ts( target, source )
+    strProg, strAbundance = astrSs[0], astrSs[1]
+
+    #Get input selection files (discriminate from the src files also passed as a list)
+    #Check to see where the input selection files end and the python src begin
+    iFileCount = 0
+    for strFile in astrSs[1:]:
+      if strFile[-3:] == ".py":
+        break
+      iFileCount = iFileCount + 1
+    lsSelectionFiles = astrSs[2:iFileCount+1]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert, strAbundance, strFigureT, target[1].get_abspath()]+lsSelectionFiles)
+  return funcCollectionCurveSummary
 
 ###Start process
 #Read in all input files in the input directory
@@ -187,6 +208,10 @@ for fileName in lFileInputFiles:
 
 print("lMicropitaFiles")
 print([strFile.get_abspath() for strFile in lMicropitaFiles])
+
+#Collect input files later used for multistudy summary graphics
+#{"InputFile:[SelectionFile1],[SelectionFile2],[SelectionFile3]...]}
+dictSelectionFiles = dict()
 
 #Read in each config file
 #An use thier contents to perform analysis
@@ -250,6 +275,10 @@ for fileConfigMicropita in lMicropitaFiles:
   sFileBase = os.path.basename(fileConfigMicropita.get_abspath()).split(c_strExtDelim)[0]
   sOutputDir = sfle.d(fileDirOutput,sFileBase)
   sMicropitaOutput = File(sfle.d(fileDirOutput,c_strPathDelim.join([sFileBase,sAbundanceFileName])))
+  #Store input abundance table and output selection file association for Multistudy summary
+  if not sAbundanceFileName in dictSelectionFiles:
+    dictSelectionFiles[sAbundanceFileName] = list()
+  dictSelectionFiles[sAbundanceFileName].append(sMicropitaOutput.get_abspath())
 
   #Make file names from the input micropita file in the temp directory
   sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
@@ -267,6 +296,8 @@ for fileConfigMicropita in lMicropitaFiles:
   #Make more files, now for the figure 3 HCL
   sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel =  [File(sfle.d( sOutputDir,
   sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufStratHCLUSTFig,c_strSufStratHCLUSTColor,c_strSufStratHCLUSTLabel)]
+
+
 
   #Run micropita analysis
   sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
@@ -298,7 +329,7 @@ for fileConfigMicropita in lMicropitaFiles:
          funcCladogramSelectionMethods(" ".join(["-t",sFileConfiguration[c_strConfigSelectedTaxa]]),
                                        " ".join(["-c",sFileConfiguration[c_strConfigHighlightClades]]),
                                        " ".join(["-i",strInvertImage]),
-                                       " ".join(["-r",sFileConfiguration[c_strConfigRoot]]),
+                                       " ".join(["-rt",sFileConfiguration[c_strConfigRoot]]),
                                        " ".join(["-e",sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
                                        " ".join(["-cfl",sFileConfiguration[c_strConfigCladeFilterLevel]]),
                                        " ".join(["-cfm",sFileConfiguration[c_strConfigCladeFilterMeasure]]),
@@ -314,5 +345,20 @@ for fileConfigMicropita in lMicropitaFiles:
                                 " ".join(["-id", c_strAbundanceIDCol]),
                                 " ".join(["-i", strInvertImage])))
 
-#Create Figure 5
+#For each input file
+for strInputAbundanceFile in dictSelectionFiles:
+  print("dictSelectionFiles[strInputAbundanceFile]")
+  print(dictSelectionFiles[strInputAbundanceFile])
+  #Make more files, now for figure 5 Collection Curve
+  sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
+  sfle.rebase( strInputAbundanceFile, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
+
+  #Create Figure 5
+  #Collection Curve
+  Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, sAbundanceFileName] + dictSelectionFiles[strInputAbundanceFile] + ls_srcFig1, 
+      funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+                              " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
+                              " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+                              " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                              " ".join(["-i", strInvertImage])))
 
