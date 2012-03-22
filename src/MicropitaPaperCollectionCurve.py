@@ -165,6 +165,9 @@ def _main( ):
     logging.info("MicropitaPaperCollectionCurve. The following arguments were passed.")
     logging.info(str(args))
 
+    print("str(aaaaaaaaaaaaaaaaaaaaaaaargs)")
+    print(str(args))
+
     #Normalize Abundance data
     fNormalize = (args.fNormalize.lower() == "true")
 
@@ -193,6 +196,8 @@ def _main( ):
 
     #Get diversity of each sample in the abundance table
     totalData = AbundanceTable()
+    print("args.strAbundanceFile")
+    print(args.strAbundanceFile)
     rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=args.strAbundanceFile, tempDelimiter=Constants.TAB, 
                                                             tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow),
                                                             tempNormalize=fNormalize)
@@ -251,6 +256,12 @@ def _main( ):
             else:
                 #Calculate diversity
                 lsCurSampleDiversity = list()
+                print("lsCurSampleSelections")
+                print(lsCurSampleSelections)
+                print("strSample")
+                print(strSample)
+                print("lsSampleNames")
+                print(lsSampleNames)
                 for strSample in lsCurSampleSelections:
                     lsCurSampleDiversity.append(lStudyDiversityMetrics[lsSampleNames.index(strSample)])
                 dDiversity = sum(lsCurSampleDiversity)/float(len(lsCurSampleDiversity))

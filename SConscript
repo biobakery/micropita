@@ -181,9 +181,9 @@ def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdC
 #Create a summary chart with collection curves
 def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert):
   def funcCollectionCurveSummary( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow, strFirstDataRow=strFirstDataRow, strNormalize=strNormalize, strInvert=strInvert):
+    print("START")
     strFigureT, astrSs = sfle.ts( target, source )
     strProg, strAbundance = astrSs[0], astrSs[1]
-
     #Get input selection files (discriminate from the src files also passed as a list)
     #Check to see where the input selection files end and the python src begin
     iFileCount = 0
@@ -279,6 +279,8 @@ for fileConfigMicropita in lMicropitaFiles:
   if not sAbundanceFileName in dictSelectionFiles:
     dictSelectionFiles[sAbundanceFileName] = list()
   dictSelectionFiles[sAbundanceFileName].append(sMicropitaOutput.get_abspath())
+  print("dictSelectionFiles")
+  print(dictSelectionFiles)
 
   #Make file names from the input micropita file in the temp directory
   sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
@@ -347,6 +349,8 @@ for fileConfigMicropita in lMicropitaFiles:
 
 #For each input file
 for strInputAbundanceFile in dictSelectionFiles:
+  print("strInputAbundanceFile1")
+  print(strInputAbundanceFile)
   print("dictSelectionFiles[strInputAbundanceFile]")
   print(dictSelectionFiles[strInputAbundanceFile])
   #Make more files, now for figure 5 Collection Curve
@@ -355,7 +359,9 @@ for strInputAbundanceFile in dictSelectionFiles:
 
   #Create Figure 5
   #Collection Curve
-  Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, sAbundanceFileName] + dictSelectionFiles[strInputAbundanceFile] + ls_srcFig1, 
+  print("strInputAbundanceFile2")
+  print(strInputAbundanceFile)
+  Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, File(sfle.d( fileDirInput,strInputAbundanceFile))] + dictSelectionFiles[strInputAbundanceFile] + ls_srcFig1, 
       funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                               " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                               " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
