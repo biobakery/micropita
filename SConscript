@@ -17,6 +17,7 @@ c_strSufCollectionCurveText = "-ColCurv.txt"
 c_strSufSelectedTaxa = ".taxa"
 c_strSufPng = ".png"
 c_strSufPCOA = "-PCoA.png"
+c_strSufStratPCOA = "-StratPCoA.png"
 c_strSufHCLUSTData = ".HCLData"
 c_strSufStratHCLUSTColor = "-Strat.HCLColor"
 c_strSufHCLUSTColor = ".HCLColor"
@@ -100,6 +101,7 @@ c_fileProgFileIO = File( sfle.d( fileDirSrc, "FileIO.py" ) )
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
 c_fileProgCollectionCurveFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCollectionCurve.py") )
 c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
+c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
 c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
 c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
 c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratSelectionHCL.py" ) )
@@ -180,6 +182,14 @@ def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdC
     strColor, strLabel = target[1].get_abspath(), target[2].get_abspath()
     return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHC, strColor, strLabel, strT])
   return funcHCLStratSelectionRet
+
+#Visualize output with Stratified PCoAs (Figure 4)
+def funcStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert ):
+  def funcStratifiedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, strStratifyMetadata=strStratifyMetadata, iNormalize=iNormalize, strInvert=strInvert):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
+    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,strStratifyMetadata,iNormalize,strInvert]+[ strAbnd, strSelection, strT])
+  return funcStratifiedPCoARet
 
 #Create a summary chart with collection curves
 def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert):
@@ -280,9 +290,9 @@ for fileConfigMicropita in lMicropitaFiles:
   sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
 
   #Make files from the micropita output file
-  sOutputFigure1APCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
+  sOutputFigure1APCoA,sOutputFigure4PCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
   sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
-  sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
+  sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
   c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
 
   #Make more files, these for cladogram options
@@ -305,8 +315,9 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                     sFileConfiguration[c_strConfigSelectedTaxa],
                                                                                                                                     lsSelectionMethods))
   #Create figure 1A PCoA
-  #PCoA of selection
-  Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+  #Unstratifeid PCoA of selection
+  if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
+    Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                                                 " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                                 " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                                 " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
@@ -338,6 +349,16 @@ for fileConfigMicropita in lMicropitaFiles:
                                 " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
                                 " ".join(["-id", c_strAbundanceIDCol]),
                                 " ".join(["-i", strInvertImage])))
+
+  #Create figure 4 PCoA
+  #PCoA of stratified selection
+  if not sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
+    Command(sOutputFigure4PCoA, [c_fileProgStratifiedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcStratifiedPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                                   " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                                   " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                                   " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
+                                                                                                                                                   " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                   " ".join(["-i",strInvertImage])))
 
   #Add input files to be later summarized in the metaplots
   #Create key combining abundance file and stratification status
