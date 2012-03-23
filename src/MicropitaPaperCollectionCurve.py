@@ -28,8 +28,10 @@ import re
 
 class MicropitaPaperCollectionCurve:
 
-    #TODO complete last
-    def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxDiversity, dictdDiversityBaseline, strMetric, fInvert):
+    c_UseDiversityMetrics = "Diversity"
+    c_UseTopRankedMethods = "TopRanked"
+
+    def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxYMetric, dictdDiversityBaseline, strMetric, fInvert):
         font = {'family':'arial',
            'color':'k',
            'weight':'normal',
@@ -44,7 +46,7 @@ class MicropitaPaperCollectionCurve:
         imgFigure.set_facecolor(objColors.c_strBackgroundColorWord)
         imgSubplot = imgFigure.add_subplot(111,axisbg=objColors.c_strBackgroundColorLetter)
         imgSubplot.set_xlabel('Number of samples sampled from study (n)')
-        imgSubplot.set_ylabel('Sampled Diversity (Inverse Simpson)')
+        imgSubplot.set_ylabel("".join(["Sampled Diversity (",strMetric,")"]))
         imgSubplot.spines['top'].set_color(objColors.c_strDetailsColorLetter)
         imgSubplot.spines['bottom'].set_color(objColors.c_strDetailsColorLetter)
         imgSubplot.spines['left'].set_color(objColors.c_strDetailsColorLetter)
@@ -62,10 +64,10 @@ class MicropitaPaperCollectionCurve:
 
         liX = list()
         liY = list()
-        #Plot max diversity
-        for iCount in dictdMaxDiversity:
+        #Plot max y metric
+        for iCount in dictdMaxYMetric:
             liX.append(iCount)
-            liY.append(dictdMaxDiversity[iCount])
+            liY.append(dictdMaxYMetric[iCount])
         plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Maximum "+strMetric)
 
         #Update range
@@ -165,9 +167,6 @@ def _main( ):
     logging.info("MicropitaPaperCollectionCurve. The following arguments were passed.")
     logging.info(str(args))
 
-    print("str(aaaaaaaaaaaaaaaaaaaaaaaargs)")
-    print(str(args))
-
     #Normalize Abundance data
     fNormalize = (args.fNormalize.lower() == "true")
 
@@ -180,12 +179,14 @@ def _main( ):
     #Micropita instance
     microPITA = MicroPITA()
 
-    #TODO maybe set up for multiple dviersity metrics at once
-    #Diversity metric
-    lsDiversityMetric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
-
     #Instance of plot collection curve script
     mCC = MicropitaPaperCollectionCurve()
+
+    #Metric
+    c_strMetricCategory = mCC.c_UseDiversityMetrics
+
+    #Diversity metric
+    lsDiversityRunMetrics = [microPITA.c_INV_SIMPSON_A_DIVERSITY,microPITA.c_CHAO1_A_DIVERSITY]
 
     #Manage the cases where there are no or 1 selection file given
     if args.strSelectionFiles == None:
@@ -196,128 +197,138 @@ def _main( ):
 
     #Get diversity of each sample in the abundance table
     totalData = AbundanceTable()
-    print("args.strAbundanceFile")
-    print(args.strAbundanceFile)
     rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=args.strAbundanceFile, tempDelimiter=Constants.TAB, 
                                                             tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow),
                                                             tempNormalize=fNormalize)
-    #List of lists, one list per diversity metric for all samples
+
+    #Get sample names
     lsSampleNames = rawAbundance.dtype.names[1:]
-    lStudyDiversityMetrics = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = rawAbundance, tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = lsDiversityMetric)
-    lStudyDiversityMetrics = lStudyDiversityMetrics[0]
+    #The metrics within the metric category to run
+    #For example, the category could be Diversity and the runMetrics could be Inverse Simpson and Choa1
+    lsRunMetrics = []
+    if c_strMetricCategory == mCC.c_UseDiversityMetrics:
+        lsRunMetrics = lsDiversityRunMetrics
+    elif c_strMetricCategory == mCC.c_UseTopRankedMethods:
+        lsRunMetrics.append(mCC.c_UseTopRankedMethods)
 
-    #Get top ranked of each sample
+    #For each run metric build a collection curve. The run metric will be the y axis.
+    for strRunMetric in lsRunMetrics:
 
-    #Read through selection files and place contents in dictionary
-    dictGrandSelection = dict()
-    for strFile in args.strSelectionFiles:
-        #Read in selection file
-        strSelection = ""
-        with open(strFile,'r') as fHndlInput:
-            strSelection = fHndlInput.read()
-            fHndlInput.close()
+        #Generate the metric measurements of samples for the y axis
+        lStudyMetrics = None
+        if c_strMetricCategory == mCC.c_UseDiversityMetrics:
+            #List of lists, one list per diversity metric for all samples
+            lStudyMetrics = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = rawAbundance, tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = [strRunMetric])
+            lStudyMetrics = lStudyMetrics[0]
 
-        #Dictionary to hold selection data
-        dictSelection = dict()
-        for strSelectionLine in filter(None,strSelection.split(Constants.ENDLINE)):
-            astrSelectionMethod = strSelectionLine.split(Constants.COLON)
-            dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(Constants.COMMA))]
+        #Get top ranked of each sample
+        elif c_strMetricCategory == mCC.c_UseTopRankedMethods:
+            pass
 
-        #Put sample selection into grand study selection
-        if strFile in dictGrandSelection:
-          logging.error("".join(["MicroPitaPaperCollectionCurve. File for study was already collected in the collection curve. The following file was ignored:",strFile,"."]))
-        dictGrandSelection[strFile] = dictSelection
+        #Read through selection files and place contents in dictionary
+        dictGrandSelection = dict()
+        for strFile in args.strSelectionFiles:
+            #Read in selection file
+            strSelection = ""
+            with open(strFile,'r') as fHndlInput:
+                strSelection = fHndlInput.read()
+                fHndlInput.close()
 
-    #Break up the GrandSelection of subsampling by sample selection size
-    #For each selection size
-    #Get the average y for each sample subset (y={diversity, top ranked abundance})
-    dictMetricsBySampleN = dict()
-    iSelectionCount = -1
-    fError = False
+            #Dictionary to hold selection data
+            dictSelection = dict()
+            for strSelectionLine in filter(None,strSelection.split(Constants.ENDLINE)):
+                astrSelectionMethod = strSelectionLine.split(Constants.COLON)
+                dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(Constants.COMMA))]
 
-    print("dictGrandSelection")
-    print(dictGrandSelection)
+            #Put sample selection into grand study selection
+            if strFile in dictGrandSelection:
+                logging.error("".join(["MicroPitaPaperCollectionCurve. File for study was already collected in the collection curve. The following file was ignored:",strFile,"."]))
+            dictGrandSelection[strFile] = dictSelection
 
-    #For each subsample (N) evaluate selection methods
-    for dictStudy in dictGrandSelection:
-        dictCurStudy = dictGrandSelection[dictStudy]
+        #Break up the GrandSelection of subsampling by sample selection size
+        #For each selection size
+        #Get the average y for each sample subset (y={diversity, top ranked abundance})
+        dictMetricsBySampleN = dict()
         iSelectionCount = -1
-        #For each selection method make sure the other selection in the study selected the same N
-        lsMethodStats = list()
-        for strMethod in dictCurStudy:
-            lsCurSampleSelections = dictCurStudy[strMethod]
-            if iSelectionCount == -1:
-                iSelectionCount = len(lsCurSampleSelections)
-            elif not iSelectionCount == len(lsCurSampleSelections):
-                logging.error("".join(["MicroPitaPaperCollectionCurve. Selection methods selected an uneven number of samples. Did not include this study in the collection curve.",dictStudy,"."]))
-                fError = True
-            #If there was an error do not add the study's methods to plot data
-            if fError: break
-            else:
-                #Calculate diversity
-                lsCurSampleDiversity = list()
-                print("lsCurSampleSelections")
-                print(lsCurSampleSelections)
-                print("strSample")
-                print(strSample)
-                print("lsSampleNames")
-                print(lsSampleNames)
-                for strSample in lsCurSampleSelections:
-                    lsCurSampleDiversity.append(lStudyDiversityMetrics[lsSampleNames.index(strSample)])
-                dDiversity = sum(lsCurSampleDiversity)/float(len(lsCurSampleDiversity))
-                #Caluclate top ranked
-                dTopRanked = -1
-                lsMethodStats.append([strMethod,["Diversity",dDiversity],["TopRank",dTopRanked]])
+        fError = False
 
-        #Build data structure to hold plotting data
-        if not fError:
-            for ldStats in lsMethodStats:
-                if not ldStats[0] in dictMetricsBySampleN:
-                    dictMetricsBySampleN[ldStats[0]]=dict()
-                dictCurMethod = dictMetricsBySampleN[ldStats[0]]
-                for lMetric in ldStats[1:]:
-                    if not lMetric[0] in dictCurMethod:
-                        dictCurMethod[lMetric[0]] = dict()
-                    dictCurMetric = dictCurMethod[lMetric[0]]
-                    if not iSelectionCount in dictCurMethod:
-                        dictCurMetric[iSelectionCount] = list()
-                    dictCurMetric[iSelectionCount].append(lMetric[1])
+        #For each subsample (N) evaluate selection methods
+        for dictStudy in dictGrandSelection:
+            dictCurStudy = dictGrandSelection[dictStudy]
+            iSelectionCount = -1
+            #For each selection method make sure the other selection in the study selected the same N
+            lsMethodStats = list()
+            for strMethod in dictCurStudy:
+                lsCurSampleSelections = dictCurStudy[strMethod]
+                if iSelectionCount == -1:
+                    iSelectionCount = len(lsCurSampleSelections)
+                elif not iSelectionCount == len(lsCurSampleSelections):
+                    logging.error("".join(["MicroPitaPaperCollectionCurve. Selection methods selected an uneven number of samples. Did not include this study in the collection curve.",dictStudy,"."]))
+                    fError = True
+                #If there was an error do not add the study's methods to plot data
+                if fError: break
+                else:
+                    if c_strMetricCategory == mCC.c_UseDiversityMetrics:
+                        #Calculate diversity
+                        lsCurSampleDiversity = list()
+                        for strSample in lsCurSampleSelections:
+                            lsCurSampleDiversity.append(lStudyMetrics[lsSampleNames.index(strSample)])
+                        dDiversity = sum(lsCurSampleDiversity)/float(len(lsCurSampleDiversity))
+                        lsMethodStats.append([strMethod,[strRunMetric,dDiversity]])
 
-    print("lsMethodStats")
-    print(lsMethodStats)
+                    elif c_strMetricCategory == mCC.c_UseTopRankedMethods:
+                        #Caluclate top ranked
+                        dTopRanked = -1
+                        lsMethodStats.append([strMethod,[c_strMetricCategory,dTopRanked]])
 
-    #Most diverse set of samples  at each N
-    dictdDiverseSamplesAtN = dict()
-    #Booststrapped diversity level at N
-    dictdBootstrappedDiversityAtN = dict()
+            #Build data structure to hold plotting data
+            if not fError:
+                for ldStats in lsMethodStats:
+                    if not ldStats[0] in dictMetricsBySampleN:
+                        dictMetricsBySampleN[ldStats[0]]=dict()
+                    dictCurMethod = dictMetricsBySampleN[ldStats[0]]
+                    for lMetric in ldStats[1:]:
+                        if not lMetric[0] in dictCurMethod:
+                            dictCurMethod[lMetric[0]] = dict()
+                        dictCurMetric = dictCurMethod[lMetric[0]]
+                        if not iSelectionCount in dictCurMethod:
+                            dictCurMetric[iSelectionCount] = list()
+                        dictCurMetric[iSelectionCount].append(lMetric[1])
 
-    #Average multiple method metric instances at sample size N (if they exist)
-    #N level
-    for strMethod in dictMetricsBySampleN:
-        dictCurMethod = dictMetricsBySampleN[strMethod]
-        #Method level
-        for strMethodMetric in dictCurMethod:
-            dictMethodMetric = dictCurMethod[strMethodMetric]
-            #Metric level
-            for strN in dictMethodMetric:
-                lsMethodMetricByN = dictMethodMetric[strN]
-                #Average the list of metrics
-                dictMethodMetric[strN] = sum(lsMethodMetricByN)/float(len(lsMethodMetricByN))
+        #Most diverse set of samples  at each N
+        dictdDiverseSamplesAtN = dict()
+        #Booststrapped diversity level at N
+        dictdBootstrappedDiversityAtN = dict()
 
-                #Get Most diverse sample per N
-                if strN not in dictdDiverseSamplesAtN:
-                    ldTopSamples = sorted(lStudyDiversityMetrics)[-1*int(strN):]
-                    dictdDiverseSamplesAtN[strN] = sum(ldTopSamples)/float(len(ldTopSamples))
+        #Average multiple method metric instances at sample size N (if they exist)
+        #N level
+        for strMethod in dictMetricsBySampleN:
+            dictCurMethod = dictMetricsBySampleN[strMethod]
+            #Method level
+            for strMethodMetric in dictCurMethod:
+                dictMethodMetric = dictCurMethod[strMethodMetric]
+                #Metric level
+                for strN in dictMethodMetric:
+                    lsMethodMetricByN = dictMethodMetric[strN]
+                    #Average the list of metrics
+                    dictMethodMetric[strN] = sum(lsMethodMetricByN)/float(len(lsMethodMetricByN))
 
-                #Get bootstrapped diversity at a level N
-                if strN not in dictdBootstrappedDiversityAtN:
-                    dictdBootstrappedDiversityAtN[strN] = mCC.getAverageBootstrappedMetric(lsMetrics = lStudyDiversityMetrics, iSelectSampleCount = int(strN), iBootStrappingItr = c_BootstrapItr)
+                    #Get Most diverse sample per N
+                    if strN not in dictdDiverseSamplesAtN:
+                        ldTopSamples = sorted(lStudyMetrics)[-1*int(strN):]
+                        dictdDiverseSamplesAtN[strN] = sum(ldTopSamples)/float(len(ldTopSamples))
 
-    print(dictMetricsBySampleN)
-    print(dictMetricsBySampleN)
+                    #Get bootstrapped diversity at a level N
+                    if strN not in dictdBootstrappedDiversityAtN:
+                        dictdBootstrappedDiversityAtN[strN] = mCC.getAverageBootstrappedMetric(lsMetrics = lStudyMetrics, iSelectSampleCount = int(strN), iBootStrappingItr = c_BootstrapItr)
 
-    #Plot line graph
-    mCC.funcPlotCollectionCurve(strPlotName=args.strOutFigure, dictMethods=dictMetricsBySampleN, dictdMaxDiversity=dictdDiverseSamplesAtN, dictdDiversityBaseline=dictdBootstrappedDiversityAtN, strMetric="Diversity", fInvert = fInvert)
+        #Update the plot name with the run metric
+        strPlotNamePieces = filter(None,re.split(Constants.PATH_SEP,args.strOutFigure))
+        strPlotName = Constants.PATH_SEP.join(strPlotNamePieces[0:-1])
+        strPlotName = Constants.PATH_SEP.join([strPlotName,strRunMetric+"-"+strPlotNamePieces[-1:][0]])
+
+        #Plot line graph
+        mCC.funcPlotCollectionCurve(strPlotName=strPlotName, dictMethods=dictMetricsBySampleN, dictdMaxYMetric=dictdDiverseSamplesAtN, dictdDiversityBaseline=dictdBootstrappedDiversityAtN, strMetric=strRunMetric, fInvert = fInvert)
 
     logging.info("Stop MicropitaPaperCollectionCurve")
 
