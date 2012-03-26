@@ -252,21 +252,35 @@ def _main( ):
         iSelectionCount = -1
         fError = False
 
+        logging.debug("dictGrandSelection")
+        logging.debug(dictGrandSelection)
+
         #For each subsample (N) evaluate selection methods
         for dictStudy in dictGrandSelection:
             dictCurStudy = dictGrandSelection[dictStudy]
+
+            logging.debug("dictCurStudy")
+            logging.debug(dictCurStudy)
+
             iSelectionCount = -1
             #For each selection method make sure the other selection in the study selected the same N
             lsMethodStats = list()
             for strMethod in dictCurStudy:
                 lsCurSampleSelections = dictCurStudy[strMethod]
+
+                logging.debug("lsCurSampleSelections")
+                logging.debug(lsCurSampleSelections)
+
                 if iSelectionCount == -1:
                     iSelectionCount = len(lsCurSampleSelections)
                 elif not iSelectionCount == len(lsCurSampleSelections):
+                    print("".join(["MicroPitaPaperCollectionCurve. Selection methods selected an uneven number of samples. Did not include this study in the collection curve.",dictStudy,"."]))
                     logging.error("".join(["MicroPitaPaperCollectionCurve. Selection methods selected an uneven number of samples. Did not include this study in the collection curve.",dictStudy,"."]))
                     fError = True
                 #If there was an error do not add the study's methods to plot data
-                if fError: break
+                if fError:
+                  lsMethodStats = list()
+                  break
                 else:
                     if c_strMetricCategory == mCC.c_UseDiversityMetrics:
                         #Calculate diversity
@@ -280,6 +294,9 @@ def _main( ):
                         #Caluclate top ranked
                         dTopRanked = -1
                         lsMethodStats.append([strMethod,[c_strMetricCategory,dTopRanked]])
+
+            logging.debug("lsMethodStats")
+            logging.debug(lsMethodStats)
 
             #Build data structure to hold plotting data
             if not fError:
@@ -302,6 +319,9 @@ def _main( ):
 
         #Average multiple method metric instances at sample size N (if they exist)
         #N level
+        logging.debug("dictMetricsBySampleN")
+        logging.debug(dictMetricsBySampleN)
+
         for strMethod in dictMetricsBySampleN:
             dictCurMethod = dictMetricsBySampleN[strMethod]
             #Method level

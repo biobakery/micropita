@@ -1,6 +1,7 @@
 import re
 import sfle
 import sys
+import os
 
 Import( "*" )
 
@@ -74,7 +75,6 @@ c_strConfigSampleRow = "[Sample Name Row Index]"
 c_strConfigSelection = "[Selection]"
 c_strConfigSelectedTaxa = "[Selected Taxa]"
 c_strConfigSelectionTechniques = "[Selection Techniques]"
-c_strConfigStratifiedCount = "[Stratified Count]"
 c_strConfigSupervisedLabel = "[Supervised Label]"
 c_strConfigSupervisedCount = "[Supervised Selection Count]"
 c_strConfigUnsupervisedCount = "[Unsupervised Selection Count]"
@@ -125,8 +125,9 @@ c_strDiscriminant = "Discriminant"
 c_strDistinct = "Distinct"
 c_strRandom = "Random"
 c_strRepresentativeDissimilarity = "Representative"
-c_strSVM = [c_strDiscriminant,c_strDistinct]
+c_lsSupervisedMethods = set([c_strDiscriminant,c_strDistinct])
 c_strTaxa = "Taxa_Defined"
+c_lsUnsupervisedMethods = set([c_strDiversity,c_strExtremeDissimilarity,c_strRandom,c_strRepresentativeDissimilarity,c_strTaxa])
 #c_lstrAllSelectionMethods = [c_strRandom,c_strTaxa,c_strDiversity,c_strRepresentativeDissimilarity,c_strExtremeDissimilarity,c_strDiscriminant,c_strDistinct]
 #c_lstrAllSelectionMethods = [c_strTaxa,c_strDiversity,c_strRepresentativeDissimilarity,c_strExtremeDissimilarity,c_strDiscriminant,c_strDistinct]
 
@@ -137,7 +138,7 @@ def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDa
   def funcMicroPitaRet( target, source, env, iUnsupervisedCount=iUnsupervisedCount, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, 
                         iSupervisedCount=iSupervisedCount, strSupervisedLabel=strSupervisedLabel, strUnsupervisedStratify=strUnsupervisedStratify, strTaxaFile=strTaxaFile, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
-    strProg, strAbnd, strTaxa = astrSs[0], astrSs[1], astrSs[2]
+    strProg, strAbnd = astrSs[0], astrSs[1]
     aArgs = [iUnsupervisedCount]+lsSelectionMethods
     return sfle.ex( [strProg]+[strLoggingLevel, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify]+[strT, strAbnd, strTaxaFile, fileDirTmp] + aArgs)
   return funcMicroPitaRet
@@ -265,74 +266,129 @@ for fileConfigMicropita in lMicropitaFiles:
     else:
       iIndex = iIndex + 1
 
+  print("sFileConfiguration")
+  print(sFileConfiguration)
+
+  #Parse the supervised runs selection into multiple runs if needed
+  if(c_strConfigSupervisedCount in sFileConfiguration):
+    sSupervisedCounts = sFileConfiguration[c_strConfigSupervisedCount]
+    sFileConfiguration[c_strConfigSupervisedCount] = filter(None,re.split(",",sSupervisedCounts))
+
+  #Parse the unsupervised runs selection into multiple runs if needed
+  if(c_strConfigUnsupervisedCount in sFileConfiguration):
+    sSupervisedCounts = sFileConfiguration[c_strConfigUnsupervisedCount]
+    sFileConfiguration[c_strConfigUnsupervisedCount] = filter(None,re.split(",",sSupervisedCounts))
+
   #Common configurations
   lsSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniques]))
   strInvertImage = sFileConfiguration[c_strConfigInvertImage]
   if strInvertImage.lower()=="true":
     c_fileCladogramStyleFile = File(sfle.d( fileDirInput, "microPITA"+c_strSufCircStyleInv ))
 
+  #Indicator of if this is a supervised or unsupervised (or both run)
+  fUnsupervisedRun = (len(c_lsUnsupervisedMethods.intersection(set(lsSelectionMethods))) > 0)
+  fSupervisedRun = (len(c_lsSupervisedMethods.intersection(set(lsSelectionMethods))) > 0)
+  fIsStratified = False
+  if c_strConfigUnsupervisedStratify in sFileConfiguration:
+    fIsStratified = not sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none"
+
+  #Check to make sure the stratified/unsupervised count matches the supervised count
+  if(fUnsupervisedRun and fSupervisedRun):
+    #If stratified selection is not enabled for unsupervised
+    if(not len(sFileConfiguration[c_strConfigUnsupervisedCount]) == len(sFileConfiguration[c_strConfigSupervisedCount])):
+      print("Unsupervised selection count length was not equal to the supervised selection count. Did not run study.")
+      print("=".join(["Config file",fileConfigMicropita.get_abspath()]))
+      print("".join(["Unsupervised selection =",str(len(sFileConfiguration[c_strConfigUnsupervisedCount])),". Supervised selection =",str(len(sFileConfiguration[c_strConfigSupervisedCount]))]))
+      pass
+
   #Update the configurations that can be toggled on or off
   if sFileConfiguration[c_strConfigCladeFilter].lower() == "false":
-    sFileConfiguration[c_strConfigCladeFilterLevel] = "None"
-    sFileConfiguration[c_strConfigCladeFilterMeasure] = "None"
-    sFileConfiguration[c_strConfigCladeFilterMinSize] = "None"
+    sFileConfiguration[c_strConfigCladeFilterLevel].lower() == "none"
+    sFileConfiguration[c_strConfigCladeFilterMeasure].lower() == "none"
+    sFileConfiguration[c_strConfigCladeFilterMinSize].lower() == "none"
 
   if sFileConfiguration[c_strConfigAbundanceFilter].lower() == "false":
-    sFileConfiguration[c_strConfigAbundanceFilterPercentile] = "None"
-    sFileConfiguration[c_strConfigAbundanceFilterPercent] = "None"
+    sFileConfiguration[c_strConfigAbundanceFilterPercentile].lower() == "none"
+    sFileConfiguration[c_strConfigAbundanceFilterPercent].lower() == "none"
 
-  sAbundanceFileName = sFileConfiguration[c_strConfigInputFile]
-  sFileBase = os.path.basename(fileConfigMicropita.get_abspath()).split(c_strExtDelim)[0]
-  sOutputDir = sfle.d(fileDirOutput,sFileBase)
-  sMicropitaOutput = File(sfle.d(fileDirOutput,c_strPathDelim.join([sFileBase,sAbundanceFileName])))
+  #Get supervised and unsupervised counts
+  lsUnsupervisedCounts = sFileConfiguration[c_strConfigUnsupervisedCount]
+  lsSupervisedCounts = sFileConfiguration[c_strConfigSupervisedCount]
+  #Indicate if the unsupervised or supervised index are going to be the drivers of the loop
+  #This is done because there may not be supervised or unsupervised selection performed
+  lsIndexCounts = lsUnsupervisedCounts
+  if(not fUnsupervisedRun):
+    lsIndexCounts = lsSupervisedCounts
 
-  #Make file names from the input micropita file in the temp directory
-  sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
+  #Loop through the count selection using the unsupervised counts length for indexing
+  for iCountIndex in xrange(0,len(lsIndexCounts)):
 
-  #Make files from the micropita output file
-  sOutputFigure1APCoA,sOutputFigure4PCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
-  sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
-  sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
-  c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
+    sAbundanceFileName = sFileConfiguration[c_strConfigInputFile]
+    sFileBase = os.path.basename(fileConfigMicropita.get_abspath()).split(c_strExtDelim)[0]
+    sOutputDir = sfle.d(fileDirOutput,sFileBase)
+    #Build the micropita output name
+    sMicropitaOutput = sAbundanceFileName
+    if fSupervisedRun:
+      sMicropitaOutput = "".join(["S",lsSupervisedCounts[iCountIndex],"-",sMicropitaOutput])
+    if fUnsupervisedRun:
+      if fIsStratified:
+        sMicropitaOutput = "".join(["Strat",lsUnsupervisedCounts[iCountIndex],"-",sMicropitaOutput])
+      else:
+        sMicropitaOutput = "".join(["U",lsUnsupervisedCounts[iCountIndex],"-",sMicropitaOutput])
+    sMicropitaOutput = File(sfle.d(fileDirOutput,c_strPathDelim.join([sFileBase,sMicropitaOutput])))
 
-  #Make more files, these for cladogram options
-  cCladogramSelectedTaxa,cCladogramHighlightedTaxa = [File(sfle.d( fileDirInput, sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) 
-  for s in (c_strSufSelectedTaxa,c_strSufSelectedTaxa)]
+    #Make file names from the input micropita file in the temp directory
+    sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
 
-  #Make more files, now for the figure 3 HCL
-  sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel =  [File(sfle.d( sOutputDir,
-  sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufStratHCLUSTFig,c_strSufStratHCLUSTColor,c_strSufStratHCLUSTLabel)]
+    #Make files from the micropita output file
+    sOutputFigure1APCoA,sOutputFigure4PCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
+    sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
+    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
+    c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
 
-  #Run micropita analysis
-  sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
-  Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName, cCladogramSelectedTaxa] + c_filesSecondarySrc + [fileConfigMicropita], funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
-                                                                                                                                    sFileConfiguration[c_strConfigUnsupervisedCount],
+    #Make more files, these for cladogram options
+    cCladogramSelectedTaxa = None
+    if c_strConfigSelectedTaxa in sFileConfiguration:
+      cCladogramSelectedTaxa = File(c_strPathDelim.join(["input",sFileConfiguration[c_strConfigSelectedTaxa]]))
+
+    cCladogramHighlightedTaxa = None
+    if c_strConfigHighlightClades in sFileConfiguration:
+      cCladogramHighlightedTaxa = File(c_strPathDelim.join(["input",sFileConfiguration[c_strConfigHighlightClades]]))
+
+    #Make more files, now for the figure 3 HCL
+    sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel =  [File(sfle.d( sOutputDir,
+    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufStratHCLUSTFig,c_strSufStratHCLUSTColor,c_strSufStratHCLUSTLabel)]
+
+    #Run micropita analysis
+    sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
+    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita], funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                    sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
                                                                                                                                     " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                     " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
-                                                                                                                                    " ".join(["-s",sFileConfiguration[c_strConfigSupervisedCount]]),
+                                                                                                                                    " ".join(["-s",sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
                                                                                                                                     " ".join(["-p",sFileConfiguration[c_strConfigSupervisedLabel]]),
                                                                                                                                     " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
-                                                                                                                                    sFileConfiguration[c_strConfigSelectedTaxa],
+                                                                                                                                    cCladogramSelectedTaxa,
                                                                                                                                     lsSelectionMethods))
-  #Create figure 1A PCoA
-  #Unstratifeid PCoA of selection
-  if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
-    Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+    #Create figure 1A PCoA
+    #Unstratifeid PCoA of selection
+    if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
+      Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput, sMicropitaPredictFile] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                                                 " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                                 " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                                 " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                                 " ".join(["-i",strInvertImage])))
-  #Create figure 1B HCL
-  #Selection of samples by selection method
-  Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
+    #Create figure 1B HCL
+    #Selection of samples by selection method
+    Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
         funcHCLSelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]), " ".join(["-i",strInvertImage])))
 
-  #Create a cladogram figure 2
-  #Taxanomic Enrichment
-  Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
+    #Create a cladogram figure 2
+    #Taxanomic Enrichment
+    Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
          sCladogramSizeFile, sCladogramCircleFile], [c_fileProgSelectionCladogramFigure, sMicropitaOutput, sAbundanceFileName, c_fileCladogramStyleFile, cCladogramSelectedTaxa] + ls_srcFig2, 
-         funcCladogramSelectionMethods(" ".join(["-t",sFileConfiguration[c_strConfigSelectedTaxa]]),
-                                       " ".join(["-c",sFileConfiguration[c_strConfigHighlightClades]]),
+         funcCladogramSelectionMethods(" ".join(["-t",cCladogramSelectedTaxa.get_abspath()]),
+                                       " ".join(["-c",cCladogramHighlightedTaxa.get_abspath()]),
                                        " ".join(["-i",strInvertImage]),
                                        " ".join(["-rt",sFileConfiguration[c_strConfigRoot]]),
                                        " ".join(["-e",sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
@@ -342,37 +398,37 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join(["-afp",sFileConfiguration[c_strConfigAbundanceFilterPercentile]]),
                                        " ".join(["-afc",sFileConfiguration[c_strConfigAbundanceFilterPercent]])))
 
-  #Create figure 3
-  #Selection in Stratification
-  Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sAbundanceFileName] + ls_srcFig1, 
+    #Create figure 3
+    #Selection in Stratification
+    Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sAbundanceFileName] + ls_srcFig1, 
         funcHCLStratSelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                                 " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
                                 " ".join(["-id", c_strAbundanceIDCol]),
                                 " ".join(["-i", strInvertImage])))
 
-  #Create figure 4 PCoA
-  #PCoA of stratified selection
-  if not sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
-    Command(sOutputFigure4PCoA, [c_fileProgStratifiedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcStratifiedPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+    #Create figure 4 PCoA
+    #PCoA of stratified selection
+    if not sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
+      Command(sOutputFigure4PCoA, [c_fileProgStratifiedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcStratifiedPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                                    " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                    " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                    " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
                                                                                                                                                    " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                    " ".join(["-i",strInvertImage])))
 
-  #Add input files to be later summarized in the metaplots
-  #Create key combining abundance file and stratification status
-  sKey = "".join(["STRAT-",sFileConfiguration[c_strConfigUnsupervisedStratify],"-INPUT-",os.path.basename(sAbundanceFileName.get_abspath())])
-  if sKey not in dictSelectionFiles:
-    dictSelectionFiles[sKey] = dict()
-    curSummaryFileDict = dictSelectionFiles[sKey]
-    curSummaryFileDict[c_strSelectionFiles] = list()
-  dictSelectionFiles[sKey][c_strConfigInputFile] = sAbundanceFileName
-  dictSelectionFiles[sKey][c_strSelectionFiles].append(sMicropitaOutput)
+    #Add input files to be later summarized in the metaplots
+    #Create key combining abundance file and stratification status
+    sKey = "".join(["STRAT-",sFileConfiguration[c_strConfigUnsupervisedStratify],"-INPUT-",os.path.basename(sAbundanceFileName.get_abspath())])
+    if sKey not in dictSelectionFiles:
+      dictSelectionFiles[sKey] = dict()
+      curSummaryFileDict = dictSelectionFiles[sKey]
+      curSummaryFileDict[c_strSelectionFiles] = list()
+
+    dictSelectionFiles[sKey][c_strConfigInputFile] = sAbundanceFileName
+    dictSelectionFiles[sKey][c_strSelectionFiles].append(sMicropitaOutput)
+
 
 #For each input file
-print("dictSelectionFiles")
-print(dictSelectionFiles)
 for strInputSummaryKey in dictSelectionFiles:
   curSummaryDict = dictSelectionFiles[strInputSummaryKey]
   curInputFile = curSummaryDict[c_strConfigInputFile]
@@ -382,12 +438,8 @@ for strInputSummaryKey in dictSelectionFiles:
   sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
   sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
 
-  print([sOutputFigure5CC.get_abspath(), sOutputFigureText5CC.get_abspath()])
-
   #Create Figure 5
   #Collection Curve
-  print("curInputFile")
-  print(curInputFile.get_abspath())
   Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
       funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                               " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),

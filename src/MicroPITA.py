@@ -971,19 +971,6 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
     description = """Selects samples from abundance tables based on various selection schemes.""" )
 
 #Arguments
-#Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
-#Abundance file
-argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = "An abundance table." )
-#Taxa file
-argp.add_argument( "strFileTaxa", metavar = "Taxa_file",
-    help = "A file containing taxa to be used in taxa-directed selection." )
-#Temporary folder
-argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directory to place temporary and intermediate files.")
-#Select count
-argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
-#Selection parameter
-argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
 #Optional parameters
 #Logging
 argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
@@ -1002,6 +989,19 @@ argp.add_argument("-p", dest="strLabel", metavar= "Label", default="",
                   help= "The name of the phenotype data row on which to perform supervised methods.")
 argp.add_argument("-u", dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
                   help= "The metatdata to stratify unsupervised analysis.")
+#Outputfile
+argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
+#Abundance file
+argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = "An abundance table." )
+#Taxa file
+argp.add_argument( "strFileTaxa", metavar = "Taxa_file",
+    help = "A file containing taxa to be used in taxa-directed selection." )
+#Temporary folder
+argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directory to place temporary and intermediate files.")
+#Select count
+argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
+#Selection parameter
+argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
