@@ -110,7 +110,7 @@ class MicropitaPaperCollectionCurve:
 
         xlim(iXMin*.9,iXMax*1.1)
         ylim(iYMin*.9,iYMax*1.1)
-        objLegend = imgSubplot.legend(loc="upper right", scatterpoints=1, prop={'size':10})
+        objLegend = imgSubplot.legend(loc="best", scatterpoints=1, prop={'size':10})
 
         #Invert legend
         if(fInvert):
