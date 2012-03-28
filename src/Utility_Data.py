@@ -10,6 +10,7 @@
 #Import libaries
 from Constants import Constants
 from CommandLine import CommandLine
+from Diversity import Diversity
 from FileIO import FileIO
 import math
 import numpy as np
@@ -40,6 +41,9 @@ class Utility_Data():
         taxaDrivenCount = 2
         #Total sample count
         sampleCount = diversitySampleCount + representativeDissimilarityCount + extremeDissimilarityCount + taxaDrivenCount
+
+        #TODO remove
+        strHCLLoc = "./external/hclust/hclust.py"
 
         #Taxa
         #Number of taxa
@@ -179,9 +183,103 @@ class Utility_Data():
 
         #
         if(tempGenerateFigure):
-            CommandLine().runCommandLine(["./external/hclust/hclust.py", "--in", tempFilePath, "--out", tempFilePath[:-4]+".png", "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1",'--flabel',"1",'--font_size',"5"])
+            CommandLine().runCommandLine([strHCLLoc, "--in", tempFilePath, "--out", "".join([os.path.splitext(tempFilePath)[0],".png"]), "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1",'--flabel',"1",'--font_size',"5"])
 
         #Return file name
         return tempFilePath
 
-Utility_Data.generateAbundanceTable(tempFilePath="TestDataGeneration.txt")
+    ##
+    #Generate matrix for microPITA focused on diversity
+    #@param tempOutPutFile
+    @staticmethod
+    def generateDiversityAbundanceTable(tempFilePath, tempGenerateFigure=True):
+        #Matrix descriptors
+        #Samples
+        #Number of diversity samples
+        iSampleCount = 50
+
+        #Taxa
+        #Number of taxa
+        iTaxaCount = 250
+
+        #Chao1 
+        strChao1 = "Chao 1"
+        #Inverse Simpson
+        strISimpson = "Inverse_Simpson"
+
+        #TODO remove
+        strHCLLoc = "./external/hclust/hclust.py"
+
+        #First data row for HCLust
+        strFirstDataRow = "3"
+        strFirstDataCol = "2"
+        
+        ####Create matrix
+        #Create the matrix of n taxa (row) by n samples (column)
+        dataMatrix = np.zeros((iTaxaCount,iSampleCount+1))
+        #Create taxa names
+        lsTaxaNames = []
+        for iTaxaIndex in xrange(0,iTaxaCount):
+            lsTaxaNames.append("".join(["Taxa_",str(iTaxaIndex)]))
+        #Create sample names
+        lsSampleNames = ["ID"]
+        for iSampleIndex in xrange(0,iSampleCount+1):
+            lsSampleNames.append("".join(["Sample_",str(iSampleIndex)]))
+        #Create labels based on Chao 1 diversity
+        lsChaoLabels = [strChao1]
+        #Create labels based on Inverse Simpson diversity
+        lsISLabels = [strISimpson]
+
+        #Keep tract of which samples are being produced in the matrix
+        iSampleStart = 0
+        iSampleStop = iSampleCount+1
+
+        ####Create diversity samples
+        for iDiversitySampleIndex in xrange(iSampleStart,iSampleStop):
+            #Define index populations and set abundance per sample
+            liPopulation = set(range(iTaxaCount))
+            #Taxa indices with maximal abundance in diversity samples
+            liSelection = random.sample(liPopulation,int(iDiversitySampleIndex*(iTaxaCount/iSampleCount)))
+            #Set abundance
+            for iTaxonPosition in liSelection:
+                dataMatrix[iTaxonPosition,iDiversitySampleIndex] = 50+random.randint(0,5)
+            #Estimate diversity and set as a label
+            lsChaoLabels.append(str(Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+            if(sum(dataMatrix[:,iDiversitySampleIndex])==0):
+                lsISLabels.append("0")
+            else:
+                lsISLabels.append(str(Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+
+        #Write to file
+        if(os.path.isfile(tempFilePath)):
+            os.remove(tempFilePath)
+
+        #Data to output
+        outputContents = []
+        #Output sample id header
+        outputContents.append(Constants.TAB.join(lsSampleNames))
+        #Output Chao labels
+        outputContents.append(Constants.TAB.join(lsChaoLabels))
+        #Output InvSimpson labels
+        outputContents.append(Constants.TAB.join(lsISLabels))
+        #Write rows/taxa
+        for row in xrange(0,iTaxaCount):
+            taxaData = []
+            for sampleAbundance in dataMatrix[row]:
+                taxaData.append(str(sampleAbundance))
+            taxaData = Constants.TAB.join(taxaData)
+            outputContents.append(Constants.TAB.join([lsTaxaNames[row],taxaData]))
+
+        #Write to file
+        with open(tempFilePath,'w') as f:
+            sFileContents = f.write(Constants.ENDLINE.join(outputContents))
+            f.close()
+
+        #Generate figure
+        if(tempGenerateFigure):
+            CommandLine().runCommandLine([strHCLLoc, "--in", tempFilePath, "--out", "".join([os.path.splitext(tempFilePath)[0],".png"]), "-d", "euclidean", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1", "-s", "log", "--ystart", strFirstDataRow, "--xstart", strFirstDataCol])
+
+        #Return file name
+        return tempFilePath
+
+Utility_Data.generateDiversityAbundanceTable(tempFilePath="DiversityTestDataGeneration.txt")

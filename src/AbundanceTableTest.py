@@ -24,7 +24,7 @@ from Utility_File import Utility_File
 #Tests the Blog object
 class AbundanceTableTest(unittest.TestCase):
 
-    def testCheckRawDataFileForGoodCase(self):
+    def nottestCheckRawDataFileForGoodCase(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"
@@ -49,7 +49,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testCheckRawDataFileForGoodCaseDelimterSpace(self):
+    def nottestCheckRawDataFileForGoodCaseDelimterSpace(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"
@@ -74,7 +74,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testNormalizeColumnsForGoodCaseNoNormalize(self):
+    def nottestNormalizeColumnsForGoodCaseNoNormalize(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -95,7 +95,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testNormalizeColumnsForGoodCaseNormalize1(self):
+    def nottestNormalizeColumnsForGoodCaseNormalize1(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -116,7 +116,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testNormalizeColumnsForGoodCaseNormalize14(self):
+    def nottestNormalizeColumnsForGoodCaseNormalize14(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -137,7 +137,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testNormalizeColumnsForGoodCaseNormalizeAll(self):
+    def nottestNormalizeColumnsForGoodCaseNormalizeAll(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -158,7 +158,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testTextToStructuredArrayForGoodCaseNoNormalize(self):
+    def nottestTextToStructuredArrayForGoodCaseNoNormalize(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -177,7 +177,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testTextToStructuredArrayForGoodCaseNormalize(self):
+    def nottestTextToStructuredArrayForGoodCaseNormalize(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -196,7 +196,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=",str(answer),".\nReceived=",str(result),"."]))
 
-    def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
+    def nottestTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"
@@ -215,7 +215,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testStratifyAbundanceTableByMetadataForGoodCase(self):
+    def nottestStratifyAbundanceTableByMetadataForGoodCase(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -322,7 +322,7 @@ class AbundanceTableTest(unittest.TestCase):
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 
-    def testTransposeDataMatrixForGoodCase(self):
+    def nottestTransposeDataMatrixForGoodCase(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -343,7 +343,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testTransposeDataMatrixForGoodCaseRemoveAdornments(self):
+    def nottestTransposeDataMatrixForGoodCaseRemoveAdornments(self):
         
         #Inputs
         inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
@@ -360,6 +360,28 @@ class AbundanceTableTest(unittest.TestCase):
         #Call method
         result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
         result = data.transposeDataMatrix(tempMatrix=result[0], tempRemoveAdornments=removeAdornment)
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFilterByAbundanceForGoodCase(self):
+        
+        #Inputs
+        inputFile = "./src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        normalize = False
+        data = AbundanceTable()
+        removeAdornment = False
+
+        #Correct Answer
+        answer = ""
+        result = "1"
+
+        #Call method
+        abndData, metadata = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
+        data.filterByAbundance(npaAbundance=abndData, dPercentileCutOff = 0.99, dPercentageAbovePercentile=0.9)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))

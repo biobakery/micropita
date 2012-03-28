@@ -39,12 +39,13 @@ argp.add_argument( "-r", dest = "fNormalize", action = "store", default="False",
 	help = "Normalize the abundance data before working with it (default=False)." )
 argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
 	help = "Invert the image to a black background (default=False)." )
+argp.add_argument( "-p", dest = "sSVMPrediction", action = "store", default=None,
+	help = "Predict file path used to plot prediction if supervised methods occured." )
 #Abundance file
 argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = "An abundance table." )
 #Select file
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file",
     help = "A file containing the samples selected which will be visualized." )
-argp.add_argument( "sSVMPrediction", action= "store", metavar = "SVM.predict", help = "The name of the input file specifying the SVm prediction." )
 
 #Outputfile
 argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
@@ -104,17 +105,17 @@ def _main( ):
       iMetadataIndex = iMetadataIndex + 1
 
     #Read in prediction file is supplied
-    if(not args.sSVMPrediction == None):
+    lsPredictions = list()
+    if(not args.sSVMPrediction in [None, "None", "none"]):
         fHndlInput = open(args.sSVMPrediction,'r')
         strSVMSelection = fHndlInput.read()
         fHndlInput.close()
 
-    #Make a list of predictions
-    lsPredictions = list()
-    for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
-        lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
-        lsPredictions.append(lsPredictElements[0])
-    plotList(analysis,lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize,fInvert=c_fInvert)
+        #Make a list of predictions
+        for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
+            lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
+            lsPredictions.append(lsPredictElements[0])
+        plotList(analysis,lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize,fInvert=c_fInvert)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))

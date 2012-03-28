@@ -100,7 +100,7 @@ class MicropitaPaperCollectionCurve:
                 liX.append(iCount)
                 liY.append(dictCurMetric[iCount])
 
-            plot(liX, liY, color = objColors.dictConvertMethodToHEXColor[strMethod], marker = "o", linestyle='-', label = strMethod)
+            plot(liX, liY, color = objColors.dictConvertMethodToHEXColor[strMethod], marker = "o", alpha=objColors.c_dAlpha, linestyle='-', label = strMethod)
 
             #Update range
             iYMin = min(liY+[iYMin])
@@ -110,13 +110,16 @@ class MicropitaPaperCollectionCurve:
 
         xlim(iXMin*.9,iXMax*1.1)
         ylim(iYMin*.9,iYMax*1.1)
-        objLegend = imgSubplot.legend(loc="best", scatterpoints=1, prop={'size':10})
+        objLegend = imgSubplot.legend(loc="upper right", scatterpoints=1, prop={'size':10})
 
         #Invert legend
         if(fInvert):
             objLegend.legendPatch.set_fc(objColors.c_strBackgroundColorWord)
             objLegend.legendPatch.set_ec(objColors.c_strDetailsColorLetter)
             plt.setp(objLegend.get_texts(),color=objColors.c_strDetailsColorLetter)
+        #Make legend background transparent
+        objLegendFrame = objLegend.get_frame()
+        objLegendFrame.set_alpha(objColors.c_dAlpha)
 
         imgFigure.savefig(strPlotName, facecolor=imgFigure.get_facecolor())
 

@@ -222,7 +222,7 @@ class PCoA:
                         reducedShapes = tempShape
                         if(not ValidateData.isValidList(reducedShapes)):
                           reducedShapes = reducedShapes[0]
-                          imgSubplot.scatter(aiXPoints,aiYPoints, s=reducedSizes, c=[charColor], marker=reducedShapes, label=tempLabels[tempColorGrouping.index(charColor)], edgecolor=charMarkerEdgeColor)
+                          imgSubplot.scatter(aiXPoints,aiYPoints, s=reducedSizes, c=[charColor], marker=reducedShapes, alpha=objColors.c_dAlpha, label=tempLabels[tempColorGrouping.index(charColor)], edgecolor=charMarkerEdgeColor)
                         #Shapes are supplied as a list so plot each shape
                         else:
                           #Reduce to shape sof the current colors
@@ -243,7 +243,7 @@ class PCoA:
                             if(ValidateData.isValidList(reducedSizes)):
                               reducedSizesPerShape = self.reduceList(reducedSizes,aiShapeIndices)
                             #Plot
-                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, label=strShapeLabel[0], edgecolor=charMarkerEdgeColor)
+                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, alpha=objColors.c_dAlpha, label=strShapeLabel[0], edgecolor=charMarkerEdgeColor)
 
             elif((not ValidateData.isValidList(tempColorGrouping)) and (ValidateData.isValidList(tempShape))):
                 if len(tempShape) == iPointCount:
@@ -255,9 +255,9 @@ class PCoA:
                         reducedSizes = tempShapeSize
                         if(ValidateData.isValidList(reducedSizes)):
                           reducedSizes = self.reduceList(reducedSizes,aiShapePointPositions)
-                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiShapePointPositions),self.reduceList(adPoints[:,1],aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
+                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiShapePointPositions),self.reduceList(adPoints[:,1],aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], alpha=objColors.c_dAlpha, label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
             else:
-                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], s=tempShapeSize, c=tempColorGrouping, marker=tempShape, label=tempLabels, edgecolor=charMarkerEdgeColor)
+                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], s=tempShapeSize, c=tempColorGrouping, marker=tempShape, alpha=objColors.c_dAlpha, label=tempLabels, edgecolor=charMarkerEdgeColor)
 
             objLegend = imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
 

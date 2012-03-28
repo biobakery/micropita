@@ -17,6 +17,7 @@ from Constants import Constants
 from FileIO import FileIO
 import numpy as np
 import os
+import scipy.stats
 from ValidateData import ValidateData
 
 class AbundanceTable:
@@ -75,6 +76,61 @@ class AbundanceTable:
         writeData.close()
         inputRead.close()
         return outputFile
+
+    #Filter an abundance file by abundance
+    def filterByAbundance(self, npaAbundance, dPercentileCutOff = 0.95, dPercentageAbovePercentile=0.1):
+      """
+      Filter by abundance. Specifically this version requires elements of
+      the tree to have a certain percentage of a certain percentile in samples.
+
+      """
+
+      print(npaAbundance)
+      if(npaAbundance is not None):
+          #Sample names
+          lsSampleNames = npaAbundance.dtype.names[1:]
+          print("lsSampleNames")
+          print(lsSampleNames)
+          #List of indexes of taxa to keep
+          liTaxa = []
+          #Hold the cuttoff score (threshold) for the percentile of interest {SampleName(string):score(double)}
+          dictPercentiles = dict()
+          for index in xrange(0,len(lsSampleNames)):
+              print("npaAbundance[lsSampleNames[index]]")
+              print(npaAbundance[lsSampleNames[index]])
+              print("dPercentileCutOff")
+              print(dPercentileCutOff)
+              print("scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff)")
+              print(scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff))
+              dScore = scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff)
+              dictPercentiles[lsSampleNames[index]] = dScore
+
+          print("dictPercentiles")
+          print(dictPercentiles)
+          #Sample count (Ignore sample id [position 0] which is not a name)
+          dSampleCount = float(len(lsSampleNames[1:]))
+
+          #Check each taxa
+          iTaxaIndex = 0
+          for rowTaxaData in npaAbundance:
+              sCurTaxaName = rowTaxaData[0]
+              print("sCurTaxaName")
+              print(sCurTaxaName)
+              dCountAbovePercentile = 0.0
+              ldAbundanceMeasures = list(rowTaxaData)[1:]
+              print("ldAbundanceMeasures")
+              print(ldAbundanceMeasures)
+              #Check to see if the abundance score meets the threshold and count if it does
+              for iScoreIndex in xrange(0,len(ldAbundanceMeasures)):
+                  if(ldAbundanceMeasures[iScoreIndex] >= dictPercentiles[lsSampleNames[iScoreIndex]]):
+                      dCountAbovePercentile = dCountAbovePercentile + 1.0
+              dPercentOverPercentile = dCountAbovePercentile / dSampleCount
+              if(dPercentOverPercentile >= (dPercentageAbovePercentile/100.0)):
+                  liTaxa.append(iTaxaIndex)
+              #Increment taxa
+              iTaxaIndex = iTaxaIndex + 1
+          print("liTaxa")
+          print(liTaxa)
 
     #Testing Status: Light happy path testing
     #Normalize the given columns of a structured array given the structured array and a list of the column names
