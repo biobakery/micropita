@@ -82,6 +82,8 @@ c_strConfigCladeFilter = "[Clade Filter]"
 c_strConfigCladeFilterMeasure = "[Clade Level to Measure]"
 c_strConfigCladeFilterLevel = "[Clade Level to Filter]"
 c_strConfigCladeFilterMinSize = "[Minimum Clade Size]"
+c_strConfigCladogramRingOrder = "[Cladogram Ring Order]"
+c_strConfigCladogramTicks = "[Cladogram Dendrogram Ticks]"
 c_strConfigDataRow = "[Data Name Row Index]"
 c_strConfigEnrichmentMeasurement = "[Taxa or OTU Enrichment Measurement]"
 c_strConfigHighlightClades = "[Higlight Clades]"
@@ -209,16 +211,16 @@ def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
 
 #Visualize selected output with Cladogram (Figure 2)
 def funcCladogramSelectionMethods( strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                                   strAbundanceFilterPercentile, strAbundanceFilterPercent):
+                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks):
 
   def funcCladogramSelectionRet( target, source, env, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
-                                 strAbundanceFitlerPercent=strAbundanceFilterPercent):
+                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
     strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
     return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -301,6 +303,8 @@ dictSelectionFiles = dict()
 #Read in each config file
 #An use their contents to perform analysis
 for fileConfigMicropita in lMicropitaFiles:
+  print("fileConfigMicropita")
+  print(fileConfigMicropita)
   #Get Contents of config file
   sFileConfiguration = dict()
   #Set defaults
@@ -440,10 +444,10 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Run micropita analysis
     sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
-    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita] + lsInsilicoDataFiles, funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita] + lsInsilicoDataFiles, funcMicroPita(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                     sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
-                                                                                                                                    " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
-                                                                                                                                    " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                     " ".join(["-s",sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
                                                                                                                                     " ".join(["-p",sFileConfiguration[c_strConfigSupervisedLabel]]),
                                                                                                                                     " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
@@ -458,11 +462,11 @@ for fileConfigMicropita in lMicropitaFiles:
       strPredictFileArgument = " ".join(["-p","None"])
     if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
       lsPCOAFigures.append(sOutputFigure1APCoA)
-      Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
-                                                                                                                                                                " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
-                                                                                                                                                                " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
-                                                                                                                                                                " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
-                                                                                                                                                                " ".join(["-i",strInvertImage]),
+      Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
                                                                                                                                                                 strPredictFileArgument))
     #Create figure 1A PCoA combined
     #Unstratified PCoA of selection
@@ -478,7 +482,7 @@ for fileConfigMicropita in lMicropitaFiles:
     #Create figure 1B HCL
     #Selection of samples by selection method
     Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
-        funcHCLSelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]), " ".join(["-i",strInvertImage])))
+        funcHCLSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
 
     #Create a cladogram figure 2
     #Manage files which are optional
@@ -501,33 +505,36 @@ for fileConfigMicropita in lMicropitaFiles:
          sCladogramSizeFile, sCladogramCircleFile], lsFig2Sources + ls_srcFig2, 
          funcCladogramSelectionMethods(strTaxaArgForCladogram,
                                        strHighlightArgForCladogram,
-                                       " ".join(["-i",strInvertImage]),
-                                       " ".join(["-rt",sFileConfiguration[c_strConfigRoot]]),
-                                       " ".join(["-e",sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
-                                       " ".join(["-cfl",sFileConfiguration[c_strConfigCladeFilterLevel]]),
-                                       " ".join(["-cfm",sFileConfiguration[c_strConfigCladeFilterMeasure]]),
-                                       " ".join(["-cfn",sFileConfiguration[c_strConfigCladeFilterMinSize]]),
-                                       " ".join(["-afp",sFileConfiguration[c_strConfigAbundanceFilterPercentile]]),
-                                       " ".join(["-afc",sFileConfiguration[c_strConfigAbundanceFilterPercent]])))
+                                       " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                       " ".join([Constants_Arguments.c_strRoot,sFileConfiguration[c_strConfigRoot]]),
+                                       " ".join([Constants_Arguments.c_strEnrichmentMethod,sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
+                                       " ".join([Constants_Arguments.c_strCladeFilterLevel,sFileConfiguration[c_strConfigCladeFilterLevel]]),
+                                       " ".join([Constants_Arguments.c_strCladeMeasureLevel,sFileConfiguration[c_strConfigCladeFilterMeasure]]),
+                                       " ".join([Constants_Arguments.c_strCladeFilteringMinLevel,sFileConfiguration[c_strConfigCladeFilterMinSize]]),
+                                       " ".join([Constants_Arguments.c_strAbundanceFilterPercentile,sFileConfiguration[c_strConfigAbundanceFilterPercentile]]),
+                                       " ".join([Constants_Arguments.c_strAbundanceFilterCutoff,sFileConfiguration[c_strConfigAbundanceFilterPercent]]),
+                                       " ".join([Constants_Arguments.c_strRingOrder,sFileConfiguration[c_strConfigCladogramRingOrder]]),
+                                       " ".join([Constants_Arguments.c_strCircladerTicks,sFileConfiguration[c_strConfigCladogramTicks]])))
+
 
     #Create figure 3
     #Selection in Stratification
     Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sAbundanceFileName] + ls_srcFig1, 
-        funcHCLStratSelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
-                                " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+        funcHCLStratSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                 " ".join(["-id", c_strAbundanceIDCol]),
-                                " ".join(["-i", strInvertImage])))
+                                " ".join([Constants_Arguments.c_strInvertArgument, strInvertImage])))
 
     #Create figure 4 PCoA
     #PCoA of stratified selection
     if not sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
       lsStratPCOAFigures.append(sOutputFigure4PCoA)
-      Command(sOutputFigure4PCoA, [c_fileProgStratifiedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcStratifiedPCoASelectionMethods(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
-                                                                                                                                                   " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
-                                                                                                                                                   " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
+      Command(sOutputFigure4PCoA, [c_fileProgStratifiedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcStratifiedPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                    " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
-                                                                                                                                                   " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
-                                                                                                                                                   " ".join(["-i",strInvertImage])))
+                                                                                                                                                   " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
 
     #Add input files to be later summarized in the metaplots
     #Create key combining abundance file and stratification status
@@ -565,8 +572,8 @@ if c_fRunCollectionCurve:
     #Create Figure 5
     #Collection Curve
     Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
-        funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
-                              " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
-                              " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
-                              " ".join(["-i", strInvertImage])))
+        funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                              " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                              " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
+                              " ".join([Constants_Arguments.c_strInvertArgument, strInvertImage])))
 

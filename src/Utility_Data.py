@@ -42,9 +42,6 @@ class Utility_Data():
         #Total sample count
         sampleCount = diversitySampleCount + representativeDissimilarityCount + extremeDissimilarityCount + taxaDrivenCount
 
-        #TODO remove
-        strHCLLoc = "./external/hclust/hclust.py"
-
         #Taxa
         #Number of blocks of dissimlarity
         representiveDiversityBlocks = representativeDissimilarityCount
@@ -207,9 +204,6 @@ class Utility_Data():
         strChao1 = "Chao 1"
         #Inverse Simpson
         strISimpson = "Inverse_Simpson"
-
-        #TODO remove
-        strHCLLoc = "./external/hclust/hclust.py"
 
         #First data row for HCLust
         strFirstDataRow = "3"

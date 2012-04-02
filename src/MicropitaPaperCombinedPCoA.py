@@ -83,11 +83,6 @@ def _main( ):
     abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
     sampleNames = abundance.dtype.names[1:]
 
-    print("sampleNames")
-    print(sampleNames)
-    print("args.strSelectionMethods")
-    print(args.strSelectionMethods)
-
     #Figure colors
     objColors = Constants_Figures()
     objColors.invertColors(fInvert=c_fInvert)
@@ -120,8 +115,6 @@ def _main( ):
         #Color for selected samples in PCoA based on selection method
         astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
         sCurSelectionMethodName = astrSelectionMethod[0]
-        print("sCurSelectionMethodName")
-        print(sCurSelectionMethodName)
 
         #If the method parsed fromthe selection file is a method that is passed in as an argument and indicated as a method to plot
         if sCurSelectionMethodName in args.strSelectionMethods:
@@ -132,15 +125,12 @@ def _main( ):
             #Parse samples selected by the method
             astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
             astrSelectedSamples = [strSelectedSample.strip() for strSelectedSample in astrSelectedSamples]
-            print("astrSelectedSamples")
-            print(astrSelectedSamples)
+
             #Indicate colors
             for iindex in xrange(len(sampleNames)):
                 #Go through samples and see if the sample was selected by the method
-                print("sampleNames[iindex]")
-                print(sampleNames[iindex])
+
                 if(sampleNames[iindex] in astrSelectedSamples):
-                    print("IS IN")
                     # If it was selected by the method check to see if the color has already changed from
                     # the default, if it has then the sample was selected twice or more and should be
                     # indicated by shape for caution. So change shape.
@@ -148,21 +138,9 @@ def _main( ):
                         acharShapes[iindex] = acharMultSelectShape
                     acharColors[iindex]=charSelectedColor
                     acharSelection[iindex]=sCurSelectionMethodName
-                print("acharColors[iindex]")
-                print(acharColors[iindex])
-                print("acharSelection[iindex]")
-                print(acharSelection[iindex])
 
     #Draw PCoA
-    print("acharSelection")
-    print(acharSelection)
-    print(len(acharSelection))
-    print("acharShapes")
-    print(acharShapes)
-    print(len(acharShapes))
-    analysis.plotList(lsLabelList=acharSelection, strName="-".join(sCurSelectionMethodName), asFilePathPieces=asFilePathPieces, iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], charForceShape=acharShapes, fInvert=c_fInvert)
-#        else:
-#          analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
+    analysis.plotList(lsLabelList=acharSelection, strName=sCurSelectionMethodName, asFilePathPieces=asFilePathPieces, iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], charForceShape=acharShapes, fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperCombinedPCoA")
 

@@ -18,6 +18,7 @@ import argparse
 from AbundanceTable import AbundanceTable
 from Cladogram import Cladogram
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 from MicroPITA import MicroPITA
 import numpy as np
@@ -37,43 +38,34 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperSelectionCladogram.py",
 
 #Arguments
 #Select file
-argp.add_argument( "strSelectionFile", metavar = "Select_file",
-    help = "A file containing the samples selected which will be visualized." )
-argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = "An input file containing abundance values (otu table)." )
-argp.add_argument( "strStyleFile", metavar = "Style_file", help = "An input file used to specify cladogram syle features." )
-argp.add_argument("-t", dest="iTargetedTaxaFile", metavar= "TaxaFilePath", default=None, 
-                  help= "The file containing the targeted taxa to be selected in microPITA.")
-argp.add_argument("-c", dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, 
-                  help= "The file containing the clades or taxa/OTUs to highlight in the circlader.")
-argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
-	help = "Invert the image to a black background (default=False)." )
-argp.add_argument( "-rt", dest = "sRoot", metavar= "root", default="None",
-	help = "The Clade at which to root the cladogram. Default None indicates no rooting outside of the structure of the input file." )
-argp.add_argument("-e", dest="strEnrichmentIndicatorMethod", metavar= "enrichmentIndicatorMethod", default="FDR", 
-                  choices=["ABS","PVALUE","FDR"], 
-                  help= """The type of result the TAXA/OTU circles are commenting on. ABS = presence or absence of taxa given selected populations and an abundance over 0, 
-                        PVALUE shows differentially enriched elements between selected or not selected populations given a Rank sum nonparameteric t-test and a threshold of 0.05,
-                        FDR shows the PVALUE option but with a Benjamini and Hochberg FDR correction and a threshold of 0.1""")
-argp.add_argument( "-cfl", dest = "iCladeFilterLevel", metavar= "CladeFilterLevel", default="None",
-	help = "The level in the clade lineage to filter (based on your input Taxa/OTU IDs). 1 is the highest clade level (for instance Kingdom)." )
-argp.add_argument( "-cfm", dest = "iCladeFilterMeasure", metavar= "CladeFilterLevelMeasure", default="None",
-	help = "The level in the clade lineage to measure for filtering (based on your input Taxa/OTU IDs)." )
-argp.add_argument( "-cfn", dest = "iCladeFilterMinNumber", metavar= "CladeFilterMinNumber", default="None",
-	help = "The minimum clades at CladeFilterLevelMeasure the CladeFilterLevel clade can have without being removed." )
-argp.add_argument( "-afp", dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default="None",
-	help = "The percentile threshold cuttoff for filtering by abundance." )
-argp.add_argument( "-afc", dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default="None",
-	help = "The percentage of samples inwhich a terminal node must be above the AbundanceFilterPercentile to not be filtered." )
-
+argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp )
+argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = Constants_Arguments.c_strAbundanceFileHelp )
+argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFile )
+argp.add_argument(Constants_Arguments.c_strTaxaFilePath, dest="iTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
+argp.add_argument(Constants_Arguments.c_strHighlightCladeFile, dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, help= Constants_Arguments.c_strHighlightCladeHelp)
+argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
+argp.add_argument(Constants_Arguments.c_strRoot, dest = "sRoot", metavar= "root", default="None", help = Constants_Arguments.c_strRootHelp )
+argp.add_argument(Constants_Arguments.c_strEnrichmentMethod, dest="strEnrichmentIndicatorMethod", metavar= "enrichmentIndicatorMethod", default="FDR", 
+                  choices=Constants_Arguments.c_strEnrichmentChoices, help= Constants_Arguments.c_strEnrichmentMethodHelp)
+argp.add_argument(Constants_Arguments.c_strCladeFilterLevel, dest = "iCladeFilterLevel", metavar= "CladeFilterLevel", default="None",help = Constants_Arguments.c_strCladeFilterLevelHelp)
+argp.add_argument(Constants_Arguments.c_strCladeMeasureLevel, dest = "iCladeFilterMeasure", metavar= "CladeFilterLevelMeasure", default="None", help = Constants_Arguments.c_strCladeMeasureLevelHelp)
+argp.add_argument(Constants_Arguments.c_strCladeFilteringMinLevel, dest = "iCladeFilterMinNumber", metavar= "CladeFilterMinNumber", default="None",
+	help = Constants_Arguments.c_strCladeFilteringMinLevelHelp)
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterPercentile, dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default="None",
+	help = Constants_Arguments.c_strAbundanceFilterPercentileHelp)
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default="None",
+	help = Constants_Arguments.c_strAbundanceFilterCutoffHelp)
+argp.add_argument(Constants_Arguments.c_strRingOrder, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrder)
+argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
 
 #Outputfile
-argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = "The name of the input file specifying taxa that is generated and then used by the cladogram program." )
-argp.add_argument( "sColorFileName", metavar = "ColorFile.txt", nargs = "?", help = "The name of the input file specifying color that is generated and then used by the cladogram program." )
-argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = "The name of the input file specifying levels of the cladogram that is generated and then used by the cladogram program." )
-argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = "?", help = "The name of the input file specifying selection highlighting that is generated and then used by the cladogram program." )
-argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = "The name of the input file specifying node size that is generated and then used by the cladogram program." )
-argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = "The name of the input file specifying circle data that is generated and then used by the cladogram program." )
-argp.add_argument( "strOutFigure", metavar = "SelectionCladogram.png", nargs = "?", help = "The output cladogram figure." )
+argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
+argp.add_argument( "sColorFileName", metavar = "ColorFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerColorFile )
+argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = Constants_Arguments.c_strCIrcladerTickFile )
+argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerHighlightFile )
+argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerSizeFile )
+argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerCircleFile )
+argp.add_argument( "strOutFigure", metavar = "SelectionCladogram.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputFigure )
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -164,13 +156,19 @@ def _main( ):
                   objColors.c_strBackgroundColorName:objColors.c_strBackgroundColor}
     cladogram.setColorData(dictColors)
 
-    #TODO need to tie this to the config file
     #Set tick data
     llsTicks = None
-    if(c_fBacteriaRooted):
-      llsTicks = ([["0","Kingdom"],["1","Phyla"],["2","Classes"],["3","Orders"],["4","Families"],["5","Genera"]])
-    else:
-      llsTicks = ([["1","Kingdom"],["2","Phyla"],["3","Classes"],["4","Orders"],["5","Families"],["6","Genera"]])
+    if not args.iTicks == None:
+      llsTicks = []
+      #Parse string of ticks
+      sFilteredTick = filter(None,[sTick.strip() for sTick in args.iTicks.split(Constants.COMMA)])
+
+      #Make paresed data into the format [["#","tick"],...]
+      iTickCount = 0
+      for sTick in sFilteredTick:
+        llsTicks.append([str(iTickCount),sTick])
+        iTickCount = iTickCount + 1
+    #Set ticks
     cladogram.setTicks(llsTicks)
 
     #Set Root
@@ -207,107 +205,122 @@ def _main( ):
       if len(dictRelabel) > 0:
         cladogram.relabelIDs(dictRelabel)
 
-    if(args.strEnrichmentIndicatorMethod=="ABS"):#Abscense and Presence
-      #This is perfroming absense and presence
-      #Add circles for each method
-      dictTaxaInAllSelection = dict()
-      for selectedSampleMethod in dictSelection:
-        #All samples that were selected by the method
-        lsSelectedSamples = dictSelection[selectedSampleMethod]
-        #Get taxa interesting to this selection technique
-        setMethodTaxaTotal = set()
-        #For each selected sample get absence or presence of taxa
-        for strSelectedSample in lsSelectedSamples:
-          #Get taxa of each sample
-          lsSampleTaxaAbundance = abundance[strSelectedSample]
-          #Will hold taxa that have more than 0 abundance
-          lsSelectedTaxaPerSample = list()
-          #Go through each taxa abundance using the index to match it to the taxa name
-          for iAbundanceIndex in xrange(0,len(lsSampleTaxaAbundance)):
-            scurTaxon = abundance[strSampleID][iAbundanceIndex]
-            #If the taxa has more than 0.0 abundance add
-            if(float(lsSampleTaxaAbundance[iAbundanceIndex]) > 0.0):
-              lsSelectedTaxaPerSample.append(scurTaxon)
-          #Combine (union) taxa to a set
-          setMethodTaxaTotal = setMethodTaxaTotal | set(lsSelectedTaxaPerSample)
+#    if(args.strEnrichmentIndicatorMethod=="ABS"):#Abscense and Presence
+#      #This is perfroming absense and presence
+#      #Add circles for each method
+#      dictTaxaInAllSelection = dict()
+#
+#      #Allows one to set the order of the rings if needed
+#      lsSelectedSampleMethod = dictSelection.keys()
+#      if not args.iRingOrder == None:
+#        lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
+#
+#      for selectedSampleMethod in lsSelectedSampleMethod:
+#        if selectedSampleMethod in dictSelection:
+#          #All samples that were selected by the method
+#          lsSelectedSamples = dictSelection[selectedSampleMethod]
+#          #Get taxa interesting to this selection technique
+#          setMethodTaxaTotal = set()
+#          #For each selected sample get absence or presence of taxa
+#          for strSelectedSample in lsSelectedSamples:
+#            #Get taxa of each sample
+#            lsSampleTaxaAbundance = abundance[strSelectedSample]
+#            #Will hold taxa that have more than 0 abundance
+#            lsSelectedTaxaPerSample = list()
+#            #Go through each taxa abundance using the index to match it to the taxa name
+#            for iAbundanceIndex in xrange(0,len(lsSampleTaxaAbundance)):
+#              scurTaxon = abundance[strSampleID][iAbundanceIndex]
+#              #If the taxa has more than 0.0 abundance add
+#              if(float(lsSampleTaxaAbundance[iAbundanceIndex]) > 0.0):
+#                lsSelectedTaxaPerSample.append(scurTaxon)
+#            #Combine (union) taxa to a set
+#            setMethodTaxaTotal = setMethodTaxaTotal | set(lsSelectedTaxaPerSample)
+#
+#          #Add circle for this data
+#          #cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
 
     if((args.strEnrichmentIndicatorMethod=="PVALUE") or (args.strEnrichmentIndicatorMethod=="FDR")):#P-value or qvalue
       #Are we using qvalues or pvalues
       fIsQValue = (args.strEnrichmentIndicatorMethod=="FDR")
 
-      #This is perfroming t-test with p-values
-      #Add circles for each method
-      for selectedSampleMethod in dictSelection:
-        #All samples that were selected by the method
-        lsSelectedSamples = dictSelection[selectedSampleMethod]
-        #Samples selected
-        lfSelectedSamplesUTest = []
-        lfNotSelectedSamplesUTest = []
-        #Set up boolean list to compress array
-        for sample in lsAllSampleNames:
-          wasSelected = sample in lsSelectedSamples
-          lfSelectedSamplesUTest.append(wasSelected)
-          lfNotSelectedSamplesUTest.append(not wasSelected)
+      #Allows one to set the order of the rings if needed
+      lsSelectedSampleMethod = dictSelection.keys()
+      if not args.iRingOrder == None:
+        lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
 
-        #Holds t-tests,pvalues,qvalues as needed
-        lsTaxaTScores = list()
+      #This is performing t-test with p-values
+      for selectedSampleMethod in lsSelectedSampleMethod:
+        if selectedSampleMethod in dictSelection:
+          #All samples that were selected by the method
+          lsSelectedSamples = dictSelection[selectedSampleMethod]
+          #Samples selected
+          lfSelectedSamplesUTest = []
+          lfNotSelectedSamplesUTest = []
+          #Set up boolean list to compress array
+          for sample in lsAllSampleNames:
+            wasSelected = sample in lsSelectedSamples
+            lfSelectedSamplesUTest.append(wasSelected)
+            lfNotSelectedSamplesUTest.append(not wasSelected)
 
-        #Compress arrays to one or the other distribution
-        #Conduct wilcoxon tests on all taxa
-        for iTaxonIndex in xrange(0,len(lsAllTaxa)):
-          npaTaxaData = list(abundance[iTaxonIndex,])
-          strTaxaId = npaTaxaData[0]
-          if(strTaxaId in lsTerminalTaxa):
-            npaDistribution = np.array(npaTaxaData[1:])
-            npaSelectedDistribution = np.compress(lfSelectedSamplesUTest,npaDistribution)
-            npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
-            dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
-            #[ID,TScore,PValue,QValue,SortOrder]
-            lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
+          #Holds t-tests,pvalues,qvalues as needed
+          lsTaxaTScores = list()
 
-        #Get a list of pvalues preserving order
-        ldOrderedPValues = list()
-        for iScoreDataIndex in lsTaxaTScores:
-          ldOrderedPValues.append(iScoreDataIndex[c_PVALUEINDEX])
+          #Compress arrays to one or the other distribution
+          #Conduct wilcoxon tests on all taxa
+          for iTaxonIndex in xrange(0,len(lsAllTaxa)):
+            npaTaxaData = list(abundance[iTaxonIndex,])
+            strTaxaId = npaTaxaData[0]
+            if(strTaxaId in lsTerminalTaxa):
+              npaDistribution = np.array(npaTaxaData[1:])
+              npaSelectedDistribution = np.compress(lfSelectedSamplesUTest,npaDistribution)
+              npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
+              dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
+              #[ID,TScore,PValue,QValue,SortOrder]
+              lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
 
-        #If using qvalues generate them with FDR BH
-        if fIsQValue:
-          #Convert pvalues to qvalues
-          ldOrderedQValues = Utility_Math.convertToBHQValue(ldOrderedPValues)
+          #Get a list of pvalues preserving order
+          ldOrderedPValues = list()
+          for iScoreDataIndex in lsTaxaTScores:
+            ldOrderedPValues.append(iScoreDataIndex[c_PVALUEINDEX])
 
-          #Update the score data with qvalues
-          for iQIndex in xrange(0,len(ldOrderedQValues)):
-            lsTaxaTScores[iQIndex][c_QVALUEINDEX] = ldOrderedQValues[iQIndex]
-
-        lsAlpha = list()
-        lsShapes = list()
-        lsTaxa = list()
-        for iTaxa in xrange(0,len(lsTaxaTScores)):
-          lsCur = lsTaxaTScores[iTaxa]
-          lsTaxa.append(lsCur[c_IDINDEX])
-          dCurScore = lsCur[c_TSCOREINDEX]
-          dValue = -1
+          #If using qvalues generate them with FDR BH
           if fIsQValue:
-            dValue = lsCur[c_QVALUEINDEX]
-          else:
-            dValue = lsCur[c_PVALUEINDEX]
+            #Convert pvalues to qvalues
+            ldOrderedQValues = Utility_Math.convertToBHQValue(ldOrderedPValues)
 
-          if(dValue <= 0.05):
-            if dCurScore > 0.0:
-              lsAlpha.append(str(1-dValue))
-              lsShapes.append("^")
-            elif(dCurScore < 0.0):
-              lsAlpha.append(str(1-dValue))
-              lsShapes.append("v")
-            elif(dCurScore == 0.0):
+            #Update the score data with qvalues
+            for iQIndex in xrange(0,len(ldOrderedQValues)):
+              lsTaxaTScores[iQIndex][c_QVALUEINDEX] = ldOrderedQValues[iQIndex]
+
+          lsAlpha = list()
+          lsShapes = list()
+          lsTaxa = list()
+          for iTaxa in xrange(0,len(lsTaxaTScores)):
+            lsCur = lsTaxaTScores[iTaxa]
+            lsTaxa.append(lsCur[c_IDINDEX])
+            dCurScore = lsCur[c_TSCOREINDEX]
+            dValue = -1
+            if fIsQValue:
+              dValue = lsCur[c_QVALUEINDEX]
+            else:
+              dValue = lsCur[c_PVALUEINDEX]
+
+            if(dValue <= 0.05):
+              if dCurScore > 0.0:
+                lsAlpha.append(str(1-dValue))
+                lsShapes.append("^")
+              elif(dCurScore < 0.0):
+                lsAlpha.append(str(1-dValue))
+                lsShapes.append("v")
+              elif(dCurScore == 0.0):
+                lsAlpha.append("0.0")
+                lsShapes.append("R")
+            else:
               lsAlpha.append("0.0")
               lsShapes.append("R")
-          else:
-            lsAlpha.append("0.0")
-            lsShapes.append("R")
 
-        #Add circle for this data
-        cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
+          #Add circle for this data
+          cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
 
     #Generate cladogram
     cladogram.generate(strInputFile=args.strInputFile, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, charDelimiter=Constants.TAB, iNameRow=0, iFirstDataRow=2, fNormalize=False, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
@@ -348,20 +361,11 @@ def funcGetTerminalNodes(lsTaxa,cDelim):
           dictCounts[sClade] = True
           dictCounts[prevClade] = False
 
-  #Return only the lements that were of count 1
+  #Return only the elements that were of count 1
   for sName in dictCounts:
     if dictCounts[sName]==True:
       lsRetList.append(sName)
   return lsRetList
-
-
-#def isTerminalNode(strTaxa,lsTaxa):
-#    if not strTaxa in lsTaxa:
-#      return False
-#    for strTaxaName in lsTaxa:
-#      if((strTaxa in strTaxaName) and (not strTaxa == strTaxaName)):
-#        return False
-#    return True
 
 if __name__ == "__main__":
     _main( )
