@@ -65,6 +65,10 @@ class Constants_Arguments():
     c_strRingOrder = "-o"
     c_StrRingOrderHelp = "The order to use for the cladogram rings from inner ring to outer ring." 
 
+    #p Predict file path
+    c_strPredictFilePath = "-p"
+    c_strPredictFilePathHelp = "Predict file path used to plot prediction if supervised methods occured."
+
     #r Flag indicator for normalization
     c_strNormalizeArgument = "-r"
     c_strNormalizeHelp = "Normalize the abundance data before working with it (default=False)."
@@ -73,9 +77,21 @@ class Constants_Arguments():
     c_strRoot = "-rt"
     c_strRootHelp = "The Clade at which to root the cladogram. Default None indicates no rooting outside of the structure of the input file."
 
+    #s Supervised Label
+    c_strSupervisedLabel = "-s"
+    c_strSupervisedLabelCountHelp = "The name of the phenotype data row on which to perform supervised methods"    
+
+    #sc Supervised label count
+    c_strSupervisedLabelCount = "-sc"
+    c_strSupervisedLabelCountHelp = "The count of labeled data to select per label (default =1)"
+
     #t Taxa file path
     c_strTaxaFilePath = "-t"
     c_strTaxaFileHelp= "The file containing the clades or taxa/OTUs to highlight in the circlader."
+
+    #u Unsupervised stratify metadata
+    c_strUnsupervisedStratifyMetadata = "-u"
+    c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
 
     #Data key to indicate which insilico data set to generate
     c_dataSetKeyHelp = "Key to indicate which data set to generate. Valid values are Diversity, Unbalanced."
@@ -90,9 +106,18 @@ class Constants_Arguments():
     c_strCircladerSizeFile = "The name of the input file specifying node size that is generated and then used by the cladogram program."
     c_strCircladerStyleFile = "An input file used to specify cladogram syle features."
     c_strCircladerTaxaFile = "The name of the input file specifying taxa that is generated and then used by the cladogram program."
-    c_strCIrcladerTickFile = "The name of the input file specifying levels of the cladogram that is generated and then used by the cladogram program."
+    c_strCircladerTickFile = "The name of the input file specifying levels of the cladogram that is generated and then used by the cladogram program."
+    c_strCountHelp = "The number of samples to select (An integer greater than 0.)."
+    c_strHCLColorFile = "An output file that is used by HClust. This is the color file."
+    c_strHCLDataFile = "An output file that is used by HClust. This is the data file."
+    c_strHCLLabelFile = "An output file that is used by HClust. This is the label file."
+    c_strHCLLocation = "The location and to HClust (for example ./external/hclust/hclust.py)."
+    c_strOptionalOutputDataFile = "An optional output file"
+    c_strSelectionTechniques = "Select techniques listed one after another."
+    c_strTaxaSelectionFile = "A file containing taxa to be used in taxa-directed selection."
     c_genericOutputFigureFileHelp = "The generated output figure."
     c_genericOutputDataFileHelp = "The generated output data file."
+    c_genericTMPDirLocationHelp = "Directory to place temporary and intermediate files."
     c_strMicropitaSelectFileHelp = "A file containing the samples selected which will be visualized."
     c_strSelectionMethodsHelp = "Select techniques listed one after another."
 

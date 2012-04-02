@@ -18,6 +18,7 @@ __status__ = "Development"
 from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 from Diversity import Diversity
 import logging
@@ -158,33 +159,28 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py",
 
 #Arguments
 #Logging
-argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
-                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
-                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
-argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
-                  help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
-argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
-                  help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
-argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
-	help = "Invert the image to a black background (default=False)." )
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
+argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
+argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
 #Select file
-argp.add_argument( "strAbundanceFile", metavar = "Abundance_file",
-    help = "A file containing the sample abundances." )
-
+argp.add_argument( "strAbundanceFile", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Outputfile
-argp.add_argument( "strOutFigure", metavar = "CollectionCurveOutputFile", help = "The output collection curve figure." )
-argp.add_argument( "strOutText", metavar = "CollectionCurveOutputTextFile", help = "The data from collection curve figure." )
-argp.add_argument( "strSelectionFiles", metavar = "InputSelectionFiles", nargs = "+", help = "A list of files that contain samples selection based on a specific, common abundance table." )
+argp.add_argument( "strOutFigure", metavar = "CollectionCurveOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
+argp.add_argument( "strOutText", metavar = "CollectionCurveOutputTextFile", help = Constants_Arguments.c_genericOutputDataFileHelp)
+argp.add_argument( "strSelectionFiles", metavar = "InputSelectionFiles", nargs = "+", help = Constants_Arguments.c_strSelectionMethodsHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
-        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
-    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
+        raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start MicropitaPaperCollectionCurve")
     logging.info("MicropitaPaperCollectionCurve. The following arguments were passed.")

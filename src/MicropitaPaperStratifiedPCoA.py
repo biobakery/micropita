@@ -16,6 +16,7 @@ __status__ = "Development"
 from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 import logging
 import matplotlib.cm as cm
@@ -28,27 +29,23 @@ from ValidateData import ValidateData
 argp = argparse.ArgumentParser( prog = "MicropitaPaperStratifiedPCoA.py", description = """Creates PCoA plots for stratified MicroPITA results.""" )
 #Arguments
 #Logging
-argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
-                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
-                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
-argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
-                  help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
-argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
-                  help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
-argp.add_argument("-u", dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
-                  help= "The metatdata to stratify unsupervised analysis.")
-argp.add_argument( "-r", dest = "fNormalize", action = "store", default="False",
-	help = "Normalize the abundance data before working with it (default=False)." )
-argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
-	help = "Invert the image to a black background (default=False)." )
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=Constants_Arguments.c_lsLoggingChoices, 
+                  help= Constants_Arguments.c_strLoggingHelp)
+argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
+                  help= Constants_Arguments.c_strSampleNameRowHelp)
+argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
+                  help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadata, dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
+                  help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
+argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
+argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp)
 #Abundance file
-argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = "An abundance table." )
+argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Select file
-argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file",
-    help = "A file containing the samples selected which will be visualized." )
-
+argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 #Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
+argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = Constants_Arguments.c_strOptionalOutputDataFile)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -58,7 +55,7 @@ def _main( ):
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
-        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
+        raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start MicropitaPaperStratifiedPCoA")

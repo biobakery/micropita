@@ -210,10 +210,10 @@ def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
   return funcHCLSelectionRet
 
 #Visualize selected output with Cladogram (Figure 2)
-def funcCladogramSelectionMethods( strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
+def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
                                    strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks):
 
-  def funcCladogramSelectionRet( target, source, env, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
+  def funcCladogramSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
                                  strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks):
     strT, astrSs = sfle.ts( target, source )
@@ -224,13 +224,13 @@ def funcCladogramSelectionMethods( strTargetedTaxaFile, strHighlightCladeFile, s
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
-def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdCol ):
-  def funcHCLStratSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, strDataRow=strDataRow, strIdCol=strIdCol ):
-    strT, astrSs = sfle.ts( target, source )
-    strProg, strSelection, strAbundance = astrSs[0], astrSs[1], astrSs[2]
-    strColor, strLabel = target[1].get_abspath(), target[2].get_abspath()
-    return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHCLPath, strColor, strLabel, strT])
-  return funcHCLStratSelectionRet
+#def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdCol ):
+#  def funcHCLStratSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, strDataRow=strDataRow, strIdCol=strIdCol ):
+#    strT, astrSs = sfle.ts( target, source )
+#    strProg, strSelection, strAbundance = astrSs[0], astrSs[1], astrSs[2]
+#    strColor, strLabel = target[1].get_abspath(), target[2].get_abspath()
+#    return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHCLPath, strColor, strLabel, strT])
+#  return funcHCLStratSelectionRet
 
 #Visualize output with Stratified PCoAs (Figure 4)
 def funcStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert ):
@@ -448,9 +448,9 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                     sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
                                                                                                                                     " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                     " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
-                                                                                                                                    " ".join(["-s",sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
-                                                                                                                                    " ".join(["-p",sFileConfiguration[c_strConfigSupervisedLabel]]),
-                                                                                                                                    " ".join(["-u",sFileConfiguration[c_strConfigUnsupervisedStratify]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strSupervisedLabelCount,sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strSupervisedLabel,sFileConfiguration[c_strConfigSupervisedLabel]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadata,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
                                                                                                                                     cCladogramSelectedTaxa,
                                                                                                                                     lsSelectionMethods))
     #Create figure 1A PCoA
@@ -503,7 +503,8 @@ for fileConfigMicropita in lMicropitaFiles:
     lsCladogramFigures.append(sCladogramSelectFig)
     Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
          sCladogramSizeFile, sCladogramCircleFile], lsFig2Sources + ls_srcFig2, 
-         funcCladogramSelectionMethods(strTaxaArgForCladogram,
+         funcCladogramSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                       strTaxaArgForCladogram,
                                        strHighlightArgForCladogram,
                                        " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
                                        " ".join([Constants_Arguments.c_strRoot,sFileConfiguration[c_strConfigRoot]]),
@@ -518,12 +519,12 @@ for fileConfigMicropita in lMicropitaFiles:
 
 
     #Create figure 3
-    #Selection in Stratification
-    Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sAbundanceFileName] + ls_srcFig1, 
-        funcHCLStratSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
-                                " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
-                                " ".join(["-id", c_strAbundanceIDCol]),
-                                " ".join([Constants_Arguments.c_strInvertArgument, strInvertImage])))
+#    #Selection in Stratification
+#    Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sAbundanceFileName] + ls_srcFig1, 
+#        funcHCLStratSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+#                                " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
+#                                " ".join(["-id", c_strAbundanceIDCol]),
+#                                " ".join([Constants_Arguments.c_strInvertArgument, strInvertImage])))
 
     #Create figure 4 PCoA
     #PCoA of stratified selection

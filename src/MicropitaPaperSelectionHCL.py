@@ -17,6 +17,7 @@ __status__ = "Development"
 import argparse
 from CommandLine import CommandLine
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 from FileIO import FileIO
 import logging
@@ -127,21 +128,18 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperSelectionHCL.py",
 
 #Arguments
 #Logging
-argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
-                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
-                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
-argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
-	help = "Invert the image to a black background (default=False)." )
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
+argp.add_argument( Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False",
+	help = Constants_Arguments.c_strInvertHelp)
 #Select file
-argp.add_argument( "strSelectionFile", metavar = "Select_file",
-    help = "A file containing the samples selected which will be visualized." )
-argp.add_argument( "strHCLLoc", metavar = "HClust_location",
-    help = "The location and to HClust (for example ./external/hclust/hclust.py)." )
+argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
+argp.add_argument( "strHCLLoc", metavar = "HClust_location", help = Constants_Arguments.c_strHCLLocation)
 #Outputfile
-argp.add_argument( "strOutHCLDataFile", metavar = "HCLData.txt", nargs = "?", help = "An output file that is used by HClust. This is the data file." )
-argp.add_argument( "strOutHCLColorFile", metavar = "HCLColor.txt", nargs = "?", help = "An output file that is used by HClust. This is the color file." )
-argp.add_argument( "strOutHCLLabelFile", metavar = "HCLLabel.txt", nargs = "?", help = "An output file that is used by HClust. This is the label file." )
-argp.add_argument( "strOutFigure", metavar = "SelectionHCL.png", nargs = "?", help = "The output HCL figure." )
+argp.add_argument( "strOutHCLDataFile", metavar = "HCLData.txt", nargs = "?", help = Constants_Arguments.c_strHCLDataFile)
+argp.add_argument( "strOutHCLColorFile", metavar = "HCLColor.txt", nargs = "?", help = Constants_Arguments.c_strHCLColorFile)
+argp.add_argument( "strOutHCLLabelFile", metavar = "HCLLabel.txt", nargs = "?", help = Constants_Arguments.c_strHCLLabelFile)
+argp.add_argument( "strOutFigure", metavar = "SelectionHCL.png", nargs = "?", help = Constants_Arguments.c_genericOutputFigureFileHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -151,7 +149,7 @@ def _main( ):
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
-        raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
+        raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start MicropitaPaperSelectionHCL")

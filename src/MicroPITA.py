@@ -17,6 +17,7 @@ __status__ = "Development"
 from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from Diversity import Diversity
 from FileIO import FileIO
 import logging
@@ -973,35 +974,31 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 #Arguments
 #Optional parameters
 #Logging
-argp.add_argument("-l", dest="strLogLevel", metavar= "Loglevel", default="INFO", 
-                  choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], 
-                  help= "Logging level which will be logged to a .log file with the same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 #Abundance associated
-argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
-                  help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
-argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
-                  help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
-argp.add_argument("-s", dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
-                  help= "The count of labeled data to select per label (default =1)")
+argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
+argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
+                  help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelCount, dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
+                  help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument("-p", dest="strLabel", metavar= "Label", default="", 
-                  help= "The name of the phenotype data row on which to perform supervised methods.")
-argp.add_argument("-u", dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
-                  help= "The metatdata to stratify unsupervised analysis.")
+argp.add_argument(Constants_Arguments.c_strSupervisedLabel, dest="strLabel", metavar= "Label", default="", help= Constants_Arguments.c_strSupervisedLabelCountHelp)
+argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadata, dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
+                  help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
 #Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
+argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = Constants_Arguments.c_strOptionalOutputDataFile)
 #Abundance file
-argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = "An abundance table." )
+argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Taxa file
-argp.add_argument( "strFileTaxa", metavar = "Taxa_file",
-    help = "A file containing taxa to be used in taxa-directed selection." )
+argp.add_argument( "strFileTaxa", metavar = "Taxa_file", help = Constants_Arguments.c_strTaxaSelectionFile)
 #Temporary folder
-argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = "Directory to place temporary and intermediate files.")
+argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = Constants_Arguments.c_genericTMPDirLocationHelp)
 #Select count
-argp.add_argument( "icount", metavar = "number", type = int, help = "The number of samples to select (An integer greater than 0.)." )
+argp.add_argument( "icount", metavar = "number", type = int, help = Constants_Arguments.c_strCountHelp)
 #Selection parameter
-argp.add_argument("strSelection", metavar = "Selection_Methods", help = "Select techniques listed one after another.", nargs="*")
+argp.add_argument("strSelection", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionTechniques, nargs="*")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 

@@ -20,6 +20,7 @@ from Cladogram import Cladogram
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
+import logging
 from MicroPITA import MicroPITA
 import numpy as np
 import os
@@ -38,6 +39,9 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperSelectionCladogram.py",
 
 #Arguments
 #Select file
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+                  choices=Constants_Arguments.c_lsLoggingChoices, 
+                  help= Constants_Arguments.c_strLoggingHelp)
 argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp )
 argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = Constants_Arguments.c_strAbundanceFileHelp )
 argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFile )
@@ -61,7 +65,7 @@ argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", meta
 #Outputfile
 argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
 argp.add_argument( "sColorFileName", metavar = "ColorFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerColorFile )
-argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = Constants_Arguments.c_strCIrcladerTickFile )
+argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTickFile )
 argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerHighlightFile )
 argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerSizeFile )
 argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerCircleFile )
@@ -71,6 +75,12 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+
+    #Set up logger
+    iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
+    if not isinstance(iLogLevel, int):
+        raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     #Invert
     c_fInvert = (args.fInvert.lower() == "true")
