@@ -18,6 +18,8 @@ from Constants import Constants
 from Constants_Figures import Constants_Figures
 from Diversity import Diversity
 from cogent.cluster.nmds import NMDS
+import logging
+import matplotlib.cm as cm
 from scipy.spatial.distance import squareform
 from ValidateData import ValidateData
 from matplotlib import pyplot as plt
@@ -267,7 +269,92 @@ class PCoA:
               objLegend.legendPatch.set_ec(objColors.c_strDetailsColorLetter)
               plt.setp(objLegend.get_texts(),color=objColors.c_strDetailsColorLetter)
 
+            #Make legend background transparent
+            objLegendFrame = objLegend.get_frame()
+            objLegendFrame.set_alpha(objColors.c_dAlpha)
+
             imgFigure.savefig(tempPlotName, facecolor=imgFigure.get_facecolor())
+
+    #charForceColor if set, automatic coloring will not occur but will occur based on the charForceColor
+    #CharForceColor should be a list of selection methods or not selected which will be automatically broken into colors
+    #charForceColor must contain the same elements as the lsLabeList
+    #Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
+    #charForceShapes if set, automatic shapes will not occur
+    #Currently can only be a char (forcing effects all markers equally)
+    def plotList(self,lsLabelList, strName, asFilePathPieces, iSize, charForceColor=None, charForceShape=None, fInvert=False):
+
+        print("lsLabelList")
+        print(lsLabelList)
+        print("strName")
+        print(strName)
+        print("asFilePathPieces")
+        print(asFilePathPieces)
+        print("iSize")
+        print(iSize)
+        print("charForceColor")
+        print(charForceColor)
+        print("charForceShape")
+        print(charForceShape)
+        print("fInvert")
+        print(fInvert)
+
+        #Get uniqueValues for labels
+        acharUniqueValues = list(set(lsLabelList))
+        iCountUniqueValues = len(acharUniqueValues)
+
+        #Set colors
+        atupldLabelColors = None
+
+        #Set shapes
+        alLabelShapes = None
+        if charForceShape == None:
+            #Get shapes
+            acharShapes = PCoA.getShapes(iCountUniqueValues)
+            if acharShapes == None:
+                return False
+            #Make label shapes
+            alLabelShapes = [ acharShapes[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
+        else:
+            alLabelShapes = charForceShape
+
+        #If the coloring is not forced, color so it is based on the labels
+        if charForceColor == None:
+            #Get colors based on labels
+            atupldColors = [PCoA.RGBToHex(cm.jet(float(iUniqueValueIndex)/float(iCountUniqueValues))) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+            #Make label coloring
+            atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
+        #If the coloring is forced, color so it is based on the charForcedColor list
+        elif(ValidateData.isValidList(charForceColor)):
+            atupldLabelColors = charForceColor[0]
+            if not len(lsLabelList) == len(charForceColor[1]):
+                logging.error("PCoA.plotList. Label and forced color lengths were not the same.")
+                logging.debug("Labels")
+                logging.debug(lsLabelList)
+                logging.debug(len(lsLabelList))
+                logging.debug("Forced Colors")
+                logging.debug(charForceColor)
+                logging.debug(charForceColor[1])
+                logging.debug(len(charForceColor[1]))
+                return False
+            lsLabelList = [ "".join([charForceColor[1][iLabelIndex], "_", lsLabelList[iLabelIndex]]) for iLabelIndex in xrange(0,len(charForceColor[1]))]
+        #If the color is forced but the color does not vary, color all markers are the same.
+        else:
+            atupldLabelColors = charForceColor
+
+        #Check to make sure unique colors are returned
+        if(ValidateData.isValidList(atupldLabelColors)):
+            if not len(acharUniqueValues)==len(list(set(atupldLabelColors))):
+                logging.error("PCoA.plotList. Non-uniques colors were generated for "+strName)
+                logging.debug("Labels")
+                logging.debug(lsLabelList)
+                logging.debug("Colors")
+                logging.debug(atupldLabelColors)
+                return False
+
+        logging.debug("lsLabelList")
+        logging.debug(lsLabelList)
+        self.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata-",strName,asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
+
 
     #TODO put in utilities
     #Returns the indicies of the element in the array as a list

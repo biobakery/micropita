@@ -5,9 +5,16 @@ import os
 
 Import( "*" )
 
+#TODO make this dynamic
+sys.path.append("/home/ttickle/Desktop/ttickle/sfle/input/micropita/src")
+from Constants_Arguments import Constants_Arguments
+
 c_strDataFile = sfle.d(fileDirInput, "data")
 
 pE = DefaultEnvironment( )
+
+#Process flags
+c_fRunCollectionCurve = False
 
 #Normalize
 c_NormalizePCOA = "False"
@@ -18,6 +25,7 @@ c_strStratPCOAMovieEnding = "/Strat-PCOA.avi"
 c_strCladogramMovieEnding = "/Cladogram.avi"
 c_strSufCollectionCurveFigure = "-ColCurv.png"
 c_strSufCollectionCurveText = "-ColCurv.txt"
+c_strSufCombinedPCOA = "-Combined.png"
 c_strSufSelectedTaxa = ".taxa"
 c_strSufPng = ".png"
 c_strSufPCOA = "-PCoA.png"
@@ -29,6 +37,7 @@ c_strSufStratHCLUSTLabel = "-Strat.HCLLabel"
 c_strSufHCLUSTLabel = ".HCLLabel"
 c_strSufStratHCLUSTFig = "-StratHCL.png"
 c_strSufHCLUSTFig = "-SHCL.png"
+c_strSufInsilicoData = ".txt"
 c_strSufFig2 = "-Fig2.png"
 c_strSufCircTaxa = ".CTaxa"
 c_strSufCircColor = ".CColor"
@@ -41,6 +50,14 @@ c_strSufConfig = ".config"
 c_strSufCircStyleInv = "-invert.CStyle"
 c_strSufMicropita = ".txt"
 c_strSufPredict = "-SVM.predict"
+
+#Data files to generate
+c_strInsilicoDataDiversity = "DiversityTest"+c_strSufInsilicoData
+c_strInsilicoDataDiversityKey = "Diversity"
+c_strInsilicoDataRepresentative = "RepresentativeTest"+c_strSufInsilicoData
+c_strInsilicoDataUnbalanced = "UnbalancedTest"+c_strSufInsilicoData
+c_strInsilicoDataUnbalancedKey = "Unbalanced"
+lsInsilicoDataNames = [c_strInsilicoDataDiversity,c_strInsilicoDataRepresentative,c_strInsilicoDataUnbalanced]
 
 #Dict keys
 c_strSelectionFiles = "SelectionFiles"
@@ -73,6 +90,7 @@ c_strConfigInvertImage = "[Invert Image]"
 c_strConfigLabels = "[Labels]"
 c_strConfigLogging = "[Logging]"
 c_strConfigNormalizeAbundance = "[Normalize Abundance]"
+c_strConfigPlotCombinedSelectionTechniques = "[Selection Methods to plot in a combined graph]"
 c_strConfigRoot = "[Root]"
 c_strConfigSampleRow = "[Sample Name Row Index]"
 c_strConfigSelection = "[Selection]"
@@ -91,7 +109,8 @@ c_strConfigUnsupervisedStratify = "[Stratify by Metadata]"
 c_fileCladogramStyleFile = File(sfle.d( fileDirInput, "microPITA"+c_strSufCircStyle ))
 
 #External programs
-c_progHC = "./external/hclust/hclust.py"
+c_progHCLPath = "./external/hclust/hclust.py"
+c_progHCL = "../../external/hclust/hclust.py"
 
 #Src Code
 c_fileProgAbundanceTable = File( sfle.d( fileDirSrc, "AbundanceTable.py" ) )
@@ -105,6 +124,7 @@ c_fileProgMencoder = File("/usr/bin/mencoder")
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
 c_fileProgCollectionCurveFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCollectionCurve.py") )
 c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
+c_fileProgCombinedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCombinedPCoA.py") )
 c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
 c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
 c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
@@ -112,7 +132,7 @@ c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStr
 c_fileProgMLPYDistanceAdaptor = File( sfle.d( fileDirSrc, "MLPYDistanceAdaptor.py" ) )
 c_fileProgPCOA = File( sfle.d( fileDirSrc, "PCoA.py" ) )
 c_fileProgSVM = File( sfle.d( fileDirSrc, "SVM.py" ) )
-c_fileProgUtilityData = File( sfle.d( fileDirSrc, "Utility_Data.py" ) )
+c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSets.py" ) )
 c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
 
 #Lists of sources needed for different python scripts that are ran so that they can be used as libraries
@@ -137,6 +157,20 @@ c_lsUnsupervisedMethods = set([c_strDiversity,c_strExtremeDissimilarity,c_strRan
 
 ##Start flow
 #Scripts to call
+##Generate insilico data sets
+def funcGenerateData(strDataSetKey):
+  def funcGenerateDataRet( target, source, env, strDataSetKey=strDataSetKey ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg = astrSs[0]
+    return sfle.ex( [strProg,strT,strDataSetKey] )
+  return funcGenerateDataRet
+
+#Visualize insilico data
+def funcVisualizeInsilicoData( target, source, env ):
+  strT, astrSs, = sfle.ts( target, source )
+  strProg, strInputDataFile = astrSs[0], astrSs[1]
+  return sfle.ex([strProg, "--in", strInputDataFile, "--out", strT, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1",'--flabel',"1",'--font_size',"5"])
+
 ##Call micropita to run
 def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify, strTaxaFile, lsSelectionMethods):
   def funcMicroPitaRet( target, source, env, iUnsupervisedCount=iUnsupervisedCount, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, 
@@ -153,8 +187,16 @@ def funcPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iN
   def funcPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, strPredictFileArgument=strPredictFileArgument):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,iNormalize,strInvert,strPredictFileArgument]+[ strAbnd, strSelection, strT])
+    return sfle.ex([strProg]+[strLoggingLevel, iSampleNameRow,iFirstDataRow,iNormalize,strInvert,strPredictFileArgument]+[ strAbnd, strSelection, strT])
   return funcPCoARet
+
+#Visualize output with Combined PCoA (Figure 1A)
+def funcCombinedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, lsSelectionMethods):
+  def funcCombinedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
+    return sfle.ex([strProg]+[strLoggingLevel,iSampleNameRow,iFirstDataRow,iNormalize,strInvert]+[ strAbnd, strSelection, strT]+lsSelectionMethods)
+  return funcCombinedPCoARet
 
 #Visualize selected output with HCL (Figure 1B)
 def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
@@ -162,7 +204,7 @@ def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection = astrSs[0], astrSs[1]
     strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
-    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, c_progHC, strData, strColor, strLabel, strT])
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, c_progHCLPath, strData, strColor, strLabel, strT])
   return funcHCLSelectionRet
 
 #Visualize selected output with Cladogram (Figure 2)
@@ -185,7 +227,7 @@ def funcHCLStratSelectionMethods( strLoggingLevel, strInvert, strDataRow, strIdC
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance = astrSs[0], astrSs[1], astrSs[2]
     strColor, strLabel = target[1].get_abspath(), target[2].get_abspath()
-    return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHC, strColor, strLabel, strT])
+    return sfle.ex([strProg, strLoggingLevel, strDataRow, strIdCol, strInvert, strSelection, strAbundance, c_progHCLPath, strColor, strLabel, strT])
   return funcHCLStratSelectionRet
 
 #Visualize output with Stratified PCoAs (Figure 4)
@@ -197,8 +239,8 @@ def funcStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstD
   return funcStratifiedPCoARet
 
 #Create a summary chart with collection curves
-def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert):
-  def funcCollectionCurveRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow, strFirstDataRow=strFirstDataRow, strNormalize=strNormalize, strInvert=strInvert):
+def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strInvert):
+  def funcCollectionCurveRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow, strFirstDataRow=strFirstDataRow, strInvert=strInvert):
     strFigureT, astrSs = sfle.ts( target, source )
     strProg, strAbundance = astrSs[0], astrSs[1]
     #Get input selection files (discriminate from the src files also passed as a list)
@@ -209,7 +251,7 @@ def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataR
         break
       iFileCount = iFileCount + 1
     lsSelectionFiles = astrSs[2:iFileCount+1]
-    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strFirstDataRow, strNormalize, strInvert, strAbundance, strFigureT, target[1].get_abspath()]+lsSelectionFiles)
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strFirstDataRow, strInvert, strAbundance, strFigureT, target[1].get_abspath()]+lsSelectionFiles)
   return funcCollectionCurveRet
 
 #Make movies from a list of images
@@ -233,11 +275,24 @@ def globFilesByExtension(strDirectory,strExtension,strDelim = c_strExtDelim):
   return lCleanedFiles
 
 ###Start process
+#Generate insilico data sets
+lDataFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufInsilicoData)
+lsInsilicoDataFiles = []
+for strInsilicoData in lsInsilicoDataNames:
+  if not strInsilicoData in lDataFiles:
+    if strInsilicoData == c_strInsilicoDataDiversity:
+      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
+      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
+      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateData(strDataSetKey=c_strInsilicoDataDiversityKey))
+      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData)
+    elif strInsilicoData == c_strInsilicoDataUnbalanced:
+      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
+      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
+      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateData(strDataSetKey=c_strInsilicoDataUnbalancedKey))
+      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData)
+
 #Get micropita config files
 lMicropitaFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufConfig)
-
-#print("lMicropitaFiles")
-#print([strFile.get_abspath() for strFile in lMicropitaFiles])
 
 #Collect input files later used for multistudy summary graphics
 #{"InputFile:[SelectionFile1],[SelectionFile2],[SelectionFile3]...]}
@@ -282,9 +337,6 @@ for fileConfigMicropita in lMicropitaFiles:
     else:
       iIndex = iIndex + 1
 
-#  print("sFileConfiguration")
-#  print(sFileConfiguration)
-
   #Parse the supervised runs selection into multiple runs if needed
   if(c_strConfigSupervisedCount in sFileConfiguration):
     sSupervisedCounts = sFileConfiguration[c_strConfigSupervisedCount]
@@ -297,6 +349,7 @@ for fileConfigMicropita in lMicropitaFiles:
 
   #Common configurations
   lsSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniques]))
+  lsPlotCombinedSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigPlotCombinedSelectionTechniques]))
   strInvertImage = sFileConfiguration[c_strConfigInvertImage]
   if strInvertImage.lower()=="true":
     c_fileCladogramStyleFile = File(sfle.d( fileDirInput, "microPITA"+c_strSufCircStyleInv ))
@@ -365,9 +418,9 @@ for fileConfigMicropita in lMicropitaFiles:
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
 
     #Make files from the micropita output file
-    sOutputFigure1APCoA,sOutputFigure4PCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
+    sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
     sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
-    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
+    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
     c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
 
     #Make more files, these for cladogram options
@@ -387,7 +440,7 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Run micropita analysis
     sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
-    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita], funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita] + lsInsilicoDataFiles, funcMicroPita(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                     sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
                                                                                                                                     " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                     " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
@@ -411,6 +464,17 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                                 " ".join(["-i",strInvertImage]),
                                                                                                                                                                 strPredictFileArgument))
+    #Create figure 1A PCoA combined
+    #Unstratified PCoA of selection
+    #Manage optional files
+    if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
+      Command(sOutputCombinedFigure1APCoA, [c_fileProgCombinedPCoAFigure, sAbundanceFileName, sMicropitaOutput] + c_filePrimarySrc, funcCombinedPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                                                                                                                                                 lsPlotCombinedSelectionMethods))
+
     #Create figure 1B HCL
     #Selection of samples by selection method
     Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
@@ -478,31 +542,31 @@ for fileConfigMicropita in lMicropitaFiles:
 
   #If this configuration file had multiple sampling
   if lsIndexCounts > 1:
-    if len(lsPCOAFigures) > 1:
-      Command(sOutputDir+c_strPCOAMovieEnding,[c_fileProgMencoder]+lsPCOAFigures, funcMakeMovie(lsImageFiles=lsPCOAFigures))
+#    if len(lsPCOAFigures) > 1:
+#      Command(sOutputDir+c_strPCOAMovieEnding,[c_fileProgMencoder]+lsPCOAFigures, funcMakeMovie(lsImageFiles=lsPCOAFigures))
 #    if len(lsStratPCOAFigures) > 1:
 #      Command(sOutputDir+c_strStratPCOAMovieEnding,[c_fileProgMencoder]+lsStratPCOAFigures, funcMakeMovie(lsImageFiles=lsStratPCOAFigures))
-#    if len(lsCladogramFigures) > 1:
-#      Command(sOutputDir+c_strCladogramMovieEnding,[c_fileProgMencoder]+lsCladogramFigures, funcMakeMovie(lsImageFiles=lsCladogramFigures))
+    if len(lsCladogramFigures) > 1:
+      Command(sOutputDir+c_strCladogramMovieEnding,[c_fileProgMencoder]+lsCladogramFigures, funcMakeMovie(lsImageFiles=lsCladogramFigures))
 
-#For each input file
-#Create summary files
-#Create collection curves
-for strInputSummaryKey in dictSelectionFiles:
-  curSummaryDict = dictSelectionFiles[strInputSummaryKey]
-  curInputFile = curSummaryDict[c_strConfigInputFile]
-  curListofSelection = curSummaryDict[c_strSelectionFiles]
+if c_fRunCollectionCurve:
+  #For each input file
+  #Create summary files
+  #Create collection curves
+  for strInputSummaryKey in dictSelectionFiles:
+    curSummaryDict = dictSelectionFiles[strInputSummaryKey]
+    curInputFile = curSummaryDict[c_strConfigInputFile]
+    curListofSelection = curSummaryDict[c_strSelectionFiles]
 
-  #Make more files, now for figure 5 Collection Curve
-  sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
-  sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
+    #Make more files, now for figure 5 Collection Curve
+    sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
+    sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
 
-  #Create Figure 5
-  #Collection Curve
-  Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
-      funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
+    #Create Figure 5
+    #Collection Curve
+    Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
+        funcCollectionCurveSummary(" ".join(["-l", sFileConfiguration[c_strConfigLogging]]),
                               " ".join(["-n",sFileConfiguration[c_strConfigSampleRow]]),
                               " ".join(["-d",sFileConfiguration[c_strConfigDataRow]]),
-                              " ".join(["-r",sFileConfiguration[c_strConfigNormalizeAbundance]]),
                               " ".join(["-i", strInvertImage])))
 

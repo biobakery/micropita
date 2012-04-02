@@ -19,9 +19,11 @@ from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
 from Constants_Figures import Constants_Figures
+from Diversity import Diversity
 import logging
 from pylab import *
 from MicroPITA import MicroPITA
+import numpy as np
 import os
 import random
 import re
@@ -123,12 +125,32 @@ class MicropitaPaperCollectionCurve:
 
         imgFigure.savefig(strPlotName, facecolor=imgFigure.get_facecolor())
 
-    def getAverageBootstrappedMetric(self, lsMetrics, iSelectSampleCount, iBootStrappingItr):
-        ldAveragePerIteration = list()
+    #First a subselection occurs and pool. 
+    def getMedianBootstrappedMetric(self, npaAbundance, lsSampleNames, iSelectSampleCount, sMetric, iBootStrappingItr):
+        ldMeasurePerIteration = list()
+        iSampleCount = len(lsSampleNames)
         for iItr in xrange(iBootStrappingItr):
-            ldSelection = [random.choice(lsMetrics) for iSampleCount in xrange(iSelectSampleCount)]
-            ldAveragePerIteration.append(sum(ldSelection)/float(len(ldSelection)))
-        return sum(ldAveragePerIteration)/float(len(ldAveragePerIteration))
+            #Select population
+            liSelection = random.sample(xrange(iSampleCount),iSelectSampleCount)
+            lfSelection = [(iSelectIndex in liSelection) for iSelectIndex in xrange(iSampleCount)]
+
+            #When combining combine counts (Chao1) by summing and (Relative abundance) by average
+            if(sMetric == Diversity.c_INV_SIMPSON_A_DIVERSITY):
+                ldPooledSample = list()
+                for featureAbundance in npaAbundance:
+                    ldSelectedAbundance = np.compress(lfSelection,list(featureAbundance)[1:])
+                    ldPooledSample.append(sum(ldSelectedAbundance)/(len(ldSelectedAbundance)*1.0))
+                if sum(ldPooledSample)==0.0:
+                    ldMeasurePerIteration.append(0)
+                else:
+                    ldMeasurePerIteration.append(Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=np.array(ldPooledSample)))
+            #Do not normalize
+            elif(sMetric == Diversity.c_CHAO1_A_DIVERSITY):
+                ldPooledSample = list()
+                for featureAbundance in npaAbundance:
+                    ldPooledSample.append(sum(np.compress(lfSelection, list(featureAbundance)[1:])))
+                ldMeasurePerIteration.append(Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=np.array(ldPooledSample)))
+        return np.median(ldMeasurePerIteration)
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py", 
@@ -143,8 +165,6 @@ argp.add_argument("-n", dest="iSampleNameRow", metavar= "SampleNameRow", default
                   help= "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering.")
 argp.add_argument("-d", dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
                   help= "The row in the abundance file that is the first row to contain abundance data. This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata.")
-argp.add_argument( "-r", dest = "fNormalize", action = "store", default="False",
-	help = "Normalize the abundance data before working with it (default=False)." )
 argp.add_argument( "-i", dest = "fInvert", action = "store", default="False",
 	help = "Invert the image to a black background (default=False)." )
 #Select file
@@ -169,9 +189,6 @@ def _main( ):
     logging.info("Start MicropitaPaperCollectionCurve")
     logging.info("MicropitaPaperCollectionCurve. The following arguments were passed.")
     logging.info(str(args))
-
-    #Normalize Abundance data
-    fNormalize = (args.fNormalize.lower() == "true")
 
     #Invert figure
     fInvert = (args.fInvert.lower() == "true")
@@ -198,14 +215,6 @@ def _main( ):
     if isinstance(args.strSelectionFiles, basestring):
       args.strSelectionFiles = [args.strSelectionFiles]
 
-    #Get diversity of each sample in the abundance table
-    totalData = AbundanceTable()
-    rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=args.strAbundanceFile, tempDelimiter=Constants.TAB, 
-                                                            tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow),
-                                                            tempNormalize=fNormalize)
-
-    #Get sample names
-    lsSampleNames = rawAbundance.dtype.names[1:]
     #The metrics within the metric category to run
     #For example, the category could be Diversity and the runMetrics could be Inverse Simpson and Choa1
     lsRunMetrics = []
@@ -216,6 +225,17 @@ def _main( ):
 
     #For each run metric build a collection curve. The run metric will be the y axis.
     for strRunMetric in lsRunMetrics:
+
+        #Do not normalize Choa1
+        fNormalize = (not strRunMetric == Diversity.c_CHAO1_A_DIVERSITY)
+
+        #Get diversity of each sample in the abundance table
+        totalData = AbundanceTable()
+        rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=args.strAbundanceFile, tempDelimiter=Constants.TAB, 
+                                                            tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow),
+                                                            tempNormalize=fNormalize)
+        #Get sample names
+        lsSampleNames = rawAbundance.dtype.names[1:]
 
         #Generate the metric measurements of samples for the y axis
         lStudyMetrics = None
@@ -248,7 +268,7 @@ def _main( ):
                 logging.error("".join(["MicroPitaPaperCollectionCurve. File for study was already collected in the collection curve. The following file was ignored:",strFile,"."]))
             dictGrandSelection[strFile] = dictSelection
 
-        #Break up the GrandSelection of subsampling by sample selection size
+        #Break up the grandSelection of subsampling by sample selection size
         #For each selection size
         #Get the average y for each sample subset (y={diversity, top ranked abundance})
         dictMetricsBySampleN = dict()
@@ -315,7 +335,7 @@ def _main( ):
                             dictCurMetric[iSelectionCount] = list()
                         dictCurMetric[iSelectionCount].append(lMetric[1])
 
-        #Most diverse set of samples  at each N
+        #Most diverse set of samples at each N
         dictdDiverseSamplesAtN = dict()
         #Booststrapped diversity level at N
         dictdBootstrappedDiversityAtN = dict()
@@ -343,7 +363,7 @@ def _main( ):
 
                     #Get bootstrapped diversity at a level N
                     if strN not in dictdBootstrappedDiversityAtN:
-                        dictdBootstrappedDiversityAtN[strN] = mCC.getAverageBootstrappedMetric(lsMetrics = lStudyMetrics, iSelectSampleCount = int(strN), iBootStrappingItr = c_BootstrapItr)
+                        dictdBootstrappedDiversityAtN[strN] = mCC.getMedianBootstrappedMetric(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = int(strN), sMetric=strRunMetric, iBootStrappingItr = c_BootstrapItr)
 
         #Update the plot name with the run metric
         strPlotNamePieces = filter(None,re.split(Constants.PATH_SEP,args.strOutFigure))

@@ -425,7 +425,7 @@ class MicroPITA:
     #@param tempMatrix [taxa (row) x sample(column)] Matrix with first column as a taxa id column which is ignored
     #@param tempTargetedTaxa list of string names of taxa which are measured after ranking against the full sample.
     #@return [(sample name,average rank)]
-    def getAverageRanksSamples(self, tempMatrix, tempTargetedTaxa):
+    def getAverageRanksSamples(self, tempMatrix, tempTargetedTaxa, sSampleIDName):
 
         #Sample rank averages [[sample,average rank of selected taxa]]
         #Returned
@@ -444,7 +444,7 @@ class MicroPITA:
             #For each taxa
             for taxaIDIndex in xrange(0,len(allTaxaNames)):
                 currentAbundance = tempMatrix[name][taxaIDIndex]
-                ranks.append([tempMatrix["TID"][taxaIDIndex],currentAbundance,-1])
+                ranks.append([tempMatrix[sSampleIDName][taxaIDIndex],currentAbundance,-1])
 
             #Sort based on abundance
             ranks = sorted(ranks, key = lambda sampleData: sampleData[1], reverse = True)
@@ -487,11 +487,11 @@ class MicroPITA:
         #return
         return sampleRankAverages
 
-    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount):
+    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount, sSampleIDName):
       if(len(tempTargetedTaxa) < 1):
         logging.error("MicroPITA.getAverageRanksSamples. Taxa defined selection was requested but no taxa were given.")
       #Rank the samples
-      userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa)
+      userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
 
       #Select the top samples
 #      topRankedSamples = userRankedSamples[0:(sampleSelectionCount-1):]
@@ -857,7 +857,7 @@ class MicroPITA:
             if(c_RUN_RANK_AVERAGE_USER_4):
               if not microPITA.c_USER_RANKED in selectedSamples:
                   selectedSamples[microPITA.c_USER_RANKED]=list()
-              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount))
+              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sSampleIDName=sampleID))
             logging.info("Selected Samples 4")
             logging.info(selectedSamples)
 

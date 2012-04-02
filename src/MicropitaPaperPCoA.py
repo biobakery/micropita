@@ -46,7 +46,6 @@ argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", h
 #Select file
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file",
     help = "A file containing the samples selected which will be visualized." )
-
 #Outputfile
 argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = "An optional output file" )
 
@@ -101,7 +100,7 @@ def _main( ):
     iMetadataIndex = 0
 
     for asMetadata in metadata:
-      plotList(objPCOA=analysis,lsLabelList=asMetadata,strName=str(iMetadataIndex),asFilePathPieces=asFilePathPieces,iSize=c_shapeSize,charForceColor='k',fInvert=c_fInvert)
+      analysis.plotList(lsLabelList=asMetadata,strName=str(iMetadataIndex),asFilePathPieces=asFilePathPieces,iSize=c_shapeSize,charForceColor='k',fInvert=c_fInvert)
       iMetadataIndex = iMetadataIndex + 1
 
     #Read in prediction file is supplied
@@ -115,7 +114,7 @@ def _main( ):
         for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
             lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
             lsPredictions.append(lsPredictElements[0])
-        plotList(analysis,lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize,fInvert=c_fInvert)
+        analysis.plotList(lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize,fInvert=c_fInvert)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
@@ -147,69 +146,11 @@ def _main( ):
 
         #Draw PCoA
         if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
-          plotList(objPCOA=analysis,lsLabelList=lsPredictions[1:],strName=astrSelectionMethod[0],asFilePathPieces=asFilePathPieces,iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
+          analysis.plotList(lsLabelList=lsPredictions[1:],strName=astrSelectionMethod[0],asFilePathPieces=asFilePathPieces,iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
         else:
           analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
 
     logging.info("Stop MicropitaPaperPCoA")
-
-#charForceColor if set, automatic coloring will not occur but will occur based on the charForceColor
-#CharForceColor should be a list of selection methods or not selected which will be automatically broken into colors
-#charForceColor must contain the same elements as the lsLabeList
-#Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
-#charForceShapes if set, automatic shapes will not occur
-#Currently can only be a char (forcing effects all markers equally)
-def plotList(objPCOA,lsLabelList,strName,asFilePathPieces,iSize,charForceColor=None,charForceShape=None, fInvert=False):
-    #Get uniqueValues for labels
-    acharUniqueValues = list(set(lsLabelList))
-    iCountUniqueValues = len(acharUniqueValues)
-
-    #Set colors
-    atupldLabelColors = None
-
-    #Set shapes
-    alLabelShapes = None
-    if charForceShape == None:
-      #Get shapes
-      acharShapes = PCoA.getShapes(iCountUniqueValues)
-      if acharShapes == None:
-        return False
-      #Make label shapes
-      alLabelShapes = [ acharShapes[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
-    else:
-      alLabelShapes = acharShapes
-
-    #If the coloring is not forced, color so it is based on the labels
-    if charForceColor == None:
-      #Get colors based on labels
-      atupldColors = [PCoA.RGBToHex(cm.jet(float(iUniqueValueIndex)/float(iCountUniqueValues))) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
-      #Make label coloring
-      atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
-    #If the coloring is forced, color so it is based on the charForcedColor list
-    elif(ValidateData.isValidList(charForceColor)):
-      atupldLabelColors = charForceColor[0]
-      if not len(lsLabelList) == len(charForceColor[1]):
-        logging.error("MicropitaPaperPCoA.plotList. Label and forced color lengths were not the same.") 
-        return False
-      lsLabelList = [ "".join([charForceColor[1][iLabelIndex], "_", lsLabelList[iLabelIndex]]) for iLabelIndex in xrange(0,len(charForceColor[1]))]
-    #If the color is forced but the color does not vary, color all markers are the same.
-    else:
-      atupldLabelColors = charForceColor
-
-    #Check to make sure unique colors are returned
-    if(ValidateData.isValidList(atupldLabelColors)):
-      if not len(acharUniqueValues)==len(list(set(atupldLabelColors))):
-        logging.error("MicropitaPaperPCoA.plotList. Non-uniques colors were generated for "+strName)
-        logging.debug("Labels")
-        logging.debug(lsLabelList)
-        logging.debug("Colors")
-        logging.debug(atupldLabelColors)
-        return False
-
-    logging.debug("lsLabelList")
-    logging.debug(lsLabelList)
-    objPCOA.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata-",strName,asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
-
 
 if __name__ == "__main__":
     _main( )

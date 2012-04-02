@@ -9,10 +9,10 @@
 
 #Import libaries
 from Constants import Constants
+from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
 from Diversity import Diversity
 from FileIO import FileIO
-import math
 import numpy as np
 import os
 import random
@@ -28,17 +28,17 @@ class Utility_Data():
     #Generate matrix for microPITA
     #@param tempOutPutFile
     @staticmethod
-    def generateAbundanceTable(tempFilePath, tempGenerateFigure=True):
+    def generateAbundanceTable(tempFilePath):
         #Matrix descriptors
         #Samples
         #Number of diversity samples
-        diversitySampleCount = 8
+        diversitySampleCount = 16#8
         #Number of representative dissimilarity samples
-        representativeDissimilarityCount = 7
+        representativeDissimilarityCount = 14#7
         #Number of extreme dissimilarity samples
-        extremeDissimilarityCount = 7
+        extremeDissimilarityCount = 14#7
         #Number of taxa-driven samples
-        taxaDrivenCount = 2
+        taxaDrivenCount = 4#2
         #Total sample count
         sampleCount = diversitySampleCount + representativeDissimilarityCount + extremeDissimilarityCount + taxaDrivenCount
 
@@ -46,22 +46,24 @@ class Utility_Data():
         strHCLLoc = "./external/hclust/hclust.py"
 
         #Taxa
-        #Number of taxa
-        taxaCount = 56
-        #Number of taxa with abundance in diversity samples
-        diversityMaximalTaxa = 25
-        #Number of taxa with minimal abundance in diversity samples
-        diversityMinimalTaxa = 6
         #Number of blocks of dissimlarity
-        representiveDiversityBlocks = 7
+        representiveDiversityBlocks = representativeDissimilarityCount
         #Number of taxa in each block of dissimilarity
         representiveDiversityTaxa = 8
         #Number of blocks of extreme dissimilarity
-        extremeDissimilarityBlocks = 7
+        extremeDissimilarityBlocks = representiveDiversityBlocks
         #Number of taxa in each block of extreme dissimilarity
-        extremeDissimilarityTaxa = 3
+        extremeDissimilarityTaxa = 5#int(representiveDiversityBlocks*.5)
         #Number of low abundance taxa in extreme dissimilarity
-        extremeDissimilarityLowTaxa = 12
+        extremeDissimilarityLowTaxa = representiveDiversityTaxa
+        #Number of taxa
+        taxaCount = representiveDiversityBlocks*representiveDiversityTaxa
+        #Number of taxa with abundance in diversity samples
+        diversityMaximalTaxa = int(taxaCount*.4)
+        #Number of taxa with minimal abundance in diversity samples
+        diversityMinimalTaxa = int(taxaCount*.1)
+        #Buffer of taxa to skip before startign the first extreme dissimilarity block
+        iExtremeDissimilarityStart = representiveDiversityTaxa-extremeDissimilarityTaxa
 
         #Taxa selected for taxa driven
         taxaDriverPositions = set([3,43,19])
@@ -69,6 +71,7 @@ class Utility_Data():
         ####Create matrix
         #Create the matrix of n taxa (row) by n samples (column)
         dataMatrix = np.zeros((taxaCount,sampleCount))
+
         #Create taxa names
         taxaNames = []
         for taxa in xrange(0,taxaCount):
@@ -121,10 +124,11 @@ class Utility_Data():
         sampleStop = sampleStop + extremeDissimilarityCount
 
         #Extreme dissimilarity
-        taxonBlockStart = 3
-        taxonBlockStop = taxonBlockStart + extremeDissimilarityTaxa
-        extremeTaxaBlockIncrement = (taxaCount/extremeDissimilarityBlocks)-extremeDissimilarityTaxa
+        extremeTaxaBlockIncrement = representiveDiversityTaxa-extremeDissimilarityTaxa
+        taxonBlockStart = iExtremeDissimilarityStart
+        taxonBlockStop = taxonBlockStart + extremeTaxaBlockIncrement
         for extremeSampleIndex in xrange(sampleStart,sampleStop):
+
             #Set block abundance
             for extremeBlockTaxonPosition in xrange(taxonBlockStart,taxonBlockStop):
                 dataMatrix[extremeBlockTaxonPosition,extremeSampleIndex] = 100+random.randint(0,5)
@@ -163,6 +167,7 @@ class Utility_Data():
                 dataMatrix[noiseTaxonPosition,drivenSampleIndex] = 0+random.randint(1,5)
 
         #Write to file
+        #Delete current file before writing
         if(os.path.isfile(tempFilePath)):
             os.remove(tempFilePath)
         #File writer
@@ -181,10 +186,6 @@ class Utility_Data():
         outToFile.writeToFile(Constants.ENDLINE.join(outputContents))
         outToFile.close()
 
-        #
-        if(tempGenerateFigure):
-            CommandLine().runCommandLine([strHCLLoc, "--in", tempFilePath, "--out", "".join([os.path.splitext(tempFilePath)[0],".png"]), "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1",'--flabel',"1",'--font_size',"5"])
-
         #Return file name
         return tempFilePath
 
@@ -192,7 +193,7 @@ class Utility_Data():
     #Generate matrix for microPITA focused on diversity
     #@param tempOutPutFile
     @staticmethod
-    def generateDiversityAbundanceTable(tempFilePath, tempGenerateFigure=True):
+    def generateDiversityAbundanceTable(tempFilePath):
         #Matrix descriptors
         #Samples
         #Number of diversity samples
@@ -251,6 +252,7 @@ class Utility_Data():
                 lsISLabels.append(str(Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
 
         #Write to file
+        #Delete current file before writing
         if(os.path.isfile(tempFilePath)):
             os.remove(tempFilePath)
 
@@ -275,11 +277,5 @@ class Utility_Data():
             sFileContents = f.write(Constants.ENDLINE.join(outputContents))
             f.close()
 
-        #Generate figure
-        if(tempGenerateFigure):
-            CommandLine().runCommandLine([strHCLLoc, "--in", tempFilePath, "--out", "".join([os.path.splitext(tempFilePath)[0],".png"]), "-d", "euclidean", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1", "-s", "log", "--ystart", strFirstDataRow, "--xstart", strFirstDataCol])
-
         #Return file name
         return tempFilePath
-
-Utility_Data.generateDiversityAbundanceTable(tempFilePath="DiversityTestDataGeneration.txt")

@@ -57,7 +57,6 @@ class Diversity:
     #@return 1 float is returned
     @staticmethod
     def getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=None):
-        #Validate data
 
         #Calculate metric
         return sum((tempSampleTaxaAbundancies)*(tempSampleTaxaAbundancies))
@@ -69,7 +68,6 @@ class Diversity:
     #Note***: Assumes that the abundance measurements are already normalized by the total population N
     @staticmethod
     def getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=None):
-        #Validate data
 
         simpsons = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies)
         #Return False if the diversity is 0 before inverting it
@@ -88,7 +86,6 @@ class Diversity:
     ## Calculates the Shannon index
     @staticmethod
     def getShannonDiversityIndex(tempSampleTaxaAbundancies=None):
-        #Validate data
 
         #Calculate metric
         tempSampleTaxaAbundancies = tempSampleTaxaAbundancies[np.where(tempSampleTaxaAbundancies != 0)]
@@ -106,7 +103,6 @@ class Diversity:
     #@params tempCorrectForBias False indicates uncorrected for bias (uncorrected = Chao 1984, corrected = Chao 1987, Eq. 2)
     @staticmethod
     def getChao1DiversityIndex(tempSampleTaxaAbundancies=None, tempCorrectForBias=False):
-        #Validate data
 
         #Observed = total number of species observed in all samples pooled
         totalObservedSpecies = len(tempSampleTaxaAbundancies)-len(tempSampleTaxaAbundancies[tempSampleTaxaAbundancies == 0])
@@ -139,7 +135,6 @@ class Diversity:
     #@return ndarray A condensed distance matrix
     @staticmethod
     def getBrayCurtisDissimilarity(tempSampleTaxaAbundancies=None):
-        #Validate data
 
         #Calculate metric
         try:
