@@ -34,7 +34,7 @@ class MicropitaPaperCollectionCurve:
     c_UseDiversityMetrics = "Diversity"
     c_UseTopRankedMethods = "TopRanked"
 
-    def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxYMetric, dictdDiversityBaseline, strMetric, fInvert):
+    def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxYMetric, dictdMinYMetric, dictdDiversityBaseline, strMetric, fInvert):
         font = {'family':'arial',
            'color':'k',
            'weight':'normal',
@@ -71,7 +71,13 @@ class MicropitaPaperCollectionCurve:
         for iCount in dictdMaxYMetric:
             liX.append(iCount)
             liY.append(dictdMaxYMetric[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Maximum "+strMetric)
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Average Max "+strMetric)
+
+        #Plot min y metric
+        for iCount in dictdMinYMetric:
+            liX.append(iCount)
+            liY.append(dictdMinYMetric[iCount])
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="-", linestyle='--', label = "Average Min "+strMetric)
 
         #Update range
         iYMin = min(liY)
@@ -202,7 +208,7 @@ def _main( ):
     c_strMetricCategory = mCC.c_UseDiversityMetrics
 
     #Diversity metric
-    lsDiversityRunMetrics = [microPITA.c_INV_SIMPSON_A_DIVERSITY,microPITA.c_CHAO1_A_DIVERSITY]
+    lsDiversityRunMetrics = [microPITA.c_INV_SIMPSON_A_DIVERSITY]#,microPITA.c_CHAO1_A_DIVERSITY]
 
     #Manage the cases where there are no or 1 selection file given
     if args.strSelectionFiles == None:
@@ -332,7 +338,9 @@ def _main( ):
                         dictCurMetric[iSelectionCount].append(lMetric[1])
 
         #Most diverse set of samples at each N
-        dictdDiverseSamplesAtN = dict()
+        dictdMostDiverseSamplesAtN = dict()
+        #Least diverse set of samples at each N
+        dictdLeastDiverseSamplesAtN = dict()
         #Booststrapped diversity level at N
         dictdBootstrappedDiversityAtN = dict()
 
@@ -352,10 +360,13 @@ def _main( ):
                     #Average the list of metrics
                     dictMethodMetric[strN] = sum(lsMethodMetricByN)/float(len(lsMethodMetricByN))
 
-                    #Get Most diverse sample per N
-                    if strN not in dictdDiverseSamplesAtN:
-                        ldTopSamples = sorted(lStudyMetrics)[-1*int(strN):]
-                        dictdDiverseSamplesAtN[strN] = sum(ldTopSamples)/float(len(ldTopSamples))
+                    #Get Most and least diverse sample per N
+                    if strN not in dictdMostDiverseSamplesAtN:
+                        lSortedStudyMetrics = sorted(lStudyMetrics)
+                        ldTopSamples = lSortedStudyMetrics[-1*int(strN):]
+                        ldBottomSamples = lSortedStudyMetrics[0:int(strN)]
+                        dictdMostDiverseSamplesAtN[strN] = sum(ldTopSamples)/float(len(ldTopSamples))
+                        dictdLeastDiverseSamplesAtN[strN] = sum(ldBottomSamples)/float(len(ldBottomSamples))
 
                     #Get bootstrapped diversity at a level N
                     if strN not in dictdBootstrappedDiversityAtN:
@@ -367,7 +378,7 @@ def _main( ):
         strPlotName = Constants.PATH_SEP.join([strPlotName,strRunMetric+"-"+strPlotNamePieces[-1:][0]])
 
         #Plot line graph
-        mCC.funcPlotCollectionCurve(strPlotName=strPlotName, dictMethods=dictMetricsBySampleN, dictdMaxYMetric=dictdDiverseSamplesAtN, dictdDiversityBaseline=dictdBootstrappedDiversityAtN, strMetric=strRunMetric, fInvert = fInvert)
+        mCC.funcPlotCollectionCurve(strPlotName=strPlotName, dictMethods=dictMetricsBySampleN, dictdMaxYMetric=dictdMostDiverseSamplesAtN, dictdMinYMetric=dictdLeastDiverseSamplesAtN, dictdDiversityBaseline=dictdBootstrappedDiversityAtN, strMetric=strRunMetric, fInvert = fInvert)
 
     logging.info("Stop MicropitaPaperCollectionCurve")
 
