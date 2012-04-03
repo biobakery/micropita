@@ -144,6 +144,24 @@ class PCoA:
 
     #@params tempPlotName A valid file path to save the image of the plot
     def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempLegendLocation="upper right", tempInvert=False):
+        print("--plot")
+        print("tempPlotName")
+        print(tempPlotName)
+        print("tempColorGrouping")
+        print(tempColorGrouping)
+        print("tempShape")
+        print(tempShape)
+        print("tempLabels")
+        print(tempLabels)
+        print("tempShapeLabels")
+        print(tempShapeLabels)
+        print("tempShapeSize")
+        print(tempShapeSize)
+        print("tempLegendLocation")
+        print(tempLegendLocation)
+        print("tempInvert")
+        print(tempInvert)
+
         if(not self.pcoa == None):
             #Get point count
             adPoints = self.pcoa.getPoints()
@@ -165,12 +183,24 @@ class PCoA:
             if(ValidateData.isValidList(tempColorGrouping)):
               if not len(tempColorGrouping) == iPointCount:
                 print("Error, the list of colors was given but was not the same size as the points so nothing was plotted.")
+                print("tempColorGrouping")
+                print(tempColorGrouping)
+                print("iPointCount")
+                print(iPointCount)
+                print("len adPoints")
+                print(len(adPoints))
                 return
 
             #Check sizes
             if(ValidateData.isValidList(tempShapeSize)):
               if not len(tempShapeSize) == iPointCount:
                 print("Error, the list of sizes was given but was not the same size as the points so nothing was plotted.")
+                print("tempShapeSize")
+                print(tempShapeSize)
+                print("iPointCount")
+                print(iPointCount)
+                print("len adPoints")
+                print(len(adPoints))
                 return
 
             #Get plot object
@@ -281,14 +311,12 @@ class PCoA:
     #Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
     #charForceShapes if set, automatic shapes will not occur
     #Currently can only be a char (forcing effects all markers equally)
-    def plotList(self,lsLabelList, strName, asFilePathPieces, iSize, charForceColor=None, charForceShape=None, fInvert=False):
-
+    def plotList(self,lsLabelList, strOutputFileName, iSize, charForceColor=None, charForceShape=None, fInvert=False):
+        print("--plotlist")
         print("lsLabelList")
         print(lsLabelList)
-        print("strName")
-        print(strName)
-        print("asFilePathPieces")
-        print(asFilePathPieces)
+        print("strOutputFileName")
+        print(strOutputFileName)
         print("iSize")
         print(iSize)
         print("charForceColor")
@@ -321,39 +349,44 @@ class PCoA:
         if charForceColor == None:
             #Get colors based on labels
             atupldColors = [PCoA.RGBToHex(cm.jet(float(iUniqueValueIndex)/float(iCountUniqueValues))) for iUniqueValueIndex in xrange(0,iCountUniqueValues)]
+            #Make sure generated colors are unique
+            if not iCountUniqueValues == len(set(atupldColors)):
+                logging.error("PCoA.plotList. Generated colors were not unique for each unique label value.")
+                logging.error("Labels")
+                logging.error(lsLabelList)
+                logging.error(len(lsLabelList))
+                logging.error("Unique Labels")
+                logging.error(set(lsLabelList))
+                logging.error(len(set(lsLabelList)))
+                logging.error("Colors")
+                logging.error(atupldColors)
+                logging.error(len(atupldColors))
+                logging.error("Unique Colors")
+                logging.error(set(atupldColors))
+                logging.error(len(set(atupldColors)))
+                return False
             #Make label coloring
             atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
         #If the coloring is forced, color so it is based on the charForcedColor list
         elif(ValidateData.isValidList(charForceColor)):
             atupldLabelColors = charForceColor[0]
-            if not len(lsLabelList) == len(charForceColor[1]):
+            if not len(lsLabelList) == len(atupldLabelColors):
                 logging.error("PCoA.plotList. Label and forced color lengths were not the same.")
-                logging.debug("Labels")
-                logging.debug(lsLabelList)
-                logging.debug(len(lsLabelList))
-                logging.debug("Forced Colors")
-                logging.debug(charForceColor)
-                logging.debug(charForceColor[1])
-                logging.debug(len(charForceColor[1]))
+                logging.error("Labels")
+                logging.error(lsLabelList)
+                logging.error(len(lsLabelList))
+                logging.error("Forced Colors")
+                logging.error(charForceColor[0])
+                logging.error(len(charForceColor[0]))
                 return False
             lsLabelList = [ "".join([charForceColor[1][iLabelIndex], "_", lsLabelList[iLabelIndex]]) for iLabelIndex in xrange(0,len(charForceColor[1]))]
         #If the color is forced but the color does not vary, color all markers are the same.
         else:
             atupldLabelColors = charForceColor
 
-        #Check to make sure unique colors are returned
-        if(ValidateData.isValidList(atupldLabelColors)):
-            if not len(acharUniqueValues)==len(list(set(atupldLabelColors))):
-                logging.error("PCoA.plotList. Non-uniques colors were generated for "+strName)
-                logging.debug("Labels")
-                logging.debug(lsLabelList)
-                logging.debug("Colors")
-                logging.debug(atupldLabelColors)
-                return False
-
         logging.debug("lsLabelList")
         logging.debug(lsLabelList)
-        self.plot(tempPlotName="".join([asFilePathPieces[0],"-metadata-",strName,asFilePathPieces[1]]), tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
+        self.plot(tempPlotName=strOutputFileName, tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
 
 
     #TODO put in utilities

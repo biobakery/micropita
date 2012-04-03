@@ -26,7 +26,7 @@ from PCoA import PCoA
 from ValidateData import ValidateData
 
 #Set up arguments reader
-argp = argparse.ArgumentParser( prog = "MicropitaPaperStratifiedPCoA.py", description = """Creates PCoA plots for stratified MicroPITA results.""" )
+argp = argparse.ArgumentParser( prog = "MicropitaPaperStratifiedPCoA.py", description = """Creates PCoA plots for stratified MicroPITA results (Both supervised and unsupervised).""" )
 #Arguments
 #Logging
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
@@ -40,6 +40,8 @@ argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadata, dest="s
                   help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp)
+argp.add_argument(Constants_Arguments.c_strPredictFilePath, dest = "sSVMPrediction", action = "store", default=None,
+	help = Constants_Arguments.c_strPredictFilePathHelp)
 #Abundance file
 argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Select file
@@ -75,6 +77,10 @@ def _main( ):
     c_fInvert = (args.fInvert == "True")
     c_Normalize = (args.fNormalize == "True")
 
+    #Color manager
+    objColors = Constants_Figures()
+    objColors.invertColors(fInvert=c_fInvert)
+
     #Read abundance file
     #Abundance table object to read in and manage data
     rawData = AbundanceTable()
@@ -93,6 +99,19 @@ def _main( ):
     #Make distance matrix
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
+    #Read in prediction file is supplied
+    lsPredictions = list()
+    if(not args.sSVMPrediction in [None, "None", "none"]):
+        fHndlInput = open(args.sSVMPrediction,'r')
+        strSVMSelection = fHndlInput.read()
+        fHndlInput.close()
+
+        #Make a list of predictions
+        for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
+            lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
+            lsPredictions.append(lsPredictElements[0])
+        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,fInvert=c_fInvert)
+
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
     for strSelectionMethod in lstrSelection:
@@ -103,8 +122,6 @@ def _main( ):
 
         #Color for selected samples in PCoA based on selection method
         charSelectedColor = ""
-        objColors = Constants_Figures()
-        objColors.invertColors(fInvert=c_fInvert)
         astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
         charSelectedColor = objColors.dictConvertMethodToHEXColor[astrSelectionMethod[0]]
 
@@ -122,7 +139,9 @@ def _main( ):
                 acharSelection.append(c_NotSelected)
 
         #Draw Stratified PCoA
-        analysis.plotList(lsLabelList=metadata[args.strUnsupervisedStratify],strName="-".join([args.strUnsupervisedStratify,astrSelectionMethod[0]]),asFilePathPieces=asFilePathPieces,iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
+        analysis.plotList(lsLabelList=metadata[args.strUnsupervisedStratify],
+                          strOutputFileName="-".join([asFilePathPieces[0],args.strUnsupervisedStratify,astrSelectionMethod[0],asFilePathPieces[1]]),
+                          iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperStratifiedPCoA")
 

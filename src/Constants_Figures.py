@@ -62,7 +62,9 @@ class Constants_Figures():
     #PCOA related
     c_charNoSelect = "#FFFFFF" # White
     c_charPCOAShape = "o"
+    c_charPCOAMultSelectColor = "#CCCCCC"
     c_charPCOAMultSelectionShape = "+"
+    c_strPCOAMultSelectionName = "Multiple Selection"
 
     def invertColors(self,fInvert):
         if fInvert==True:

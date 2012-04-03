@@ -61,6 +61,7 @@ def _main( ):
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start MicropitaPaperPCoA")
+    print(args)
 
     #Analysis object
     analysis = PCoA()
@@ -100,7 +101,7 @@ def _main( ):
     iMetadataIndex = 0
 
     for asMetadata in metadata:
-      analysis.plotList(lsLabelList=asMetadata,strName=str(iMetadataIndex),asFilePathPieces=asFilePathPieces,iSize=c_shapeSize,charForceColor='k',fInvert=c_fInvert)
+      analysis.plotList(lsLabelList=asMetadata,strOutputFileName=str(iMetadataIndex),iSize=c_shapeSize,charForceColor='k',fInvert=c_fInvert)
       iMetadataIndex = iMetadataIndex + 1
 
     #Read in prediction file is supplied
@@ -114,7 +115,7 @@ def _main( ):
         for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
             lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
             lsPredictions.append(lsPredictElements[0])
-        analysis.plotList(lsPredictions[1:],"SVMPredictions",asFilePathPieces,c_shapeSize,fInvert=c_fInvert)
+        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,fInvert=c_fInvert)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
@@ -146,9 +147,11 @@ def _main( ):
 
         #Draw PCoA
         if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
-          analysis.plotList(lsLabelList=lsPredictions[1:],strName=astrSelectionMethod[0],asFilePathPieces=asFilePathPieces,iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
+          analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]),
+              iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
         else:
-          analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors, tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
+          analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors,
+              tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
 
     logging.info("Stop MicropitaPaperPCoA")
 

@@ -478,7 +478,7 @@ class MicroPITA:
             #Save average rank by sample name
             if(not countRank == 0):
                 sampleRankAverages.append([name,sumRank/countRank])
-                print([name,sumRank/countRank])
+#                print([name,sumRank/countRank])
             else:
                 logging.error("".join(["MicroPITA.getAverageRanksSamples. Found no taxa for sample=",str(name)]))
 
