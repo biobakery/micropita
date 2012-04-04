@@ -53,7 +53,7 @@ class SVM:
     c_KEYWORD_SCALED_FILE = "SCALED"
     c_KEYWORD_RANGE_FILE = "RANGE"
     c_KEYWORD_CV_OUT_FILE = "CV_OUT"
-    c_KEYWORD_CV_PNG_FILE = "CV_PNG"
+#    c_KEYWORD_CV_PNG_FILE = "CV_PNG"
     c_KEYWORD_MODEL_FILE = "MODEL"
     c_KEYWORD_PREDICTION_SCALED_FILE = "SCALED_FOR_PREDICTION"
     c_KEYWORD_PREDICTION_FILE = "PREDICTION"
@@ -81,7 +81,7 @@ class SVM:
             return False
 
         #TODO Need to validate
-        costList = tempLogC.split(",")
+        costList = [filter(None,strPiece) for strPiece in tempLogC.split(",")]
 
         #Create output file names
         inputFile = Constants.QUOTE+tempInputFileName+Constants.QUOTE
@@ -92,13 +92,13 @@ class SVM:
             scaledFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALED_FILE_EXT,Constants.QUOTE])
             rangeFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALING_PARAMETERS,Constants.QUOTE])
             cvOutFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_FILE_EXT,Constants.QUOTE])
-            cvImageFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_IMAGE_EXT,Constants.QUOTE])
+#            cvImageFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_IMAGE_EXT,Constants.QUOTE])
             modelFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_MODEL_FILE_EXT,Constants.QUOTE])
         else:
             scaledFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALED_FILE_EXT,Constants.QUOTE])
             rangeFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALING_PARAMETERS,Constants.QUOTE])
             cvOutFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_FILE_EXT,Constants.QUOTE])
-            cvImageFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_IMAGE_EXT,Constants.QUOTE])
+#            cvImageFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_IMAGE_EXT,Constants.QUOTE])
             modelFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_MODEL_FILE_EXT,Constants.QUOTE])
 
         #Dict contains generated files for return value and later reference
@@ -120,7 +120,7 @@ class SVM:
             generatedFiles[self.c_KEYWORD_RANGE_FILE] = rangeFile.strip(Constants.QUOTE)
         
         #Cross validate for the c and g parameters
-        #If scaling was used, use the scaled file, otherwise use the orginal file.
+        #If scaling was used, use the scaled file, otherwise use the original file.
         if((tempScaling == -1)or(tempScaling == 0)):
             #Indicate file to perform CV on
             cv_file = scaledFile
@@ -164,7 +164,7 @@ class SVM:
         generatedFiles[self.c_COST_VALUE] = str(math.log(bestCost,2))
         generatedFiles[self.c_ACCURACY] = str(highestAccuracy)
         generatedFiles[self.c_KEYWORD_CV_OUT_FILE] = cvOutFile.strip(Constants.QUOTE)
-        generatedFiles[self.c_KEYWORD_CV_PNG_FILE] = cvImageFile.strip(Constants.QUOTE)
+#        generatedFiles[self.c_KEYWORD_CV_PNG_FILE] = cvImageFile.strip(Constants.QUOTE)
 
         #Create model
         if(tempProbabilistic):

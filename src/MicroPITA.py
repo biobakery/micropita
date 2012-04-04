@@ -18,6 +18,7 @@ from AbundanceTable import AbundanceTable
 import argparse
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
+import csv
 from Diversity import Diversity
 from FileIO import FileIO
 import logging
@@ -660,6 +661,12 @@ class MicroPITA:
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
         rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=iSampleNameRow, tempFirstDataRow=iFirstDataRow, tempNormalize=False)
 
+        #If there is only 1 unique value for the labels, do not run the Supervised methods
+        if len(set(metadata[strLabel])) < 2:
+            c_RUN_DISCRIMINANT = False
+            c_RUN_DISTINCT = False
+            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+metadata[strLabel]))
+
         logging.debug(" ".join(["Micropita:run.","Received metadata=",str(metadata)]))
         print(" ".join(["Micropita:run.","Received metadata=",str(metadata)]))
 
@@ -886,19 +893,27 @@ class MicroPITA:
             #Run linear SVM
             svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[strLabel], tempFirstDataRow=iFirstDataRow, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
             #Read in prediction file and select samples
-            #Selecting samples most ambiguous to all hyperplanes
             if(not svmRelatedData == False):
-                #TODO make the constants static so this doesnt happen
-                if(SVM().c_KEYWORD_PREDICTION_FILE in svmRelatedData):
-                    predictionFile = svmRelatedData[SVM().c_KEYWORD_PREDICTION_FILE]
-                    
+                if(SVM.c_KEYWORD_PREDICTION_FILE in svmRelatedData):
+                    #Get prediction file path
+                    predictionFile = svmRelatedData[SVM.c_KEYWORD_PREDICTION_FILE]
+                    #Get the input file for the SVMS which has the original labels before classification
+                    strSVMInputFile = svmRelatedData[SVM.c_KEYWORD_INPUT_FILE]
+                    #Holds labels to compare to the predictions
+                    lsOriginalLabels = None
+                    #Open input file and get labels to compare to the predictions
+                    with open(strSVMInputFile,'r') as f:
+                        reader = csv.reader(f, delimiter=Constants.WHITE_SPACE, quoting=csv.QUOTE_NONE)
+                        lsOriginalLabels = [row[0] for row in reader]
+
                     #TODO test selection of samples
                     #Read in file
                     readIn = FileIO(predictionFile,True,False,False)
                     predictionLists = readIn.readFullFile()
                     readIn.close()
-                    predictionLists = predictionLists.split(Constants.ENDLINE)
-                    #Get label count (meaning the number of label categories)
+                    predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(Constants.ENDLINE)]
+
+                    #Get label count (meaning the number of label categories)(-1 to not count the predicted first entry)
                     labelCount = len(predictionLists[0].split(Constants.WHITE_SPACE))-1
                     #Central probability
                     centralProbability = 1.0 / float(labelCount)
@@ -908,23 +923,34 @@ class MicroPITA:
                     #For each line in the file subtract all but the first item from the central value
                     #The first item being the header line not a row of probabilities
                     #Selected_label prob_for_label1 prob_ForLabel2....
-                    for lineIndex in xrange(1,len(predictionLists)-1):
+                    #Remove prediction label header
+                    predictionLists = predictionLists[1:]
+                    for lineIndex in xrange(0,len(predictionLists)):
+
                         #Split line into elements by whitespace and remove first element (the label)
                         lineElements = predictionLists[lineIndex]
+                        #Skip blank entries
+                        if lineElements.strip() == '':
+                            continue
+
+                        #Get label and probabilities
                         lineElements = lineElements.split(Constants.WHITE_SPACE)
                         iCurLabel = str(lineElements[0])
                         lineElements = lineElements[1:]
 
-                        #Sum the absolute values of the differences
-                        #Store the index and the summed absolute differences
-                        deviation = 0
-                        for prediction in lineElements:
-                            deviation += math.pow((float(prediction)-centralProbability),2)
-                        if(not iCurLabel in centralDeviation):
-                            centralDeviation[iCurLabel] = []
-                        curSVMData = centralDeviation[iCurLabel]
-                        curSVMData.append([deviation,lineIndex,iCurLabel])
-                        centralDeviation[iCurLabel] = curSVMData
+                        #Only work with samples that are correctly predicted
+                        if iCurLabel == lsOriginalLabels[lineIndex]:
+
+                            #Sum the absolute values of the differences
+                            #Store the index and the deviation from the central probability
+                            deviation = 0
+                            for prediction in lineElements:
+                                deviation += math.pow((float(prediction)-centralProbability),2)
+                            if(not iCurLabel in centralDeviation):
+                                centralDeviation[iCurLabel] = []
+                            curSVMData = centralDeviation[iCurLabel]
+                            curSVMData.append([deviation,lineIndex,iCurLabel])
+                            centralDeviation[iCurLabel] = curSVMData
 
                     #Sort sample by summed absolute deviations from the center and take the top N indexes
                     for scurKey in centralDeviation:
@@ -935,7 +961,7 @@ class MicroPITA:
                     selectedSamplesIndicesFar = list()
                     #If the amount of samples needed are greater than what was analyzed with the SVM,
                     #Return them all for both far and near.
-                    #Get the samples closes to hyperplanestrUserDefinedTaxaFile
+                    #Get the samples closes to hyperplane
                     #Get samples farthest from hyperplane
                     #Make this balanced to the labels so for each sample label select the sampleSVMSelectionCount count of samples
                     for scurKey in centralDeviation:
@@ -949,18 +975,17 @@ class MicroPITA:
                             selectedSamplesIndicesClose.extend([measurement[1] for measurement in lcurDeviations[0:sampleSVMSelectionCount]])
                             selectedSamplesIndicesFar.extend([measurement[1] for measurement in lcurDeviations[(iLengthCurDeviations-sampleSVMSelectionCount):iLengthCurDeviations]])
                     #Take indicies and translate to sample names
-                    #TODO A little scary, requires no one mess with the sampleNames...maybe a different way to do this?
                     #Select close to hyperplane
                     if(c_RUN_DISCRIMINANT):
                         SVMSamples = list()
                         for selectedSampleIndex in selectedSamplesIndicesClose:
-                            SVMSamples.append(sampleNames[selectedSampleIndex-1])
+                            SVMSamples.append(sampleNames[selectedSampleIndex])
                         selectedSamples[microPITA.c_SVM_CLOSE]=SVMSamples
                     #Select far from hyperplane
                     if(c_RUN_DISTINCT):
                         SVMSamples = list()
                         for selectedSampleIndex in selectedSamplesIndicesFar:
-                            SVMSamples.append(sampleNames[selectedSampleIndex-1])
+                            SVMSamples.append(sampleNames[selectedSampleIndex])
                         selectedSamples[microPITA.c_SVM_FAR]=SVMSamples
 
         logging.info("Selected Samples 6")
