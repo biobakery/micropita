@@ -118,6 +118,7 @@ class Constants_Arguments():
     c_genericOutputFigureFileHelp = "The generated output figure."
     c_genericOutputDataFileHelp = "The generated output data file."
     c_genericTMPDirLocationHelp = "Directory to place temporary and intermediate files."
+    c_strMicropitaActualFileHelp = "A file containing indications of how in silico samples were actually intended on being sampled by sampling methods."
     c_strMicropitaSelectFileHelp = "A file containing the samples selected which will be visualized."
     c_strSelectionMethodsHelp = "Select techniques listed one after another."
 

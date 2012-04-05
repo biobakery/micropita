@@ -23,34 +23,34 @@ c_NormalizePCOA = "False"
 c_strPCOAMovieEnding = "/PCOA.avi"
 c_strStratPCOAMovieEnding = "/Strat-PCOA.avi"
 c_strCladogramMovieEnding = "/Cladogram.avi"
+c_strSufCircCircle = ".CCircle"
+c_strSufCircColor = ".CColor"
+c_strSufCircHighlight = ".CHLight"
+c_strSufCircSize = ".CSize"
+c_strSufCircStyle = ".CStyle"
+c_strSufCircStyleInv = "-invert.CStyle"
+c_strSufCircTaxa = ".CTaxa"
+c_strSufCircTick = ".CTick"
 c_strSufCollectionCurveFigure = "-ColCurv.png"
 c_strSufCollectionCurveText = "-ColCurv.txt"
 c_strSufCombinedPCOA = "-Combined.png"
-c_strSufSelectedTaxa = ".taxa"
-c_strSufPng = ".png"
-c_strSufPCOA = "-PCoA.png"
 c_strSufCombinedStratPCOA = "-Combined-StratPCoA.png"
-c_strSufStratPCOA = "-StratPCoA.png"
-c_strSufHCLUSTData = ".HCLData"
-c_strSufStratHCLUSTColor = "-Strat.HCLColor"
-c_strSufHCLUSTColor = ".HCLColor"
-c_strSufStratHCLUSTLabel = "-Strat.HCLLabel"
-c_strSufHCLUSTLabel = ".HCLLabel"
-c_strSufStratHCLUSTFig = "-StratHCL.png"
-c_strSufHCLUSTFig = "-SHCL.png"
-c_strSufInsilicoData = ".txt"
-c_strSufFig2 = "-Fig2.png"
-c_strSufCircTaxa = ".CTaxa"
-c_strSufCircColor = ".CColor"
-c_strSufCircSize = ".CSize"
-c_strSufCircStyle = ".CStyle"
-c_strSufCircTick = ".CTick"
-c_strSufCircHighlight = ".CHLight"
-c_strSufCircCircle = ".CCircle"
 c_strSufConfig = ".config"
-c_strSufCircStyleInv = "-invert.CStyle"
+c_strSufConfusionMatrix = "-Confusion.png"
+c_strSufFig2 = "-Fig2.png"
+c_strSufHCLUSTColor = ".HCLColor"
+c_strSufHCLUSTData = ".HCLData"
+c_strSufInsilicoData = ".txt"
 c_strSufMicropita = ".txt"
+c_strSufOverlapMatrix = "-overlap.png"
+c_strSufPCOA = "-PCoA.png"
+c_strSufPng = ".png"
 c_strSufPredict = "-SVM.predict"
+c_strSufSelectedTaxa = ".taxa"
+c_strSufStratHCLUSTColor = "-Strat.HCLColor"
+c_strSufStratHCLUSTFig = "-StratHCL.png"
+c_strSufStratHCLUSTLabel = "-Strat.HCLLabel"
+c_strSufStratPCOA = "-StratPCoA.png"
 
 #Data files to generate
 c_strInsilicoDataDiversity = "DiversityTest"+c_strSufInsilicoData
@@ -79,6 +79,7 @@ c_strAbundanceIDCol = "0"
 c_strConfigAbundanceFilter = "[Abundance Filter]"
 c_strConfigAbundanceFilterPercentile = "[Abundance Filter Percentile]"
 c_strConfigAbundanceFilterPercent = "[Abundance Filter Percent Above Percentile]"
+c_strConfigActualFile = "[File Containing Actual Classes of Samples if Known]"
 c_strConfigCladeFilter = "[Clade Filter]"
 c_strConfigCladeFilterMeasure = "[Clade Level to Measure]"
 c_strConfigCladeFilterLevel = "[Clade Level to Filter]"
@@ -119,23 +120,24 @@ c_progHCL = "../../external/hclust/hclust.py"
 #Src Code
 c_fileProgAbundanceTable = File( sfle.d( fileDirSrc, "AbundanceTable.py" ) )
 c_fileProgCladogram = File( sfle.d( fileDirSrc, "Cladogram.py" ) )
+c_fileProgCombinedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCombinedPCoA.py") )
+c_fileProgCombinedStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCombinedStratifiedPCoA.py" ) )
 c_fileProgCommandLine = File( sfle.d( fileDirSrc, "CommandLine.py" ) )
+c_fileProgCollectionCurveFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCollectionCurve.py") )
+c_fileProgConfusionMatrixFigure = File( sfle.d( fileDirSrc, "MicropitaPaperConfusionMatrix.py") )
 c_fileProgConstants = File( sfle.d( fileDirSrc, "Constants.py" ) )
 c_fileProgConstantsFigures = File( sfle.d( fileDirSrc, "Constants_Figures.py" ) )
 c_fileProgDiversity = File( sfle.d( fileDirSrc, "Diversity.py" ) )
 c_fileProgFileIO = File( sfle.d( fileDirSrc, "FileIO.py" ) )
 c_fileProgMencoder = File("/usr/bin/mencoder")
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
-c_fileProgCollectionCurveFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCollectionCurve.py") )
-c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
-c_fileProgCombinedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCombinedPCoA.py") )
-c_fileProgCombinedStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperCombinedStratifiedPCoA.py" ) )
-c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
-c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
-c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
-c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratSelectionHCL.py" ) )
 c_fileProgMLPYDistanceAdaptor = File( sfle.d( fileDirSrc, "MLPYDistanceAdaptor.py" ) )
 c_fileProgPCOA = File( sfle.d( fileDirSrc, "PCoA.py" ) )
+c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
+c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
+c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
+c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
+c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratSelectionHCL.py" ) )
 c_fileProgSVM = File( sfle.d( fileDirSrc, "SVM.py" ) )
 c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSets.py" ) )
 c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
@@ -211,6 +213,22 @@ def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
     strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
     return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, c_progHCLPath, strData, strColor, strLabel, strT])
   return funcHCLSelectionRet
+
+#Visualize selected output with Confusion matrix (Figure 1B Alt 1)
+def funcConfusionMatrix( strLoggingLevel, strInvert ):
+  def funcConfusionMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strSelection, strActualFile = astrSs[0], astrSs[1], astrSs[2]
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strActualFile, strT])
+  return funcConfusionMatrixRet
+
+#Visualize selected output with Overap Matrix (Figure 1B Alt 2)
+def funcOverlapMatrix( strLoggingLevel, strInvert ):
+  def funcOverlapMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strSelection = astrSs[0], astrSs[1]
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strT])
+  return funcOverlapMatrixRet
 
 #Visualize selected output with Cladogram (Figure 2)
 def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
@@ -434,9 +452,9 @@ for fileConfigMicropita in lMicropitaFiles:
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( File(sAbundanceFileName), c_strSufMicropita, c_strSufPredict )))
 
     #Make files from the micropita output file
-    sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
+    sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
     sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
-    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufHCLUSTData,c_strSufHCLUSTColor,
+    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufConfusionMatrix,c_strSufOverlapMatrix,c_strSufHCLUSTData,c_strSufHCLUSTColor,
     c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
 
     #Make more files, these for cladogram options
@@ -495,6 +513,18 @@ for fileConfigMicropita in lMicropitaFiles:
     #Selection of samples by selection method
     Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
         funcHCLSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
+
+    #Create alt figure 1B overlapp matrix
+    Command(sOutputFigure1BOverlap, [c_fileProgOverlapMatrixFigure, sMicropitaOutput] + ls_srcFig1, 
+        funcOverlapMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
+
+    #Do not generate the confusion and overlap matrices on data without a file defining the actual classes.
+    if not sFileConfiguration[c_strConfigActualFile].lower() == "none"
+
+        #Create alt figure 1B confusion matrix
+        #Selection of samples by selection method
+        Command(sOutputFigure1BConfusion, [c_fileProgConfusionMatrixFigure, sMicropitaOutput, sActualDataClassesFile] + ls_srcFig1, 
+            funcConfusionMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
 
     #Create a cladogram figure 2
     #Manage files which are optional

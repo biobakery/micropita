@@ -24,7 +24,7 @@ class PlotMatrix:
 
   #Given a matrix and labels consistent to the matrix, plot a confustion matrix
   @staticmethod
-  def funcPlotMatrix(npMatrix, lsLabels, strOutputFigurePath, strPredictedTitle="Predicted", strActualTitle="Actual", fFlipYLabels=False):
+  def funcPlotMatrix(npMatrix, lsLabels, strOutputFigurePath, strXTitle="X Axis", strYTitle="Y Axis", fFlipYLabels=False, fInvert=False):
 
     plt.clf()
     figConfusionMatrix = plt.figure()
@@ -53,8 +53,8 @@ class PlotMatrix:
     objAxis.yaxis.set_ticklabels(lNewYLabels)
 
     #Set axis titles
-    ylabel(strActualTitle)
-    plt.suptitle(strPredictedTitle)
+    ylabel(strYTitle)
+    plt.suptitle(strXTitle)
 
     #Plot matrix values
     objPlot = objAxis.imshow(np.array(npMatrix), cmap=cm.jet, interpolation='nearest')
@@ -72,5 +72,5 @@ class PlotMatrix:
 
 #npMatrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]
 #lsLabels = ["Label 1","Label 2","Label 3","Label 4"]
-#strOutputPath = "confmat.png"
+#strOutputPath = "confusion.png"
 #PlotMatrix.funcPlotMatrix(npMatrix, lsLabels, strOutputPath, fFlipYLabels=True)
