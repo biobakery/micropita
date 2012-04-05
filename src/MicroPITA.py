@@ -668,7 +668,6 @@ class MicroPITA:
             logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+metadata[strLabel]))
 
         logging.debug(" ".join(["Micropita:run.","Received metadata=",str(metadata)]))
-        print(" ".join(["Micropita:run.","Received metadata=",str(metadata)]))
 
         sampleSelectionCount = iSampleSelectionCount
         sampleSVMSelectionCount = iSupervisedSampleCount
@@ -726,7 +725,7 @@ class MicroPITA:
         #For each stratified abundance block or for the unstratfified abundance
         #Run the unsupervised blocks
         for abundanceBlockValue in dictAbundanceBlocks:
-            print("Running abundance block:"+abundanceBlockValue)
+            logging.info("Running abundance block:"+abundanceBlockValue)
             abundance = dictAbundanceBlocks[abundanceBlockValue]
             #Get sample names excluding the taxa id column name
             sampleNames = abundance.dtype.names[1:]
@@ -917,6 +916,8 @@ class MicroPITA:
                     labelCount = len(predictionLists[0].split(Constants.WHITE_SPACE))-1
                     #Central probability
                     centralProbability = 1.0 / float(labelCount)
+                    logging.debug("centralProbability")
+                    logging.debug(centralProbability)
                     #Create and array to hold difference of the samples probabilities from the central probability
                     centralDeviation = dict()
 
@@ -926,6 +927,8 @@ class MicroPITA:
                     #Remove prediction label header
                     predictionLists = predictionLists[1:]
                     for lineIndex in xrange(0,len(predictionLists)):
+                        logging.debug("lineIndex")
+                        logging.debug(lineIndex)
 
                         #Split line into elements by whitespace and remove first element (the label)
                         lineElements = predictionLists[lineIndex]
@@ -939,8 +942,12 @@ class MicroPITA:
                         lineElements = lineElements[1:]
 
                         #Only work with samples that are correctly predicted
+                        logging.debug("iCurLabel")
+                        logging.debug(iCurLabel)
+                        logging.debug("lsOriginalLabels[lineIndex]")
+                        logging.debug(lsOriginalLabels[lineIndex])
                         if iCurLabel == lsOriginalLabels[lineIndex]:
-
+                            logging.debug("Correctly predicted")
                             #Sum the absolute values of the differences
                             #Store the index and the deviation from the central probability
                             deviation = 0
@@ -951,11 +958,15 @@ class MicroPITA:
                             curSVMData = centralDeviation[iCurLabel]
                             curSVMData.append([deviation,lineIndex,iCurLabel])
                             centralDeviation[iCurLabel] = curSVMData
+                            logging.debug("curSVMData")
+                            logging.debug(curSVMData)
 
                     #Sort sample by summed absolute deviations from the center and take the top N indexes
                     for scurKey in centralDeviation:
                         lcurLabeSamples = centralDeviation[scurKey]
                         centralDeviation[scurKey] = sorted(lcurLabeSamples, key=operator.itemgetter(0))
+                        logging.debug("centralDeviation[scurKey]")
+                        logging.debug(centralDeviation[scurKey])
 
                     selectedSamplesIndicesClose = list()
                     selectedSamplesIndicesFar = list()
@@ -974,6 +985,12 @@ class MicroPITA:
                         else:
                             selectedSamplesIndicesClose.extend([measurement[1] for measurement in lcurDeviations[0:sampleSVMSelectionCount]])
                             selectedSamplesIndicesFar.extend([measurement[1] for measurement in lcurDeviations[(iLengthCurDeviations-sampleSVMSelectionCount):iLengthCurDeviations]])
+                    logging.debug("selectedSamplesIndicesClose")
+                    logging.debug(selectedSamplesIndicesClose)
+                    logging.debug("selectedSamplesIndicesFar")
+                    logging.debug(selectedSamplesIndicesFar)
+                    logging.debug("sampleNames")
+                    logging.debug(sampleNames)
                     #Take indicies and translate to sample names
                     #Select close to hyperplane
                     if(c_RUN_DISCRIMINANT):
@@ -981,12 +998,16 @@ class MicroPITA:
                         for selectedSampleIndex in selectedSamplesIndicesClose:
                             SVMSamples.append(sampleNames[selectedSampleIndex])
                         selectedSamples[microPITA.c_SVM_CLOSE]=SVMSamples
+                        logging.debug("SVMSamples Close")
+                        logging.debug(SVMSamples)
                     #Select far from hyperplane
                     if(c_RUN_DISTINCT):
                         SVMSamples = list()
                         for selectedSampleIndex in selectedSamplesIndicesFar:
                             SVMSamples.append(sampleNames[selectedSampleIndex])
                         selectedSamples[microPITA.c_SVM_FAR]=SVMSamples
+                        logging.debug("SVMSamples Far")
+                        logging.debug(SVMSamples)
 
         logging.info("Selected Samples 6")
         logging.info(selectedSamples)

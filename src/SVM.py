@@ -18,6 +18,7 @@ from Constants import Constants
 from CommandLine import CommandLine
 from FileIO import FileIO
 import math
+import operator
 import os
 from ValidateData import ValidateData
 
@@ -82,24 +83,32 @@ class SVM:
 
         #TODO Need to validate
         costList = [filter(None,strPiece) for strPiece in tempLogC.split(",")]
+        costList = sorted(costList)
 
         #Create output file names
         inputFile = Constants.QUOTE+tempInputFileName+Constants.QUOTE
         fileNamePrefix = os.path.splitext(tempInputFileName)[0]
         fileNameBase = fileNamePrefix.split(Constants.PATH_SEP)[-1]
 
+        #Creat file names and delete of they exist
         if(tempTMPDirectory == None):
             scaledFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALED_FILE_EXT,Constants.QUOTE])
             rangeFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALING_PARAMETERS,Constants.QUOTE])
             cvOutFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_FILE_EXT,Constants.QUOTE])
-#            cvImageFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_IMAGE_EXT,Constants.QUOTE])
             modelFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_MODEL_FILE_EXT,Constants.QUOTE])
         else:
             scaledFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALED_FILE_EXT,Constants.QUOTE])
             rangeFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALING_PARAMETERS,Constants.QUOTE])
             cvOutFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_FILE_EXT,Constants.QUOTE])
-#            cvImageFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_IMAGE_EXT,Constants.QUOTE])
             modelFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_MODEL_FILE_EXT,Constants.QUOTE])
+        if os.path.exists(scaledFile):
+            os.remove(scaledFile)
+        if os.path.exists(rangeFile):
+            os.remove(rangeFile)
+        if os.path.exists(cvOutFile):
+            os.remove(cvOutFile)
+        if os.path.exists(modelFile):
+            os.remove(modelFile)
 
         #Dict contains generated files for return value and later reference
         generatedFiles = dict()
@@ -119,7 +128,7 @@ class SVM:
             generatedFiles[self.c_KEYWORD_SCALED_FILE] = scaledFile.strip(Constants.QUOTE)
             generatedFiles[self.c_KEYWORD_RANGE_FILE] = rangeFile.strip(Constants.QUOTE)
         
-        #Cross validate for the c and g parameters
+        #Cross validate for the c parameter
         #If scaling was used, use the scaled file, otherwise use the original file.
         if((tempScaling == -1)or(tempScaling == 0)):
             #Indicate file to perform CV on
@@ -128,6 +137,8 @@ class SVM:
             cv_file = inputFile
 
         #Perform cross validation
+        #Holds the cost and accuracy
+        lldCostAccuracy = []
         #Holds the highest cost
         bestCost = 0.0
         #Holds the associated accuracy
@@ -148,6 +159,7 @@ class SVM:
                 accuracy = False
                 break
 
+            lldCostAccuracy.append([cost,float(accuracy)])
             writeCrossValidationFile.writeToFile("".join(["Cost=",str(cost)," with ",str(accuracy),"% Cross Validation Accuracy\n"]))
 
             #Get best cost parameter
@@ -161,10 +173,19 @@ class SVM:
             print "".join(["Received error during cross validation on scaled file. Command=",cmd])
             return False
 
+        #Sort [cost, accuracy] by accuracy
+        lldCostAccuracy = sorted(lldCostAccuracy, key=operator.itemgetter(1))
+        #If the accuracy does not change
+        if len(lldCostAccuracy) > 1:
+            #If the accuracy does not change, use the middle entry for the c parameter,
+            #this assumes the c value are sorted in the function, of which they are.
+            #Otherwise leave best cost and accuracy as is
+            if lldCostAccuracy[0][1] == lldCostAccuracy[len(lldCostAccuracy)-1][1]:
+                bestCost,highestAccuracy = lldCostAccuracy[int(len(lldCostAccuracy)/2)]
+
         generatedFiles[self.c_COST_VALUE] = str(math.log(bestCost,2))
         generatedFiles[self.c_ACCURACY] = str(highestAccuracy)
         generatedFiles[self.c_KEYWORD_CV_OUT_FILE] = cvOutFile.strip(Constants.QUOTE)
-#        generatedFiles[self.c_KEYWORD_CV_PNG_FILE] = cvImageFile.strip(Constants.QUOTE)
 
         #Create model
         if(tempProbabilistic):
