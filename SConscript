@@ -23,6 +23,7 @@ c_NormalizePCOA = "False"
 c_strPCOAMovieEnding = "/PCOA.avi"
 c_strStratPCOAMovieEnding = "/Strat-PCOA.avi"
 c_strCladogramMovieEnding = "/Cladogram.avi"
+c_strSufActualData = "-actual.txt"
 c_strSufCircCircle = ".CCircle"
 c_strSufCircColor = ".CColor"
 c_strSufCircHighlight = ".CHLight"
@@ -40,6 +41,8 @@ c_strSufConfusionMatrix = "-Confusion.png"
 c_strSufFig2 = "-Fig2.png"
 c_strSufHCLUSTColor = ".HCLColor"
 c_strSufHCLUSTData = ".HCLData"
+c_strSufHCLUSTFig = "-SHCL.png"
+c_strSufHCLUSTLabel = ".HCLLabel"
 c_strSufInsilicoData = ".txt"
 c_strSufMicropita = ".txt"
 c_strSufOverlapMatrix = "-overlap.png"
@@ -132,6 +135,7 @@ c_fileProgFileIO = File( sfle.d( fileDirSrc, "FileIO.py" ) )
 c_fileProgMencoder = File("/usr/bin/mencoder")
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
 c_fileProgMLPYDistanceAdaptor = File( sfle.d( fileDirSrc, "MLPYDistanceAdaptor.py" ) )
+c_fileProgOverlapMatrixFigure = File( sfle.d( fileDirSrc, "MicropitaPaperOverlapMatrix.py" ) )
 c_fileProgPCOA = File( sfle.d( fileDirSrc, "PCoA.py" ) )
 c_fileProgPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperPCoA.py" ) )
 c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionCladogram.py") )
@@ -165,18 +169,27 @@ c_lsUnsupervisedMethods = set([c_strDiversity,c_strExtremeDissimilarity,c_strRan
 ##Start flow
 #Scripts to call
 ##Generate insilico data sets
-def funcGenerateData(strDataSetKey):
-  def funcGenerateDataRet( target, source, env, strDataSetKey=strDataSetKey ):
+def funcGenerateUnbalancedData(strDataSetKey):
+  def funcGenerateUnbalancedDataRet( target, source, env, strDataSetKey=strDataSetKey ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg = astrSs[0]
+    return sfle.ex( [strProg,strT,strDataSetKey, target[1].get_abspath()] )
+  return funcGenerateUnbalancedDataRet
+
+def funcGenerateDiversityData(strDataSetKey):
+  def funcGenerateDiversityDataRet( target, source, env, strDataSetKey=strDataSetKey ):
     strT, astrSs = sfle.ts( target, source )
     strProg = astrSs[0]
     return sfle.ex( [strProg,strT,strDataSetKey] )
-  return funcGenerateDataRet
+  return funcGenerateDiversityDataRet
 
 #Visualize insilico data
-def funcVisualizeInsilicoData( target, source, env ):
-  strT, astrSs, = sfle.ts( target, source )
-  strProg, strInputDataFile = astrSs[0], astrSs[1]
-  return sfle.ex([strProg, "--in", strInputDataFile, "--out", strT, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1",'--flabel',"1",'--font_size',"5"])
+def funcVisualizeInsilicoData( strXStart, strYStart ):
+  def funcVisualizeInsilicoDataRet( target, source, env, strXStart=strXStart, strYStart=strYStart ):
+    strT, astrSs, = sfle.ts( target, source )
+    strProg, strInputDataFile = astrSs[0], astrSs[1]
+    return sfle.ex([strProg, "--in", strInputDataFile, "--out", strT, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "--grid","1","--flabel","1","--font_size","5","--xstart",strXStart,"--ystart",strYStart])
+  return funcVisualizeInsilicoDataRet
 
 ##Call micropita to run
 def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify, strTaxaFile, lsSelectionMethods):
@@ -215,19 +228,19 @@ def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
   return funcHCLSelectionRet
 
 #Visualize selected output with Confusion matrix (Figure 1B Alt 1)
-def funcConfusionMatrix( strLoggingLevel, strInvert ):
-  def funcConfusionMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
+def funcConfusionMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
+  def funcConfusionMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods ):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strActualFile = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strActualFile, strT])
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strActualFile, strT]+lsSelectionMethods)
   return funcConfusionMatrixRet
 
 #Visualize selected output with Overap Matrix (Figure 1B Alt 2)
-def funcOverlapMatrix( strLoggingLevel, strInvert ):
-  def funcOverlapMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
+def funcOverlapMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
+  def funcOverlapMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods ):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection = astrSs[0], astrSs[1]
-    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strT])
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, strT]+lsSelectionMethods)
   return funcOverlapMatrixRet
 
 #Visualize selected output with Cladogram (Figure 2)
@@ -314,13 +327,13 @@ for strInsilicoData in lsInsilicoDataNames:
     if strInsilicoData == c_strInsilicoDataDiversity:
       lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
       lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
-      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateData(strDataSetKey=c_strInsilicoDataDiversityKey))
-      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData)
+      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateDiversityData(strDataSetKey=c_strInsilicoDataDiversityKey))
+      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="2"))
     elif strInsilicoData == c_strInsilicoDataUnbalanced:
       lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
       lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
-      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateData(strDataSetKey=c_strInsilicoDataUnbalancedKey))
-      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData)
+      Command([File( sfle.d( fileDirInput,strInsilicoData )),File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufActualData) ))], [c_fileProgUtilityData], funcGenerateUnbalancedData(strDataSetKey=c_strInsilicoDataUnbalancedKey))
+      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="3"))
 
 #Get micropita config files
 lMicropitaFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufConfig)
@@ -516,15 +529,16 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Create alt figure 1B overlapp matrix
     Command(sOutputFigure1BOverlap, [c_fileProgOverlapMatrixFigure, sMicropitaOutput] + ls_srcFig1, 
-        funcOverlapMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
+        funcOverlapMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
 
-    #Do not generate the confusion and overlap matrices on data without a file defining the actual classes.
-    if not sFileConfiguration[c_strConfigActualFile].lower() == "none"
+    #Create alt figure 1B Confusion matrix
+    #Do not generate the confusion on data without a file defining the actual classes.
+    if not sFileConfiguration[c_strConfigActualFile].lower() == "none":
 
         #Create alt figure 1B confusion matrix
         #Selection of samples by selection method
-        Command(sOutputFigure1BConfusion, [c_fileProgConfusionMatrixFigure, sMicropitaOutput, sActualDataClassesFile] + ls_srcFig1, 
-            funcConfusionMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
+        Command(sOutputFigure1BConfusion, [c_fileProgConfusionMatrixFigure, sMicropitaOutput, File( sfle.d( fileDirInput,sFileConfiguration[c_strConfigActualFile] ))] + ls_srcFig1, 
+            funcConfusionMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
 
     #Create a cladogram figure 2
     #Manage files which are optional

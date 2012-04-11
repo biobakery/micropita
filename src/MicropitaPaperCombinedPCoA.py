@@ -119,7 +119,6 @@ def _main( ):
 
         #If the method parsed from the selection file is a method that is passed in as an argument and indicated as a method to plot
         if sCurSelectionMethodName in args.strSelectionMethods:
-
             #Get the correct color for the method
             charSelectedColor = objColors.dictConvertMethodToHEXColor[sCurSelectionMethodName]
 
@@ -137,8 +136,10 @@ def _main( ):
                     # indicated by shape for caution. So change shape.
                     if not acharColors[iindex] == objColors.c_charNoSelect:
                         acharShapes[iindex] = acharMultSelectShape
-                    acharColors[iindex] = charSelectedColor
-                    acharSelection[iindex] = sCurSelectionMethodName
+                        acharSelection[iindex] = objColors.c_strPCOAMultSelectionName
+                    else:
+                        acharColors[iindex] = charSelectedColor
+                        acharSelection[iindex] = sCurSelectionMethodName
 
     #Draw PCoA
     analysis.plotList(lsLabelList=acharSelection, strOutputFileName=args.strOutFile, iSize=c_shapeSize,

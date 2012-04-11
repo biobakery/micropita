@@ -21,6 +21,8 @@ from Constants_Arguments import Constants_Arguments
 import logging
 import numpy as np
 import os
+from PlotMatrix import PlotMatrix
+import re
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperOverlapMatrix.py", description = """Creates an overlap matrix from microPITA output.""" )
@@ -32,6 +34,8 @@ argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", act
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 #Outputfile
 argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_genericOutputFigureFileHelp )
+#Selection parameter
+argp.add_argument("strSelectionMethods", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionMethodsHelp, nargs="*")
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -42,12 +46,12 @@ def _main( ):
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
         raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
-    logging.basicConfig(filename="".join([os.path.splitext(args.strOutputDataFile)[0],".log"]), filemode = 'w', level=iLogLevel)
+    logging.basicConfig(filename="".join([os.path.splitext(args.strOutputFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     c_fInvert = (args.fInvert == "True")
+    c_fFlipYLabels = False
 
     logging.info("Start MicropitaPaperOverlapMatrix")
-    print("Start MicropitaPaperOverlapMatrix")
 
     #Read and parse predicted data
     #Get predicted
@@ -70,19 +74,23 @@ def _main( ):
 
         #Add to dict
         dictPredicted[sCurSelectionMethodName]=astrSelectedSamples
-    
+
     #Get labels
-    lsLabels = intersect(set(dictPredicted.keys()))
-    if len(lsLabels) == 0:
-        logging.error("".join(["MicropitaPaperOverlapMatrix. No actual and predicted labels were in common so an overlap matrix could not be generated. Actual Labels=",
-                               str(dictPredicted.keys())," Predicted Labels=",str(dictActual.keys())]))
-    elif len(lsLabels) < 2:
-        logging.error("".join(["MicropitaPaperOverlapMatrix. Only one actual and predicted labels were in common so an overlap matrix could not be generated. Actual Labels=",
-                               str(dictPredicted.keys())," Predicted Labels=",str(dictActual.keys())]))
+    lsLabels = dictPredicted.keys()
+    #Subset them to just what is interested in looking at.
+    lsLabels = list(set(lsLabels) & set(args.strSelectionMethods))
+    iLabelLength = len(lsLabels)
+
+    if iLabelLength == 0:
+        logging.error("".join(["MicropitaPaperOverlapMatrix. No labels were found so an overlap matrix could not be generated. Predicted Labels=",
+                               str(dictPredicted.keys())]))
+    elif iLabelLength < 2:
+        logging.error("".join(["MicropitaPaperOverlapMatrix. Only one label was found so an overlap matrix could not be generated. Predicted Labels=",
+                               str(dictPredicted.keys())]))
 
     #make a y axis
     yLabels = lsLabels
-    if fFlipYLabels:
+    if c_fFlipYLabels:
         yLabels.reverse()
 
     #Setup data for overlap matrix
@@ -90,21 +98,24 @@ def _main( ):
     for xLabel in lsLabels:
         setPredicted = set(dictPredicted[xLabel])
         iPredictedPosition = None
-        setPotentialSharedSamples = {}
+        iArrayLengthTraveled = 0
+        setPotentialSharedSamples = set()
         for iindex, yLabel in enumerate(yLabels):
             if yLabel == xLabel:
-                iPredictedPosition = iindex
+                iPredictedPosition = iindex + iArrayLengthTraveled
                 liOverlap.append(None)
             else:
-                setOtherSamples = set(dictPredict[yLabel])
+                setOtherSamples = set(dictPredicted[yLabel])
                 liOverlap.append(len(setPredicted & setOtherSamples))
                 setPotentialSharedSamples = setOtherSamples | setPotentialSharedSamples
-        liOverlap[iPredictPosition] = setPredicted - setPotentialSharedSamples
+            iArrayLengthTraveled = iArrayLengthTraveled + iLabelLength
+        liOverlap[iPredictedPosition] = len(setPredicted - setPotentialSharedSamples)
 
     #Plot confusion matrix
-    funcPlotMatrix(npMatrix=np.array(liConfusion), lsLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=True, fInvert=c_fInvert):
+    liOverlap = np.array(liOverlap)
+    liOverlap.shape=iLabelLength,iLabelLength
+    PlotMatrix.funcPlotMatrix(npMatrix=liOverlap, lsLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
 
-    print("Stop MicropitaPaperOverlapMatrix")
     logging.info("Stop MicropitaPaperOverlapMatrix")
 
 if __name__ == "__main__":

@@ -661,6 +661,9 @@ class MicroPITA:
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
         rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=iSampleNameRow, tempFirstDataRow=iFirstDataRow, tempNormalize=False)
 
+        #Log metadata keys
+        logging.debug(" ".join(["Micropita:run.","Received metadata keys=",str(metadata.keys())]))
+
         #If there is only 1 unique value for the labels, do not run the Supervised methods
         if len(set(metadata[strLabel])) < 2:
             c_RUN_DISCRIMINANT = False

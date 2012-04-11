@@ -35,6 +35,8 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
 argp.add_argument( "strOutputDataFile", metavar = "output.txt", help = Constants_Arguments.c_genericOutputDataFileHelp )
 #Data key to determine which data set to generate
 argp.add_argument( "strDataKey", metavar = "Data Set key", help = Constants_Arguments.c_dataSetKeyHelp )
+#Actual sample selection
+argp.add_argument( "strActualFile", action="store", metavar = "Actual_file", help = Constants_Arguments.c_strMicropitaActualFileHelp, default = None, nargs = '?')
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -54,11 +56,10 @@ def _main( ):
 
     if args.strDataKey =="Diversity":
         print("Diversity")
-
         Utility_Data.generateDiversityAbundanceTable(args.strOutputDataFile)
     elif args.strDataKey =="Unbalanced":
         print("Unbalanced")
-        Utility_Data.generateAbundanceTable(args.strOutputDataFile)
+        Utility_Data.generateAbundanceTable(args.strOutputDataFile,args.strActualFile)
     else:
         logging.error("".join(["The following key is not valid. Did not generate data set. Key=",args.strDataKey]))
 

@@ -30,27 +30,17 @@ class PlotMatrix:
     figConfusionMatrix = plt.figure()
     objAxis = figConfusionMatrix.add_subplot(111)
 
-    #Format labels to be every other label
-    lNewXLabels = []
-    for strLabel in lsLabels:
-        lNewXLabels.append("")
-        lNewXLabels.append(strLabel)
-
     #Get y labels
-    lNewYLabels = lNewXLabels
+    lNewYLabels = lsLabels
     if fFlipYLabels:
         lsLabels.reverse()
-        lNewYLabels = []
-        for strLabel in lsLabels:
-            lNewYLabels.append("")
-            lNewYLabels.append(strLabel)
 
     #Set x axis and position
-    objAxis.xaxis.set_ticklabels(lNewXLabels)
+    objAxis.xaxis.set_ticklabels([""]+lsLabels)
     objAxis.xaxis.set_ticks_position('top')
 
     #Set y axis
-    objAxis.yaxis.set_ticklabels(lNewYLabels)
+    objAxis.yaxis.set_ticklabels([""]+lNewYLabels)
 
     #Set axis titles
     ylabel(strYTitle)

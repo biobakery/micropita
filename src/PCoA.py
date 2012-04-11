@@ -328,8 +328,13 @@ class PCoA:
 
         #Get uniqueValues for labels
         acharUniqueValues = list(set(lsLabelList))
+        print("lsLabelList")
+        print(lsLabelList)
+        print("acharUniqueValues")
+        print(acharUniqueValues)
         iCountUniqueValues = len(acharUniqueValues)
-
+        print("iCountUniqueValues")
+        print(iCountUniqueValues)
         #Set colors
         atupldLabelColors = None
 
@@ -338,10 +343,14 @@ class PCoA:
         if charForceShape == None:
             #Get shapes
             acharShapes = PCoA.getShapes(iCountUniqueValues)
+            print("acharShapes")
+            print(acharShapes)
             if acharShapes == None:
                 return False
             #Make label shapes
             alLabelShapes = [ acharShapes[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
+            print("alLabelShapes")
+            print(alLabelShapes)
         else:
             alLabelShapes = charForceShape
 
