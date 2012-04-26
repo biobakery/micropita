@@ -19,7 +19,9 @@ from Constants_Figures import Constants_Figures
 from Diversity import Diversity
 from cogent.cluster.nmds import NMDS
 import logging
+import math
 import matplotlib.cm as cm
+import numpy as np
 from scipy.spatial.distance import squareform
 from ValidateData import ValidateData
 from matplotlib import pyplot as plt
@@ -42,6 +44,9 @@ class PCoA:
 
     #Current pcoa object
     pcoa = None
+
+    #Get plot colors
+    objFigureControl = Constants_Figures()
 
     #Loads data into PCoA (given the matrix or a valid file path)
     #Data can be passed or read in
@@ -143,29 +148,14 @@ class PCoA:
         return False
 
     #@params tempPlotName A valid file path to save the image of the plot
-    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempLegendLocation="upper right", tempInvert=False):
-        print("--plot")
-        print("tempPlotName")
-        print(tempPlotName)
-        print("tempColorGrouping")
-        print(tempColorGrouping)
-        print("tempShape")
-        print(tempShape)
-        print("tempLabels")
-        print(tempLabels)
-        print("tempShapeLabels")
-        print(tempShapeLabels)
-        print("tempShapeSize")
-        print(tempShapeSize)
-        print("tempLegendLocation")
-        print(tempLegendLocation)
-        print("tempInvert")
-        print(tempInvert)
+    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempAlpha = 1.0, tempLegendLocation="upper right", tempInvert=False):
 
         if(not self.pcoa == None):
             #Get point count
             adPoints = self.pcoa.getPoints()
-            iPointCount = len(adPoints[:,0])
+            ldXPoints = list(adPoints[:,0])
+            ldYPoints = list(adPoints[:,1])
+            iPointCount = len(ldXPoints)
 
             #Check shapes
             if(ValidateData.isValidList(tempShape)):
@@ -176,7 +166,7 @@ class PCoA:
                 print("iPointCount")
                 print(iPointCount)
                 print("len adPoints")
-                print(len(adPoints))
+                print(iPointCount)
                 return
 
             #Check colors
@@ -188,7 +178,7 @@ class PCoA:
                 print("iPointCount")
                 print(iPointCount)
                 print("len adPoints")
-                print(len(adPoints))
+                print(iPointCount)
                 return
 
             #Check sizes
@@ -200,34 +190,87 @@ class PCoA:
                 print("iPointCount")
                 print(iPointCount)
                 print("len adPoints")
-                print(len(adPoints))
+                print(iPointCount)
                 return
 
             #Get plot object
             imgFigure = plt.figure()
 
-            #Get plot colors
-            objColors = Constants_Figures()
-            objColors.invertColors(fInvert=tempInvert)
+            self.objFigureControl.invertColors(fInvert=tempInvert)
 
             #Color/Invert figure
-            imgFigure.set_facecolor(objColors.c_strBackgroundColorWord)
-            imgSubplot = imgFigure.add_subplot(111,axisbg=objColors.c_strBackgroundColorLetter)
+            imgFigure.set_facecolor(self.objFigureControl.c_strBackgroundColorWord)
+            imgSubplot = imgFigure.add_subplot(111,axisbg=self.objFigureControl.c_strBackgroundColorLetter)
             imgSubplot.set_xlabel("Dimension 1")
             imgSubplot.set_ylabel("Dimension 2")
-            imgSubplot.spines['top'].set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.spines['bottom'].set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.spines['left'].set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.spines['right'].set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.xaxis.label.set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.yaxis.label.set_color(objColors.c_strDetailsColorLetter)
-            imgSubplot.tick_params(axis='x', colors=objColors.c_strDetailsColorLetter)
-            imgSubplot.tick_params(axis='y', colors=objColors.c_strDetailsColorLetter)
-            charMarkerEdgeColor = objColors.c_strDetailsColorLetter
+            imgSubplot.spines['top'].set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.spines['bottom'].set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.spines['left'].set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.spines['right'].set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.xaxis.label.set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.yaxis.label.set_color(self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.tick_params(axis='x', colors=self.objFigureControl.c_strDetailsColorLetter)
+            imgSubplot.tick_params(axis='y', colors=self.objFigureControl.c_strDetailsColorLetter)
+            charMarkerEdgeColor = self.objFigureControl.c_strDetailsColorLetter
 
+            #If given a list of colors, each color will be plotted individually stratified by shape
             #Plot colors seperately so the legend will pick up on the labels and make a legend
             if(ValidateData.isValidList(tempColorGrouping)):
                 if len(tempColorGrouping) == iPointCount:
+                    #Check for lists in the list which indicate the need to plot pie charts
+                    lfAreLists = [ValidateData.isValidList(objColor) for objIndex, objColor in enumerate(tempColorGrouping)]
+
+                    #Pie chart data seperated out
+                    lsColorsPieCharts = None
+                    lcShapesPieCharts = None
+                    lsLabelsPieCharts = None
+                    lsSizesPieCharts = None
+                    ldXPointsPieCharts = None
+                    ldYPointsPieCharts = None
+                    #Split out piechart data
+                    if sum(lfAreLists) > 0:
+                        #Get lists of index that are and are not lists
+                        liAreLists = []
+                        liAreNotLists = []
+                        curIndex = 0
+                        for fIsList in lfAreLists:
+                            if fIsList: liAreLists.append(curIndex)
+                            else: liAreNotLists.append(curIndex)
+                            curIndex = curIndex + 1
+
+                        lsColorsPieCharts = self.reduceList(tempColorGrouping, liAreLists)
+                        tempColorGrouping = self.reduceList(tempColorGrouping, liAreNotLists)
+                        #Split out shapes
+                        if ValidateData.isValidList(tempShape):
+                            lcShapesPieCharts = self.reduceList(tempShape, liAreLists)
+                            tempShape = self.reduceList(tempShape, liAreNotLists)
+                        else:
+                            lcShapesPieCharts = tempShape
+                        #Split out labels
+                        if ValidateData.isValidList(tempLabels):
+                            lsLabelsPieCharts = self.reduceList(tempLabels, liAreLists)
+                            tempLabels = self.reduceList(tempLabels, liAreNotLists)
+                        else:
+                            lsLabelsPieCharts = tempLabels
+                        #Split out sizes
+                        if ValidateData.isValidList(tempShapeSize):
+                            lsSizesPieCharts = self.reduceList(tempShapeSize, liAreLists)
+                            tempShapeSize = self.reduceList(tempShapeSize, liAreNotLists)
+                        else:
+                            lsSizesPieCharts = tempShapeSize
+                        #Split out xpoints
+                        if ValidateData.isValidList(ldXPoints):
+                            ldXPointsPieCharts = self.reduceList(ldXPoints, liAreLists)
+                            ldXPoints = self.reduceList(ldXPoints, liAreNotLists)
+                        else:
+                            ldXPointsPieCharts = ldXPoints
+                        #Split out ypoints
+                        if ValidateData.isValidList(ldYPoints):
+                            ldYPointsPieCharts = self.reduceList(ldYPoints, liAreLists)
+                            ldYPoints = self.reduceList(ldYPoints, liAreNotLists)
+                        else:
+                            ldYPointsPieCharts = ldYPoints
+
                     #Get unique colors and plot each individually
                     acharUniqueColors = list(set(tempColorGrouping))
                     for iColorIndex in xrange(0,len(acharUniqueColors)):
@@ -246,26 +289,35 @@ class PCoA:
                           reducedSizes = self.reduceList(reducedSizes,aiColorPointPositions)
 
                         #Reduce to the current color grouping
-                        aiXPoints = self.reduceList(adPoints[:,0],aiColorPointPositions)
-                        aiYPoints = self.reduceList(adPoints[:,1],aiColorPointPositions)
+                        aiXPoints = self.reduceList(ldXPoints,aiColorPointPositions)
+                        aiYPoints = self.reduceList(ldYPoints,aiColorPointPositions)
 
+                        #There are 3 options for shapes which are checked in this order.
+                        #1. 1 shape character is given which is used for all markers
+                        #2. A list is given of marker characters or lists of decimals which will be used to make pie chart markers
+                        #This is handled after the rest this block of code
+                        #3. A list of char are given each indicating the marker for a sample
                         #If the shapes are not a list plot
                         #Otherwise plot per shape per color (can not plot list of shapes in matplotlib)
                         reducedShapes = tempShape
                         if(not ValidateData.isValidList(reducedShapes)):
                           reducedShapes = reducedShapes[0]
-                          imgSubplot.scatter(aiXPoints,aiYPoints, s=reducedSizes, c=[charColor], marker=reducedShapes, alpha=objColors.c_dAlpha, label=tempLabels[tempColorGrouping.index(charColor)], edgecolor=charMarkerEdgeColor)
+                          imgSubplot.scatter(aiXPoints,aiYPoints, c=[charColor], marker=reducedShapes, alpha=tempAlpha, label=tempLabels[tempColorGrouping.index(charColor)], s=reducedSizes, edgecolor=charMarkerEdgeColor)
                         #Shapes are supplied as a list so plot each shape
                         else:
-                          #Reduce to shape sof the current colors
+                          #Reduce to shapes of the current colors
                           reducedShapes = self.reduceList(reducedShapes,aiColorPointPositions)
                           acharReducedShapesElements = list(set(reducedShapes))
                           #If there are multiple shapes, plot seperately because one is not allowed to plot them as a list
                           for aCharShapeElement in acharReducedShapesElements:
                             #Get indices
                             aiShapeIndices = self.getIndices(reducedShapes,aCharShapeElement)
-                            #Reduce label to shapes
+                            #Reduce label by shapes
                             strShapeLabel = self.reduceList(acharLabelsByColor,aiShapeIndices)
+                            #Reduce sizes by shapes
+                            strShapeSizes = reducedSizes
+                            if ValidateData.isValidList(reducedSizes):
+                              strShapeSizes = self.reduceList(reducedSizes,aiShapeIndices)
                             #Get points per shape
                             aiXPointsPerShape = self.reduceList(aiXPoints,aiShapeIndices)
                             aiYPointsPerShape = self.reduceList(aiYPoints,aiShapeIndices)
@@ -275,8 +327,13 @@ class PCoA:
                             if(ValidateData.isValidList(reducedSizes)):
                               reducedSizesPerShape = self.reduceList(reducedSizes,aiShapeIndices)
                             #Plot
-                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, s=reducedSizesPerShape, c=[charColor], marker=aCharShapeElement, alpha=objColors.c_dAlpha, label=strShapeLabel[0], edgecolor=charMarkerEdgeColor)
+                            imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, c=[charColor], marker=aCharShapeElement, alpha=tempAlpha, label=strShapeLabel[0], s=strShapeSizes, edgecolor=charMarkerEdgeColor)
 
+                    #Plot pie charts
+                    if not lsColorsPieCharts == None:
+                        self.plotWithPieMarkers(imgSubplot=imgSubplot, aiXPoints=ldXPointsPieCharts, aiYPoints=ldYPointsPieCharts, dSize=lsSizesPieCharts, llColors=lsColorsPieCharts, lsLabels=lsLabelsPieCharts, lcShapes=lcShapesPieCharts, edgeColor=charMarkerEdgeColor, dAlpha=tempAlpha)
+
+            #If the Color is not a list but shapes are a list then plot by each unique shape
             elif((not ValidateData.isValidList(tempColorGrouping)) and (ValidateData.isValidList(tempShape))):
                 if len(tempShape) == iPointCount:
                     #Get unique shapes and plot each individually
@@ -287,23 +344,182 @@ class PCoA:
                         reducedSizes = tempShapeSize
                         if(ValidateData.isValidList(reducedSizes)):
                           reducedSizes = self.reduceList(reducedSizes,aiShapePointPositions)
-                        imgSubplot.scatter(self.reduceList(adPoints[:,0],aiShapePointPositions),self.reduceList(adPoints[:,1],aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], alpha=objColors.c_dAlpha, label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
+                        imgSubplot.scatter(self.reduceList(ldXPoints,aiShapePointPositions),self.reduceList(ldYPoints,aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], alpha=dAlpha, label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
+
+            #This is the simple case where color and shape are constant and do not change.
             else:
-                imgSubplot.scatter(adPoints[:,0],adPoints[:,1], s=tempShapeSize, c=tempColorGrouping, marker=tempShape, alpha=objColors.c_dAlpha, label=tempLabels, edgecolor=charMarkerEdgeColor)
+                imgSubplot.scatter(ldXPoints,ldYPoints, c=tempColorGrouping, marker=tempShape, alpha=dAlpha, label=tempLabels, s=self.objFigureControl.iMarkerSize, edgecolor=charMarkerEdgeColor)
 
             objLegend = imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
 
             #Invert legend
             if(tempInvert):
-              objLegend.legendPatch.set_fc(objColors.c_strBackgroundColorWord)
-              objLegend.legendPatch.set_ec(objColors.c_strDetailsColorLetter)
-              plt.setp(objLegend.get_texts(),color=objColors.c_strDetailsColorLetter)
+              if objLegend:
+                objLegend.legendPatch.set_fc(self.objFigureControl.c_strBackgroundColorWord)
+                objLegend.legendPatch.set_ec(self.objFigureControl.c_strDetailsColorLetter)
+                plt.setp(objLegend.get_texts(),color=self.objFigureControl.c_strDetailsColorLetter)
 
             #Make legend background transparent
-            objLegendFrame = objLegend.get_frame()
-            objLegendFrame.set_alpha(objColors.c_dAlpha)
+            if objLegend:
+              objLegendFrame = objLegend.get_frame()
+              objLegendFrame.set_alpha(self.objFigureControl.c_dAlpha)
 
             imgFigure.savefig(tempPlotName, facecolor=imgFigure.get_facecolor())
+
+    #The all lists should be in the same order
+    #aiXPoints List of X axis points (one element per color list)
+    #aiYPoints List of X axis points (one element per color list)
+    #dSize double or List of doubles (one element per color list)
+    #llColors List of Lists of colors, one list of colors is for 1 piechart/multiply highlighted feature
+    #Example ["red","blue","green"] for a marker with 3 sections
+    #lsLabels List of labels  (one element per color list)
+    #lcShapes indicates whihc shape of a pie chart to use, currently supported 'o' and 's'  (one element per color list)
+    #edgeColor One color entry for the edge of the piechart
+    def plotWithPieMarkers(self, imgSubplot, aiXPoints, aiYPoints, dSize, llColors, lsLabels, lcShapes, edgeColor, dAlpha):
+        #Zip up points to pairs
+        xyPoints = zip(aiXPoints,aiYPoints)
+        #For each pair of points
+        for iIndex,dXY in enumerate(xyPoints):
+            ldWedges = []
+            #Get colors
+            lcurColors = llColors[iIndex]
+            #Get pie cut shape
+            cPieChartType = lcShapes[iIndex]
+            if cPieChartType == Constants_Figures().c_charPCOAPieChart:
+                ldWedges = self.makePieWedges(len(lcurColors),20)
+            elif cPieChartType == Constants_Figures().c_charPCOASquarePieChart:
+                ldWedges = self.makeSquarePieWedges(len(lcurColors))
+            for iWedgeIndex,dWedge in enumerate(ldWedges):
+                print(str("START"))
+                print(str(dXY))
+                print(str(dXY))
+                print(str(dWedge))
+                print(str(dSize))
+                print(str(lsLabels))
+                print(str(lcurColors))
+
+                imgSubplot.scatter(x=dXY[0], y=dXY[1], marker=(dWedge,0), s=dSize[iIndex], label=lsLabels[iIndex], facecolor=lcurColors[iWedgeIndex], edgecolor=edgeColor, alpha=dAlpha)
+
+    #iWedgecount Number of equal wedge sizes to make
+    #iSplineResolution The higher the number the better smoothing for the circle parameter
+    def makePieWedges(self, iWedgeCount,iSplineResolution = 10):
+        ldWedge = []
+        dLastValue = 0.0
+
+        #Create a list of equal percentages for all wedges
+        #Do not include a last wedge it gets all the space from the 2nd to last wedge to the end
+        #Which should still be equal to the others
+        ldPercentages = [1.0/iWedgeCount]*(iWedgeCount-1)
+
+        for dPercentage in ldPercentages:
+            ldX = [0] + np.cos(np.linspace(2*math.pi*dLastValue,2*math.pi*(dLastValue+dPercentage),iSplineResolution)).tolist()
+            ldY = [0] + np.sin(np.linspace(2*math.pi*dLastValue,2*math.pi*(dLastValue+dPercentage),iSplineResolution)).tolist()
+            ldWedge.append(zip(ldX,ldY))
+            dLastValue = dLastValue+dPercentage
+        ldX = [0] + np.cos(np.linspace(2*math.pi*dLastValue,2*math.pi,iSplineResolution)).tolist()
+        ldY = [0] + np.sin(np.linspace(2*math.pi*dLastValue,2*math.pi,iSplineResolution)).tolist()
+        ldWedge.append(zip(ldX,ldY))
+        return ldWedge
+
+    #iWedgecount Number of equal wedge sizes to make
+    #iSplineResolution The higher the number the better smoothing for the circle parameter
+    def makeSquarePieWedges(self, iWedgeCount):
+        ldWedge = []
+        dLastPercentageValue = 0.0
+        dLastSquareValue = 0.0
+        dCumulativePercentageValue = 0.0
+        dRadius = None
+        fXYSwitched = False
+        fAfterCorner = False
+        iSwitchCounts = 0
+        iMagicNumber =(1.0/4)
+
+        #Create a list of equal percentages for all wedges
+        #Do not include a last wedge it gets all the space from the 2nd to last wedge to the end
+        #Which should still be equal to the others
+        ldPercentages = [1.0/iWedgeCount]*(iWedgeCount)
+
+        for dPercentage in ldPercentages:
+          ldCircleXs = np.cos([2*math.pi*dLastPercentageValue,2*math.pi*(dLastPercentageValue+dPercentage)])
+          ldCircleYs = np.sin([2*math.pi*dLastPercentageValue,2*math.pi*(dLastPercentageValue+dPercentage)])
+
+          if dRadius == None:
+            dRadius = ldCircleXs[0]
+
+          #Check to see if at corner
+          fAtCorner = False
+          iDistance = int((dLastPercentageValue+dPercentage+(iMagicNumber/2))/iMagicNumber
+                  ) - int((dLastPercentageValue+(iMagicNumber/2))/iMagicNumber)
+          if(iDistance > 0):
+            fAtCorner = True
+            if iDistance > 1:
+              fXYSwitched = not fXYSwitched
+              iSwitchCounts = iSwitchCounts + 1
+
+          #Check to see if at a side center
+          fAtSide = False
+          if (int((dLastPercentageValue+dPercentage)/iMagicNumber) > int(dLastPercentageValue/iMagicNumber)):
+            fAtSide = True
+
+          #Handle corner xy switching
+          if fAtCorner:
+            fXYSwitched = not fXYSwitched
+            iSwitchCounts = iSwitchCounts + 1
+          #Make sure the xy switching occurs to vary the slope at the corner.
+          if fXYSwitched:
+              ldCircleXs,ldCircleYs = ldCircleYs,ldCircleXs
+
+          dSquarePoint = dRadius * (ldCircleYs[1]/float(ldCircleXs[1]))
+          dRadiusSq1 = dRadius
+          dRadiusSq2 = dRadius
+          dLastSquareValueSq = dLastSquareValue
+          dSquarePointSq = dSquarePoint
+
+          #If in quadrants 2,3 make sign changes
+          if iSwitchCounts in [2,3]:
+            if iSwitchCounts == 2:
+              dRadiusSq1 = dRadiusSq1 *-1
+            elif iSwitchCounts == 3:
+              dRadiusSq1 = dRadiusSq1 * -1
+              dRadiusSq2 = dRadiusSq2 * -1
+            dLastSquareValueSq = dLastSquareValueSq * -1.0
+            dSquarePointSq = dSquarePointSq * -1.0
+
+          if fAtCorner:
+            #Corner 1
+            if iSwitchCounts==1:
+              ldWedge.append(zip([0,dRadiusSq1,dRadiusSq1,dSquarePointSq,0],[0,dLastSquareValueSq,dRadiusSq2,dRadiusSq2,0]))
+            #Corner 2
+            elif iSwitchCounts==2:
+              if iDistance > 1:
+                ldWedge.append(zip([0,-dRadiusSq1,-dRadiusSq1,dRadiusSq1,dRadiusSq1,0],[0,-dLastSquareValueSq,dRadiusSq2,dRadiusSq2,dSquarePointSq,0]))
+              else:
+                ldWedge.append(zip([0,-dLastSquareValueSq,dRadiusSq1,dRadiusSq1,0],[0,dRadiusSq2,dRadiusSq2,dSquarePointSq,0]))
+            #Corner 3
+            elif iSwitchCounts==3:
+              if iDistance > 1:
+                ldWedge.append(zip([0,-dLastSquareValueSq,dRadiusSq1,dRadiusSq1,dSquarePointSq,0],[0,-dRadiusSq2,-dRadiusSq2,dRadiusSq2,dRadiusSq2,0]))
+              else:
+                ldWedge.append(zip([0,dRadiusSq1,dRadiusSq1,dSquarePointSq,0],[0,dLastSquareValueSq,dRadiusSq2,dRadiusSq2,0]))
+            #Corner 4
+            elif iSwitchCounts==4:
+              if iDistance > 1:
+                ldWedge.append(zip([0,-dRadiusSq1,-dRadiusSq1,dRadiusSq1,dRadiusSq1,0],[0,-dLastSquareValueSq,-dRadiusSq2,-dRadiusSq2,dSquarePointSq,0]))
+              else:
+                ldWedge.append(zip([0,(-1.0*dLastSquareValueSq),dRadiusSq1,dRadiusSq1,0],[0,(-1.0*dRadiusSq2),(-1.0*dRadiusSq2),dSquarePointSq,0]))
+
+            fAfterCorner = True
+          else:
+            if iSwitchCounts%2:
+              ldWedge.append(zip([0,dLastSquareValueSq,dSquarePointSq,0],[0,dRadiusSq2,dRadiusSq2,0]))
+            else:
+              ldWedge.append(zip([0,dRadiusSq1,dRadiusSq1,0],[0,dLastSquareValueSq,dSquarePointSq,0]))
+
+          dLastSquareValue = dSquarePoint
+          dCumulativePercentageValue = dCumulativePercentageValue + dLastSquareValue
+          dLastPercentageValue = dLastPercentageValue+dPercentage
+
+        return ldWedge
 
     #charForceColor if set, automatic coloring will not occur but will occur based on the charForceColor
     #CharForceColor should be a list of selection methods or not selected which will be automatically broken into colors
@@ -311,30 +527,12 @@ class PCoA:
     #Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
     #charForceShapes if set, automatic shapes will not occur
     #Currently can only be a char (forcing effects all markers equally)
-    def plotList(self,lsLabelList, strOutputFileName, iSize, charForceColor=None, charForceShape=None, fInvert=False):
-        print("--plotlist")
-        print("lsLabelList")
-        print(lsLabelList)
-        print("strOutputFileName")
-        print(strOutputFileName)
-        print("iSize")
-        print(iSize)
-        print("charForceColor")
-        print(charForceColor)
-        print("charForceShape")
-        print(charForceShape)
-        print("fInvert")
-        print(fInvert)
+    def plotList(self,lsLabelList, strOutputFileName, iSize, dAlpha = 1.0, charForceColor=None, charForceShape=None, fInvert=False):
 
         #Get uniqueValues for labels
         acharUniqueValues = list(set(lsLabelList))
-        print("lsLabelList")
-        print(lsLabelList)
-        print("acharUniqueValues")
-        print(acharUniqueValues)
         iCountUniqueValues = len(acharUniqueValues)
-        print("iCountUniqueValues")
-        print(iCountUniqueValues)
+
         #Set colors
         atupldLabelColors = None
 
@@ -343,14 +541,10 @@ class PCoA:
         if charForceShape == None:
             #Get shapes
             acharShapes = PCoA.getShapes(iCountUniqueValues)
-            print("acharShapes")
-            print(acharShapes)
             if acharShapes == None:
                 return False
             #Make label shapes
             alLabelShapes = [ acharShapes[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
-            print("alLabelShapes")
-            print(alLabelShapes)
         else:
             alLabelShapes = charForceShape
 
@@ -395,7 +589,7 @@ class PCoA:
 
         logging.debug("lsLabelList")
         logging.debug(lsLabelList)
-        self.plot(tempPlotName=strOutputFileName, tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempInvert = fInvert)
+        self.plot(tempPlotName=strOutputFileName, tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempAlpha=dAlpha, tempInvert = fInvert)
 
 
     #TODO put in utilities
@@ -431,8 +625,11 @@ class PCoA:
 
     @staticmethod
     def getShapes(intShapeCount):
-      lsShapes = ['o','^','s','D','v','<','>','8','p','h']
-      if intShapeCount > len(lsShapes):
-        print("".join(["Error, PCoA.getShapes. Do not have enough shapes to give. Received request for ",str(intShapeCount)," shapes. Max available shape count is ",str(len(lsShapes)),"."]))
+      #Shapes for the data (typically used when stratifying)
+      #Currently pie cut objects are just o and s
+      #TODO extend pie cut objects to all convex polygons derived from straight lines
+      lsPointShapes = ['o','s','^','v','<','>','8','p','h']
+      if intShapeCount > len(lsPointShapes):
+        print("".join(["Error, PCoA.getShapes. Do not have enough shapes to give. Received request for ",str(intShapeCount)," shapes. Max available shape count is ",str(len(lsPointShapes)),"."]))
         return None
-      return lsShapes[0:intShapeCount]
+      return lsPointShapes[0:intShapeCount]

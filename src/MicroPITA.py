@@ -152,7 +152,7 @@ class MicroPITA:
     #Build a matrix of alpha diversity metrics for each sample
     #Row = metric, column = sample
     #@params tempSampleAbundance Observations (Taxa (row) x sample (column))
-    #@params tempSampleNames List of sample names of samples to measure (do not include the taxa id  column name or other column names which should not be read)
+    #@params tempSampleNames List of sample names of samples to measure (do not include the taxa id column name or other column names which should not be read)
     #@params tempDiversityMetricAlpha List of diversity metrics to use in measuring
     #@return A lists of lists. Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
     #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
@@ -241,6 +241,7 @@ class MicroPITA:
     #TODO stop ignoring tempNumberSamplesReturned
     #otherwise a distance object is expected and will be used.
     def getCentralSamplesByKMedoids(self, tempMatrix=None, tempMetric=None, tempSampleNames=None, tempNumberClusters=0, tempNumberSamplesReturned=0):
+
         #Validate parameters
         if(tempNumberClusters > tempNumberSamplesReturned):
             logging.error("MicroPITA.getCentralSamplesByKMedoids. Number of clusters should be equal to or less than the number samples returned. We will not represent a cluster otherwise.")
@@ -257,10 +258,7 @@ class MicroPITA:
 
         #If the cluster count is equal to the sample count return all samples
         if(sampleCount == tempNumberClusters):
-            returningSamples = dict()
-            for index in xrange(1,(tempNumberClusters+1)):
-                returningSamples[str(index)] = [tempSampleNames[(index-1)]]
-            return returningSamples
+            return list(tempSampleNames)
 
         #Get distance matrix
         distanceMatrix=self.getBetaMetric(tempAbundancies=tempMatrix, tempMetric=tempMetric)
@@ -274,7 +272,7 @@ class MicroPITA:
         if(( tempMetric==Diversity.c_UNIFRAC_B_DIVERSITY ) or ( tempMetric==Diversity.c_WEIGHTED_UNIFRAC_B_DIVERSITY )):
           distanceMatrix = distanceMatrix['distance_matrix'][0]
         #TODO make sure you are getting condensed for unifrac and braycurtis
-        #Mane the adaptor for the MLPY Kmediods method to use custom distanc matrices
+        #Make the adaptor for the MLPY Kmediods method to use custom distanc matrices
         distance = MLPYDistanceAdaptor(tempDistanceMatrix=distanceMatrix, tempIsCondensedMatrix=True)
 
         #Create object to determine clusters/medoids
@@ -650,12 +648,18 @@ class MicroPITA:
         if((microPITA.c_strDiscriminant in strSelectionTechnique) and (not strLabel == None)):
             c_RUN_DISCRIMINANT = True
 
-        #Abundance table object to read in and manage data
-        totalData = AbundanceTable()
-
         #Input file path components
         inputFileComponents = os.path.split(strInputAbundanceFile)
         inputFilePrefix = inputFileComponents[0]
+
+        #Abundance table object to read in and manage data
+        totalData = AbundanceTable()
+
+        #Check/reduce raw abundance data
+        if(not os.path.exists(inputFilePrefix+"-checked.txt")):
+            strInputAbundanceFile = totalData.checkRawDataFile(strInputAbundanceFile)
+        else:
+            strInputAbundanceFile = inputFilePrefix+"-checked.txt"
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
@@ -687,13 +691,6 @@ class MicroPITA:
         #Holds the top ranked samples from different metrics
         #dict[metric name] = [samplename,samplename...]
         selectedSamples = dict()
-
-        #Check/reduce raw abundance data
-        #TODO remove this check
-        if(not os.path.exists(inputFilePrefix+"-checked.txt")):
-            inputFile = totalData.checkRawDataFile(strInputAbundanceFile)
-        else:
-            inputFile = inputFilePrefix+"-checked.txt"
 
         #Stratify the data if need be
         dictAbundanceBlocks = dict()
@@ -1016,6 +1013,45 @@ class MicroPITA:
         logging.info(selectedSamples)
         return selectedSamples
 
+    #Writes the selection of samples by method to an output file.
+    #dictSelection is the dictionary of selections by methdo {"method":["sample selected","sample selected"...]}
+    #strOutputFilePath the str file path to write to
+    @staticmethod
+    def funcWriteSelectionToFile(dictSelection,strOutputFilePath):
+
+        #Holds the output content
+        strOutputContent = ""
+        #Create output content from dictionary
+        for sKey in dictSelection:
+            strOutputContent = "".join([strOutputContent,sKey,Constants.COLON,", ".join(dictSelection[sKey]),Constants.ENDLINE])
+
+        #Write to file
+        if(not strOutputContent == ""):
+            fHndlOutput = open(strOutputFilePath,'w')
+            fHndlOutput.write(str(strOutputContent))
+            fHndlOutput.close()
+        logging.debug("".join(["Selected samples output to file:",strOutputContent]))
+
+    #Reads in an output selection file from micropita and formats it into a dictionary
+    #Dictionary formatted as- {"method":["sample selected","sample selected"...]}
+    @staticmethod
+    def funcReadSelectionFileToDictionary(strInputFile):
+
+        #Read in selection file
+        strSelection = ""
+        with open(strInputFile,'r') as fHndlInput:
+            strSelection = fHndlInput.read()
+            fHndlInput.close()
+
+        #Dictionary to hold selection data
+        dictSelection = dict()
+        for strSelectionLine in filter(None,strSelection.split(Constants.ENDLINE)):
+            astrSelectionMethod = strSelectionLine.split(Constants.COLON)
+            dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(Constants.COMMA))]
+
+        #Return dictionary
+        return dictSelection
+
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicroPITA.py", 
     description = """Selects samples from abundance tables based on various selection schemes.""" )
@@ -1064,22 +1100,17 @@ def _main( ):
         raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
+    #Run micropita
     logging.info("Start microPITA")
-    dictSelectedSamples = MicroPITA().run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel, strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
+    microPITA = MicroPITA()
+    dictSelectedSamples = microPITA.run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel, strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
     logging.info("End microPITA")
 
+    #Log output for debugging
     logging.debug("".join(["Returned the following samples:",str(dictSelectedSamples)]))
 
-    strOutputContent = ""
-    for sKey in dictSelectedSamples:
-        strOutputContent = "".join([strOutputContent,sKey,Constants.COLON,", ".join(dictSelectedSamples[sKey]),Constants.ENDLINE])
-
-    #Write to file
-    if(not strOutputContent == ""):
-        fHndlOutput = open(args.strOutFile,'w')
-        fHndlOutput.write(str(strOutputContent))
-        fHndlOutput.close()
-    logging.debug("".join(["Selected samples output to file:",args.strOutFile]))
+    #Write selection to file
+    microPITA.funcWriteSelectionToFile(dictSelection=dictSelectedSamples,strOutputFilePath=args.strOutFile)
 
 if __name__ == "__main__":
     _main( )

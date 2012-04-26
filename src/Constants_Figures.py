@@ -65,6 +65,11 @@ class Constants_Figures():
     c_charPCOAMultSelectColor = "#CCCCCC"
     c_charPCOAMultSelectionShape = "+"
     c_strPCOAMultSelectionName = "Multiple Selection"
+    c_strPCOANotSelected = "Not_Selected"
+    iMarkerSize = 100
+    iPieMarkerSize = 30
+    c_charPCOAPieChart = "o"
+    c_charPCOASquarePieChart = "s"
 
     def invertColors(self,fInvert):
         if fInvert==True:

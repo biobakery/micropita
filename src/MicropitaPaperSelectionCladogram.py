@@ -61,6 +61,9 @@ argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbund
 	help = Constants_Arguments.c_strAbundanceFilterCutoffHelp)
 argp.add_argument(Constants_Arguments.c_strRingOrder, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrder)
 argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
+argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
+argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
 
 #Outputfile
 argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
@@ -84,6 +87,8 @@ def _main( ):
 
     #Invert
     c_fInvert = (args.fInvert.lower() == "true")
+    #Normalize
+    c_Normalize = (args.fNormalize.lower() == "true")
 
     #Position holders in t-stats data list
     c_IDINDEX = 0
@@ -106,7 +111,7 @@ def _main( ):
 
     #Read in abundance data
     rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strInputFile, tempDelimiter=Constants.TAB, tempNameRow=0, tempFirstDataRow=2, tempNormalize=True)
+    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strInputFile, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
     strSampleID = abundance.dtype.names[0]
     lsAllSampleNames = abundance.dtype.names[1:]
 
@@ -333,7 +338,7 @@ def _main( ):
           cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
 
     #Generate cladogram
-    cladogram.generate(strInputFile=args.strInputFile, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, charDelimiter=Constants.TAB, iNameRow=0, iFirstDataRow=2, fNormalize=False, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
+    cladogram.generate(strInputFile=args.strInputFile, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, charDelimiter=Constants.TAB, iNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow), fNormalize=False, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
 
 ##Returns only terminal nodes given the list's structure
 def funcGetTerminalNodes(lsTaxa,cDelim):

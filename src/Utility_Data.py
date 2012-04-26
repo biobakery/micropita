@@ -11,6 +11,7 @@
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
+import csv
 from Diversity import Diversity
 from FileIO import FileIO
 from MicroPITA import MicroPITA
@@ -97,8 +98,8 @@ class Utility_Data():
         dictActualData[MicroPITA.c_DIVERSITY_1] = []
         dictActualData[MicroPITA.c_DIVERSITY_2] = []
         dictActualData[MicroPITA.c_EXTREME_DISSIMILARITY_1] = []
-        dictActualData[MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1] = ["Sample_8_D","Sample_13_D","Sample_46_T","Sample_30_E"]
-        dictActualData[MicroPITA.c_USER_RANKED] = []
+        dictActualData[MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1] = ["Sample_14_D", "Sample_44_T"]
+        dictActualData[MicroPITA.c_USER_RANKED] = ["Sample_16_R","Sample_17_R","Sample_18_R","Sample_32_E"]
         dictActualData[MicroPITA.c_SVM_CLOSE] = []
         dictActualData[MicroPITA.c_SVM_FAR] = []
 
@@ -214,7 +215,6 @@ class Utility_Data():
             sampleNames.append(strSampleName)
             dictActualData[MicroPITA.c_USER_RANKED].append(strSampleName)
             dictActualData[MicroPITA.c_SVM_FAR].append(strSampleName)
-            dictActualData[MicroPITA.c_EXTREME_DISSIMILARITY_1].append(strSampleName)
 
             #Define index populations and set abundance per sample (for noise)
             population = set(range(taxaCount))
@@ -265,6 +265,25 @@ class Utility_Data():
         #Return file name
         return strOutputFile
 
+    ##
+    #Generate matrix of random data
+    #
+    @staticmethod
+    def generateRandomMatrix(tempFilePath,iNumberRows,iNumberColumns, iMinValue, iMaxValue, charDelimiter = Constants.TAB):
+        dataMatrix = np.zeros([iNumberRows,iNumberColumns])
+
+        #Generate random data
+        for row in xrange(0, iNumberRows):
+            for col in xrange(0, iNumberColumns):
+                dataMatrix[row,col] = random.randint(iMinValue, iMaxValue)
+        
+        #Write to file
+        fileOutput = csv.writer(open(tempFilePath,'w'), delimiter=charDelimiter)
+        fileOutput.writerow(["_".join(["Label",str(isample)]) for isample in xrange(0,iNumberColumns)])
+        #Write rows/taxa
+        for row in dataMatrix:
+            fileOutput.writerow(row)
+      
     ##
     #Generate matrix for microPITA focused on diversity
     #@param tempOutPutFile
@@ -352,3 +371,5 @@ class Utility_Data():
 
         #Return file name
         return tempFilePath
+
+#Utility_Data.generateRandomMatrix(tempFilePath="Random.txt",iNumberRows=10,iNumberColumns=6, iMinValue=0, iMaxValue=2500)

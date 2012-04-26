@@ -69,6 +69,11 @@ class Constants_Arguments():
     c_strPredictFilePath = "-p"
     c_strPredictFilePathHelp = "Predict file path used to plot prediction if supervised methods occured."
 
+    #pltSel PLot the selected methods (used for teh collection curve figure because I need two nargs=* and
+    #so need flags for this argument. Is the same as c_strSelectionTechniques
+    c_strPlotSelectedArgument = "-pltSel"
+    c_strPlotSelectedHelp = "Select techniques listed one after another."
+
     #r Flag indicator for normalization
     c_strNormalizeArgument = "-r"
     c_strNormalizeHelp = "Normalize the abundance data before working with it (default=False)."

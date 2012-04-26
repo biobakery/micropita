@@ -29,7 +29,7 @@ class AbundanceTable:
     #@params tempDelimiter Character. Delimiter for the data
     #@return Return string file path
     @staticmethod
-    def checkRawDataFile(tempReadDataFileName, tempDelimiter = Constants.TAB):
+    def checkRawDataFile(tempReadDataFileName, tempDelimiter = Constants.TAB, tempFirstDataIndex = 2):
         #Validate parameters
         if(not ValidateData.isValidFileName(tempReadDataFileName)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(tempReadDataFileName)
@@ -38,25 +38,30 @@ class AbundanceTable:
             print "AbundanceTable:checkRawDataFile::Error, Delimiter is not a valid string/char type. Delimiter ="+str(tempDelimiter)+"."
             return False
 
-        #File to output to
+        #Get output file and remove if existing
         outputFile = os.path.splitext(tempReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
         if(os.path.exists(outputFile)):
             os.remove(outputFile)
-        #File Reader
-        inputRead = FileIO(tempReadDataFileName,True,False,False)
+
+        #Read input file lines
+        readData = ""
+        with open(tempReadDataFileName,'r') as f:
+            readData = f.read()
+            f.close()
+        readData = filter(None,readData.split(Constants.ENDLINE))
+
         #File writer
         writeData = FileIO(outputFile,False,True,True)
 
-        #Read lines
-        read_data = inputRead.readFullFile()
-        read_data = filter(None,read_data.split(Constants.ENDLINE))
-        writeData.writeToFile(read_data[0]+Constants.ENDLINE)
-        writeData.writeToFile(read_data[1]+Constants.ENDLINE)
-        #For each line in the table
-        for line in read_data[2:]:
+        #Write metadata without change
+        for strDataLine in readData[0:tempFirstDataIndex]:
+            writeData.writeToFile("".join([strDataLine,Constants.ENDLINE]))
+
+        #For each data line in the table
+        for line in readData[tempFirstDataIndex:]:
             writeToFile = False
             cleanLine = list()
-            #Break into delimited elements
+            #Break line into delimited elements
             lineElements = filter(None,line.split(tempDelimiter))
 
             #For each element but the first (taxa name)
@@ -67,6 +72,7 @@ class AbundanceTable:
                     cleanLine.append("0")
                 elif(element == "0"):
                     cleanLine.append("0")
+                #If an abundance is found set the line to be saved.
                 else:
                     cleanLine.append(element)
                     writeToFile = True
@@ -74,7 +80,6 @@ class AbundanceTable:
             if(writeToFile):    
                 writeData.writeToFile(lineElements[0]+tempDelimiter+tempDelimiter.join(cleanLine)+Constants.ENDLINE)
         writeData.close()
-        inputRead.close()
         return outputFile
 
     #Filter an abundance file by abundance
@@ -161,7 +166,8 @@ class AbundanceTable:
     #@params tempInputFile String file path to read in and stratify
     #These assumptions are based on the current default formating of an abundance file
     #@tempDelimiter The delimiter used in the adundance file
-    #@tempStratifyByRow The row which contains the metadata to use in stratification. Starts with 0.
+    #@tempStratifyByRow The row which contains the metadata to use in stratification.
+    #Can be the index of the row starting with 0 or a keyword found in the first column of the row.
     #@return Returns boolean true or false. True indicating completion without detected errors
     def stratifyAbundanceTableByMetadata(self, tempInputFile = None, tempDelimiter = Constants.TAB, tempStratifyByRow = 1):
         #Validate parameters
@@ -171,8 +177,8 @@ class AbundanceTable:
         if(not ValidateData.isValidStringType(tempDelimiter)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Delimiter is not a valid string/char type. Delimiter ="+str(tempDelimiter)+"."
             return False
-        if(not ValidateData.isValidPositiveInteger(tempStratifyByRow, tempZero = True)):
-            print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Stratify by row is not a positive interger. Row ="+str(tempStratifyByRow)+"."
+        if(not ValidateData.isValidPositiveInteger(tempStratifyByRow, tempZero = True) and (not ValidateData.isValidString(tempStratifyByRow))):
+            print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Stratify by row is not a positive integer or string keyword. Row ="+str(tempStratifyByRow)+"."
             return False
 
         #Get the base of the file path
@@ -186,6 +192,15 @@ class AbundanceTable:
 
         #Collect metadata
         metadataInformation = dict()
+
+        #If the tempStratifyRow is by key word than find the index
+        if ValidateData.isValidString(tempStratifyByRow):
+            for iLineIndex, strLine in enumerate(contents):
+                if strLine.split(tempDelimiter)[0].strip("\"") == tempStratifyByRow:
+                    tempStratifyByRow = iLineIndex
+                    break
+
+        #Stratify by metadata row
         stratifyByRow = filter(None,contents[tempStratifyByRow].split(tempDelimiter))
         for metaDataIndex in xrange(1,len(stratifyByRow)):
             metadata = stratifyByRow[metaDataIndex]

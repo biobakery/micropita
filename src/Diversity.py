@@ -57,7 +57,6 @@ class Diversity:
     #@return 1 float is returned
     @staticmethod
     def getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=None):
-
         #Calculate metric
         return sum((tempSampleTaxaAbundancies)*(tempSampleTaxaAbundancies))
 
@@ -75,7 +74,7 @@ class Diversity:
             return False
         #If simpsons is false return false, else return inverse
         if(not ValidateData.isFalse(simpsons)):
-            simpsons = 1/simpsons
+            simpsons = 1.0/simpsons
         return simpsons
 
     #Alpha diversity
@@ -159,7 +158,7 @@ class Diversity:
         if(not ValidateData.isFalse(bcValue)):
             #TODO Since brays curtis can get larger than 1, need to normalize this with a different value
             #TODO Need all inverses to be inverse in a specific way ... maybe multiplicative inverse is better
-            return 1-bcValue
+            return 1.0-bcValue
         return False
 
     #Beta diversity

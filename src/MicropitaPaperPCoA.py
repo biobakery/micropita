@@ -61,6 +61,7 @@ def _main( ):
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
     logging.info("Start MicropitaPaperPCoA")
+    print("Start MicropitaPaperPCoA")
     print(args)
 
     #Analysis object
@@ -72,8 +73,7 @@ def _main( ):
     fHndlInput.close()
 
     c_fCheckFile = False
-    c_NotSelected = "Not_Selected"
-    c_shapeSize = 40
+    c_NotSelected = Constants_Figures.c_strPCOANotSelected
 
     c_fInvert = (args.fInvert == "True")
     c_Normalize = (args.fNormalize == "True")
@@ -84,9 +84,13 @@ def _main( ):
     abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
     sampleNames = abundance.dtype.names[1:]
 
+    #Standardize figures
     #Shapes
     acharShape = Constants_Figures.c_charPCOAShape
-
+    #Alpha
+    dAlpha = Constants_Figures.c_dAlpha
+    #Size
+    c_shapeSize = Constants_Figures.iMarkerSize
     #File path components
     asFilePathPieces = os.path.splitext(args.strOutFile)
 
@@ -99,7 +103,8 @@ def _main( ):
     #Draw known truths
     #Draw labeling from metadata
     for asMetadata in metadata:
-      analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize,fInvert=c_fInvert)
+      print("CRAZY truths")
+      analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
 
     #Read in prediction file is supplied
     lsPredictions = list()
@@ -112,7 +117,8 @@ def _main( ):
         for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
             lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
             lsPredictions.append(lsPredictElements[0])
-        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,fInvert=c_fInvert)
+        print("Everythwere")
+        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,dAlpha=dAlpha,fInvert=c_fInvert)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
@@ -144,11 +150,13 @@ def _main( ):
 
         #Draw PCoA
         if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
+          print("Here")
           analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]),
-              iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
+              iSize=c_shapeSize, dAlpha=dAlpha, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
         else:
+          print("There")
           analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors,
-              tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempLegendLocation="lower left", tempInvert = c_fInvert)
+              tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = c_fInvert)
 
     logging.info("Stop MicropitaPaperPCoA")
 

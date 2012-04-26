@@ -19,10 +19,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pylab import *
 
-#Creates a confusion matrix
+#Plots a matrix
 class PlotMatrix:
 
-  #Given a matrix and labels consistent to the matrix, plot a confustion matrix
+  #Given a matrix and labels consistent to the matrix, plot a matrix
   @staticmethod
   def funcPlotMatrix(npMatrix, lsLabels, strOutputFigurePath, strXTitle="X Axis", strYTitle="Y Axis", fFlipYLabels=False, fInvert=False):
 
@@ -47,7 +47,7 @@ class PlotMatrix:
     plt.suptitle(strXTitle)
 
     #Plot matrix values
-    objPlot = objAxis.imshow(np.array(npMatrix), cmap=cm.jet, interpolation='nearest')
+    objPlot = objAxis.imshow(np.array(npMatrix), cmap=get_cmap("Blues"), interpolation='nearest')
 
     #Plot text values
     for yIndex, ldRow in enumerate(npMatrix):

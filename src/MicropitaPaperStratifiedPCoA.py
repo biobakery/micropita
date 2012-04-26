@@ -71,15 +71,16 @@ def _main( ):
     fHndlInput.close()
 
     c_fCheckFile = False
-    c_NotSelected = "Not_Selected"
-    c_shapeSize = 40
 
     c_fInvert = (args.fInvert == "True")
     c_Normalize = (args.fNormalize == "True")
 
     #Color manager
-    objColors = Constants_Figures()
-    objColors.invertColors(fInvert=c_fInvert)
+    objFigureControl = Constants_Figures()
+    objFigureControl.invertColors(fInvert=c_fInvert)
+    strNotSelected = objFigureControl.c_strPCOANotSelected
+    c_shapeSize = objFigureControl.iMarkerSize
+    dAlpha = objFigureControl.c_dAlpha
 
     #Read abundance file
     #Abundance table object to read in and manage data
@@ -110,7 +111,7 @@ def _main( ):
         for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
             lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
             lsPredictions.append(lsPredictElements[0])
-        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,fInvert=c_fInvert)
+        analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,dAlpha=dAlpha,fInvert=c_fInvert)
 
     #Draw selections
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
@@ -123,7 +124,7 @@ def _main( ):
         #Color for selected samples in PCoA based on selection method
         charSelectedColor = ""
         astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
-        charSelectedColor = objColors.dictConvertMethodToHEXColor[astrSelectionMethod[0]]
+        charSelectedColor = objFigureControl.dictConvertMethodToHEXColor[astrSelectionMethod[0]]
 
         #Parse samples
         astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
@@ -135,13 +136,13 @@ def _main( ):
                 acharColors.append(charSelectedColor)
                 acharSelection.append(astrSelectionMethod[0])
             else:
-                acharColors.append(objColors.c_charNoSelect)
-                acharSelection.append(c_NotSelected)
+                acharColors.append(objFigureControl.c_charNoSelect)
+                acharSelection.append(strNotSelected)
 
         #Draw Stratified PCoA
         analysis.plotList(lsLabelList=metadata[args.strUnsupervisedStratify],
                           strOutputFileName="-".join([asFilePathPieces[0],args.strUnsupervisedStratify,astrSelectionMethod[0],asFilePathPieces[1]]),
-                          iSize=c_shapeSize, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
+                          iSize=c_shapeSize, dAlpha=dAlpha, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperStratifiedPCoA")
 

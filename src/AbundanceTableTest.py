@@ -17,6 +17,7 @@ from AbundanceTable import AbundanceTable
 from Constants import Constants
 from FileIO import FileIO
 import os
+import re
 import unittest
 from Utility_File import Utility_File
 
@@ -24,10 +25,10 @@ from Utility_File import Utility_File
 #Tests the Blog object
 class AbundanceTableTest(unittest.TestCase):
 
-    def nottestCheckRawDataFileForGoodCase(self):
+    def testCheckRawDataFileForGoodCase(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"
         outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
         delimiter = Constants.TAB
 
@@ -49,10 +50,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def nottestCheckRawDataFileForGoodCaseDelimterSpace(self):
+    def testCheckRawDataFileForGoodCaseDelimterSpace(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"
         outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
         delimiter = Constants.WHITE_SPACE
 
@@ -74,10 +75,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def nottestNormalizeColumnsForGoodCaseNoNormalize(self):
+    def testNormalizeColumnsForGoodCaseNoNormalize(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -95,10 +96,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestNormalizeColumnsForGoodCaseNormalize1(self):
+    def testNormalizeColumnsForGoodCaseNormalize1(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -116,10 +117,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestNormalizeColumnsForGoodCaseNormalize14(self):
+    def testNormalizeColumnsForGoodCaseNormalize14(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -137,10 +138,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestNormalizeColumnsForGoodCaseNormalizeAll(self):
+    def testNormalizeColumnsForGoodCaseNormalizeAll(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -158,10 +159,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestTextToStructuredArrayForGoodCaseNoNormalize(self):
+    def testTextToStructuredArrayForGoodCaseNoNormalize(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -177,10 +178,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestTextToStructuredArrayForGoodCaseNormalize(self):
+    def testTextToStructuredArrayForGoodCaseNormalize(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -196,10 +197,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=",str(answer),".\nReceived=",str(result),"."]))
 
-    def nottestTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
+    def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"
         delimiter = Constants.WHITE_SPACE
         nameRow = 0
         firstDataRow = 2
@@ -215,10 +216,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestStratifyAbundanceTableByMetadataForGoodCase(self):
+    def testStratifyAbundanceTableByMetadataForGoodCaseByIndex(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         stratifyRow = 1
         table = AbundanceTable()
@@ -227,105 +228,127 @@ class AbundanceTableTest(unittest.TestCase):
         answer = ""
 
         #Should generate the following files
-        anteriorNaresFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        anteriorNaresFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        lAntecubitalFossaFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lAntecubitalFossaFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lRetroauricularCreaseFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        lRetroauricularCreaseFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        rAntecubitalFossaFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rAntecubitalFossaFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rRetroauricularCreaseFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        rRetroauricularCreaseFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        subgingivalPlaqueFileName = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
-        subgingivalPlaqueFileNameAnswer = "./testData/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+        anteriorNaresFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
+        anteriorNaresFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
+        lAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
+        lAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
+        lRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
+        lRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
+        rAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
+        rAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
+        rRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
+        rRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
+        subgingivalPlaqueFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+        subgingivalPlaqueFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
 
-        #Check file creation
-        error = ""
-        if(os.path.exists(anteriorNaresFileName)):
-            read = FileIO(anteriorNaresFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(anteriorNaresFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+anteriorNaresFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+anteriorNaresFileName
+        dictCreatedFiles = {anteriorNaresFileName:anteriorNaresFileNameAnswer,
+                            lAntecubitalFossaFileName:lAntecubitalFossaFileNameAnswer,
+                            lRetroauricularCreaseFileName:lRetroauricularCreaseFileNameAnswer,
+                            rAntecubitalFossaFileName:rAntecubitalFossaFileNameAnswer,
+                            rRetroauricularCreaseFileName:rRetroauricularCreaseFileNameAnswer,
+                            subgingivalPlaqueFileName:subgingivalPlaqueFileNameAnswer}
 
-        if(os.path.exists(lAntecubitalFossaFileName)):
-            read = FileIO(lAntecubitalFossaFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(lAntecubitalFossaFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+lAntecubitalFossaFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+lAntecubitalFossaFileName
-
-        if(os.path.exists(lRetroauricularCreaseFileName)):
-            read = FileIO(lRetroauricularCreaseFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(lRetroauricularCreaseFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+lRetroauricularCreaseFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+lRetroauricularCreaseFileName
-
-        if(os.path.exists(rAntecubitalFossaFileName)):
-            read = FileIO(rAntecubitalFossaFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(rAntecubitalFossaFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+rAntecubitalFossaFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+rAntecubitalFossaFileName
-
-        if(os.path.exists(rRetroauricularCreaseFileName)):
-            read = FileIO(rRetroauricularCreaseFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(rRetroauricularCreaseFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+rRetroauricularCreaseFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+rRetroauricularCreaseFileName
-
-        if(os.path.exists(subgingivalPlaqueFileName)):
-            read = FileIO(subgingivalPlaqueFileName,True,False,False)
-            contents = read.readFullFile()
-            read.close()
-            read = FileIO(subgingivalPlaqueFileNameAnswer,True,False,False)
-            contentsAnswer = read.readFullFile()
-            read.close()
-            if(not contents == contentsAnswer):
-                error = error + "\nFile: "+subgingivalPlaqueFileName+"\nExpected:"+contentsAnswer+".\nReceived:"+contents+"."
-        else:
-            error = error + "\nFile count not be found. Path:"+subgingivalPlaqueFileName
+        #Delete files if they exist
+        for strFile in dictCreatedFiles:
+            if os.path.exists(strFile):
+                os.remove(strFile)
 
         #Call method
         table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+
+        #Check file creation
+        error = ""
+        for strFile in dictCreatedFiles:
+            if(os.path.exists(strFile)):
+
+                contents = list()
+                contentsAnswer = list()
+                with open(strFile) as f:
+                    contents = f.read()
+                    contents = filter(None,re.split("\n",contents))
+                    f.close()
+                with open(dictCreatedFiles[strFile]) as f:
+                    contentsAnswer = f.read()
+                    contentsAnswer = filter(None,re.split("\n",contentsAnswer))
+                    f.close()
+                if(not contents == contentsAnswer):
+                    error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
+            else:
+                error = error + "\nFile count not be found. Path:"+strFile
+        result = error
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testStratifyAbundanceTableByMetadataForGoodCaseByKeyWord(self):
+        
+        #Inputs
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        delimiter = Constants.TAB
+        stratifyRow = "STSite"
+        table = AbundanceTable()
+
+        #Correct Answer is blank indicating no error
+        answer = ""
+
+        #Should generate the following files
+        anteriorNaresFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
+        anteriorNaresFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
+        lAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
+        lAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
+        lRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
+        lRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
+        rAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
+        rAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
+        rRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
+        rRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
+        subgingivalPlaqueFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+        subgingivalPlaqueFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+
+        dictCreatedFiles = {anteriorNaresFileName:anteriorNaresFileNameAnswer,
+                            lAntecubitalFossaFileName:lAntecubitalFossaFileNameAnswer,
+                            lRetroauricularCreaseFileName:lRetroauricularCreaseFileNameAnswer,
+                            rAntecubitalFossaFileName:rAntecubitalFossaFileNameAnswer,
+                            rRetroauricularCreaseFileName:rRetroauricularCreaseFileNameAnswer,
+                            subgingivalPlaqueFileName:subgingivalPlaqueFileNameAnswer}
+
+        #Delete files if they exist
+        for strFile in dictCreatedFiles:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Call method
+        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+
+        #Check file creation
+        error = ""
+        for strFile in dictCreatedFiles:
+            if(os.path.exists(strFile)):
+
+                contents = list()
+                contentsAnswer = list()
+                with open(strFile) as f:
+                    contents = f.read()
+                    contents = filter(None,re.split("\n",contents))
+                    f.close()
+                with open(dictCreatedFiles[strFile]) as f:
+                    contentsAnswer = f.read()
+                    contentsAnswer = filter(None,re.split("\n",contentsAnswer))
+                    f.close()
+                if(not contents == contentsAnswer):
+                    error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
+            else:
+                error = error + "\nFile count not be found. Path:"+strFile
         result = error
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 
-    def nottestTransposeDataMatrixForGoodCase(self):
+    def testTransposeDataMatrixForGoodCase(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -343,10 +366,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def nottestTransposeDataMatrixForGoodCaseRemoveAdornments(self):
+    def testTransposeDataMatrixForGoodCaseRemoveAdornments(self):
         
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -364,10 +387,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testFilterByAbundanceForGoodCase(self):
+    def notFilterByAbundanceForGoodCase(self):
         
         #Inputs
-        inputFile = "./src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2

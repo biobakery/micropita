@@ -71,8 +71,6 @@ def _main( ):
     lstrSelection =  filter(None,strSelection.split(Constants.ENDLINE))
 
     c_fCheckFile = False
-    c_NotSelected = "Not_Selected"
-    c_shapeSize = 40
 
     c_fInvert = (args.fInvert == "True")
     c_Normalize = (args.fNormalize == "True")
@@ -84,11 +82,14 @@ def _main( ):
     sampleNames = abundance.dtype.names[1:]
 
     #Figure colors
-    objColors = Constants_Figures()
-    objColors.invertColors(fInvert=c_fInvert)
+    objFigureControl = Constants_Figures()
+    objFigureControl.invertColors(fInvert=c_fInvert)
+
+    #Not selected label
+    c_NotSelected = objFigureControl.c_strPCOANotSelected
 
     #Shape for a sample that is selected twice
-    acharMultSelectShape = objColors.c_charPCOAMultSelectionShape
+    acharMultSelectShape = objFigureControl.c_charPCOAMultSelectionShape
 
     #File path components
     asFilePathPieces = os.path.splitext(args.strOutFile)
@@ -100,11 +101,13 @@ def _main( ):
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
     #Colors
-    acharColors = [objColors.c_charNoSelect for iindex in xrange(len(sampleNames))]
+    acharColors = [objFigureControl.c_charNoSelect for iindex in xrange(len(sampleNames))]
     #Labels
     acharSelection = [c_NotSelected for iindex in xrange(len(sampleNames))]
     #Shapes
-    acharShapes = [objColors.c_charPCOAShape for iindex in xrange(len(sampleNames))]
+    acharShapes = [objFigureControl.c_charPCOAShape for iindex in xrange(len(sampleNames))]
+    #Sizes
+    aiSizes = [objFigureControl.iMarkerSize for iindex in xrange(len(sampleNames))]
 
     #Selection methods
     lsSelectionMethods = []
@@ -120,7 +123,7 @@ def _main( ):
         #If the method parsed from the selection file is a method that is passed in as an argument and indicated as a method to plot
         if sCurSelectionMethodName in args.strSelectionMethods:
             #Get the correct color for the method
-            charSelectedColor = objColors.dictConvertMethodToHEXColor[sCurSelectionMethodName]
+            charSelectedColor = objFigureControl.dictConvertMethodToHEXColor[sCurSelectionMethodName]
 
             #Parse samples selected by the method
             astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
@@ -133,16 +136,26 @@ def _main( ):
                 if(sampleNames[iindex] in astrSelectedSamples):
                     # If it was selected by the method check to see if the color has already changed from
                     # the default, if it has then the sample was selected twice or more and should be
-                    # indicated by shape for caution. So change shape.
-                    if not acharColors[iindex] == objColors.c_charNoSelect:
-                        acharShapes[iindex] = acharMultSelectShape
-                        acharSelection[iindex] = objColors.c_strPCOAMultSelectionName
+                    # indicated by a pie chart marker which is a list of colors with the first 
+                    # element a char indicating the polygon type to be plotted
+                    if not acharColors[iindex] == objFigureControl.c_charNoSelect:
+                        #Update colors (this is where the pie cut marker is indicated to the PCoA software)
+                        curColor = acharColors[iindex]
+                        if not ValidateData.isValidList(curColor):
+                            acharColors[iindex] = [curColor]
+                        acharColors[iindex].append(charSelectedColor)
+                        #Update shape
+                        acharShapes[iindex] = objFigureControl.c_charPCOAPieChart
+                        #Update label
+                        acharSelection[iindex] = objFigureControl.c_strPCOAMultSelectionName
+                        #Update size
+                        aiSizes[iindex] = objFigureControl.iPieMarkerSize
                     else:
                         acharColors[iindex] = charSelectedColor
                         acharSelection[iindex] = sCurSelectionMethodName
 
     #Draw PCoA
-    analysis.plotList(lsLabelList=acharSelection, strOutputFileName=args.strOutFile, iSize=c_shapeSize,
+    analysis.plotList(lsLabelList=acharSelection, strOutputFileName=args.strOutFile, iSize=aiSizes, dAlpha = objFigureControl.c_dAlpha,
         charForceColor=[acharColors,acharSelection], charForceShape=acharShapes, fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperCombinedPCoA")
