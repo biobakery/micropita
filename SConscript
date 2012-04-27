@@ -12,7 +12,7 @@ from Constants_Arguments import Constants_Arguments
 pE = DefaultEnvironment( )
 
 #Process flags
-c_fRunCollectionCurve = False
+c_fRunCollectionCurve = True
 fMakeMovies = False
 
 #Normalize

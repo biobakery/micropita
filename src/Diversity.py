@@ -122,6 +122,14 @@ class Diversity:
         else:
             return chao1_uncorrected(observed = totalObservedSpecies, singles = singlesObserved, doubles = doublesObserved)
 
+    #Count
+    #Count how many bugs / features have a value of greater than 0 or the threshold given
+    #Expects a vector of abundances
+    #Do not normalize data if using the threshold
+    @staticmethod
+    def getObservedCount(tempSampleAbundances, dThreshold = 0.0):
+        return sum([1 for observation in tempSampleAbundances if observation > dThreshold])
+
     #Beta diversity
     #Testing: Happy Path
     #Calculates the BrayCurtis Beta diversity index

@@ -29,22 +29,15 @@ import operator
 import os
 import random
 import re
+from Utility_Math import Utility_Math
 
 class MicropitaPaperCollectionCurve:
 
     #Bootstrap interations
     c_BootstrapItr = 100
 
-    #Do not normalize if Choa1
-    fNormalize = True
-
     #Metric
-    c_strMetricCategory = MicroPITA.c_INV_SIMPSON_A_DIVERSITY
-
-    #Allow switching to Choa1 for testing
-    if True:
-        fNormalize = False
-        c_strMetricCategory = MicroPITA.c_CHAO1_A_DIVERSITY
+    c_strMetricCategory = "Observed Counts"
 
     #Plot the collection curve
     def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxYMetric, dictdMinYMetric, dictdDiversityBaseline, strMetric, fInvert):
@@ -100,7 +93,7 @@ class MicropitaPaperCollectionCurve:
         for iCount in sorted(dictdMaxYMetric.keys()):
             liX.append(iCount)
             liY.append(dictdMaxYMetric[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Average Max "+strMetric)
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Summed Max "+strMetric)
 
         #Update range
         iYMin = min(liY)
@@ -114,7 +107,7 @@ class MicropitaPaperCollectionCurve:
         for iCount in sorted(dictdMinYMetric.keys()):
             liX.append(iCount)
             liY.append(dictdMinYMetric[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="-", linestyle='--', label = "Average Min "+strMetric)
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="-", linestyle='--', label = "Summed Min "+strMetric)
 
         #Update range
         iYMin = min(liY)
@@ -179,27 +172,15 @@ class MicropitaPaperCollectionCurve:
         ldMeasurePerIteration = list()
         for iItr in xrange(iBootStrappingItr):
             #Select population
-            lsSelectedSampleNames = random.sample(lsSampleNames,iSelectSampleCount)
+            lsSelectedSampleNames = Utility_Math.funcSampleWithReplacement(lsSampleNames,iSelectSampleCount)
             #When combining combine counts by summing
-            ldPooledSample = np.array(self.funcSumRowsOfColumns(npaAbundance,lsSelectedSampleNames))
+            ldPooledSample = np.array(Utility_Math.funcSumRowsOfColumns(npaAbundance,lsSelectedSampleNames))
             if float(sum(ldPooledSample))==0.0:
                 ldMeasurePerIteration.append(0.0)
             else:
-                if self.fNormalize:
-                    ldPooledSample = ldPooledSample/float(sum(ldPooledSample))
-                ldMeasurePerIteration.append(microPITA.getAlphaMetric(tempAbundancies=ldPooledSample, tempMetric=self.c_strMetricCategory))
+                ldMeasurePerIteration.append(Diversity.getObservedCount(tempSampleAbundances=ldPooledSample))
         logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedMetric")
         return np.median(ldMeasurePerIteration)
-
-    #Takes the column indices of a npArray and sums the rows into one column
-    #Returns a list which is the row sums of the column
-    def funcSumRowsOfColumns(self, npaAbundance, lsSampleNames):
-        #Compress by data name
-        npPooledSample = npaAbundance[lsSampleNames[0]]
-        for strSampleName in lsSampleNames[1:]:
-            #When combining, combine counts by summing
-            npPooledSample = npPooledSample + npaAbundance[strSampleName]
-        return list(npPooledSample)
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py", 
@@ -263,29 +244,16 @@ def _main( ):
     #Get sample names
     lsSampleNames = rawAbundance.dtype.names[1:]
 
-    #Calculate individual diversities
-    #List of lists, one list per diversity metric for all samples
+    #Calculate individual counts per sample (row)
     #Sort the sample names by their diversity and store the names (Lowest diversity first)
-    #This needs to be normalized for the diversity metric but only normalize a copy,
     #the abundances will be used for pooling later and so will need to stay unnormalized.
-    lStudyMetrics = None
-    if mCC.fNormalize:
-        lStudyMetrics = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = totalData.normalizeColumns(tempStructuredArray = rawAbundance.copy(), tempColumns = list(lsSampleNames)),
-                                                      tempSampleNames = lsSampleNames,
-                                                      tempDiversityMetricAlpha = [mCC.c_strMetricCategory])
-    else:
-        lStudyMetrics = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = rawAbundance,
-                                                      tempSampleNames = lsSampleNames,
-                                                      tempDiversityMetricAlpha = [mCC.c_strMetricCategory])
-    lStudyMetrics = zip(lStudyMetrics[0],lsSampleNames)
+    lStudyMetrics = zip([Diversity.getObservedCount(rawAbundance[sSample]) for sSample in lsSampleNames],lsSampleNames)
     lStudyMetrics.sort(key=operator.itemgetter(0))
-
     lStudyMetrics = [tplSample[1] for tplSample in lStudyMetrics]
 
     #Read through selection files and place contents in dictionary
     dictAllSelectionStudies = dict()
     for strFile in args.strSelectionFiles:
-
         #Put sample selection dictionaries into a larger dictionary by file name
         if strFile in dictAllSelectionStudies:
             logging.error("".join(["MicroPitaPaperCollectionCurve. File for study was already collected in the collection curve. The following file was ignored:",strFile,"."]))
@@ -308,8 +276,6 @@ def _main( ):
         for strCurrentMethod in dictCurStudy:
             #If the method parsed from the selection file is a method that is passed in as an argument and indicated as a method to plot
             if strCurrentMethod in args.pltSel:
-                print("strCurrentMethod")
-                print(strCurrentMethod)
                 #If method is not in dictMetricsBySampleN add it
                 if not strCurrentMethod in dictMetricsBySampleN:
                     dictMetricsBySampleN[strCurrentMethod] = dict()
@@ -324,14 +290,10 @@ def _main( ):
                 #Calculate diversity
                 #This assumes that a method is not ran multiple times in the same study at the same count
                 #And if so that the same method at the same count will give the same results which is currently true
-                ldSummedSubSet = np.array(mCC.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
+                ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
-                #Normalize
-                if mCC.fNormalize:
-                    ldSummedSubSet = ldSummedSubSet/float(sum(ldSummedSubSet))
-
-                #Get diversity
-                dictCurStudyMethod[iSampleCount]=microPITA.getAlphaMetric(tempAbundancies=ldSummedSubSet, tempMetric=mCC.c_strMetricCategory)
+                #Get diversity (observed count)
+                dictCurStudyMethod[iSampleCount]=Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
     logging.debug(dictMetricsBySampleN)
@@ -350,16 +312,13 @@ def _main( ):
         ldLeastSamples = lStudyMetrics[0:int(strSelectionCount)]
 
         #Select most diverse samples, pool, and optionally normalize
-        ldSummedSubSet = np.array(mCC.funcSumRowsOfColumns(rawAbundance, ldMostSamples))
-        if mCC.fNormalize:
-            ldSummedSubSet = ldSummedSubSet/float(sum(ldSummedSubSet))
-        dictdMostMetricSamplesAtN[strSelectionCount] = microPITA.getAlphaMetric(tempAbundancies=ldSummedSubSet, tempMetric=mCC.c_strMetricCategory)
+        ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, ldMostSamples))
+        dictdMostMetricSamplesAtN[strSelectionCount] = Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
 
         #Select least diverse samples, pool, and optionally normalize
-        ldSummedSubSet = np.array(mCC.funcSumRowsOfColumns(rawAbundance, ldLeastSamples))
-        if mCC.fNormalize:
-            ldSummedSubSet = ldSummedSubSet/float(sum(ldSummedSubSet))
-        dictdLeastMetricSamplesAtN[strSelectionCount] = microPITA.getAlphaMetric(tempAbundancies=ldSummedSubSet, tempMetric=mCC.c_strMetricCategory)
+        ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, ldLeastSamples))
+        dictdLeastMetricSamplesAtN[strSelectionCount] = Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
+
         #Get bootstrapped metric
         dictdBootstrappedMetricAtN[strSelectionCount] = mCC.getMedianBootstrappedMetric(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = int(strSelectionCount), iBootStrappingItr = mCC.c_BootstrapItr, microPITA = microPITA)
 

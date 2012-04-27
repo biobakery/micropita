@@ -8,6 +8,8 @@
 #######################################################
 
 #Import local code
+import numpy as np
+import random
 import unittest
 from Utility_Math import Utility_Math
 
@@ -17,7 +19,7 @@ class Utility_MathTest(unittest.TestCase):
     def setUp(self): pass
 
     def testConvertToBHQValueForGoodCaseR(self):
-        methodName = "testConvertToBHFDRForGoodCase"
+        methodName = "testConvertToBHFDRForGoodCaseR"
 
         ldInputPvalues = [0.00,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.10,
                           0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.20,0.21,
@@ -78,16 +80,14 @@ class Utility_MathTest(unittest.TestCase):
           "0.9996938775510203, 0.9997979797979798, 0.9998999999999999, 1.0]"])
 
         ldResults = Utility_Math.convertToBHQValue(ldInputPvalues)
-
-        print(ldResults)
-
         self.assertEquals(strCorrectAnswer, str(ldResults), methodName+" did not give correct result. Expected ."+strCorrectAnswer+". but received ."+str(ldResults)+".")
 
-    def testConvertToBHQValueForGoodCaseSAS(self):
-        methodName = "testConvertToBHFDRForGoodCase"
+    def testConvertToBHQValueForGoodCase2(self):
+        methodName = "testConvertToBHFDRForGoodCase2"
 
         ldInputPvalues = [0.0120,0.0330,0.2120,0.9000,0.9800,0.0010,0.9990,0.0003,.00001]
 
+        #R was used to produce the following as a result
         #> pvalues2 = c(0.0120,0.0330,0.2120,0.9000,0.9800,0.0010,0.9990,0.0003,.00001)
         #> p.adjust(p=pvalues2, method="BH")
         #[1] 0.02700 0.05940 0.31800 0.99900 0.99900 0.00300 0.99900 0.00135 0.00009
@@ -96,10 +96,71 @@ class Utility_MathTest(unittest.TestCase):
                                     "0.999, 0.0013499999999999999, 9e-05]"])
 
         ldResults = Utility_Math.convertToBHQValue(ldInputPvalues)
+        self.assertEquals(str(strCorrectAnswer), str(ldResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(ldResults)+".")
 
-        print(ldResults)
+    def testFuncSampleWithReplacementForGoodCase1(self):
+      methodName = "testFuncSampleWithReplacementForGoodCase1"
+      iDataLength = 20
 
-        self.assertEquals(strCorrectAnswer, str(ldResults), methodName+" did not give correct result. Expected ."+strCorrectAnswer+". but received ."+str(ldResults)+".")
+      random.seed("NotRandom")
+      aData = list(range(iDataLength))
+      iSelect = 10
+
+      strCorrectAnswer = str([2, 19, 5, 4, 12, 18, 4, 10, 5, 12])
+      lResults = str(list(Utility_Math.funcSampleWithReplacement(aData, iSelect)))
+      self.assertEquals(str(strCorrectAnswer), str(lResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(lResults)+".")
+
+    def testFuncSampleWithReplacementForGoodCase2(self):
+      methodName = "testFuncSampleWithReplacementForGoodCase2"
+
+      iDataLength = 1
+
+      random.seed("NotRandom")
+      aData = list(range(iDataLength))
+      iSelect = 8
+
+      strCorrectAnswer = str([0, 0, 0, 0, 0, 0, 0, 0])
+      lResults = str(list(Utility_Math.funcSampleWithReplacement(aData, iSelect)))
+      self.assertEquals(str(strCorrectAnswer), str(lResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(lResults)+".")
+
+    def testFuncSampleWithReplacementForGoodCase3(self):
+      methodName = "testFuncSampleWithReplacementForGoodCase3"
+      print(methodName)
+      iDataLength = 1
+
+      random.seed("NotRandom")
+      aData = list(range(iDataLength))
+      iSelect = 0
+
+      strCorrectAnswer = str([])
+      lResults = str(list(Utility_Math.funcSampleWithReplacement(aData, iSelect)))
+      self.assertEquals(str(strCorrectAnswer), str(lResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(lResults)+".")
+
+    def testFuncSampleWithReplacementForGoodCase4(self):
+      methodName = "testFuncSampleWithReplacementForGoodCase4"
+      print(methodName)
+      iDataLength = 10
+
+      random.seed("NotRandom")
+      aData = []
+      iSelect = 3
+
+      strCorrectAnswer = str([])
+      lResults = str(list(Utility_Math.funcSampleWithReplacement(aData, iSelect)))
+      self.assertEquals(str(strCorrectAnswer), str(lResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(lResults)+".")
+
+    def testFuncSampleWithReplacementForGoodCase5(self):
+      methodName = "testFuncSampleWithReplacementForGoodCase5"
+      print(methodName)
+      iDataLength = 10
+
+      random.seed("NotRandom")
+      aData = None
+      iSelect = 3
+
+      strCorrectAnswer = str([])
+      lResults = str(list(Utility_Math.funcSampleWithReplacement(aData, iSelect)))
+      self.assertEquals(str(strCorrectAnswer), str(lResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(lResults)+".")
 
 ##
 #Create a suite to be called to test

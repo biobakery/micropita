@@ -390,14 +390,6 @@ class PCoA:
             elif cPieChartType == Constants_Figures().c_charPCOASquarePieChart:
                 ldWedges = self.makeSquarePieWedges(len(lcurColors))
             for iWedgeIndex,dWedge in enumerate(ldWedges):
-                print(str("START"))
-                print(str(dXY))
-                print(str(dXY))
-                print(str(dWedge))
-                print(str(dSize))
-                print(str(lsLabels))
-                print(str(lcurColors))
-
                 imgSubplot.scatter(x=dXY[0], y=dXY[1], marker=(dWedge,0), s=dSize[iIndex], label=lsLabels[iIndex], facecolor=lcurColors[iWedgeIndex], edgecolor=edgeColor, alpha=dAlpha)
 
     #iWedgecount Number of equal wedge sizes to make

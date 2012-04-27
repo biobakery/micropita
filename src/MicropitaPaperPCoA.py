@@ -103,7 +103,6 @@ def _main( ):
     #Draw known truths
     #Draw labeling from metadata
     for asMetadata in metadata:
-      print("CRAZY truths")
       analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
 
     #Read in prediction file is supplied
@@ -117,7 +116,6 @@ def _main( ):
         for strSVMSelectionLine in filter(None,strSVMSelection.split(Constants.ENDLINE)):
             lsPredictElements = strSVMSelectionLine.split(Constants.WHITE_SPACE)
             lsPredictions.append(lsPredictElements[0])
-        print("Everythwere")
         analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-SVMPredictions",asFilePathPieces[1]]),iSize=c_shapeSize,dAlpha=dAlpha,fInvert=c_fInvert)
 
     #Draw selections
@@ -150,11 +148,9 @@ def _main( ):
 
         #Draw PCoA
         if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
-          print("Here")
           analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]),
               iSize=c_shapeSize, dAlpha=dAlpha, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
         else:
-          print("There")
           analysis.plot(tempPlotName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]), tempColorGrouping=acharColors,
               tempShape=acharShape, tempLabels=acharSelection, tempShapeSize=c_shapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = c_fInvert)
 

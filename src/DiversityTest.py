@@ -203,6 +203,45 @@ class DiversityTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
+    def testGetObservedCountForGoodCaseMixed(self):
+        #Inputs
+        sampleAbundances = np.array([1.0,0.0,2.0,0.0,5.6,0.0,0.0])
+
+        #Correct Answer
+        answer = 3
+
+        #Call method
+        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testGetObservedCountForGoodCase0(self):
+        #Inputs
+        sampleAbundances = np.array([0.0,0.0,0.0,0.0,0.0,0.0,0.0])
+
+        #Correct Answer
+        answer = 0
+
+        #Call method
+        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testGetObservedCountForGoodCaseAll(self):
+        #Inputs
+        sampleAbundances = np.array([1.0,1.1,111.0,0.1,0.111,11.111,111.11])
+
+        #Correct Answer
+        answer = 7
+
+        #Call method
+        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
     def testGetBrayCurtisDissimilarityForGoodCase1(self):
         
         #Inputs
@@ -349,7 +388,7 @@ class DiversityTest(unittest.TestCase):
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
     #This is running the example at http://pycogent.sourceforge.net/examples/unifrac.html 10-21-2011
-    def testGetUnifracDistanceForGoodCase1(self):
+    def nottestGetUnifracDistanceForGoodCase1(self):
         
         #Inputs
         sampleAbundancies = np.array([[1.0,2.0,3.0,4.0,5.0], [2.0,4.0,6.0,8.0,10.0]])
