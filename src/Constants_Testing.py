@@ -18,6 +18,7 @@ class Constants_Testing():
     c_strTestingRoot = "Testing/"
     c_strTestingTMP = c_strTestingRoot+"TMP/"
     c_strTestingData = c_strTestingRoot+"Data/"
+    c_strTestingTruth = c_strTestingData+"CorrectTestingResults/"
 
     #Indexes
     PARAMETER_NAME_POSITION = 0

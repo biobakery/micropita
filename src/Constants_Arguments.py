@@ -17,6 +17,10 @@ class Constants_Arguments():
     c_strAbundanceFilterPercentile = "-afp"
     c_strAbundanceFilterPercentileHelp = "The percentile threshold cuttoff for filtering by abundance."
 
+    #a alpha The threshold used for either pvalues or qvalues in Cladogram feature enrichment
+    c_strEnrichmentThreshold = "-a"
+    c_strEnrichmentThresholdHelp = "The threshold defining significance for p-value or q-values of feature enrichment."
+
     #c Circlader highlight clade file
     c_strHighlightCladeFile = "-c"
     c_strHighlightCladeHelp = "The file containing the clades or taxa/OTUs to highlight in the circlader."

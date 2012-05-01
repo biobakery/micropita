@@ -561,6 +561,7 @@ class MicroPITA:
         #Create a dictionary converting labels to indexes
         metadataLabelToIndex = dict()
         indexCount = 0
+
         for metadataLabel in tempMatrixLabels:
             if(not metadataLabel in metadataLabelToIndex):
                 metadataLabelToIndex[metadataLabel] = indexCount

@@ -89,6 +89,7 @@ c_strConfigCladeFilter = "[Clade Filter]"
 c_strConfigCladeFilterMeasure = "[Clade Level to Measure]"
 c_strConfigCladeFilterLevel = "[Clade Level to Filter]"
 c_strConfigCladeFilterMinSize = "[Minimum Clade Size]"
+c_strConfigCladogramAlpha = "[Enrichment Threshold]"
 c_strConfigCladogramRingOrder = "[Cladogram Ring Order]"
 c_strConfigCladogramTicks = "[Cladogram Dendrogram Ticks]"
 c_strConfigDataRow = "[Data Name Row Index]"
@@ -244,17 +245,17 @@ def funcOverlapMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
 
 #Visualize selected output with Cladogram (Figure 2)
 def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks):
+                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha):
 
   def funcCladogramSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, 
                                  iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
-                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks):
+                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
     strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
     return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -354,8 +355,8 @@ for fileConfigMicropita in lMicropitaFiles:
   sFileContents = list()
   with open(fileConfigMicropita.get_abspath()) as f:
     sFileContents = f.read()
-    sFileContents = filter(None,re.split("\n",sFileContents))
     f.close()
+  sFileContents = filter(None,re.split("\n",sFileContents))
 
   #Parse config file
   iIndex = 0
@@ -507,14 +508,6 @@ for fileConfigMicropita in lMicropitaFiles:
       strPredictFileArgument = " ".join(["-p","None"])
     if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
       lsPCOAFigures.append(sOutputFigure1APCoA)
-      print("sOutputFigure1APCoA")
-      print(sOutputFigure1APCoA)
-      print("c_fileProgPCoAFigure")
-      print(c_fileProgPCoAFigure)
-      print("sCheckedAbundanceFile")
-      print(sCheckedAbundanceFile)
-      print("sMicropitaOutput")
-      print(sMicropitaOutput)
       Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
@@ -584,7 +577,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strAbundanceFilterPercentile,sFileConfiguration[c_strConfigAbundanceFilterPercentile]]),
                                        " ".join([Constants_Arguments.c_strAbundanceFilterCutoff,sFileConfiguration[c_strConfigAbundanceFilterPercent]]),
                                        " ".join([Constants_Arguments.c_strRingOrder,sFileConfiguration[c_strConfigCladogramRingOrder]]),
-                                       " ".join([Constants_Arguments.c_strCircladerTicks,sFileConfiguration[c_strConfigCladogramTicks]])))
+                                       " ".join([Constants_Arguments.c_strCircladerTicks,sFileConfiguration[c_strConfigCladogramTicks]]),
+                                       " ".join([Constants_Arguments.c_strEnrichmentThreshold,sFileConfiguration[c_strConfigCladogramAlpha]])))
 
     #Create figure 3
 #    #Selection in Stratification

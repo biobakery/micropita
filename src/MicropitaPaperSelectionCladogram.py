@@ -64,6 +64,7 @@ argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", meta
 argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
 argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
+argp.add_argument(Constants_Arguments.c_strEnrichmentThreshold, dest = "dAlpha", action = "store", default = 0.05, help = Constants_Arguments.c_strEnrichmentThresholdHelp)
 
 #Outputfile
 argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
@@ -178,7 +179,7 @@ def _main( ):
       #Parse string of ticks
       sFilteredTick = filter(None,[sTick.strip() for sTick in args.iTicks.split(Constants.COMMA)])
 
-      #Make paresed data into the format [["#","tick"],...]
+      #Make parsed data into the format [["#","tick"],...]
       iTickCount = 0
       for sTick in sFilteredTick:
         llsTicks.append([str(iTickCount),sTick])
@@ -320,7 +321,7 @@ def _main( ):
             else:
               dValue = lsCur[c_PVALUEINDEX]
 
-            if(dValue <= 0.05):
+            if(dValue <= float(args.dAlpha)):
               if dCurScore > 0.0:
                 lsAlpha.append(str(1-dValue))
                 lsShapes.append("^")

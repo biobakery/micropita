@@ -15,11 +15,10 @@ __status__ = "Development"
 #Import libraries
 from AbundanceTable import AbundanceTable
 from Constants import Constants
-from FileIO import FileIO
+from Constants_Testing import Constants_Testing
 import os
 import re
 import unittest
-from Utility_File import Utility_File
 
 ##
 #Tests the Blog object
@@ -28,8 +27,8 @@ class AbundanceTableTest(unittest.TestCase):
     def testCheckRawDataFileForGoodCase(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"
-        outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
         delimiter = Constants.TAB
 
         #Remove output file before the test
@@ -40,33 +39,87 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
 
         #Get answer
-        readFile = FileIO(outputFile,True,False,False)
-        result = readFile.readFullFile()
-        readFile.close()
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+            f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testCheckRawDataFileForGoodCaseDelimterSpace(self):
+    def testCheckRawDataFileForReduceByZero(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"
-        outputFile = Utility_File.getFileNamePrefix(inputFile)+Constants.OUTPUT_SUFFIX
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_ReduceZeros.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+            f.close()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForReduceBtyZeroAndMissingData(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_MissingData.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\tNA\t700098980\t700098988\t700037470\t700037472\t700037474\tNA\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+            f.close()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForGoodCaseDelimiterSpace(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_Space.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
         delimiter = Constants.WHITE_SPACE
 
         #Correct Answer
         answer = "\"TID\" 700098986 700098984 700098982 700098980 700098988 700037470 700037472 700037474 700037476 700037478\n\"STSite\" \"L_Antecubital_fossa\" \"R_Retroauricular_crease\" \"L_Retroauricular_crease\" \"Subgingival_plaque\" \"R_Antecubital_fossa\" \"L_Retroauricular_crease\" \"R_Retroauricular_crease\" \"L_Antecubital_fossa\" \"R_Antecubital_fossa\" \"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\" 1 0 0 12 0 6 0 2 1 0\n\"Bacteria|unclassified|4904\" 0 10 0 43 6 0 23 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\" 3 0 0 29 0 45 0 1 1 0\n\"Bacteria|3417\" 0 45 0 34 3 0 0 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\" 5 0 0 2 0 6 0 1 1 0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempDelimiter=delimiter)
+        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
 
         #Get answer
-        readFile = FileIO(outputFile,True,False,False)
-        result = readFile.readFullFile()
-        readFile.close()
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+            f.close()
 
         #Remove output file after the test
         if(os.path.exists(outputFile)):
@@ -78,7 +131,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testNormalizeColumnsForGoodCaseNoNormalize(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -99,7 +152,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testNormalizeColumnsForGoodCaseNormalize1(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -120,7 +173,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testNormalizeColumnsForGoodCaseNormalize14(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -141,7 +194,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testNormalizeColumnsForGoodCaseNormalizeAll(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -162,7 +215,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testTextToStructuredArrayForGoodCaseNoNormalize(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -181,7 +234,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testTextToStructuredArrayForGoodCaseNormalize(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -200,7 +253,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"])
         delimiter = Constants.WHITE_SPACE
         nameRow = 0
         firstDataRow = 2
@@ -219,27 +272,28 @@ class AbundanceTableTest(unittest.TestCase):
     def testStratifyAbundanceTableByMetadataForGoodCaseByIndex(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         stratifyRow = 1
         table = AbundanceTable()
+        strOutputDirectory = Constants_Testing.c_strTestingTMP
 
         #Correct Answer is blank indicating no error
         answer = ""
 
         #Should generate the following files
-        anteriorNaresFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        anteriorNaresFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        lAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        lRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        rAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        rRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        subgingivalPlaqueFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
-        subgingivalPlaqueFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+        anteriorNaresFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"])
+        anteriorNaresFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"])
+        lAntecubitalFossaFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"])
+        lAntecubitalFossaFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"])
+        lRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"])
+        lRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"])
+        rAntecubitalFossaFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"])
+        rAntecubitalFossaFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"])
+        rRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"])
+        rRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"])
+        subgingivalPlaqueFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"])
+        subgingivalPlaqueFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"])
 
         dictCreatedFiles = {anteriorNaresFileName:anteriorNaresFileNameAnswer,
                             lAntecubitalFossaFileName:lAntecubitalFossaFileNameAnswer,
@@ -248,13 +302,13 @@ class AbundanceTableTest(unittest.TestCase):
                             rRetroauricularCreaseFileName:rRetroauricularCreaseFileNameAnswer,
                             subgingivalPlaqueFileName:subgingivalPlaqueFileNameAnswer}
 
-        #Delete files if they exist
+        #Delete files in abridged documents if they exist
         for strFile in dictCreatedFiles:
             if os.path.exists(strFile):
                 os.remove(strFile)
 
         #Call method
-        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
 
         #Check file creation
         error = ""
@@ -283,27 +337,28 @@ class AbundanceTableTest(unittest.TestCase):
     def testStratifyAbundanceTableByMetadataForGoodCaseByKeyWord(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         stratifyRow = "STSite"
         table = AbundanceTable()
+        strOutputDirectory = Constants_Testing.c_strTestingTMP
 
         #Correct Answer is blank indicating no error
         answer = ""
 
         #Should generate the following files
-        anteriorNaresFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        anteriorNaresFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"
-        lAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"
-        lRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        lRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"
-        rAntecubitalFossaFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rAntecubitalFossaFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"
-        rRetroauricularCreaseFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        rRetroauricularCreaseFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"
-        subgingivalPlaqueFileName = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
-        subgingivalPlaqueFileNameAnswer = "./Testing/Data/CorrectTestingResults/hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"
+        anteriorNaresFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"])
+        anteriorNaresFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Anterior_nares.txt"])
+        lAntecubitalFossaFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"])
+        lAntecubitalFossaFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"])
+        lRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"])
+        lRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"])
+        rAntecubitalFossaFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"])
+        rAntecubitalFossaFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Antecubital_fossa.txt"])
+        rRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"])
+        rRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"])
+        subgingivalPlaqueFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"])
+        subgingivalPlaqueFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-Subgingival_plaque.txt"])
 
         dictCreatedFiles = {anteriorNaresFileName:anteriorNaresFileNameAnswer,
                             lAntecubitalFossaFileName:lAntecubitalFossaFileNameAnswer,
@@ -318,7 +373,65 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(strFile)
 
         #Call method
-        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+
+        #Check file creation
+        error = ""
+        for strFile in dictCreatedFiles:
+            if(os.path.exists(strFile)):
+
+                contents = list()
+                contentsAnswer = list()
+                with open(strFile) as f:
+                    contents = f.read()
+                    contents = filter(None,re.split("\n",contents))
+                    f.close()
+                with open(dictCreatedFiles[strFile]) as f:
+                    contentsAnswer = f.read()
+                    contentsAnswer = filter(None,re.split("\n",contentsAnswer))
+                    f.close()
+                if(not contents == contentsAnswer):
+                    error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
+            else:
+                error = error + "\nFile count not be found. Path:"+strFile
+        result = error
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testStratifyAbundanceTableByMetadataForGoodCaseByKeyWordAndGroup(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        stratifyRow = "STSite"
+        table = AbundanceTable()
+        strOutputDirectory = Constants_Testing.c_strTestingTMP
+
+        llsGroupings = [["\"L_Antecubital_fossa\"","\"Anterior_nares\"","\"Subgingival_plaque\""],["\"R_Retroauricular_crease\"","\"R_Antecubital_fossa\""]]
+
+        #Correct Answer is blank indicating no error
+        answer = ""
+
+        #Should generate the following files
+        lAntecubitalFossaFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa.txt"])
+        lAntecubitalFossaFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Antecubital_fossa-GROUPED.txt"])
+        lRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease.txt"])
+        lRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-L_Retroauricular_crease-GROUPED.txt"])
+        rRetroauricularCreaseFileName = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease.txt"])
+        rRetroauricularCreaseFileNameAnswer = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-by-R_Retroauricular_crease-GROUPED.txt"])
+
+        dictCreatedFiles = {lAntecubitalFossaFileName:lAntecubitalFossaFileNameAnswer,
+                            lRetroauricularCreaseFileName:lRetroauricularCreaseFileNameAnswer,
+                            rRetroauricularCreaseFileName:rRetroauricularCreaseFileNameAnswer}
+
+        #Delete files if they exist
+        for strFile in dictCreatedFiles:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Call method
+        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow, tempLlsGroupings = llsGroupings)
 
         #Check file creation
         error = ""
@@ -348,7 +461,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testTransposeDataMatrixForGoodCase(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -369,7 +482,7 @@ class AbundanceTableTest(unittest.TestCase):
     def testTransposeDataMatrixForGoodCaseRemoveAdornments(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
@@ -390,7 +503,7 @@ class AbundanceTableTest(unittest.TestCase):
     def notFilterByAbundanceForGoodCase(self):
         
         #Inputs
-        inputFile = "./Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2

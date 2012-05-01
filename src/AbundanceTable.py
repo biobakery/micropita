@@ -14,10 +14,13 @@ __status__ = "Development"
 
 #External libraries
 from Constants import Constants
+import csv
 from FileIO import FileIO
 import numpy as np
 import os
+import re
 import scipy.stats
+import string
 from ValidateData import ValidateData
 
 class AbundanceTable:
@@ -26,10 +29,13 @@ class AbundanceTable:
     #Check the input otu or phlotype abundance table
     #Currently reduces the taxa that have no occurence
     #@params tempReadDataFileName String. Data file name
+    #@params tempOutputFileName String. The file path to save the checked file as.
+    #If left empty (defualt) a path will be created from the input file name
+    #Placing the file in the same directory as the current file.
     #@params tempDelimiter Character. Delimiter for the data
     #@return Return string file path
     @staticmethod
-    def checkRawDataFile(tempReadDataFileName, tempDelimiter = Constants.TAB, tempFirstDataIndex = 2):
+    def checkRawDataFile(tempReadDataFileName, tempOutputFileName = "", tempDelimiter = Constants.TAB, tempFirstDataIndex = 2):
         #Validate parameters
         if(not ValidateData.isValidFileName(tempReadDataFileName)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(tempReadDataFileName)
@@ -39,39 +45,56 @@ class AbundanceTable:
             return False
 
         #Get output file and remove if existing
-        outputFile = os.path.splitext(tempReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
-        if(os.path.exists(outputFile)):
-            os.remove(outputFile)
+        outputFile = tempOutputFileName
+        if not tempOutputFileName:
+            outputFile = os.path.splitext(tempReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
+            if(os.path.exists(outputFile)):
+                os.remove(outputFile)
 
         #Read input file lines
+        #Drop blank lines
         readData = ""
         with open(tempReadDataFileName,'r') as f:
             readData = f.read()
             f.close()
         readData = filter(None,readData.split(Constants.ENDLINE))
 
+        #Read the length of each line and make sure there is no jagged data
+        iLongestLength = len(readData[0].split(tempDelimiter))
+        for strLine in readData:
+            iLongestLength = max(iLongestLength, len(strLine.split(tempDelimiter)))
+
         #File writer
         writeData = FileIO(outputFile,False,True,True)
 
-        #Write metadata without change
+        #Write metadata
+        #Empty data is changed to a default
+        #Jagged ends are filled with a default
         for strDataLine in readData[0:tempFirstDataIndex]:
-            writeData.writeToFile("".join([strDataLine,Constants.ENDLINE]))
+            lsLineElements = strDataLine.split(tempDelimiter)
+            for iindex, sElement in enumerate(lsLineElements):
+                if not sElement:
+                    lsLineElements[iindex] = Constants.c_strEmptyDataMetadata
+            if len(lsLineElements) < iLongestLength:
+                lsLineElements = lsLineElements + (["NA"]*(iLongestLength-len(lsLineElements)))
+            writeData.writeToFile(tempDelimiter.join(lsLineElements)+Constants.ENDLINE)
 
         #For each data line in the table
         for line in readData[tempFirstDataIndex:]:
             writeToFile = False
             cleanLine = list()
             #Break line into delimited elements
-            lineElements = filter(None,line.split(tempDelimiter))
+            lineElements = line.split(tempDelimiter)
 
             #For each element but the first (taxa name)
             #Element check to see if not == zero
             #If so add to output
             for element in lineElements[1:]:
-                if(element.rstrip() == ''):
-                    cleanLine.append("0")
+                if(element in string.whitespace):
+                    cleanLine.append(Constants.c_strEmptyAbundanceData)
+                #Set abundance of 0 but do not indicate the line should be saved
                 elif(element == "0"):
-                    cleanLine.append("0")
+                    cleanLine.append(element)
                 #If an abundance is found set the line to be saved.
                 else:
                     cleanLine.append(element)
@@ -90,28 +113,17 @@ class AbundanceTable:
 
       """
 
-      print(npaAbundance)
       if(npaAbundance is not None):
           #Sample names
           lsSampleNames = npaAbundance.dtype.names[1:]
-          print("lsSampleNames")
-          print(lsSampleNames)
           #List of indexes of taxa to keep
           liTaxa = []
           #Hold the cuttoff score (threshold) for the percentile of interest {SampleName(string):score(double)}
           dictPercentiles = dict()
           for index in xrange(0,len(lsSampleNames)):
-              print("npaAbundance[lsSampleNames[index]]")
-              print(npaAbundance[lsSampleNames[index]])
-              print("dPercentileCutOff")
-              print(dPercentileCutOff)
-              print("scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff)")
-              print(scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff))
               dScore = scipy.stats.scoreatpercentile(npaAbundance[lsSampleNames[index]],dPercentileCutOff)
               dictPercentiles[lsSampleNames[index]] = dScore
 
-          print("dictPercentiles")
-          print(dictPercentiles)
           #Sample count (Ignore sample id [position 0] which is not a name)
           dSampleCount = float(len(lsSampleNames[1:]))
 
@@ -119,12 +131,8 @@ class AbundanceTable:
           iTaxaIndex = 0
           for rowTaxaData in npaAbundance:
               sCurTaxaName = rowTaxaData[0]
-              print("sCurTaxaName")
-              print(sCurTaxaName)
               dCountAbovePercentile = 0.0
               ldAbundanceMeasures = list(rowTaxaData)[1:]
-              print("ldAbundanceMeasures")
-              print(ldAbundanceMeasures)
               #Check to see if the abundance score meets the threshold and count if it does
               for iScoreIndex in xrange(0,len(ldAbundanceMeasures)):
                   if(ldAbundanceMeasures[iScoreIndex] >= dictPercentiles[lsSampleNames[iScoreIndex]]):
@@ -134,8 +142,6 @@ class AbundanceTable:
                   liTaxa.append(iTaxaIndex)
               #Increment taxa
               iTaxaIndex = iTaxaIndex + 1
-          print("liTaxa")
-          print(liTaxa)
 
     #Testing Status: Light happy path testing
     #Normalize the given columns of a structured array given the structured array and a list of the column names
@@ -168,8 +174,13 @@ class AbundanceTable:
     #@tempDelimiter The delimiter used in the adundance file
     #@tempStratifyByRow The row which contains the metadata to use in stratification.
     #Can be the index of the row starting with 0 or a keyword found in the first column of the row.
+    #tempLlsGroupings is a list of string lists where each string list holds values that are equal and should be grouped together.
+    #So for example, if you wanted to group metadata "1", "2", and "3" seperately but "4" and "5" together you would
+    #Give the following [["4","5"].
+    #If you know what "1" and "3" also together you would give [["1","3"],["4","5"]]
     #@return Returns boolean true or false. True indicating completion without detected errors
-    def stratifyAbundanceTableByMetadata(self, tempInputFile = None, tempDelimiter = Constants.TAB, tempStratifyByRow = 1):
+    def stratifyAbundanceTableByMetadata(self, tempInputFile = None, tempDirectory = "", tempDelimiter = Constants.TAB, tempStratifyByRow = 1, tempLlsGroupings = []):
+
         #Validate parameters
         if(not ValidateData.isValidFileName(tempInputFile)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, file not valid. File:"+str(tempInputFile)
@@ -182,46 +193,75 @@ class AbundanceTable:
             return False
 
         #Get the base of the file path
-        baseFilePath = os.path.splitext(tempInputFile)[0]
+        #This is dependent on the given output directory and the prefix of the file name of the input file
+        #If no output file is given then the input fiel directory is used.
+        baseFilePath = tempDirectory
+        if baseFilePath:
+            baseFilePath = baseFilePath + os.path.splitext(os.path.split(tempInputFile)[1])[0]
+        else:
+            baseFilePath = os.path.splitext(tempInputFile)[0]
 
         #Read in file
-        inputRead = FileIO(tempInputFile,True, False, False)
-        contents = inputRead.readFullFile()
-        inputRead.close()
-        contents = filter(None,contents.split(Constants.ENDLINE))
+        sFileContents = None
+        with open(tempInputFile,'r') as f:
+            sFileContents = f.read()
+            f.close()
+        sFileContents = filter(None,re.split(Constants.ENDLINE,sFileContents))
 
         #Collect metadata
         metadataInformation = dict()
 
         #If the tempStratifyRow is by key word than find the index
         if ValidateData.isValidString(tempStratifyByRow):
-            for iLineIndex, strLine in enumerate(contents):
+            for iLineIndex, strLine in enumerate(sFileContents):
                 if strLine.split(tempDelimiter)[0].strip("\"") == tempStratifyByRow:
                     tempStratifyByRow = iLineIndex
                     break
 
         #Stratify by metadata row
-        stratifyByRow = filter(None,contents[tempStratifyByRow].split(tempDelimiter))
+        #Split metadata row into metadata entries
+        #And put in a dictionary containing {"variable":[1,2,3,4 column index]}
+        stratifyByRow = sFileContents[tempStratifyByRow].split(tempDelimiter)
         for metaDataIndex in xrange(1,len(stratifyByRow)):
             metadata = stratifyByRow[metaDataIndex]
+            #Put all wierd categories, none, whitespace, blank space metadata cases into one bin
+            if not metadata or metadata in string.whitespace:
+                metadata = "Blank"
+            #Remove any extraneous formatting
+            metadata = metadata.strip(string.whitespace)
+            #Store processed metadata with column occurence in dictionary
             if(not metadata in metadataInformation):
-                #Include the taxa line
-                metadataInformation[metadata] = [0]
+                metadataInformation[metadata] = []
             metadataInformation[metadata].append(metaDataIndex)
+
+        #For each of the groupings
+        #Use the first value as the primary value which the rest of the values in the list are placed into
+        #Go through the dict holding the indices and extend the list for the primary value with the secondary values
+        #Then set the secondary value list to empty so that it will be ignored.
+        if tempLlsGroupings:
+            for lSKeyGroups in tempLlsGroupings:
+                if len(lSKeyGroups) > 1:
+                    for sGroup in lSKeyGroups[1:]:
+                        if sGroup in metadataInformation:
+                            metadataInformation[lSKeyGroups[0]].extend(metadataInformation[sGroup])
+                            metadataInformation[sGroup] = []
 
         #Stratify data
         stratifiedAbundanceTables = dict()
-        for tableRow in contents:
-            row = filter(None,tableRow.split(tempDelimiter))
+        for tableRow in sFileContents:
+            row = tableRow.split(tempDelimiter)
             if(len(row)> 1):
                 for metadata in metadataInformation:
+                    #[0] includes the taxa line
                     columns = metadataInformation[metadata]
-                    lineList = list()
-                    for column in columns:
-                        lineList.append(row[column])
-                    if(not metadata in stratifiedAbundanceTables):
-                        stratifiedAbundanceTables[metadata] = list()
-                    stratifiedAbundanceTables[metadata].append(tempDelimiter.join(lineList))
+                    if columns:
+                        columns = [0] + columns
+                        lineList = list()
+                        for column in columns:
+                            lineList.append(row[column])
+                        if(not metadata in stratifiedAbundanceTables):
+                            stratifiedAbundanceTables[metadata] = list()
+                        stratifiedAbundanceTables[metadata].append(tempDelimiter.join(lineList))
 
         #Write to file
         for metadata in stratifiedAbundanceTables:
@@ -268,13 +308,13 @@ class AbundanceTable:
         contents = contents.replace("\"","")
         contents = filter(None,contents.split(Constants.ENDLINE))
         namesRow = contents[tempNameRow]
-        namesRow = filter(None,namesRow.split(tempDelimiter))
+        namesRow = namesRow.split(tempDelimiter)
 
         #Get metadata lines
         metadata = dict()
         if((tempFirstDataRow-tempNameRow)>1):
             for line in contents[tempNameRow+1:tempFirstDataRow]:
-                asmetadataElements = filter(None,line.split(tempDelimiter))
+                asmetadataElements = line.split(tempDelimiter)
                 metadata[asmetadataElements[0]]=asmetadataElements[1:]
 
         #Build data type object (data name,data type)
@@ -285,7 +325,7 @@ class AbundanceTable:
         #Extract data
         #Create the tuple with the first data row
         rowData = contents[tempFirstDataRow]
-        rowData = filter(None,rowData.split(tempDelimiter))
+        rowData = rowData.split(tempDelimiter)
         taxId = rowData[0]
         longestTaxId = len(taxId)
         sampleReads = rowData[1:]
@@ -297,7 +337,7 @@ class AbundanceTable:
 
         #Add the rest of the rows
         for rowData in contents[tempFirstDataRow+1:]:
-            rowData = filter(None,rowData.split(tempDelimiter))
+            rowData = rowData.split(tempDelimiter)
             taxId = rowData[0]
             tempTaxIdLen = len(taxId)
             if(tempTaxIdLen > longestTaxId):

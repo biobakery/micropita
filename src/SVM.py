@@ -263,6 +263,10 @@ class SVM:
     @staticmethod
     def convertAbundanceFileToSVMFile(tempInputFile=None, tempOutputSVMFile=None, tempDelimiter=None, tempLabels=None, tempFirstDataRow=None, tempSkipFirstColumn = True, tempNormalize=None):
         #Validate parameters
+
+        print("tempLabels")
+        print(tempLabels)
+        print(len(tempLabels))
         if(not ValidateData.isValidFileName(tempInputFile)):
             print "Error, file not valid. File:"+str(tempInputFile)
             return False
@@ -286,9 +290,10 @@ class SVM:
             return False
 
         #Read in file
-        inputRead = FileIO(tempInputFile,True, False, False)
-        contents = inputRead.readFullFile()
-        inputRead.close()
+        contents = None
+        with open(tempInputFile,'r') as f:
+            contents = f.read()
+        f.close()
 
         #If output file exists, delete
         if(os.path.exists(tempOutputSVMFile)):
@@ -315,7 +320,10 @@ class SVM:
         if(tempNormalize==True):
             #Add data as numeric and normalize
             for lineIndex in xrange(tempFirstDataRow,len(contents)):
+                print("lineIndex")
+                print(lineIndex)
                 columns = contents[lineIndex].split(tempDelimiter)
+                print(columns)
                 for columnIndex in xrange(startingColumn,len(columns)):
                     dataMatrix[columnIndex-startingColumn].append(float(columns[columnIndex]))
             

@@ -54,6 +54,10 @@ class Constants():
     TAB = '\t'
     WHITE_SPACE = " "
 
+    #Default values for missing data in the Abundance Table
+    c_strEmptyAbundanceData = "0"
+    c_strEmptyDataMetadata = "NA"
+
     #Testing Variables
     TEMPORARY_TEST_FILE = TEST_DATA_TEMP_DIRECTORY+"TEMPTESTINGFILEEEEEEEANDIMGONE.txt"
 
