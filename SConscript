@@ -12,7 +12,8 @@ from Constants_Arguments import Constants_Arguments
 pE = DefaultEnvironment( )
 
 #Process flags
-c_fRunCollectionCurve = True
+c_fGenerateInSilicoDataSets = False
+c_fRunCollectionCurve = False
 fMakeMovies = False
 
 #Normalize
@@ -321,20 +322,24 @@ def globFilesByExtension(strDirectory,strExtension,strDelim = c_strExtDelim):
 
 ###Start process
 #Generate insilico data sets
+#Remember when creating insilico data sets, the Unbalanced test set's labels are off given built in randomness.
+#When you remake this data set you will have to adjust the labels
 lDataFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufInsilicoData)
 lsInsilicoDataFiles = []
-for strInsilicoData in lsInsilicoDataNames:
-  if not strInsilicoData in lDataFiles:
-    if strInsilicoData == c_strInsilicoDataDiversity:
-      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
-      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
-      Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateDiversityData(strDataSetKey=c_strInsilicoDataDiversityKey))
-      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="2"))
-    elif strInsilicoData == c_strInsilicoDataUnbalanced:
-      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
-      lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
-      Command([File( sfle.d( fileDirInput,strInsilicoData )),File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufActualData) ))], [c_fileProgUtilityData], funcGenerateUnbalancedData(strDataSetKey=c_strInsilicoDataUnbalancedKey))
-      Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="3"))
+
+if c_fGenerateInSilicoDataSets:
+  for strInsilicoData in lsInsilicoDataNames:
+    if not strInsilicoData in lDataFiles:
+      if strInsilicoData == c_strInsilicoDataDiversity:
+        lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
+        lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
+        Command(File( sfle.d( fileDirInput,strInsilicoData )), [c_fileProgUtilityData], funcGenerateDiversityData(strDataSetKey=c_strInsilicoDataDiversityKey))
+        Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="2"))
+      elif strInsilicoData == c_strInsilicoDataUnbalanced:
+        lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,strInsilicoData )).get_abspath())
+        lsInsilicoDataFiles.append(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )).get_abspath())
+        Command([File( sfle.d( fileDirInput,strInsilicoData )),File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufActualData) ))], [c_fileProgUtilityData], funcGenerateUnbalancedData(strDataSetKey=c_strInsilicoDataUnbalancedKey))
+        Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="3"))
 
 #Get micropita config files
 lMicropitaFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufConfig)
@@ -467,13 +472,13 @@ for fileConfigMicropita in lMicropitaFiles:
     #Make file names from the input micropita file in the temp directory
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufMicropita, c_strSufPredict )))
 
-    #Make files from the micropita output file
+    #Make files names from the micropita output file
     sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
     sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
     sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufConfusionMatrix,c_strSufOverlapMatrix,c_strSufHCLUSTData,c_strSufHCLUSTColor,
     c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
 
-    #Make more files, these for cladogram options
+    #Make more file names, these for cladogram options
     cCladogramSelectedTaxa = None
     if c_strConfigSelectedTaxa in sFileConfiguration:
       if(not sFileConfiguration[c_strConfigSelectedTaxa].lower() == "none"):
@@ -489,8 +494,15 @@ for fileConfigMicropita in lMicropitaFiles:
     sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufStratHCLUSTFig,c_strSufStratHCLUSTColor,c_strSufStratHCLUSTLabel)]
 
     #Run micropita analysis
+    #Note, micropita will check the input file so no need to send in teh checked abundance file,
+    #Send in the raw abundance file and micropita will make a checked version to use.
+    #The lsInsilicoDataFiles is addecd to this command to order the actions correctly.
+    #The insilico file creation must go before micropita
     sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
-    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita] + lsInsilicoDataFiles, funcMicroPita(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+    lFileMicropitaConditionalDependencies = []+lsInsilicoDataFiles
+    if os.path.exists(sCheckedAbundanceFile.get_abspath()):
+      lFileMicropitaConditionalDependencies.append(sCheckedAbundanceFile.get_abspath())
+    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita]+lFileMicropitaConditionalDependencies, funcMicroPita(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                     sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
                                                                                                                                     " ".join([Constants_Arguments.c_strSampleNameRowArgument,sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                     " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
@@ -580,7 +592,7 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strCircladerTicks,sFileConfiguration[c_strConfigCladogramTicks]]),
                                        " ".join([Constants_Arguments.c_strEnrichmentThreshold,sFileConfiguration[c_strConfigCladogramAlpha]])))
 
-    #Create figure 3
+    #Create figure 3 HCL version
 #    #Selection in Stratification
 #    Command([sOutputFigure3HCL, sStratHCLSelectColor, sStratHCLSelectLabel], [c_fileProgStratSelectionHCLFigure, sMicropitaOutput, sCheckedAbundanceFile] + ls_srcFig1, 
 #        funcHCLStratSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),

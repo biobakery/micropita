@@ -320,10 +320,7 @@ class SVM:
         if(tempNormalize==True):
             #Add data as numeric and normalize
             for lineIndex in xrange(tempFirstDataRow,len(contents)):
-                print("lineIndex")
-                print(lineIndex)
                 columns = contents[lineIndex].split(tempDelimiter)
-                print(columns)
                 for columnIndex in xrange(startingColumn,len(columns)):
                     dataMatrix[columnIndex-startingColumn].append(float(columns[columnIndex]))
             

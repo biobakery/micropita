@@ -657,10 +657,13 @@ class MicroPITA:
         totalData = AbundanceTable()
 
         #Check/reduce raw abundance data
+        print("Micropita making file")
         if(not os.path.exists(inputFilePrefix+"-checked.txt")):
             strInputAbundanceFile = totalData.checkRawDataFile(strInputAbundanceFile)
+            print("Made new checked")
         else:
             strInputAbundanceFile = inputFilePrefix+"-checked.txt"
+            print("Using old file")
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
