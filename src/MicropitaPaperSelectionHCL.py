@@ -19,7 +19,6 @@ from CommandLine import CommandLine
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
-from FileIO import FileIO
 import logging
 from MicroPITA import MicroPITA
 import numpy as np
@@ -64,17 +63,15 @@ class MicropitaPaperSelectionHCL:
                     selectedMatrix[iSample][iMetric] = "0"
 
         #Write to file
-        noWriteError = True
-        output = FileIO(tempOutputFile,False,True,False)
-        #Write id row
-        nowriteError = noWriteError and output.writeToFile(Constants.TAB.join(["ID",Constants.TAB.join([cID for cID in colIds])])+"\n")
-        #Write data
-        for iRow in xrange(0,len(rowIds)):
-            nowriteError = noWriteError and output.writeToFile(Constants.TAB.join([rowIds[iRow],Constants.TAB.join(selectedMatrix[iRow])])+"\n")
+        with open(tempOutputFile,'a') as f:
+            f.write(Constants.TAB.join(["ID",Constants.TAB.join([cID for cID in colIds])])+"\n")
+            #Write data
+            for iRow in xrange(0,len(rowIds)):
+                f.write(Constants.TAB.join([rowIds[iRow],Constants.TAB.join(selectedMatrix[iRow])])+"\n")
         #Close
-        output.close()
+        f.close()
 
-        return noWriteError
+        return True
 
     def generateColorFile(self, strColorFilePath, strLabelPath):
         #If the color file exists, delete
@@ -84,42 +81,44 @@ class MicropitaPaperSelectionHCL:
         if(os.path.exists(strLabelPath)):
             os.remove(strLabelPath)
         #Create file handle to write to files
-        colorFileWriter = FileIO(strColorFilePath,False,True,True)
-        labelFileWriter = FileIO(strLabelPath,False,True,True)
+        with open(strColorFilePath,'w') as fhdlColor:
+            colorList = list()
+            colorList.append("".join([MicroPITA.c_DIVERSITY_1+Constants.TAB+Constants_Figures.invSimpsonColor])) 
+            colorList.append("".join([MicroPITA.c_DIVERSITY_2+Constants.TAB+Constants_Figures.chao1Color]))
+            colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1+Constants.TAB+Constants_Figures.brayCurtisColor])) 
+            colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2+Constants.TAB+Constants_Figures.unifracColor])) 
+            colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3+Constants.TAB+Constants_Figures.weightedUnifracColor]))
+            colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_1+Constants.TAB+Constants_Figures.inBrayCurtisColor]))
+            colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_2+Constants.TAB+Constants_Figures.inUnifracColor]))
+            colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_3+Constants.TAB+Constants_Figures.inWeightedUnifracColor]))
+            colorList.append("".join([MicroPITA.c_USER_RANKED+Constants.TAB+Constants_Figures.userRanked]))
+            colorList.append("".join([MicroPITA.c_RANDOM+Constants.TAB+Constants_Figures.randomColor]))
+            colorList.append("".join([MicroPITA.c_SVM_CLOSE+Constants.TAB+Constants_Figures.svmClose]))
+            colorList.append("".join([MicroPITA.c_SVM_FAR+Constants.TAB+Constants_Figures.svmFar]))
 
-        #Collect color and label data
-        colorList = list()
-        labelList = list()
-        colorList.append("".join([MicroPITA.c_DIVERSITY_1+Constants.TAB+Constants_Figures.invSimpsonColor])) 
-        colorList.append("".join([MicroPITA.c_DIVERSITY_2+Constants.TAB+Constants_Figures.chao1Color]))
-        labelList.append("".join([MicroPITA.c_DIVERSITY_1+Constants.TAB+MicroPITA.c_DIVERSITY_1]))
-        labelList.append("".join([MicroPITA.c_DIVERSITY_2+Constants.TAB+MicroPITA.c_DIVERSITY_2]))
-        colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1+Constants.TAB+Constants_Figures.brayCurtisColor])) 
-        colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2+Constants.TAB+Constants_Figures.unifracColor])) 
-        colorList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3+Constants.TAB+Constants_Figures.weightedUnifracColor]))
-        labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1]))
-        labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2]))
-        labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3]))
-        colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_1+Constants.TAB+Constants_Figures.inBrayCurtisColor]))
-        colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_2+Constants.TAB+Constants_Figures.inUnifracColor]))
-        colorList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_3+Constants.TAB+Constants_Figures.inWeightedUnifracColor]))
-        labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_1+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_1]))
-        labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_2+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_2]))
-        labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_3+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_3]))
-        colorList.append("".join([MicroPITA.c_USER_RANKED+Constants.TAB+Constants_Figures.userRanked]))
-        labelList.append("".join([MicroPITA.c_USER_RANKED+Constants.TAB+MicroPITA.c_USER_RANKED]))
-        colorList.append("".join([MicroPITA.c_RANDOM+Constants.TAB+Constants_Figures.randomColor]))
-        labelList.append("".join([MicroPITA.c_RANDOM+Constants.TAB+MicroPITA.c_RANDOM]))
-        colorList.append("".join([MicroPITA.c_SVM_CLOSE+Constants.TAB+Constants_Figures.svmClose]))
-        colorList.append("".join([MicroPITA.c_SVM_FAR+Constants.TAB+Constants_Figures.svmFar]))
-        labelList.append("".join([MicroPITA.c_SVM_CLOSE+Constants.TAB+MicroPITA.c_SVM_CLOSE]))
-        labelList.append("".join([MicroPITA.c_SVM_FAR+Constants.TAB+MicroPITA.c_SVM_FAR]))
+            #Close file handle
+            fhdlColor.write(Constants.ENDLINE.join(colorList))
+        fhdlColor.close()
 
-        #Close file handle
-        colorFileWriter.writeToFile(Constants.ENDLINE.join(colorList))
-        labelFileWriter.writeToFile(Constants.ENDLINE.join(labelList))
-        colorFileWriter.close()
-        labelFileWriter.close()
+
+        with open(strLabelPath,'w') as fhdlLabel:
+            labelList = list()
+            labelList.append("".join([MicroPITA.c_DIVERSITY_1+Constants.TAB+MicroPITA.c_DIVERSITY_1]))
+            labelList.append("".join([MicroPITA.c_DIVERSITY_2+Constants.TAB+MicroPITA.c_DIVERSITY_2]))
+            labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1]))
+            labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2]))
+            labelList.append("".join([MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3+Constants.TAB+MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3]))
+            labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_1+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_1]))
+            labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_2+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_2]))
+            labelList.append("".join([MicroPITA.c_EXTREME_DISSIMILARITY_3+Constants.TAB+MicroPITA.c_EXTREME_DISSIMILARITY_3]))
+            labelList.append("".join([MicroPITA.c_USER_RANKED+Constants.TAB+MicroPITA.c_USER_RANKED]))
+            labelList.append("".join([MicroPITA.c_RANDOM+Constants.TAB+MicroPITA.c_RANDOM]))
+            labelList.append("".join([MicroPITA.c_SVM_CLOSE+Constants.TAB+MicroPITA.c_SVM_CLOSE]))
+            labelList.append("".join([MicroPITA.c_SVM_FAR+Constants.TAB+MicroPITA.c_SVM_FAR]))
+
+            #Close file handle
+            fhdlLabel.write(Constants.ENDLINE.join(labelList))
+        fhdlLabel.close()
 
 
 #Set up arguments reader

@@ -15,7 +15,7 @@
 class Constants_Testing():
 
     #Locations
-    c_strTestingRoot = "Testing/"
+    c_strTestingRoot = "input/micropita/src/"+"Testing/"
     c_strTestingTMP = c_strTestingRoot+"TMP/"
     c_strTestingData = c_strTestingRoot+"Data/"
     c_strTestingTruth = c_strTestingData+"CorrectTestingResults/"

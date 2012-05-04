@@ -15,7 +15,6 @@ __status__ = "Development"
 #Import libraries
 from Constants import Constants
 from Diversity import Diversity
-from FileIO import FileIO
 import numpy as np
 import unittest
 
@@ -422,9 +421,10 @@ class DiversityTest(unittest.TestCase):
         
         #Newick tree
         taxTree = Constants.INPUT_DATA_DIRECTORY+"HMPNewickTreeQiimeFormat/rep_set_v35-NoQuote.tre"
-        readTree = FileIO(taxTree,True,False,False)
-        taxTree = readTree.readFullFile()
-        readTree.close()
+
+        with open(taxTree,'r') as f:
+            taxTree = f.read()
+        f.close()
 
         #Translates to this dictionary
         envs = Constants.INPUT_DATA_DIRECTORY+"HMPQiimeFormatAbundanceTable/otu_table_psn_v35.red.txt"

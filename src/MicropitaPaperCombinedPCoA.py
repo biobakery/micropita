@@ -36,6 +36,10 @@ argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleN
 argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+                  help= Constants_Arguments.c_strIsNormalizedHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+
 #Selection Methods to plot, max 4
 #Abundance file
 argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
@@ -77,9 +81,13 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
-    sampleNames = abundance.dtype.names[1:]
+    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
+                                            fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+                                            iFirstDataRow = int(args.iFirstDataRow))
+    if c_Normalize:
+        rawData.funcNormalize()
+
+    sampleNames = rawData.funcGetSampleNames()
 
     #Figure colors
     objFigureControl = Constants_Figures()
@@ -96,7 +104,8 @@ def _main( ):
 
     #Generate PCoA
     #LoadData
-    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize, tempCheckFile=c_fCheckFile)
+    analysis.loadData(xData=rawData, fIsRawData=True)
+#    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize, tempCheckFile=c_fCheckFile)
     #Make distance matrix
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 

@@ -39,7 +39,7 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, strOutputFileName = outputFile, cDelimiter=delimiter)
 
         #Get answer
         result = ""
@@ -65,7 +65,7 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, strOutputFileName = outputFile, cDelimiter=delimiter)
 
         #Get answer
         result = ""
@@ -76,7 +76,7 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testCheckRawDataFileForReduceBtyZeroAndMissingData(self):
+    def testCheckRawDataFileForReduceByZeroAndMissingData(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_MissingData.txt"])
@@ -91,7 +91,33 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\"\t700098986\t700098984\tNA\t700098980\t700098988\t700037470\t700037472\t700037474\tNA\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+            f.close()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForReduceByZeroAndMissingDataOfDifferentLength(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking_MissingDataVary.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\tNA\t700098980\t700098988\t700037470\t700037472\t700037474\tNA\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, strOutputFileName = outputFile, cDelimiter=delimiter)
 
         #Get answer
         result = ""
@@ -113,7 +139,7 @@ class AbundanceTableTest(unittest.TestCase):
         answer = "\"TID\" 700098986 700098984 700098982 700098980 700098988 700037470 700037472 700037474 700037476 700037478\n\"STSite\" \"L_Antecubital_fossa\" \"R_Retroauricular_crease\" \"L_Retroauricular_crease\" \"Subgingival_plaque\" \"R_Antecubital_fossa\" \"L_Retroauricular_crease\" \"R_Retroauricular_crease\" \"L_Antecubital_fossa\" \"R_Antecubital_fossa\" \"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\" 1 0 0 12 0 6 0 2 1 0\n\"Bacteria|unclassified|4904\" 0 10 0 43 6 0 23 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\" 3 0 0 29 0 45 0 1 1 0\n\"Bacteria|3417\" 0 45 0 34 3 0 0 0 1 0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\" 5 0 0 2 0 6 0 1 1 0\n"
 
         #Call method
-        AbundanceTable.checkRawDataFile(tempReadDataFileName=inputFile, tempOutputFileName = outputFile, tempDelimiter=delimiter)
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, strOutputFileName = outputFile, cDelimiter=delimiter)
 
         #Get answer
         result = ""
@@ -128,154 +154,12 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testNormalizeColumnsForGoodCaseNoNormalize(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        data = AbundanceTable()
-        columnNames = []
-
-        #Correct Answer
-        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)\n ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"
-
-        #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.normalizeColumns(tempStructuredArray=result[0], tempColumns=columnNames)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testNormalizeColumnsForGoodCaseNormalize1(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        data = AbundanceTable()
-        columnNames = ["700098986"]
-
-        #Correct Answer
-        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)\n ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"
-
-        #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.normalizeColumns(tempStructuredArray=result[0], tempColumns=columnNames)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testNormalizeColumnsForGoodCaseNormalize14(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        data = AbundanceTable()
-        columnNames = ["700098986","700098980"]
-
-        #Correct Answer
-        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 0.35833333333333334, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)\n ('Bacteria|3417', 0.0, 45.0, 0.0, 0.2833333333333333, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"
-
-        #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.normalizeColumns(tempStructuredArray=result[0], tempColumns=columnNames)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testNormalizeColumnsForGoodCaseNormalizeAll(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        data = AbundanceTable()
-        columnNames = ["700098986","700098984","700098982","700098980","700098988","700037470","700037472","700037474","700037476","700037478"]
-
-        #Correct Answer
-        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)\n ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)]"
-
-        #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.normalizeColumns(tempStructuredArray=result[0], tempColumns=columnNames)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testTextToStructuredArrayForGoodCaseNoNormalize(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        microPITA = AbundanceTable()
-
-        #Correct Answer
-        answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
-
-        #Call method
-        result = microPITA.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testTextToStructuredArrayForGoodCaseNormalize(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = AbundanceTable()
-
-        #Correct Answer
-        answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0),\n       ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
-
-        #Call method
-        result = microPITA.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=",str(answer),".\nReceived=",str(result),"."]))
-
-    def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
-        
-        #Inputs
-        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"])
-        delimiter = Constants.WHITE_SPACE
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        microPITA = AbundanceTable()
-
-        #Correct Answer
-        answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
-
-        #Call method
-        result = microPITA.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
     def testStratifyAbundanceTableByMetadataForGoodCaseByIndex(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         stratifyRow = 1
-        table = AbundanceTable()
         strOutputDirectory = Constants_Testing.c_strTestingTMP
 
         #Correct Answer is blank indicating no error
@@ -308,7 +192,7 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(strFile)
 
         #Call method
-        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+        AbundanceTable.funcStratifyAbundanceTableByMetadata(strInputFile = inputFile, strDirectory = strOutputDirectory, cDelimiter = delimiter, iStratifyByRow = stratifyRow)
 
         #Check file creation
         error = ""
@@ -340,7 +224,6 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         stratifyRow = "STSite"
-        table = AbundanceTable()
         strOutputDirectory = Constants_Testing.c_strTestingTMP
 
         #Correct Answer is blank indicating no error
@@ -373,7 +256,7 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(strFile)
 
         #Call method
-        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow)
+        AbundanceTable.funcStratifyAbundanceTableByMetadata(strInputFile = inputFile, strDirectory = strOutputDirectory, cDelimiter = delimiter, iStratifyByRow = stratifyRow)
 
         #Check file creation
         error = ""
@@ -405,7 +288,6 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         stratifyRow = "STSite"
-        table = AbundanceTable()
         strOutputDirectory = Constants_Testing.c_strTestingTMP
 
         llsGroupings = [["\"L_Antecubital_fossa\"","\"Anterior_nares\"","\"Subgingival_plaque\""],["\"R_Retroauricular_crease\"","\"R_Antecubital_fossa\""]]
@@ -431,7 +313,7 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(strFile)
 
         #Call method
-        table.stratifyAbundanceTableByMetadata(tempInputFile = inputFile, tempDirectory = strOutputDirectory, tempDelimiter = delimiter, tempStratifyByRow = stratifyRow, tempLlsGroupings = llsGroupings)
+        AbundanceTable.funcStratifyAbundanceTableByMetadata(strInputFile = inputFile, strDirectory = strOutputDirectory, cDelimiter = delimiter, iStratifyByRow = stratifyRow, llsGroupings = llsGroupings)
 
         #Check file creation
         error = ""
@@ -457,29 +339,27 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-
-    def testTransposeDataMatrixForGoodCase(self):
+    def testFuncNormalizeColumnsBySumForGoodCaseNormalizeAll(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         nameRow = 0
         firstDataRow = 2
-        normalize = False
-        data = AbundanceTable()
-        removeAdornment = False
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
-        answer = "[[ 'Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72'\n  'Bacteria|unclassified|4904'\n  'Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361'\n  'Bacteria|3417'\n  'Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368']\n ['1.0' '0.0' '3.0' '0.0' '5.0']\n ['0.0' '10.0' '0.0' '45.0' '0.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']\n ['12.0' '43.0' '29.0' '34.0' '2.0']\n ['0.0' '6.0' '0.0' '3.0' '0.0']\n ['6.0' '0.0' '45.0' '0.0' '6.0']\n ['0.0' '23.0' '0.0' '0.0' '0.0']\n ['2.0' '0.0' '1.0' '0.0' '1.0']\n ['1.0' '1.0' '1.0' '1.0' '1.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']]"
+        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)\n ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)]"
 
         #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.transposeDataMatrix(tempMatrix=result[0], tempRemoveAdornments=removeAdornment)
+        data.funcNormalizeColumnsBySum()
+        result = data.funcGetAbundanceCopy()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testTransposeDataMatrixForGoodCaseRemoveAdornments(self):
+    def testTextToStructuredArrayForGoodCase(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -487,20 +367,207 @@ class AbundanceTableTest(unittest.TestCase):
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable()
-        removeAdornment = True
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
-        answer = "[[  1.   0.   3.   0.   5.]\n [  0.  10.   0.  45.   0.]\n [  0.   0.   0.   0.   0.]\n [ 12.  43.  29.  34.   2.]\n [  0.   6.   0.   3.   0.]\n [  6.   0.  45.   0.   6.]\n [  0.  23.   0.   0.   0.]\n [  2.   0.   1.   0.   1.]\n [  1.   1.   1.   1.   1.]\n [  0.   0.   0.   0.   0.]]"
+        answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
 
         #Call method
-        result = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        result = data.transposeDataMatrix(tempMatrix=result[0], tempRemoveAdornments=removeAdornment)
+        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def notFilterByAbundanceForGoodCase(self):
+    def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"])
+        delimiter = Constants.WHITE_SPACE
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Correct Answer
+        answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
+
+        #Call method
+        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFilterAbundanceBySequenceOccurenceForGoodCase(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering-Answer.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        iMinSampleThreshold = 2
+        iMinSequenceThreshold = 2
+
+        #Correct Answer
+        abndDataAnswer, metadataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceBySequenceOccurence(iMinSequence = iMinSequenceThreshold, iMinSamples = iMinSampleThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer),"".join([str(self),"::Expected=",str(abndDataAnswer),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCase1(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer1.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 50
+        dPercentageAboveThreshold = 60
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCase2(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer2.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 70
+        dPercentageAboveThreshold = 70
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCase3(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer3.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 90
+        dPercentageAboveThreshold = 20
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCase3(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer3.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 90
+        dPercentageAboveThreshold = 20
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCaseAllGone(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-AnswerAllGone.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 90
+        dPercentageAboveThreshold = 100
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFilterAbundanceByPercentileForGoodCaseAll(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer.txt"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dPercentileCutOffThreshold = 50
+        dPercentageAboveThreshold = 30
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+
+        #Call method
+        data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
+    def testFuncToArrayForGoodCase(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -508,16 +575,14 @@ class AbundanceTableTest(unittest.TestCase):
         nameRow = 0
         firstDataRow = 2
         normalize = False
-        data = AbundanceTable()
-        removeAdornment = False
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+        result = data.funcToArray()
 
         #Correct Answer
-        answer = ""
-        result = "1"
-
-        #Call method
-        abndData, metadata = data.textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        data.filterByAbundance(npaAbundance=abndData, dPercentileCutOff = 0.99, dPercentageAbovePercentile=0.9)
+        answer = "[[  1.   0.   0.  12.   0.   6.   0.   2.   1.   0.]\n [  0.  10.   0.  43.   6.   0.  23.   0.   1.   0.]\n [  3.   0.   0.  29.   0.  45.   0.   1.   1.   0.]\n [  0.  45.   0.  34.   3.   0.   0.   0.   1.   0.]\n [  5.   0.   0.   2.   0.   6.   0.   1.   1.   0.]]"
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))

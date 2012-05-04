@@ -49,8 +49,80 @@ class CladogramTest(unittest.TestCase):
         tempClades = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
                       "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A"]
         correctAnswer = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A","1A|2A|3A|4A|5A","1A|2A|3A|4A|6A"]
-        result = Cladogram().filterByCladeSize(tempClades)
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 2
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        result = cladogram.filterByCladeSize(tempClades)
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    # Test filter by size
+    def testFilterByCladeSizeForAllFiltering(self):
+        methodName = "testFilterByCladeSizeForAllFiltering"
+
+        lsIds = ["A|B|C","B|C","B|D","A|B","B|E"]
+        answerFileContents = []
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        lsRet = cladogram.filterByCladeSize(lsIds)
+
+        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
+
+    def testFilterByCladeSizeForNoFiltering(self):
+        methodName = "testFilterByCladeSizeForNoFiltering"
+
+        lsIds = ["A|B|C|1","A|B|2","A|B|C|3","A|B|4","A|B|C|5"]
+        answerFileContents = lsIds
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5#
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        lsRet = cladogram.filterByCladeSize(lsIds)
+
+        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
+
+    def testFilterByCladeSizeForSomeFiltering(self):
+        methodName = "testFilterByCladeSizeSomeNoFiltering"
+
+        lsIds = ["A|B|C|1","A2|B|C|6","A|B|2","A3|B|C|6","A3|B|C|6","A|B|C|3","A|B|4","A4|B|C|6","A|B|C|5"]
+        answerFileContents = ["A|B|C|1","A|B|2","A|B|C|3","A|B|4","A|B|C|5"]
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        lsRet = cladogram.filterByCladeSize(lsIds)
+
+        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
 
     def testFilterByCladeSizeFor1Removed(self):
         methodName = "testFilterByCladeSizeFor1Removed"
@@ -58,7 +130,18 @@ class CladogramTest(unittest.TestCase):
         tempClades = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
                       "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A","1B|2B|3B|4B|1B"]
         correctAnswer = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A","1A|2A|3A|4A|5A","1A|2A|3A|4A|6A"]
-        result = Cladogram().filterByCladeSize(tempClades)
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        result = cladogram.filterByCladeSize(tempClades)
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testFilterByCladeSizeFor2Removed(self):
@@ -67,7 +150,18 @@ class CladogramTest(unittest.TestCase):
         tempClades = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
                       "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A","1B|2B|3B|4B|1B","1B|2B|3B|4B|2B"]
         correctAnswer = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A","1A|2A|3A|4A|5A","1A|2A|3A|4A|6A"]
-        result = Cladogram().filterByCladeSize(tempClades)
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        result = cladogram.filterByCladeSize(tempClades)
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testFilterByCladeSizeFor3Removed(self):
@@ -76,9 +170,19 @@ class CladogramTest(unittest.TestCase):
         tempClades = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
                       "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A","1B|2B|3B|4B|1B","1B|2B|3B|4B|2B","1C|2C|3C|4C|3C"]
         correctAnswer = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A","1A|2A|3A|4A|5A","1A|2A|3A|4A|6A"]
-        result = Cladogram().filterByCladeSize(tempClades)
-        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        result = cladogram.filterByCladeSize(tempClades)
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testFilterByCladeSizeFor4Removed(self):
         methodName = "testFilterByCladeSizeFor3Removed"
@@ -90,7 +194,18 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
                       "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A","1B|2B|3B|4B|1B","1B|2B|3B|4B|2B",
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B"]
-        result = Cladogram().filterByCladeSize(tempClades)
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 5
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        result = cladogram.filterByCladeSize(tempClades)
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testUpdateToRootForLevel0(self):
@@ -635,7 +750,7 @@ class CladogramTest(unittest.TestCase):
     def testFilterByAbundanceForGoodCase(self):
         methodName = "testFilterByAbundanceForGoodCase"
 
-        strTestFile = "Testing/Data/FilterByAbundance.txt"
+        strTestFile = "".join([Constants_Testing.c_strTestingData,"FilterByAbundance.txt"])
         charCurDelimiter = "\t"
         iCurNameRow = 0
         iCurFirstDataRow = 1
@@ -652,49 +767,11 @@ class CladogramTest(unittest.TestCase):
 
         self.assertEquals(str(lsCorrectIds),str(lsRet), methodName+"Did not get the correct file, expected:"+str(lsCorrectIds)+" but received:"+str(lsRet)+".")
 
-
-    # Test filter by size
-    def testFilterByCladeSizeForAllFiltering(self):
-        methodName = "testFilterByCladeSizeForAllFiltering"
-
-        lsIds = ["A|B|C","B|C","B|C","A|B","B|C"]
-        answerFileContents = []
-
-        cladogram = Cladogram()
-        cladogram.c_iMinCladeSize = 5
-        lsRet = cladogram.filterByCladeSize(lsIds)
-
-        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
-
-    def testFilterByCladeSizeForNoFiltering(self):
-        methodName = "testFilterByCladeSizeForNoFiltering"
-
-        lsIds = ["A|B|C|1","A|B|2","A|B|C|3","A|B|4","A|B|C|5"]
-        answerFileContents = lsIds
-
-        cladogram = Cladogram()
-        cladogram.c_iMinCladeSize = 5
-        lsRet = cladogram.filterByCladeSize(lsIds)
-
-        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
-
-    def testFilterByCladeSizeForSomeFiltering(self):
-        methodName = "testFilterByCladeSizeSomeNoFiltering"
-
-        lsIds = ["A|B|C|1","A2|B|C|6","A|B|2","A3|B|C|6","A3|B|C|6","A|B|C|3","A|B|4","A4|B|C|6","A|B|C|5"]
-        answerFileContents = ["A|B|C|1","A|B|2","A|B|C|3","A|B|4","A|B|C|5"]
-
-        cladogram = Cladogram()
-        cladogram.c_iMinCladeSize = 5
-        lsRet = cladogram.filterByCladeSize(lsIds)
-
-        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
-
     # Test create size file
     def testCreateSizeFileForGoodCase(self):
         methodName = "testCreateSizeFileForGoodCase"
 
-        strTestFile = "Testing/Data/SmallAbundance.txt"
+        strTestFile = "".join([Constants_Testing.c_strTestingData,"SmallAbundance.txt"])
         charCurDelimiter = "\t"
         iCurNameRow = 0
         iCurFirstDataRow = 1
@@ -703,7 +780,7 @@ class CladogramTest(unittest.TestCase):
         answerFileContents = "Taxa1\t19.1938205472\nTaxa2\t24.2073385653\nTaxa3\t0.000130281830588\nTaxa4\t20.7493620036\nTaxa5\t23.3284684971"
 
         cladogram = Cladogram()
-        cladogram.strSizeFilePath = "./Testing/TMP/testCreateSizeFileForGoodCase.txt"
+        cladogram.strSizeFilePath = "".join([Constants_Testing.c_strTestingTMP,"testCreateSizeFileForGoodCase.txt"])
 
         if(os.path.exists(cladogram.strSizeFilePath)):
           os.remove(cladogram.strSizeFilePath)

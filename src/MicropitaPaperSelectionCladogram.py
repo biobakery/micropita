@@ -55,9 +55,9 @@ argp.add_argument(Constants_Arguments.c_strCladeFilterLevel, dest = "iCladeFilte
 argp.add_argument(Constants_Arguments.c_strCladeMeasureLevel, dest = "iCladeFilterMeasure", metavar= "CladeFilterLevelMeasure", default="None", help = Constants_Arguments.c_strCladeMeasureLevelHelp)
 argp.add_argument(Constants_Arguments.c_strCladeFilteringMinLevel, dest = "iCladeFilterMinNumber", metavar= "CladeFilterMinNumber", default="None",
 	help = Constants_Arguments.c_strCladeFilteringMinLevelHelp)
-argp.add_argument(Constants_Arguments.c_strAbundanceFilterPercentile, dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default="None",
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterPercentile, dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default=0.0,
 	help = Constants_Arguments.c_strAbundanceFilterPercentileHelp)
-argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default="None",
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default=0.0,
 	help = Constants_Arguments.c_strAbundanceFilterCutoffHelp)
 argp.add_argument(Constants_Arguments.c_strRingOrder, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrder)
 argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
@@ -65,6 +65,11 @@ argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleN
 argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
 argp.add_argument(Constants_Arguments.c_strEnrichmentThreshold, dest = "dAlpha", action = "store", default = 0.05, help = Constants_Arguments.c_strEnrichmentThresholdHelp)
+argp.add_argument(Constants_Arguments.c_strOccurenceFilterSequenceCount, dest ="iMinSequenceCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSequenceHelp)
+argp.add_argument(Constants_Arguments.c_strOccurenceFilterSampleCount, dest ="iMinSampleCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSampleHelp)
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+                  help= Constants_Arguments.c_strIsNormalizedHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
 
 #Outputfile
 argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
@@ -79,7 +84,8 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
-
+    print("Start Circlader")
+    print(args)
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
@@ -110,11 +116,28 @@ def _main( ):
     #Delimiter for taxa/otu lineages
     c_strLineageDelim = "|"
 
-    #Read in abundance data
-    rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strInputFile, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
-    strSampleID = abundance.dtype.names[0]
-    lsAllSampleNames = abundance.dtype.names[1:]
+    #Abundance table
+    rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=args.fIsNormalized,
+                                          fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+                                          iFirstDataRow = int(args.iFirstDataRow),cFeatureNameDelimiter=c_strLineageDelim)
+
+    #Filtering
+    #Indicate Filtering
+    fFilterAbundance = (not args.iAbundanceFilterPercentile.lower() == "none")
+    fFilterOccurence = (not args.iMinSequenceCount.lower() == "none")
+
+    if fFilterAbundance:
+      rawData.funcFilterAbundanceByPercentile(dPercentileCutOff = float(args.iAbundanceFilterPercentile),
+                                          dPercentageAbovePercentile = float(args.iAbundanceFilterPercentCuttoff))
+    elif fFilterOccurence:
+      rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
+
+    if c_Normalize:
+      rawData.normalize()
+
+    abundance = rawData.funcGetAbundanceCopy()
+    strSampleID = rawData.funcGetIDMetadataName()
+    lsAllSampleNames = rawData.funcGetSampleNames()
 
     #All taxa in the study
     lsAllTaxa = [strTaxaId for strTaxaId in list(abundance[strSampleID])]
@@ -135,15 +158,6 @@ def _main( ):
       iCladeLevelForReducing = int(args.iCladeFilterLevel)
       iCladeLevelMinimumCount = int(args.iCladeFilterMinNumber)
     cladogram.setFilterByCladeSize(fCladeSizeFilter = fFilterClades, iCladeLevelToMeasure = iCladeLevelForFiltering, iCladeLevelToReduce = iCladeLevelForReducing, iMinimumCladeSize = iCladeLevelMinimumCount)
-
-    #Abundance filtering
-    fFilterAbundance = (not args.iAbundanceFilterPercentile.lower() == "none")
-    dPercentileCutOff = 0.0
-    dPercentageAbovePercentile = 0.0
-    if(fFilterAbundance):
-      dPercentileCutOff = float(args.iAbundanceFilterPercentile)
-      dPercentageAbovePercentile = float(args.iAbundanceFilterPercentCuttoff)
-    cladogram.setFilterByAbundance(fAbundanceFilter = fFilterAbundance, dPercentileCutOff = dPercentileCutOff,  dPercentageAbovePercentile = dPercentageAbovePercentile)
 
     #Read in selection file
     fHndlInput = open(args.strSelectionFile,'r')
@@ -221,48 +235,15 @@ def _main( ):
       if len(dictRelabel) > 0:
         cladogram.relabelIDs(dictRelabel)
 
-#    if(args.strEnrichmentIndicatorMethod=="ABS"):#Abscense and Presence
-#      #This is perfroming absense and presence
-#      #Add circles for each method
-#      dictTaxaInAllSelection = dict()
-#
-#      #Allows one to set the order of the rings if needed
-#      lsSelectedSampleMethod = dictSelection.keys()
-#      if not args.iRingOrder == None:
-#        lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
-#
-#      for selectedSampleMethod in lsSelectedSampleMethod:
-#        if selectedSampleMethod in dictSelection:
-#          #All samples that were selected by the method
-#          lsSelectedSamples = dictSelection[selectedSampleMethod]
-#          #Get taxa interesting to this selection technique
-#          setMethodTaxaTotal = set()
-#          #For each selected sample get absence or presence of taxa
-#          for strSelectedSample in lsSelectedSamples:
-#            #Get taxa of each sample
-#            lsSampleTaxaAbundance = abundance[strSelectedSample]
-#            #Will hold taxa that have more than 0 abundance
-#            lsSelectedTaxaPerSample = list()
-#            #Go through each taxa abundance using the index to match it to the taxa name
-#            for iAbundanceIndex in xrange(0,len(lsSampleTaxaAbundance)):
-#              scurTaxon = abundance[strSampleID][iAbundanceIndex]
-#              #If the taxa has more than 0.0 abundance add
-#              if(float(lsSampleTaxaAbundance[iAbundanceIndex]) > 0.0):
-#                lsSelectedTaxaPerSample.append(scurTaxon)
-#            #Combine (union) taxa to a set
-#            setMethodTaxaTotal = setMethodTaxaTotal | set(lsSelectedTaxaPerSample)
-#
-#          #Add circle for this data
-#          #cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
+    #Allows one to set the order of the rings if needed
+    lsSelectedSampleMethod = dictSelection.keys()
+    if not args.iRingOrder == None:
+      lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
 
+    #Measure enrichment
     if((args.strEnrichmentIndicatorMethod=="PVALUE") or (args.strEnrichmentIndicatorMethod=="FDR")):#P-value or qvalue
       #Are we using qvalues or pvalues
       fIsQValue = (args.strEnrichmentIndicatorMethod=="FDR")
-
-      #Allows one to set the order of the rings if needed
-      lsSelectedSampleMethod = dictSelection.keys()
-      if not args.iRingOrder == None:
-        lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
 
       #This is performing t-test with p-values
       for selectedSampleMethod in lsSelectedSampleMethod:
@@ -339,7 +320,7 @@ def _main( ):
           cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
 
     #Generate cladogram
-    cladogram.generate(strInputFile=args.strInputFile, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, charDelimiter=Constants.TAB, iNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow), fNormalize=False, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
+    cladogram.generate(abtbData=rawData, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
 
 ##Returns only terminal nodes given the list's structure
 def funcGetTerminalNodes(lsTaxa,cDelim):

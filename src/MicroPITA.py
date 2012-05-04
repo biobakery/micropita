@@ -20,7 +20,6 @@ from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 import csv
 from Diversity import Diversity
-from FileIO import FileIO
 import logging
 import math
 import mlpy
@@ -33,6 +32,7 @@ import re
 import scipy.cluster.hierarchy as hcluster
 from SVM import SVM
 import sys
+from Utility_Math import Utility_Math
 from ValidateData import ValidateData
 
 
@@ -94,36 +94,6 @@ class MicroPITA:
 
     #Linkage used in the Hierarchical clustering
     c_HIERARCHICAL_CLUSTER_METHOD = 'average'
-
-####General
-    #Happy path tested
-    #Expectes a structured array for npData (rows = Taxa/OTU)
-    #Expectes the first entry of every row to be an id that is ignored but carried forward
-    #Metadata is used to collapse by
-    def funcStratifyDataByMetadata(self,lsMetadata, npData):
-        dictAbundanceBlocks = dict()
-        setValues = set(lsMetadata)
-        lsNames = npData.dtype.names
-        #Get index of values to break up
-        for value in setValues:
-            fDataIndex = [sData==value for sData in lsMetadata]
-            #The true is added to keep the first column which should be the feature id
-            dictAbundanceBlocks[value] = npData[np.compress([True]+fDataIndex,lsNames)]
-        return dictAbundanceBlocks
-
-    def funcStratifyMetadataByMetadata(self, lsMetadata, dictMetadataToStratify):
-        dictMetadataBlocks = dict()
-        setValues = set(lsMetadata)
-        #Get index of values to break up
-        for value in setValues:
-            fDataIndex = [sData==value for sData in lsMetadata]
-            dictBrokenMetadata = dict()
-            for metadataType in dictMetadataToStratify:
-                dictValues = dictMetadataToStratify[metadataType]
-                dictBrokenMetadata[metadataType] = np.compress(fDataIndex,dictValues).tolist()
-            #The true is added to keep the first column which should be the feature id
-            dictMetadataBlocks[value] = dictBrokenMetadata
-        return dictMetadataBlocks
 
 ####Group 1## Diversity
 
@@ -591,8 +561,149 @@ class MicroPITA:
             logging.error("MicroPITA.runSVM: Prediction files were false.")
         return modelFiles
 
+    #Run the supervised methods
+    def runSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
+                                   strOuputSVMFile, strSupervisedMetadata, sampleSVMSelectionCount,
+                                   iFirstDataRow, fSkipFirstColumn, fNormalize,
+                                   iScaleLowestBound, strCostRange, fProbabilitic):
+        #Run supervised blocks
+        #Select supervised (using SVM)
+        #Expects input file's matrix to be Taxa (row) by Sample (col) with a taxa id column (index=0)
+        #Get sample names
+        sampleNames = abundanceTable.funcGetSampleNames()
+        #Will contain the samples selected to return
+        dictSelectedSamples = dict()
+        #Run linear SVM
+        svmRelatedData = self.runSVM(tempInputFile=abundanceTable.funcGetName(), tempDelimiter=abundanceTable.funcGetFileDelimiter(),
+                                     tempOutputSVMFile=strOuputSVMFile,
+                                     tempMatrixLabels=abundanceTable.funcGetMetadata(strSupervisedMetadata), tempFirstDataRow=iFirstDataRow,
+                                     tempSkipFirstColumn=fSkipFirstColumn,
+                                     tempNormalize=fNormalize, tempSVMScaleLowestBound=iScaleLowestBound,
+                                     tempSVMLogC=strCostRange, tempSVMProbabilistic=fProbabilitic)
+
+        #Read in prediction file and select samples
+        if svmRelatedData:
+            if(SVM.c_KEYWORD_PREDICTION_FILE in svmRelatedData):
+                #Get prediction file path
+                predictionFile = svmRelatedData[SVM.c_KEYWORD_PREDICTION_FILE]
+                #Get the input file for the SVMS which has the original labels before classification
+                strSVMInputFile = svmRelatedData[SVM.c_KEYWORD_INPUT_FILE]
+                #Holds labels to compare to the predictions
+                lsOriginalLabels = None
+                #Open input file and get labels to compare to the predictions
+                with open(strSVMInputFile,'r') as f:
+                    reader = csv.reader(f, delimiter=Constants.WHITE_SPACE, quoting=csv.QUOTE_NONE)
+                    lsOriginalLabels = [row[0] for row in reader]
+                f.close()
+                #TODO test selection of samples
+                #Read in file
+                with open(predictionFile,'r') as f:
+                    predictionLists = f.read()
+                f.close()
+                predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(Constants.ENDLINE)]
+
+                #Get label count (meaning the number of label categories)(-1 to not count the predicted first entry)
+                labelCount = len(predictionLists[0].split(Constants.WHITE_SPACE))-1
+                #Central probability
+                centralProbability = 1.0 / float(labelCount)
+                logging.debug("centralProbability")
+                logging.debug(centralProbability)
+                #Create and array to hold difference of the samples probabilities from the central probability
+                centralDeviation = dict()
+
+                #For each line in the file subtract all but the first item from the central value
+                #The first item being the header line not a row of probabilities
+                #Selected_label prob_for_label1 prob_ForLabel2....
+                #Remove prediction label header
+                predictionLists = predictionLists[1:]
+                for lineIndex in xrange(0,len(predictionLists)):
+                    logging.debug("lineIndex")
+                    logging.debug(lineIndex)
+
+                    #Split line into elements by whitespace and remove first element (the label)
+                    lineElements = predictionLists[lineIndex]
+                    #Skip blank entries
+                    if lineElements.strip() == '':
+                        continue
+
+                    #Get label and probabilities
+                    lineElements = lineElements.split(Constants.WHITE_SPACE)
+                    iCurLabel = str(lineElements[0])
+                    lineElements = lineElements[1:]
+
+                    #Only work with samples that are correctly predicted
+                    logging.debug("iCurLabel")
+                    logging.debug(iCurLabel)
+                    logging.debug("lsOriginalLabels[lineIndex]")
+                    logging.debug(lsOriginalLabels[lineIndex])
+                    if iCurLabel == lsOriginalLabels[lineIndex]:
+                        logging.debug("Correctly predicted")
+                        #Sum the absolute values of the differences
+                        #Store the index and the deviation from the central probability
+                        deviation = 0
+                        for prediction in lineElements:
+                            deviation += math.pow((float(prediction)-centralProbability),2)
+                        if(not iCurLabel in centralDeviation):
+                            centralDeviation[iCurLabel] = []
+                        curSVMData = centralDeviation[iCurLabel]
+                        curSVMData.append([deviation,lineIndex,iCurLabel])
+                        centralDeviation[iCurLabel] = curSVMData
+                        logging.debug("curSVMData")
+                        logging.debug(curSVMData)
+
+                #Sort sample by summed absolute deviations from the center and take the top N indexes
+                for scurKey in centralDeviation:
+                    lcurLabeSamples = centralDeviation[scurKey]
+                    centralDeviation[scurKey] = sorted(lcurLabeSamples, key=operator.itemgetter(0))
+                    logging.debug("centralDeviation[scurKey]")
+                    logging.debug(centralDeviation[scurKey])
+
+                selectedSamplesIndicesClose = list()
+                selectedSamplesIndicesFar = list()
+                #If the amount of samples needed are greater than what was analyzed with the SVM,
+                #Return them all for both far and near.
+                #Get the samples closes to hyperplane
+                #Get samples farthest from hyperplane
+                #Make this balanced to the labels so for each sample label select the sampleSVMSelectionCount count of samples
+                for scurKey in centralDeviation:
+                    lcurDeviations = centralDeviation[scurKey]
+                    iLengthCurDeviations = len(lcurDeviations)
+                    if(sampleSVMSelectionCount > iLengthCurDeviations):
+                        licurIndices = [measurement[1] for measurement in lcurDeviations]
+                        selectedSamplesIndicesClose.extend(licurIndices)
+                        selectedSamplesIndicesFar.extend(licurIndices)
+                    else:
+                        selectedSamplesIndicesClose.extend([measurement[1] for measurement in lcurDeviations[0:sampleSVMSelectionCount]])
+                        selectedSamplesIndicesFar.extend([measurement[1] for measurement in lcurDeviations[(iLengthCurDeviations-sampleSVMSelectionCount):iLengthCurDeviations]])
+                logging.debug("selectedSamplesIndicesClose")
+                logging.debug(selectedSamplesIndicesClose)
+                logging.debug("selectedSamplesIndicesFar")
+                logging.debug(selectedSamplesIndicesFar)
+                logging.debug("sampleNames")
+                logging.debug(sampleNames)
+                #Take indicies and translate to sample names
+                #Select close to hyperplane
+                if fRunDiscriminant:
+                    SVMSamples = list()
+                    for selectedSampleIndex in selectedSamplesIndicesClose:
+                        SVMSamples.append(sampleNames[selectedSampleIndex])
+                    dictSelectedSamples[self.c_SVM_CLOSE]=SVMSamples
+                    logging.debug("SVMSamples Close")
+                    logging.debug(SVMSamples)
+                #Select far from hyperplane
+                if fRunDistinct:
+                    SVMSamples = list()
+                    for selectedSampleIndex in selectedSamplesIndicesFar:
+                        SVMSamples.append(sampleNames[selectedSampleIndex])
+                    dictSelectedSamples[self.c_SVM_FAR]=SVMSamples
+                    logging.debug("SVMSamples Far")
+                    logging.debug(SVMSamples)
+        return dictSelectedSamples
+
     #Start micropita selection
-    def run(self, strOutputFile="MicroPITAOutput.txt", strInputAbundanceFile=None, strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1, strSelectionTechnique=None, strLabel=None, strStratify=None, iSampleNameRow=0, iFirstDataRow=1):
+    def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
+            strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1,
+            strSelectionTechnique=None, strLabel=None, strStratify=None, iSampleNameRow=0, iFirstDataRow=1):
         #microPITA object0
         microPITA = MicroPITA()
 
@@ -650,35 +761,8 @@ class MicroPITA:
             c_RUN_DISCRIMINANT = True
 
         #Input file path components
-        inputFileComponents = os.path.split(strInputAbundanceFile)
+        inputFileComponents = os.path.splitext(strInputAbundanceFile)
         inputFilePrefix = inputFileComponents[0]
-
-        #Abundance table object to read in and manage data
-        totalData = AbundanceTable()
-
-        #Check/reduce raw abundance data
-        print("Micropita making file")
-        if(not os.path.exists(inputFilePrefix+"-checked.txt")):
-            strInputAbundanceFile = totalData.checkRawDataFile(strInputAbundanceFile)
-            print("Made new checked")
-        else:
-            strInputAbundanceFile = inputFilePrefix+"-checked.txt"
-            print("Using old file")
-
-        #Read in abundance data
-        #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
-        rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=strInputAbundanceFile, tempDelimiter=Constants.TAB, tempNameRow=iSampleNameRow, tempFirstDataRow=iFirstDataRow, tempNormalize=False)
-
-        #Log metadata keys
-        logging.debug(" ".join(["Micropita:run.","Received metadata keys=",str(metadata.keys())]))
-
-        #If there is only 1 unique value for the labels, do not run the Supervised methods
-        if len(set(metadata[strLabel])) < 2:
-            c_RUN_DISCRIMINANT = False
-            c_RUN_DISTINCT = False
-            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+metadata[strLabel]))
-
-        logging.debug(" ".join(["Micropita:run.","Received metadata=",str(metadata)]))
 
         sampleSelectionCount = iSampleSelectionCount
         sampleSVMSelectionCount = iSupervisedSampleCount
@@ -696,117 +780,132 @@ class MicroPITA:
         #dict[metric name] = [samplename,samplename...]
         selectedSamples = dict()
 
-        #Stratify the data if need be
-        dictAbundanceBlocks = dict()
-        if (strStratify == None) or (strStratify.lower() == "none"):
-          dictAbundanceBlocks["Total"]=rawAbundance
-        elif strStratify in metadata:
-          lsMetadata = metadata[strStratify]
-          dictAbundanceBlocks = microPITA.funcStratifyDataByMetadata(lsMetadata=lsMetadata, npData=rawAbundance)
-          dictMetadataBlocks = microPITA.funcStratifyMetadataByMetadata(lsMetadata=lsMetadata, dictMetadataToStratify=metadata)
-          #Write to file to record
-          lsOutputPathElements = os.path.split(strOutputFile)
-          for strStratifiedGroup in dictAbundanceBlocks:
-              strMetadataHeader = ""
-              strOutputBase = filter(None,[lsSample for lsSample in lsOutputPathElements[0].split("/")])[-1]
-              strOutputFileName = "".join([lsOutputPathElements[0],"/",strOutputBase,"-StratBy-",strStratifiedGroup,".",lsOutputPathElements[1]])
-              #Write metadata
-              dictCurMetadata = dictMetadataBlocks[strStratifiedGroup]
-              for sMetaKey in dictCurMetadata:
-                  strMetadataHeader = strMetadataHeader + Constants.TAB.join([sMetaKey]+dictCurMetadata[sMetaKey])+Constants.ENDLINE
-                  curAbundance = dictAbundanceBlocks[strStratifiedGroup]
-                  lsCurNames = curAbundance.dtype.names
-                  curAbundance = curAbundance.tolist()
-              with open(strOutputFileName, 'w') as f:
-                  f.write(Constants.TAB.join(lsCurNames)+Constants.ENDLINE)
-                  f.write(strMetadataHeader)
-                  lsOutput = list()
-                  for curAbundanceRow in curAbundance:
-                      lsOutput.append(Constants.TAB.join([str(curAbundanceElement) for curAbundanceElement in curAbundanceRow]))
-                  f.write(Constants.ENDLINE.join(lsOutput))
-                  f.close()
+        #Check/reduce raw abundance data
+        if(not os.path.exists("".join([inputFilePrefix,"-checked.txt"]))):
+            strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, iFirstDataIndex=iFirstDataRow, strOutputFileName=inputFilePrefix+"-checked.txt")
+        else:
+            strInputAbundanceFile = inputFilePrefix+"-checked.txt"
+
+        #Read in abundance data
+        #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
+        #Abundance table object to read in and manage data
+        totalAbundanceTable = AbundanceTable.makeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
+                                   cDelimiter=cDelimiter, iNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, cFeatureNameDelimiter=cFeatureNameDelimiter)
+
+        dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
+
+        #Log metadata keys
+        logging.debug(" ".join(["Micropita:run.","Received metadata keys=",str(dictTotalMetadata.keys())]))
+
+        #If there is only 1 unique value for the labels, do not run the Supervised methods
+        if len(set(dictTotalMetadata[strLabel])) < 2:
+            c_RUN_DISCRIMINANT = False
+            c_RUN_DISTINCT = False
+            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+dictTotalMetadata[strLabel]))
+
+        logging.debug(" ".join(["Micropita:run.","Received metadata=",str(dictTotalMetadata)]))
+
+        #Run supervised methods#
+        if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
+            selectedSamples.update(self.runSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
+                                   strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
+                                   strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, iFirstDataRow=iFirstDataRow,
+                                   fSkipFirstColumn=c_SKIP_FIRST_COLUMN, fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
+                                   iScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, strCostRange=c_SVM_COST_RANGE, fProbabilitic=c_SVM_PROBABILISTIC))
+            logging.info("Selected Samples Unsupervised")
+            logging.info(selectedSamples)
+        
+        #Run unsupervised methods###
+        #Stratify the data if need be and drop the old data
+        lStratifiedAbundanceTables = None
+        if (not strStratify == None) and (not strStratify == "None"):
+            lStratifiedAbundanceTables = totalAbundanceTable.funcStratifyByMetadata(strStratify,xWriteToFile="".join([os.path.split(strOutputFile)[0],"/"]))
+            totalAbundanceTable = None
+        else:
+            lStratifiedAbundanceTables = [totalAbundanceTable]
 
         #For each stratified abundance block or for the unstratfified abundance
         #Run the unsupervised blocks
-        for abundanceBlockValue in dictAbundanceBlocks:
-            logging.info("Running abundance block:"+abundanceBlockValue)
-            abundance = dictAbundanceBlocks[abundanceBlockValue]
-            #Get sample names excluding the taxa id column name
-            sampleNames = abundance.dtype.names[1:]
-            sampleID = abundance.dtype.names[0]
+        for stratAbundanceTable in lStratifiedAbundanceTables:
+            logging.info("Running abundance block:"+stratAbundanceTable.funcGetName())
 
-            #Need to first work with unnormalized data
-            if((c_RUN_MAX_DIVERSITY_1)or(c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
-                if(c_RUN_MAX_DIVERSITY_1):
-                    #Must first generate metrics that do not want normalization before normalization occurs
-                    #Expects Observations (Taxa (row) x sample (column))
-                    #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                    internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
-                    #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
-                    #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
-                    mostDiverseAlphaSamplesIndexesNoNorm = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=sampleNames, tempTopAmount=sampleSelectionCount)
-                    #Add to results
-                    for index in xrange(0,len(diversityMetricsAlphaNoNormalize)):
-                        astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlphaNoNormalize[index]]
-                        if not astrSelectionMethod in selectedSamples:
-                            selectedSamples[astrSelectionMethod]=list()
-                        selectedSamples[astrSelectionMethod].extend(mostDiverseAlphaSamplesIndexesNoNorm[index])
+            #Sample names
+            lsSampleNames = stratAbundanceTable.funcGetSampleNames()
 
-                if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
-                    logging.info("Performing representative selection on unnormalized data.")
-                    #Run KMedoids with custom distance metric in unnormalized space
-                    for bMetric in diversityMetricsBetaNoNormalize:
+            #Only perform if the data is not yet normalized
+            if not stratAbundanceTable.funcIsNormalized():
 
-                        #Get representative dissimilarity samples
-                        transposedAbundance = totalData.transposeDataMatrix(abundance, tempRemoveAdornments=True)
-                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=transposedAbundance, tempMetric=bMetric, tempSampleNames=sampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
-
-                        if(not medoidSamples == False):
-                            astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
+                #Need to first work with unnormalized data
+                if((c_RUN_MAX_DIVERSITY_1)or(c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
+                    if(c_RUN_MAX_DIVERSITY_1):
+                        #Must first generate metrics that do not want normalization before normalization occurs
+                        #Expects Observations (Taxa (row) x sample (column))
+                        #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+                        internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
+                        #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
+                        #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
+                        mostDiverseAlphaSamplesIndexesNoNorm = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=lsSampleNames, tempTopAmount=sampleSelectionCount)
+                        #Add to results
+                        for index in xrange(0,len(diversityMetricsAlphaNoNormalize)):
+                            astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlphaNoNormalize[index]]
                             if not astrSelectionMethod in selectedSamples:
                                 selectedSamples[astrSelectionMethod]=list()
-                            selectedSamples[astrSelectionMethod].extend(medoidSamples)
+                            selectedSamples[astrSelectionMethod].extend(mostDiverseAlphaSamplesIndexesNoNorm[index])
 
-                if(c_RUN_MAX_DISSIMILARITY_3):
-                    logging.info("Performing extreme selection on unnormalized data.")
-                    #Run HClust with inverse custom distance metric in unnormalized space
-                    #TODO centralize all transpose needs
-                    #TODO transpose is being performed
-                    tAbundance = totalData.transposeDataMatrix(tempMatrix=abundance, tempRemoveAdornments=True)
+                    #Abundance matrix transposed
+                    npaTransposedUnnormalizedAbundance = Utility_Math.transposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
 
-                    for bMetric in inverseDiversityMetricsBetaNoNormalize:
-                        #Samples for repersentative dissimilarity
-                        #This involves inverting the distance metric,
-                        #Taking the dendrogram level of where the number cluster == the number of samples to select
-                        #Returning a representative sample from each cluster
-                        extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=tAbundance, tempSampleNames=sampleNames, tempSelectSampleCount=sampleSelectionCount)
+                    if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
+                        logging.info("Performing representative selection on unnormalized data.")
+                        #Run KMedoids with custom distance metric in unnormalized space
+                        for bMetric in diversityMetricsBetaNoNormalize:
 
-                        #Add selected samples
-                        if not extremeSamples == False:
-                            astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
-                            if not astrSelectionMethod in selectedSamples:
-                                selectedSamples[astrSelectionMethod]=list()
-                            selectedSamples[astrSelectionMethod].extend(extremeSamples)
+                            #Get representative dissimilarity samples
+                            medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
 
-            logging.info("Selected Samples 1,2,3a")
-            logging.info(selectedSamples)
+                            if(not medoidSamples == False):
+                                astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
+                                if not astrSelectionMethod in selectedSamples:
+                                    selectedSamples[astrSelectionMethod]=list()
+                                selectedSamples[astrSelectionMethod].extend(medoidSamples)
 
-            #Normalize data at this point
-            abundance = totalData.normalizeColumns(tempStructuredArray=abundance, tempColumns=list(sampleNames))
-            if(abundance == False):
-                logging.error("MicroPITA.run. Error occured during normalizing data. Stopped.")
-                return False
+                    if(c_RUN_MAX_DISSIMILARITY_3):
+                        logging.info("Performing extreme selection on unnormalized data.")
+                        #Run HClust with inverse custom distance metric in unnormalized space
+
+                        for bMetric in inverseDiversityMetricsBetaNoNormalize:
+                            #Samples for repersentative dissimilarity
+                            #This involves inverting the distance metric,
+                            #Taking the dendrogram level of where the number cluster == the number of samples to select
+                            #Returning a representative sample from each cluster
+                            extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=npaTransposedUnnormalizedAbundance, tempSampleNames=lsSampleNames, tempSelectSampleCount=sampleSelectionCount)
+
+                            #Add selected samples
+                            if not extremeSamples == False:
+                                astrSelectionMethod = microPITA.convertBMetricExtreme[bMetric]
+                                if not astrSelectionMethod in selectedSamples:
+                                    selectedSamples[astrSelectionMethod]=list()
+                                selectedSamples[astrSelectionMethod].extend(extremeSamples)
+
+                logging.info("Selected Samples 1,2,3a")
+                logging.info(selectedSamples)
+
+                #Normalize data at this point
+                fNormalizeSuccess = stratAbundanceTable.funcNormalize()
+                if not fNormalizeSuccess:
+                    logging.error("MicroPITA.run. Error occured during normalizing data. Stopped.")
+                    return False
 
             #Generate alpha metrics and get most diverse
             if(c_RUN_MAX_DIVERSITY_1):
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
+                internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
                 #Get top ranked alpha diversity by most diverse
                 #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                 #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
-                mostDiverseAlphaSamplesIndexes = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=sampleNames, tempTopAmount=sampleSelectionCount)
+                mostDiverseAlphaSamplesIndexes = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=lsSampleNames, tempTopAmount=sampleSelectionCount)
 
                 #Add to results
                 for index in xrange(0,len(diversityMetricsAlpha)):
@@ -821,8 +920,8 @@ class MicroPITA:
             #Generate beta metrics and 
             if((c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
 
-                #Transpose data
-                transposedAbundance = totalData.transposeDataMatrix(abundance, tempRemoveAdornments=True)
+                #Abundance matrix transposed
+                npaTransposedUnnormalizedAbundance = Utility_Math.transposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
 
                 #Get center selection using clusters/tiling
                 #This will be for beta metrics in normalized space
@@ -831,7 +930,7 @@ class MicroPITA:
                     for bMetric in diversityMetricsBeta:
 
                         #Get representative dissimilarity samples
-                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=transposedAbundance, tempMetric=bMetric, tempSampleNames=sampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
+                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
 
                         if(not medoidSamples == False):
                             astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -849,7 +948,7 @@ class MicroPITA:
                         #This involves inverting the distance metric,
                         #Taking the dendrogram level of where the number cluster == the number of samples to select
                         #Returning a repersentative sample from each cluster
-                        extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=transposedAbundance, tempSampleNames=sampleNames, tempSelectSampleCount=sampleSelectionCount)
+                        extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=npaTransposedUnnormalizedAbundance, tempSampleNames=lsSampleNames, tempSelectSampleCount=sampleSelectionCount)
 
                         #Add selected samples
                         if(not extremeSamples == False):
@@ -868,7 +967,7 @@ class MicroPITA:
             if(c_RUN_RANK_AVERAGE_USER_4):
               if not microPITA.c_USER_RANKED in selectedSamples:
                   selectedSamples[microPITA.c_USER_RANKED]=list()
-              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=abundance, tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sSampleIDName=sampleID))
+              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=stratAbundanceTable.funcGetAbundanceCopy(), tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sSampleIDName=stratAbundanceTable.funcGetIDMetadataName()))
             logging.info("Selected Samples 4")
             logging.info(selectedSamples)
 
@@ -877,7 +976,7 @@ class MicroPITA:
             if(c_RUN_RANDOM_5):
 
                 #Select randomly from sample names
-                randomlySelectedSamples = microPITA.getRandomSamples(tempSamples=sampleNames, tempNumberOfSamplesToReturn=sampleSelectionCount)
+                randomlySelectedSamples = microPITA.getRandomSamples(tempSamples=lsSampleNames, tempNumberOfSamplesToReturn=sampleSelectionCount)
                 if not microPITA.c_RANDOM in selectedSamples:
                     selectedSamples[microPITA.c_RANDOM]=list()
                 selectedSamples[microPITA.c_RANDOM].extend(list(randomlySelectedSamples))
@@ -885,140 +984,10 @@ class MicroPITA:
             logging.info("Selected Samples 5")
             logging.info(selectedSamples)
 
-        #Run supervised blocks
-        #Select supervised (using SVM)
-        #Expects input file's matrix to be Taxa (row) by Sample (col) with a taxa id column (index=0)
-        if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-            #Get file name without extention
-            strTail = os.path.split(strInputAbundanceFile)[1]
-            #Get sample names
-            sampleNames = rawAbundance.dtype.names[1:]
-            #Run linear SVM
-            svmRelatedData = microPITA.runSVM(tempInputFile=strInputAbundanceFile, tempDelimiter=c_ABUNDANCE_DELIMITER, tempOutputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(strTail)[0],"-SVM.txt"]), tempMatrixLabels=metadata[strLabel], tempFirstDataRow=iFirstDataRow, tempSkipFirstColumn=c_SKIP_FIRST_COLUMN, tempNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY, tempSVMScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, tempSVMLogC=c_SVM_COST_RANGE, tempSVMProbabilistic=c_SVM_PROBABILISTIC)
-            #Read in prediction file and select samples
-            if(not svmRelatedData == False):
-                if(SVM.c_KEYWORD_PREDICTION_FILE in svmRelatedData):
-                    #Get prediction file path
-                    predictionFile = svmRelatedData[SVM.c_KEYWORD_PREDICTION_FILE]
-                    #Get the input file for the SVMS which has the original labels before classification
-                    strSVMInputFile = svmRelatedData[SVM.c_KEYWORD_INPUT_FILE]
-                    #Holds labels to compare to the predictions
-                    lsOriginalLabels = None
-                    #Open input file and get labels to compare to the predictions
-                    with open(strSVMInputFile,'r') as f:
-                        reader = csv.reader(f, delimiter=Constants.WHITE_SPACE, quoting=csv.QUOTE_NONE)
-                        lsOriginalLabels = [row[0] for row in reader]
-
-                    #TODO test selection of samples
-                    #Read in file
-                    readIn = FileIO(predictionFile,True,False,False)
-                    predictionLists = readIn.readFullFile()
-                    readIn.close()
-                    predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(Constants.ENDLINE)]
-
-                    #Get label count (meaning the number of label categories)(-1 to not count the predicted first entry)
-                    labelCount = len(predictionLists[0].split(Constants.WHITE_SPACE))-1
-                    #Central probability
-                    centralProbability = 1.0 / float(labelCount)
-                    logging.debug("centralProbability")
-                    logging.debug(centralProbability)
-                    #Create and array to hold difference of the samples probabilities from the central probability
-                    centralDeviation = dict()
-
-                    #For each line in the file subtract all but the first item from the central value
-                    #The first item being the header line not a row of probabilities
-                    #Selected_label prob_for_label1 prob_ForLabel2....
-                    #Remove prediction label header
-                    predictionLists = predictionLists[1:]
-                    for lineIndex in xrange(0,len(predictionLists)):
-                        logging.debug("lineIndex")
-                        logging.debug(lineIndex)
-
-                        #Split line into elements by whitespace and remove first element (the label)
-                        lineElements = predictionLists[lineIndex]
-                        #Skip blank entries
-                        if lineElements.strip() == '':
-                            continue
-
-                        #Get label and probabilities
-                        lineElements = lineElements.split(Constants.WHITE_SPACE)
-                        iCurLabel = str(lineElements[0])
-                        lineElements = lineElements[1:]
-
-                        #Only work with samples that are correctly predicted
-                        logging.debug("iCurLabel")
-                        logging.debug(iCurLabel)
-                        logging.debug("lsOriginalLabels[lineIndex]")
-                        logging.debug(lsOriginalLabels[lineIndex])
-                        if iCurLabel == lsOriginalLabels[lineIndex]:
-                            logging.debug("Correctly predicted")
-                            #Sum the absolute values of the differences
-                            #Store the index and the deviation from the central probability
-                            deviation = 0
-                            for prediction in lineElements:
-                                deviation += math.pow((float(prediction)-centralProbability),2)
-                            if(not iCurLabel in centralDeviation):
-                                centralDeviation[iCurLabel] = []
-                            curSVMData = centralDeviation[iCurLabel]
-                            curSVMData.append([deviation,lineIndex,iCurLabel])
-                            centralDeviation[iCurLabel] = curSVMData
-                            logging.debug("curSVMData")
-                            logging.debug(curSVMData)
-
-                    #Sort sample by summed absolute deviations from the center and take the top N indexes
-                    for scurKey in centralDeviation:
-                        lcurLabeSamples = centralDeviation[scurKey]
-                        centralDeviation[scurKey] = sorted(lcurLabeSamples, key=operator.itemgetter(0))
-                        logging.debug("centralDeviation[scurKey]")
-                        logging.debug(centralDeviation[scurKey])
-
-                    selectedSamplesIndicesClose = list()
-                    selectedSamplesIndicesFar = list()
-                    #If the amount of samples needed are greater than what was analyzed with the SVM,
-                    #Return them all for both far and near.
-                    #Get the samples closes to hyperplane
-                    #Get samples farthest from hyperplane
-                    #Make this balanced to the labels so for each sample label select the sampleSVMSelectionCount count of samples
-                    for scurKey in centralDeviation:
-                        lcurDeviations = centralDeviation[scurKey]
-                        iLengthCurDeviations = len(lcurDeviations)
-                        if(sampleSVMSelectionCount > iLengthCurDeviations):
-                            licurIndices = [measurement[1] for measurement in lcurDeviations]
-                            selectedSamplesIndicesClose.extend(licurIndices)
-                            selectedSamplesIndicesFar.extend(licurIndices)
-                        else:
-                            selectedSamplesIndicesClose.extend([measurement[1] for measurement in lcurDeviations[0:sampleSVMSelectionCount]])
-                            selectedSamplesIndicesFar.extend([measurement[1] for measurement in lcurDeviations[(iLengthCurDeviations-sampleSVMSelectionCount):iLengthCurDeviations]])
-                    logging.debug("selectedSamplesIndicesClose")
-                    logging.debug(selectedSamplesIndicesClose)
-                    logging.debug("selectedSamplesIndicesFar")
-                    logging.debug(selectedSamplesIndicesFar)
-                    logging.debug("sampleNames")
-                    logging.debug(sampleNames)
-                    #Take indicies and translate to sample names
-                    #Select close to hyperplane
-                    if(c_RUN_DISCRIMINANT):
-                        SVMSamples = list()
-                        for selectedSampleIndex in selectedSamplesIndicesClose:
-                            SVMSamples.append(sampleNames[selectedSampleIndex])
-                        selectedSamples[microPITA.c_SVM_CLOSE]=SVMSamples
-                        logging.debug("SVMSamples Close")
-                        logging.debug(SVMSamples)
-                    #Select far from hyperplane
-                    if(c_RUN_DISTINCT):
-                        SVMSamples = list()
-                        for selectedSampleIndex in selectedSamplesIndicesFar:
-                            SVMSamples.append(sampleNames[selectedSampleIndex])
-                        selectedSamples[microPITA.c_SVM_FAR]=SVMSamples
-                        logging.debug("SVMSamples Far")
-                        logging.debug(SVMSamples)
-
-        logging.info("Selected Samples 6")
-        logging.info(selectedSamples)
         return selectedSamples
 
     #Writes the selection of samples by method to an output file.
-    #dictSelection is the dictionary of selections by methdo {"method":["sample selected","sample selected"...]}
+    #dictSelection is the dictionary of selections by method {"method":["sample selected","sample selected"...]}
     #strOutputFilePath the str file path to write to
     @staticmethod
     def funcWriteSelectionToFile(dictSelection,strOutputFilePath):
@@ -1031,8 +1000,8 @@ class MicroPITA:
 
         #Write to file
         if(not strOutputContent == ""):
-            fHndlOutput = open(strOutputFilePath,'w')
-            fHndlOutput.write(str(strOutputContent))
+            with open(strOutputFilePath,'w') as fHndlOutput:
+                fHndlOutput.write(str(strOutputContent))
             fHndlOutput.close()
         logging.debug("".join(["Selected samples output to file:",strOutputContent]))
 
@@ -1045,7 +1014,7 @@ class MicroPITA:
         strSelection = ""
         with open(strInputFile,'r') as fHndlInput:
             strSelection = fHndlInput.read()
-            fHndlInput.close()
+        fHndlInput.close()
 
         #Dictionary to hold selection data
         dictSelection = dict()
@@ -1071,6 +1040,10 @@ argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", m
                   help= Constants_Arguments.c_strFirstDataRowHelp)
 argp.add_argument(Constants_Arguments.c_strSupervisedLabelCount, dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
                   help= Constants_Arguments.c_strSupervisedLabelCountHelp)
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+                  help= Constants_Arguments.c_strIsNormalizedHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+
 #SVM label
 #Label parameter to be used with SVM
 argp.add_argument(Constants_Arguments.c_strSupervisedLabel, dest="strLabel", metavar= "Label", default="", help= Constants_Arguments.c_strSupervisedLabelCountHelp)
@@ -1107,7 +1080,12 @@ def _main( ):
     #Run micropita
     logging.info("Start microPITA")
     microPITA = MicroPITA()
-    dictSelectedSamples = microPITA.run(strOutputFile=args.strOutFile, strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount), iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel, strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection, iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
+    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
+                                        cDelimiter=Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=args.strFileAbund,
+                                        strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount),
+                                        iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel,
+                                        strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection,
+                                        iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
     logging.info("End microPITA")
 
     #Log output for debugging

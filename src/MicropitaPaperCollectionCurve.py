@@ -193,6 +193,10 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
 argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
 argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+                  help= Constants_Arguments.c_strIsNormalizedHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+
 #Select file
 argp.add_argument( "strAbundanceFile", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Outputfile
@@ -236,13 +240,14 @@ def _main( ):
     if isinstance(args.strSelectionFiles, basestring):
       args.strSelectionFiles = [args.strSelectionFiles]
 
-    #Get abundance table data
-    totalData = AbundanceTable()
-    rawAbundance,metadata = totalData.textToStructuredArray(tempInputFile=args.strAbundanceFile, tempDelimiter=Constants.TAB, 
-                                                            tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow),
-                                                            tempNormalize=False)
-    #Get sample names
-    lsSampleNames = rawAbundance.dtype.names[1:]
+    #Read abundance file
+    #Abundance table object to read in and manage data
+    totalData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
+                                            fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+                                            iFirstDataRow = int(args.iFirstDataRow))
+
+    rawAbundance = rawData.funcGetAbundanceCopy()
+    lsSampleNames = rawData.funcGetSampleNames()
 
     #Calculate individual counts per sample (row)
     #Sort the sample names by their diversity and store the names (Lowest diversity first)

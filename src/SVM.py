@@ -16,7 +16,6 @@ __status__ = "Development"
 #Libraries
 from Constants import Constants
 from CommandLine import CommandLine
-from FileIO import FileIO
 import math
 import operator
 import os
@@ -143,31 +142,31 @@ class SVM:
         bestCost = 0.0
         #Holds the associated accuracy
         highestAccuracy = -1
-        writeCrossValidationFile = FileIO(cvOutFile.strip(Constants.QUOTE),False, True, True)
-        for cost in costList:
-            cost = math.pow(2,int(cost))
-            cmd = [Constants.QUOTE+self.c_SVM_TRAIN_LOCATION+Constants.QUOTE,"-s",self.c_C_SVC,"-t",self.c_LINEAR_KERNEL,"-c",str(cost),"-v",str(tempCrossValidationFold),"-q",cv_file]
-            print "Cross Validation"
-            print cmd
-            result = shell.runPipedCommandLine(tempCommand = cmd)
+        with open(cvOutFile.strip(Constants.QUOTE),'a') as f:
+            for cost in costList:
+                cost = math.pow(2,int(cost))
+                cmd = [Constants.QUOTE+self.c_SVM_TRAIN_LOCATION+Constants.QUOTE,"-s",self.c_C_SVC,"-t",self.c_LINEAR_KERNEL,"-c",str(cost),"-v",str(tempCrossValidationFold),"-q",cv_file]
+                print "Cross Validation"
+                print cmd
+                result = shell.runPipedCommandLine(tempCommand = cmd)
 
-            #TODO This is not very clean
-            accuracy = result[0].split(" = ")
-            if(len(accuracy) == 2):
-                accuracy = accuracy[1][:-2]
-            else:
-                accuracy = False
-                break
+                #TODO This is not very clean
+                accuracy = result[0].split(" = ")
+                if(len(accuracy) == 2):
+                    accuracy = accuracy[1][:-2]
+                else:
+                    accuracy = False
+                    break
 
-            lldCostAccuracy.append([cost,float(accuracy)])
-            writeCrossValidationFile.writeToFile("".join(["Cost=",str(cost)," with ",str(accuracy),"% Cross Validation Accuracy\n"]))
+                lldCostAccuracy.append([cost,float(accuracy)])
+                f.write("".join(["Cost=",str(cost)," with ",str(accuracy),"% Cross Validation Accuracy\n"]))
 
-            #Get best cost parameter
-            if(not accuracy == False):
-                if(highestAccuracy < float(accuracy)):
-                    bestCost = cost
-                    highestAccuracy = float(accuracy)
-        writeCrossValidationFile.close()
+                #Get best cost parameter
+                if(not accuracy == False):
+                    if(highestAccuracy < float(accuracy)):
+                        bestCost = cost
+                        highestAccuracy = float(accuracy)
+        f.close()
 
         if(accuracy == False):
             print "".join(["Received error during cross validation on scaled file. Command=",cmd])
@@ -325,19 +324,19 @@ class SVM:
                     dataMatrix[columnIndex-startingColumn].append(float(columns[columnIndex]))
             
             #Output file
-            output = FileIO(tempOutputSVMFile,False,True,True)
-            for numericData in dataMatrix:
-                outputString = str(numericData[0])
-                dataNoLabel=numericData[1:]
+            with open(tempOutputSVMFile,'a') as f:
+                for numericData in dataMatrix:
+                    outputString = str(numericData[0])
+                    dataNoLabel=numericData[1:]
 
-                columnSum = sum(dataNoLabel)
-                for normalizedDataIndex in xrange(0,len(dataNoLabel)):
-                    if(columnSum > 0):
-                        outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex]/columnSum)])
-                    else:
-                        outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex])])
-                output.writeToFile(outputString+Constants.ENDLINE)
-            output.close()
+                    columnSum = sum(dataNoLabel)
+                    for normalizedDataIndex in xrange(0,len(dataNoLabel)):
+                        if(columnSum > 0):
+                            outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex]/columnSum)])
+                        else:
+                            outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex])])
+                    f.write(outputString+Constants.ENDLINE)
+            f.close()
             return True
         else:
             #Add data
@@ -347,7 +346,7 @@ class SVM:
                     dataMatrix[columnIndex-startingColumn].append("".join([str(lineIndex+1-tempFirstDataRow),Constants.COLON,str(columns[columnIndex])]))
 
             #Output file
-            output = FileIO(tempOutputSVMFile,False,True,True)
-            [output.writeToFile(" ".join(dataColumn)+Constants.ENDLINE) for dataColumn in dataMatrix]
-            output.close()
+            with open(tempOutputSVMFile,'a') as f:
+                (f.write(" ".join(dataColumn)+Constants.ENDLINE) for dataColumn in dataMatrix)
+            f.close()
             return True

@@ -42,6 +42,10 @@ argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp)
 argp.add_argument(Constants_Arguments.c_strPredictFilePath, dest = "sSVMPrediction", action = "store", default=None,
 	help = Constants_Arguments.c_strPredictFilePathHelp)
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+                  help= Constants_Arguments.c_strIsNormalizedHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+
 #Abundance file
 argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Select file
@@ -84,9 +88,13 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable()
-    abundance,metadata = rawData.textToStructuredArray(tempInputFile=args.strFileAbund, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize)
-    sampleNames = abundance.dtype.names[1:]
+    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
+                                            fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+                                            iFirstDataRow = int(args.iFirstDataRow))
+    if c_Normalize:
+        rawData.funcNormalize()
+
+    sampleNames = rawData.funcGetSampleNames()
 
     #Shapes
     acharShape = Constants_Figures.c_charPCOAShape
@@ -96,7 +104,8 @@ def _main( ):
 
     #Generate PCoA
     #LoadData
-    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize, tempCheckFile=c_fCheckFile)
+    analysis.loadData(xData=rawData, fIsRawData=True)
+#    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize, tempCheckFile=c_fCheckFile)
     #Make distance matrix
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
@@ -140,7 +149,7 @@ def _main( ):
                 acharSelection.append(strNotSelected)
 
         #Draw Stratified PCoA
-        analysis.plotList(lsLabelList=metadata[args.strUnsupervisedStratify],
+        analysis.plotList(lsLabelList=rawData.funcGetMetadata(args.strUnsupervisedStratify),
                           strOutputFileName="-".join([asFilePathPieces[0],args.strUnsupervisedStratify,astrSelectionMethod[0],asFilePathPieces[1]]),
                           iSize=c_shapeSize, dAlpha=dAlpha, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
 

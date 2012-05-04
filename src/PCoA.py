@@ -23,6 +23,7 @@ import math
 import matplotlib.cm as cm
 import numpy as np
 from scipy.spatial.distance import squareform
+from Utility_Math import Utility_Math
 from ValidateData import ValidateData
 from matplotlib import pyplot as plt
 import re
@@ -67,49 +68,83 @@ class PCoA:
     #@params tempNormalize True normalizes each column by the sum of the column (columnElement=columnElement/sum(column))
     #@params tempCheckFile True indicates the files should be check. 
     #@return Return boolean indicator of success (True=Was able to load data)
-    def loadData(self,tempReadData, tempIsRawData, tempDelimiter=Constants.TAB, tempNameRow=0, tempFirstDataRow=1, tempNormalize=True, tempCheckFile=True):
+#    def loadData(self,tempReadData, tempIsRawData, tempDelimiter=Constants.TAB, tempNameRow=0, tempFirstDataRow=1, tempNormalize=True, tempCheckFile=True):
+#
+#        #Indicates if data needs to be read or if a structured matrix is given
+#        readData=None
+#
+#        #Validate parameters
+#        if(ValidateData.isValidFileName(tempReadData)):
+#            readData=True
+#        elif(ValidateData.isValidStructuredArray(tempReadData)):
+#            readData=False
+#        else:
+#            print("".join(["PCoA:loadData::Error tempReadData was not an existing file or an np array."]))
+#            return False
+#
+#        #If a file path is given, read data.
+#        if(ValidateData.isTrue(readData)):
+#            #Object to read in and manipulate raw data
+#            rawData = AbundanceTable()
+#            #If indicated, check the input file
+#            if(ValidateData.isTrue(tempCheckFile)):
+#                tempReadData = rawData.checkRawDataFile(tempReadData)
+#                if(ValidateData.isFalse(tempReadData)):
+#                    print("".join(["PCoA:loadData::Error when checking raw data file, did not perform PCoA. File name:",str(tempReadData)]))
+#                    return False
+#            #Read in the file data to a numpy array.
+#            #Samples (column) by Taxa (rows)(lists) without the column
+#            data = rawData.textToArray(tempInputFile=tempReadData, tempDelimiter=tempDelimiter, tempNameRow=tempNameRow, tempFirstDataRow=tempFirstDataRow, tempNormalize=tempNormalize)
+#            if(ValidateData.isFalse(data)):
+#                print("PCoA:loadData::Error when reading checked raw data file, did not perform PCoA.")
+#                return False
+#
+#            #Transpose data to be Taxa (columns) by samples (rows)(lists)
+#            data = rawData.transposeDataMatrix(tempMatrix=data[0], tempRemoveAdornments=False)
+#            if(ValidateData.isFalse(data)):
+#                print("PCoA:loadData::Error when transposing read raw data file, did not perform PCoA.")
+#                return False
+#            else:
+#                self.dataMatrix=data
+#                self.isRawData=tempIsRawData
+#        #Otherwise load the data directly as passed.
+#        else:
+#            self.dataMatrix=tempReadData
+#            self.isRawData=tempIsRawData
+#        return True
 
-        #Indicates if data needs to be read or if a structured matrix is given
-        readData=None
+    #Loads data into PCoA (given the matrix or a valid file path)
+    #Data can be the Abundance Table to be converted to a distance matrix or a distance matrix
+    #If it is the AbundanceTable, indicate that it is rawData (tempIsRawData=True)
+    #If it is the distance matrix already generated indicate (tempIsRawData=False)
+    #and no conversion will occur in subsequent methods
+    #@params tempReadData Either a Structured matrix of data or a valid file path to read from
+    #@params xData Abundancetable or Distance matrix . Taxa (columns) by samples (rows)(lists)
+    #@return Return boolean indicator of success (True=Was able to load data)
+    def loadData(self, xData, fIsRawData):
 
-        #Validate parameters
-        if(ValidateData.isValidFileName(tempReadData)):
-            readData=True
-        elif(ValidateData.isValidStructuredArray(tempReadData)):
-            readData=False
-        else:
-            print("".join(["PCoA:loadData::Error tempReadData was not an existing file or an np array."]))
-            return False
+        if fIsRawData:
 
-        #If a file path is given, read data.
-        if(ValidateData.isTrue(readData)):
-            #Object to read in and manipulate raw data
-            rawData = AbundanceTable()
-            #If indicated, check the input file
-            if(ValidateData.isTrue(tempCheckFile)):
-                tempReadData = rawData.checkRawDataFile(tempReadData)
-                if(ValidateData.isFalse(tempReadData)):
-                    print("".join(["PCoA:loadData::Error when checking raw data file, did not perform PCoA. File name:",str(tempReadData)]))
-                    return False
             #Read in the file data to a numpy array.
             #Samples (column) by Taxa (rows)(lists) without the column
-            data = rawData.textToArray(tempInputFile=tempReadData, tempDelimiter=tempDelimiter, tempNameRow=tempNameRow, tempFirstDataRow=tempFirstDataRow, tempNormalize=tempNormalize)
-            if(ValidateData.isFalse(data)):
-                print("PCoA:loadData::Error when reading checked raw data file, did not perform PCoA.")
+            data = xData.funcToArray()
+            if data==None:
+                print("PCoA:loadData::Error when converting AbundanceTable to Array, did not perform PCoA.")
                 return False
 
             #Transpose data to be Taxa (columns) by samples (rows)(lists)
-            data = rawData.transposeDataMatrix(tempMatrix=data[0], tempRemoveAdornments=False)
+            data = Utility_Math.transposeDataMatrix(data,tempRemoveAdornments=False)
             if(ValidateData.isFalse(data)):
-                print("PCoA:loadData::Error when transposing read raw data file, did not perform PCoA.")
+                print("PCoA:loadData::Error when transposing data file, did not perform PCoA.")
                 return False
             else:
                 self.dataMatrix=data
-                self.isRawData=tempIsRawData
+                self.isRawData=fIsRawData
+
         #Otherwise load the data directly as passed.
         else:
             self.dataMatrix=tempReadData
-            self.isRawData=tempIsRawData
+            self.isRawData=fIsRawData
         return True
 
     #Runs analysis on loaded data
@@ -348,7 +383,7 @@ class PCoA:
 
             #This is the simple case where color and shape are constant and do not change.
             else:
-                imgSubplot.scatter(ldXPoints,ldYPoints, c=tempColorGrouping, marker=tempShape, alpha=dAlpha, label=tempLabels, s=self.objFigureControl.iMarkerSize, edgecolor=charMarkerEdgeColor)
+                imgSubplot.scatter(ldXPoints,ldYPoints, c=tempColorGrouping, marker=tempShape, alpha=tempAlpha, label=tempLabels, s=self.objFigureControl.iMarkerSize, edgecolor=charMarkerEdgeColor)
 
             objLegend = imgSubplot.legend(loc=tempLegendLocation, scatterpoints=1, prop={'size':10})
 

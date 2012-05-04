@@ -17,7 +17,6 @@ from AbundanceTable import AbundanceTable
 from CommandLine import CommandLine
 from Constants import Constants
 from Diversity import Diversity
-from FileIO import FileIO
 import mlpy
 from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
@@ -26,7 +25,6 @@ from MicroPITA import MicroPITA
 import re
 from SVM import SVM
 import unittest
-from Utility_File import Utility_File
 from scikits.learn.cluster import AffinityPropagation
 #TODO Get the new import
 #from scikits.learn.datasets.samples_generator import make_blobs
@@ -521,7 +519,7 @@ class MicroPITATest(unittest.TestCase):
         inputFile = "./input/micropita/src/Testing/Data/microPITA/extremeDissimilarityTest/InsilicoNorm.txt"
 
         #Create file names
-        prefix = Utility_File.getFileNamePrefix(inputFile)
+        prefix = inputFile.splitext()[0]
         figureColorFilePath=prefix+"_ExtremeDissimilarityColor.txt"
         figureLabelFilePath=prefix+"_ExtremeDissimilarityLabel.txt"
         figureDataFile = prefix+"_values.txt"
@@ -553,28 +551,32 @@ class MicroPITATest(unittest.TestCase):
         if(os.path.exists(figureDataFile)):
             os.remove(figureDataFile)
         #Create file handle to write to files
-        colorFileWriter = FileIO(figureColorFilePath,False,True,True)
-        labelFileWriter = FileIO(figureLabelFilePath,False,True,True)
-        colorList = list()
-        labelList = list()
-        for selectedSampleName in selectedSamples:
-            colorList.append(selectedSampleName+Constants.TAB+"#FF0000")
-            labelList.append(selectedSampleName+Constants.TAB+selectedSampleName)
-        colorFileWriter.writeToFile(Constants.ENDLINE.join(colorList))
-        labelFileWriter.writeToFile(Constants.ENDLINE.join(labelList))
-        colorFileWriter.close()
-        labelFileWriter.close()
+        with open(figureColorFilePath,'a') as hndlColor:
+            colorList = list()
+            for selectedSampleName in selectedSamples:
+                colorList.append(selectedSampleName+Constants.TAB+"#FF0000")
+            hndlColor.write(Constants.ENDLINE.join(colorList))
+        hndlColor.close()
+
+        with open(figureLabelFilePath,'a') as hndlLabel:
+            labelList = list()
+            for selectedSampleName in selectedSamples:
+                labelList.append(selectedSampleName+Constants.TAB+selectedSampleName)
+            hndlLabel.write(Constants.ENDLINE.join(labelList))
+        hndlLabel.close()
+
         #Create data file
-        dataFileReader = FileIO(inputFile,True,False,False)
-        dataContent = dataFileReader.readFullFile()
-        dataFileReader.close()
+        with open(figureLabelFilePath,'r') as hndlLabel:
+            dataContent = hndlLabel.read()
+        hndlLabel.close()
         dataContent=dataContent.split(Constants.ENDLINE)
         dataWriteContent = [dataContent[0]]
         if(len(dataContent) > 3):
             dataWriteContent.extend(dataContent[2:(len(dataContent)-1)])
-        dataFileWriter = FileIO(figureDataFile,False,True,False)
-        dataFileWriter.writeToFile(Constants.ENDLINE.join(dataWriteContent))
-        dataFileWriter.close()
+
+        with open(figureDataFile,'w') as f:
+            f.write(Constants.ENDLINE.join(dataWriteContent))
+        f.close()
 
         #Call command
         CommandLine().runCommandLine(["./external/hclust/hclust.py", "--in", figureDataFile, "--out", outputFileName, "--label2cols", figureColorFilePath, "-l", figureLabelFilePath, "--legend", "1", "--legend_ncol", "1", "--pad_inches", "1.5", "--fdend_w", "0", "--font_size", "12", "--cm_h", "0", "-c", "Blues", "-d", "correlation", "-f", "braycurtis","-y","0.001"])

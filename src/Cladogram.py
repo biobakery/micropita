@@ -19,7 +19,6 @@ from AbundanceTable import AbundanceTable
 from CommandLine import CommandLine
 from Constants import Constants
 from Constants_Figures import Constants_Figures
-from FileIO import FileIO
 import math
 import numpy as np
 import os
@@ -54,16 +53,16 @@ class Cladogram:
   strSampleID = "ID"
 
   #Minimum size of clade (terminal node count for clade)
-  iMinCladeSize = -1
+  iMinCladeSize = 1
   #Level of ancestry to filter at (starts with 0 and based on the input file)
-  iCladeLevelToMeasure = -1
-  iCladeLevelToReduce = -1
+  iCladeLevelToMeasure = 1
+  iCladeLevelToReduce = 1
 
   #Flags
   #Turns on (True) or off (False) abundance-based filtering
-  fAbundanceFilter = True
+  fAbundanceFilter = False
   #Turns on (True) or off (False) clade size-based filtering
-  fCladeSizeFilter = True
+  fCladeSizeFilter = False
   #Indicate if the following files were made
   fSizeFileMade=False
   fCircleFileMade=False
@@ -152,13 +151,13 @@ class Cladogram:
     """
     self.strRoot = strRoot
 
-  def generate(self, strInputFile, strImageName, strStyleFile, sTaxaFileName, charDelimiter=Constants.TAB, iNameRow=0, iFirstDataRow=1, fNormalize=False, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
+  def generate(self, abtbData, strImageName, strStyleFile, sTaxaFileName, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This is the method to call to generate a cladogram using circlader.
-    The default data file is an abundance table unless the readData function is overwritten.
+    The default data file is an abundance table unless the getDa function is overwritten.
 
-    :param strInputFile File to read in data
-    :type strInputFile File path (string)
+    :param abtbData AbundanceTable of data
+    :type abtbData AbundanceTable
     :param strImageName File name to save the output cladogram image
     :type strImageName File name (string)
     :param strStyleFile File path indicating the style file to use
@@ -181,8 +180,9 @@ class Cladogram:
     self.manageFilePaths(sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName)
 
     #Read in the data
-    self.npaAbundance, self.strSampleID = self.readData(strInputFile, charDelimiter=charDelimiter, iNameRow=iNameRow, iFirstDataRow=iFirstDataRow, fNormalize=fNormalize)
-    self.lsSampleNames = self.npaAbundance.dtype.names[1:]
+    self.npaAbundance = abtbData.funcGetAbundanceCopy()
+    self.strSampleID = abtbData.funcGetIDMetadataName()
+    self.lsSampleNames = abtbData.funcGetSampleNames()
 
     #Get IDs
     lsIDs = [strId for strId in list(self.npaAbundance[self.strSampleID])]
@@ -192,15 +192,9 @@ class Cladogram:
     #Make numeric labels as indicated
     self.dictConvertIDs = self.generateLabels(lsIDs)
 
-    print("lsIDs: baseline")
-    print(len(lsIDs))
-
     #Filter by abundance
     if(self.fAbundanceFilter):
       lsIDs = self.filterByAbundance(lsIDs)
-
-    print("lsIDs: filter by abundance")
-    print(len(lsIDs))
 
     #Update to the correct root
     lsIDs = self.updateToRoot(lsIDs)
@@ -227,33 +221,18 @@ class Cladogram:
     if(self.fCladeSizeFilter):
       lsIDs = self.filterByCladeSize(lsIDs)
 
-    print("lsIDs: filter by clade size")
-    print(len(lsIDs))
-
     #Add in forced highlighting
     lsIDs.extend(self.dictForcedHighLights.keys())
     lsIDs = list(set(lsIDs))
 
-    print("lsIDs: forced highlights")
-    print(len(lsIDs))
-
     #Create circle files (needs to be after any filtering because it has a forcing option).
     self.createCircleFile(lsIDs)
-
-    print("lsIDs: create circle file")
-    print(len(lsIDs))
 
     #Generate / Write Tree file
     self.createTreeFile(lsIDs)
 
-    print("lsIDs: write tree file")
-    print(len(lsIDs))
-
     #Generate / Write Highlight file
     self.createHighlightFile(lsIDs)
-
-    print("lsIDs: write highlight file")
-    print(len(lsIDs))
 
     #Generate / write color file
     if(self.dictColors is not None):
@@ -269,9 +248,6 @@ class Cladogram:
 
     #Generate / Write size data
     self.createSizeFile(lsIDs)
-
-    print("lsIDs: write size file")
-    print(len(lsIDs))
 
     #Call commandline
     lsCommand = [self.circladerScript, self.strTreeFilePath, self.strImageName, "--style_file", self.strStyleFilePath, "--tree_format", "tabular"]
@@ -331,15 +307,25 @@ class Cladogram:
   def setFilterByCladeSize(self, fCladeSizeFilter, iCladeLevelToMeasure = 3, iCladeLevelToReduce = 1, iMinimumCladeSize = 5):
     """
     Switch filtering by clade size on and off.
-    fAbundanceFilter == True indicates filtering is on
+    fCladeSizeFilter == True indicates filtering is on
+    NOT 0 based.
 
-    :param fAbundanceFilter Switch to turn on (true) and off (false) clade size-based filtering
-    :type fAbundanceFilter boolean
+    :param fCladeSizeFilter Switch to turn on (true) and off (false) clade size-based filtering
+    :type fCladeSizeFilter boolean
+    :param iCladeLevelToMeasure The level of the concensus lineage that is measure or counted. Should be greater than iCladeLevelToReduce (Root is 1)
+    :type iCladeLevelToMeasure int
+    :param iCladeLevelToReduce The level of the concensus lineage that is reduced if the measured level are not the correct count (Root is 1)
+    :type iCladeLevelToReduce int
+    :param iMinimumCladeSize Minimum count of the measured clade for the clade to be kept
+    :type iMinimumCladeSize int
     """
     self.fCladeSizeFilter = fCladeSizeFilter
-    self.iCladeLevelToMeasure = iCladeLevelToMeasure
-    self.iCladeLevelToReduce = iCladeLevelToReduce
-    self.iMinCladeSize = iMinimumCladeSize
+    if iCladeLevelToMeasure > 0:
+        self.iCladeLevelToMeasure = iCladeLevelToMeasure
+    if iCladeLevelToReduce > 0:
+        self.iCladeLevelToReduce = iCladeLevelToReduce
+    if iMinimumCladeSize > 0:
+        self.iMinCladeSize = iMinimumCladeSize
 
   #Not tested
   def setTicks(self, llsTicks):
@@ -691,15 +677,17 @@ class Cladogram:
     #Count how many of a given level are in the clade
     dictCladeCount = dict()
     for sID in lsIDs:
-        sIDElements = filter(None,re.split("\|",sID))
-        if((len(sIDElements) >= self.iCladeLevelToMeasure) or ((sIDElements[-1] == "unclassified") and (len(sIDElements) >= self.iCladeLevelToMeasure))):
-          if not sIDElements[self.iCladeLevelToReduce] in dictCladeCount:
-              dictCladeCount[sIDElements[self.iCladeLevelToReduce]] = 0
-          dictCladeCount[sIDElements[self.iCladeLevelToReduce]] = dictCladeCount[sIDElements[self.iCladeLevelToReduce]] + 1
+        sIDElements = re.split("\|",sID)
+        if((len(sIDElements) >= self.iCladeLevelToMeasure) or ((sIDElements[-1] == "unclassified") and (len(sIDElements) >= self.iCladeLevelToReduce))):
+          for iElementIndex in xrange(self.iCladeLevelToMeasure):
+              currentClade = "|".join(sIDElements[0:self.iCladeLevelToMeasure])
+              if not currentClade in dictCladeCount:
+                  dictCladeCount[currentClade] = 0
+              dictCladeCount[currentClade] = dictCladeCount[currentClade] + 1
 
     retls = list()
     for strID in lsIDs:
-        strIDElements = filter(None,re.split("\|",strID))
+        strIDElements = re.split("\|",strID)
         if(len(strIDElements) >= self.iCladeLevelToMeasure):
             if( strIDElements[self.iCladeLevelToReduce] in dictCladeCount):
                 if dictCladeCount[strIDElements[self.iCladeLevelToReduce]] >= self.iMinCladeSize:
@@ -807,24 +795,6 @@ class Cladogram:
       if(os.path.exists(self.strCircleFilePath)):
         os.remove(self.strCircleFilePath)
 
-  def readData(self, strInputFile, charDelimiter=Constants.TAB, iNameRow=0, iFirstDataRow=1, fNormalize=False):
-    """
-    This reads data from a file to build a cladogram.
-
-    :param strInputFile File to read in data
-    :type strInputFile File path 
-    """
-    #Abundance table object to read in and manage data
-    rawData = AbundanceTable()
-
-    #Read in abundance data
-    #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
-    npaData,metadata = rawData.textToStructuredArray(tempInputFile=strInputFile, tempDelimiter=charDelimiter, tempNameRow=iNameRow, tempFirstDataRow=iFirstDataRow, tempNormalize=fNormalize)
-    self.strSampleID = npaData.dtype.names[0]
-
-    #Return the data array and the sample ID
-    return([npaData, self.strSampleID])
-
   def relabelIDs(self, dictLabels):
     """
     Allows the relabeling of ids. Can be used to make numeric labeling of ids or renaming
@@ -870,6 +840,6 @@ class Cladogram:
     :param fAppend Indicates if an append should occur (True == Append)
     :type fAppend boolean
     """
-    fileHandle = FileIO(strFileName,False,True,fAppend)
-    fileHandle.writeToFile(strDataToWrite)
-    fileHandle.close()
+    with open(strFileName,'a') as f:
+        f.write(strDataToWrite)
+    f.close()

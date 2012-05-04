@@ -56,6 +56,14 @@ class Constants_Arguments():
     c_strInvertArgument = "-i"
     c_strInvertHelp = "Invert the image to a black background (default=False)."
 
+    #in flag indicating the original file is normalized as read in
+    c_strIsNormalizedArgument = "-in"
+    c_strIsNormalizedHelp = "Indicates if the file is normalized when read in (True indicates normalized)."
+
+    #is flag indicating the original file is summed as read in
+    c_strIsSummedArgument = "-is"
+    c_strIsSummedHelp = "Indicates if the file is summed when read in (True indicates summed)."
+
     #l String for logging level
     c_strLoggingArgument = "-l"
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
@@ -68,6 +76,14 @@ class Constants_Arguments():
     #o Circlader ring order
     c_strRingOrder = "-o"
     c_StrRingOrderHelp = "The order to use for the cladogram rings from inner ring to outer ring." 
+
+    #ofe
+    c_strOccurenceFilterSequenceCount = "-ofe"
+    c_strOccurenceFilterSequenceHelp = "The minimum sequence count of a feature to be kept in occurence filtering. (A positive value activates the filter)."
+
+    #ofa
+    c_strOccurenceFilterSampleCount = "-ofa"
+    c_strOccurenceFilterSampleHelp = "The minimum sample the c_strOccurenceFilterSequenceCount must occur in for a feature to be kept."
 
     #p Predict file path
     c_strPredictFilePath = "-p"

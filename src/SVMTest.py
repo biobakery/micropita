@@ -14,7 +14,6 @@ __status__ = "Development"
 
 #Import libraries
 from Constants import Constants
-from FileIO import FileIO
 import numpy as np
 import os
 from SVM import SVM
@@ -40,9 +39,9 @@ class SVMTest(unittest.TestCase):
 
         #Call method
         SVM.convertAbundanceFileToSVMFile(tempInputFile=inputFile, tempOutputSVMFile=outputFile, tempDelimiter=delimiter, tempLabels=labels, tempFirstDataRow=2, tempSkipFirstColumn=skipFirst, tempNormalize=normalize)
-        read = FileIO(outputFile, True,False,False)
-        result = read.readFullFile()
-        read.close()
+        with open(outputFile,'r') as f:
+            result = f.read()
+        f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -63,9 +62,9 @@ class SVMTest(unittest.TestCase):
 
         #Call method
         SVM.convertAbundanceFileToSVMFile(tempInputFile=inputFile, tempOutputSVMFile=outputFile, tempDelimiter=delimiter, tempLabels=labels, tempFirstDataRow=2, tempSkipFirstColumn=skipFirst, tempNormalize=normalize)
-        read = FileIO(outputFile, True,False,False)
-        result = read.readFullFile()
-        read.close()
+        with open(outputFile,'r') as f:
+            result = f.read()
+        f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))

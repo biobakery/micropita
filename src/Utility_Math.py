@@ -9,8 +9,10 @@
 
 #Import libaries
 import itertools
+import numpy as np
 import operator
 import random
+from ValidateData import ValidateData
 
 ##
 #Utility function for data generation
@@ -81,4 +83,33 @@ class Utility_Math():
       #When combining, combine counts by summing
       npPooledSample = npPooledSample + npaAbundance[strSampleName]
     return list(npPooledSample)
+
+  #Testing Status: Light happy path testing
+  #Transposes a matrix.
+  #Removes the first column before transposing if tempRemoveAdornments = True
+  #@params tempMatrix Structured array to transpose
+  #@params tempRemoveAdornments Remove first column before transposing
+  #@return Returns Transposed structured array (list of lists, list=previous columns) with potentially the first column removed.
+  @staticmethod
+  def transposeDataMatrix(tempMatrix, tempRemoveAdornments=False):
+    #Validate parameters
+    if(not ValidateData.isValidStructuredArray(tempMatrix)):
+      print "".join(["Utility_Math:transposeDataMatrix::Error, transposeDataMatrix was an invalid structured array. Value =",str(tempMatrix)])
+      return False
+    if(not ValidateData.isValidBoolean(tempRemoveAdornments)):
+      print "".join(["Utility_Math:transposeDataMatrix::Error, tempRemoveAdornments was an invalid boolean. Value =",str(tempRemoveAdornments)])
+      return False
+
+    #Change to samples x taxa as is needed for the compute method below
+    #Also remove the first row which is taxa identification
+    startColumnElement = 0
+    if(tempRemoveAdornments == True):
+      startColumnElement = 1
+    conversionMatrix = list()
+    for row in tempMatrix:
+      conversionMatrix.append(list(row)[startColumnElement:])
+    tempMatrix = None
+    conversionMatrix = np.array(conversionMatrix)
+    conversionMatrix = conversionMatrix.transpose()
+    return conversionMatrix
 

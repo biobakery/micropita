@@ -95,12 +95,17 @@ c_strConfigCladogramRingOrder = "[Cladogram Ring Order]"
 c_strConfigCladogramTicks = "[Cladogram Dendrogram Ticks]"
 c_strConfigDataRow = "[Data Name Row Index]"
 c_strConfigEnrichmentMeasurement = "[Taxa or OTU Enrichment Measurement]"
+c_strConfigFileIsNormalized = "[File is Already Normalized]"
+c_strConfigFileIsSummed = "[File is Already Summed]"
 c_strConfigHighlightClades = "[Higlight Clades]"
 c_strConfigInputFile = "[Input File]"
 c_strConfigInvertImage = "[Invert Image]"
 c_strConfigLabels = "[Labels]"
 c_strConfigLogging = "[Logging]"
-c_strConfigNormalizeAbundance = "[Normalize Abundance]"
+c_strConfigNormalizeAbundance = "[Show Plots as Normalized Abundance]"
+c_strOccurenceFilter = "[Occurence Filter]"
+c_strOccurenceFilterMinSequence = "[Occurence Filter Minimum Sequence]"
+c_strOccurenceFilterMinSample = "[Occurence Filter Minimum Sample]"
 c_strConfigPlotCombinedSelectionTechniques = "[Unsupervised Selection Methods to plot in a combined graph]"
 c_strConfigPlotCombinedSupervisedSelectionTechniques = "[Supervised Selection Methods to plot in a combined graph]"
 c_strConfigRoot = "[Root]"
@@ -132,7 +137,6 @@ c_fileProgConfusionMatrixFigure = File( sfle.d( fileDirSrc, "MicropitaPaperConfu
 c_fileProgConstants = File( sfle.d( fileDirSrc, "Constants.py" ) )
 c_fileProgConstantsFigures = File( sfle.d( fileDirSrc, "Constants_Figures.py" ) )
 c_fileProgDiversity = File( sfle.d( fileDirSrc, "Diversity.py" ) )
-c_fileProgFileIO = File( sfle.d( fileDirSrc, "FileIO.py" ) )
 c_fileProgMencoder = File("/usr/bin/mencoder")
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
 c_fileProgMLPYDistanceAdaptor = File( sfle.d( fileDirSrc, "MLPYDistanceAdaptor.py" ) )
@@ -149,9 +153,9 @@ c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
 
 #Lists of sources needed for different python scripts that are ran so that they can be used as libraries
 c_filesSecondarySrc = [c_fileProgAbundanceTable, c_fileProgCommandLine, c_fileProgConstants, c_fileProgDiversity,
-	c_fileProgFileIO, c_fileProgMLPYDistanceAdaptor, c_fileProgPCOA, c_fileProgSVM, c_fileProgUtilityData]
+	               c_fileProgMLPYDistanceAdaptor, c_fileProgPCOA, c_fileProgSVM, c_fileProgUtilityData]
 c_filePrimarySrc = c_filesSecondarySrc + [c_fileProgMicroPITA]
-ls_srcFig1 = [c_fileProgCommandLine, c_fileProgConstants, c_fileProgConstantsFigures, c_fileProgMicroPITA, c_fileProgValidateData, c_fileProgFileIO]
+ls_srcFig1 = [c_fileProgCommandLine, c_fileProgConstants, c_fileProgConstantsFigures, c_fileProgMicroPITA, c_fileProgValidateData]
 ls_srcFig2 = [c_fileProgConstants, c_fileProgConstantsFigures, c_fileProgMicroPITA, c_fileProgValidateData, c_fileProgCladogram, c_fileProgAbundanceTable]
 
 #Selection parameters
@@ -193,30 +197,39 @@ def funcVisualizeInsilicoData( strXStart, strYStart ):
   return funcVisualizeInsilicoDataRet
 
 ##Call micropita to run
-def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify, strTaxaFile, lsSelectionMethods):
+def funcMicroPita( strLoggingLevel, iUnsupervisedCount, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, 
+                   strUnsupervisedStratify, strTaxaFile, fNormalized, fSummed, lsSelectionMethods):
   def funcMicroPitaRet( target, source, env, iUnsupervisedCount=iUnsupervisedCount, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, 
-                        iSupervisedCount=iSupervisedCount, strSupervisedLabel=strSupervisedLabel, strUnsupervisedStratify=strUnsupervisedStratify, strTaxaFile=strTaxaFile, lsSelectionMethods=lsSelectionMethods):
+                        iSupervisedCount=iSupervisedCount, strSupervisedLabel=strSupervisedLabel, strUnsupervisedStratify=strUnsupervisedStratify, strTaxaFile=strTaxaFile,
+                        fNormalized=fNormalized, fSummed=fSummed, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd = astrSs[0], astrSs[1]
     aArgs = [iUnsupervisedCount]+lsSelectionMethods
-    return sfle.ex( [strProg]+[strLoggingLevel, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify]+[strT, strAbnd, strTaxaFile, fileDirTmp] + aArgs)
+    return sfle.ex( [strProg]+[strLoggingLevel, iSampleNameRow, iFirstDataRow, iSupervisedCount, strSupervisedLabel, strUnsupervisedStratify, fNormalized, fSummed]+[strT, strAbnd, strTaxaFile, fileDirTmp] + aArgs)
   return funcMicroPitaRet
 
 ##Create figures
 #Visualize output with PCoA (Figure 1A)
-def funcPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, strPredictFileArgument ):
-  def funcPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, strPredictFileArgument=strPredictFileArgument):
+def funcPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, strInvert,
+                              fNormalized, fSummed, strPredictFileArgument ):
+  def funcPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow,
+                   iNormalize=iNormalize, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                   strPredictFileArgument=strPredictFileArgument):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg]+[strLoggingLevel, iSampleNameRow,iFirstDataRow,iNormalize,strInvert,strPredictFileArgument]+[ strAbnd, strSelection, strT])
+    return sfle.ex([strProg]+[strLoggingLevel, iSampleNameRow,iFirstDataRow,iNormalize,strInvert,fNormalized,
+                   fSummed, strPredictFileArgument]+[ strAbnd, strSelection, strT])
   return funcPCoARet
 
 #Visualize output with Combined PCoA (Figure 1A)
-def funcCombinedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, lsSelectionMethods):
-  def funcCombinedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods):
+def funcCombinedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, iNormalize, strInvert,
+                                      fNormalized, fSummed,lsSelectionMethods):
+  def funcCombinedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow,
+                           iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, fNormalized=fNormalized,
+                           fSummed=fSummed, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg]+[strLoggingLevel,iSampleNameRow,iFirstDataRow,iNormalize,strInvert]+[ strAbnd, strSelection, strT]+lsSelectionMethods)
+    return sfle.ex([strProg]+[strLoggingLevel,iSampleNameRow,iFirstDataRow,iNormalize,fNormalized,fSummed,strInvert]+[ strAbnd, strSelection, strT]+lsSelectionMethods)
   return funcCombinedPCoARet
 
 #Visualize selected output with HCL (Figure 1B)
@@ -245,18 +258,20 @@ def funcOverlapMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
   return funcOverlapMatrixRet
 
 #Visualize selected output with Cladogram (Figure 2)
-def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha):
+def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert,
+                                   fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
+                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha, strMinSequence, strMinSample):
 
   def funcCladogramSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, 
-                                 iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert, strRoot=strRoot, strEnrichment=strEnrichment,
+                                 iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, iNormalize=iNormalize, strInvert=strInvert,
+                                 fNormalized=fNormalized, fSummed=fSummed, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
-                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha):
+                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
     strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
-    return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+    return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, iSampleNameRow, iFirstDataRow, iNormalize, strInvert, fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -269,24 +284,35 @@ def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHigh
 #  return funcHCLStratSelectionRet
 
 #Visualize output with Stratified PCoAs (Figure 4)
-def funcStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert, strPredictFileArgument ):
-  def funcStratifiedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, strStratifyMetadata=strStratifyMetadata, iNormalize=iNormalize, strInvert=strInvert, strPredictFileArgument=strPredictFileArgument):
+def funcStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert,
+                                        fNormalized, fSummed, strPredictFileArgument ):
+  def funcStratifiedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow,
+                             iFirstDataRow=iFirstDataRow, strStratifyMetadata=strStratifyMetadata, iNormalize=iNormalize,
+                             strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                             strPredictFileArgument=strPredictFileArgument):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,strStratifyMetadata,iNormalize,strInvert,strPredictFileArgument]+[ strAbnd, strSelection, strT])
+    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,strStratifyMetadata,iNormalize,strInvert,
+                              fNormalized,fSummed,strPredictFileArgument]+[ strAbnd, strSelection, strT])
   return funcStratifiedPCoARet
 
 #Visualize output with Stratified PCoAs (Figure 3/4 Combined)
-def funcCombinedStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert, lsSelectionMethods ):
-  def funcCombinedStratifiedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, strStratifyMetadata=strStratifyMetadata, iNormalize=iNormalize, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods):
+def funcCombinedStratifiedPCoASelectionMethods( strLoggingLevel, iSampleNameRow, iFirstDataRow, strStratifyMetadata, iNormalize, strInvert,
+                                                fNormalized, fSummed, lsSelectionMethods ):
+  def funcCombinedStratifiedPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, iSampleNameRow=iSampleNameRow,
+                                     iFirstDataRow=iFirstDataRow, strStratifyMetadata=strStratifyMetadata, iNormalize=iNormalize,
+                                     strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,strStratifyMetadata,iNormalize,strInvert]+[ strAbnd, strSelection, strT] + lsSelectionMethods)
+    return sfle.ex([strProg]+[iSampleNameRow,iFirstDataRow,strStratifyMetadata,iNormalize,strInvert, fNormalized,
+                   fSummed]+[ strAbnd, strSelection, strT] + lsSelectionMethods)
   return funcCombinedStratifiedPCoARet
 
 #Create a summary chart with collection curves
-def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strInvert, lsSelectionMethods):
-  def funcCollectionCurveRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow, strFirstDataRow=strFirstDataRow, strInvert=strInvert, lsSelectionMethods=lsSelectionMethods):
+def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataRow, strInvert, fNormalized, fSummed, lsSelectionMethods):
+  def funcCollectionCurveRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
+                              strFirstDataRow=strFirstDataRow, strInvert=strInvert, fNormalized=fNormalized,
+                              fSummed=fSummed, lsSelectionMethods=lsSelectionMethods):
     strFigureT, astrSs = sfle.ts( target, source )
     strProg, strAbundance = astrSs[0], astrSs[1]
     #Get input selection files (discriminate from the src files also passed as a list)
@@ -297,7 +323,9 @@ def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strFirstDataR
         break
       iFileCount = iFileCount + 1
     lsSelectionFiles = astrSs[2:iFileCount+1]
-    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strFirstDataRow, strInvert, strAbundance, strFigureT, target[1].get_abspath()]+lsSelectionFiles+[lsSelectionMethods])
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strFirstDataRow, fNormalized,
+                    fSummed, strInvert, strAbundance, strFigureT,
+                    target[1].get_abspath()]+lsSelectionFiles+[lsSelectionMethods])
   return funcCollectionCurveRet
 
 #Make movies from a list of images
@@ -319,6 +347,44 @@ def globFilesByExtension(strDirectory,strExtension,strDelim = c_strExtDelim):
     if c_strExtDelim+strPathPieces[-1] == strExtension:
       lCleanedFiles.append(fileName)
   return lCleanedFiles
+
+def funcReadConfigFile( strConfigFile ):
+  #Dictionary to hold config data
+  dictFileConfiguration = dict()
+
+  #Read in contents into a list of lines to read
+  sFileContents = list()
+  with open(strConfigFile) as f:
+    sFileContents = f.read()
+    f.close()
+  sFileContents = filter(None,re.split("\n",sFileContents))
+
+  #Parse config file
+  iIndex = 0
+  iLengthContents = len(sFileContents)
+  #All lines
+  while iIndex < iLengthContents:
+    sLine = sFileContents[iIndex]
+    #Header lines
+    if(sLine[0] == c_strConfigFileHeaderChar):
+      strConfigKey = sLine
+      iIndex = iIndex + 1
+      if(iIndex < iLengthContents):
+        sLine = sFileContents[iIndex]
+        lsConfigData = list()
+        #Contents of headers which are not headers
+        while((iIndex < iLengthContents) and (not sLine[0] == c_strConfigFileHeaderChar)):
+          #Ignore comments
+          if(not sLine[0] == c_strConfigFileCommentChar):
+            lsConfigData.append(sLine)
+          iIndex = iIndex + 1
+          if iIndex < iLengthContents:
+            sLine = sFileContents[iIndex]
+        if(len(lsConfigData) > 0):
+          dictFileConfiguration[strConfigKey]=lsConfigData[0]
+    else:
+      iIndex = iIndex + 1
+  return dictFileConfiguration
 
 ###Start process
 #Generate insilico data sets
@@ -354,40 +420,10 @@ for fileConfigMicropita in lMicropitaFiles:
   print("fileConfigMicropita")
   print(fileConfigMicropita)
   #Get Contents of config file
-  sFileConfiguration = dict()
+  sFileConfiguration = funcReadConfigFile(fileConfigMicropita.get_abspath())
   #Set defaults
-  sFileConfiguration[c_strConfigSelectedTaxa]="None"
-  sFileContents = list()
-  with open(fileConfigMicropita.get_abspath()) as f:
-    sFileContents = f.read()
-    f.close()
-  sFileContents = filter(None,re.split("\n",sFileContents))
-
-  #Parse config file
-  iIndex = 0
-  iLengthContents = len(sFileContents)
-  #All lines
-  while iIndex < iLengthContents:
-    sLine = sFileContents[iIndex]
-    #Header lines
-    if(sLine[0] == c_strConfigFileHeaderChar):
-      strConfigKey = sLine
-      iIndex = iIndex + 1
-      if(iIndex < iLengthContents):
-        sLine = sFileContents[iIndex]
-        lsConfigData = list()
-        #Contents of headers which are not headers
-        while((iIndex < iLengthContents) and (not sLine[0] == c_strConfigFileHeaderChar)):
-          #Ignore comments
-          if(not sLine[0] == c_strConfigFileCommentChar):
-            lsConfigData.append(sLine)
-          iIndex = iIndex + 1
-          if iIndex < iLengthContents:
-            sLine = sFileContents[iIndex]
-        if(len(lsConfigData) > 0):
-          sFileConfiguration[strConfigKey]=lsConfigData[0]
-    else:
-      iIndex = iIndex + 1
+  if not c_strConfigSelectedTaxa in sFileConfiguration:
+    sFileConfiguration[c_strConfigSelectedTaxa]="None"
 
   #Parse the supervised runs selection into multiple runs if needed
   if(c_strConfigSupervisedCount in sFileConfiguration):
@@ -432,6 +468,10 @@ for fileConfigMicropita in lMicropitaFiles:
   if sFileConfiguration[c_strConfigAbundanceFilter].lower() == "false":
     sFileConfiguration[c_strConfigAbundanceFilterPercentile] = "none"
     sFileConfiguration[c_strConfigAbundanceFilterPercent] = "none"
+
+  if sFileConfiguration[c_strOccurenceFilter].lower() == "false":
+    sFileConfiguration[c_strOccurenceFilterMinSequence] = "none"
+    sFileConfiguration[c_strOccurenceFilterMinSample] = "none"
 
   #Get supervised and unsupervised counts
   lsUnsupervisedCounts = sFileConfiguration[c_strConfigUnsupervisedCount]
@@ -510,6 +550,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                     " ".join([Constants_Arguments.c_strSupervisedLabel,sFileConfiguration[c_strConfigSupervisedLabel]]),
                                                                                                                                     " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadata,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
                                                                                                                                     cCladogramSelectedTaxa,
+                                                                                                                                    " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                                                                                                                    " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                     lsSelectionMethods))
     #Create figure 1A PCoA
     #Unstratified PCoA of selection
@@ -525,6 +567,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                                 strPredictFileArgument))
     #Create figure 1A PCoA combined
     #Unstratified PCoA of selection
@@ -535,6 +579,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                                  lsPlotCombinedSelectionMethods))
 
     #Create figure 1B HCL
@@ -570,8 +616,12 @@ for fileConfigMicropita in lMicropitaFiles:
       strHighlightArgForCladogram = " ".join([strHighlightArgForCladogram,cCladogramHighlightedTaxa.get_abspath()])
     else:
       strHighlightArgForCladogram = " ".join([strHighlightArgForCladogram,"None"])
-    #Taxanomic Enrichment
+    #Taxonomic Enrichment
     lsCladogramFigures.append(sCladogramSelectFig)
+
+    print("sFileConfiguration")
+    print(sFileConfiguration)
+
     Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
          sCladogramSizeFile, sCladogramCircleFile], lsFig2Sources + ls_srcFig2, 
          funcCladogramSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
@@ -581,6 +631,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strFirstDataRow,sFileConfiguration[c_strConfigDataRow]]),
                                        " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                        " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                       " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                       " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                        " ".join([Constants_Arguments.c_strRoot,sFileConfiguration[c_strConfigRoot]]),
                                        " ".join([Constants_Arguments.c_strEnrichmentMethod,sFileConfiguration[c_strConfigEnrichmentMeasurement]]),
                                        " ".join([Constants_Arguments.c_strCladeFilterLevel,sFileConfiguration[c_strConfigCladeFilterLevel]]),
@@ -590,7 +642,9 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strAbundanceFilterCutoff,sFileConfiguration[c_strConfigAbundanceFilterPercent]]),
                                        " ".join([Constants_Arguments.c_strRingOrder,sFileConfiguration[c_strConfigCladogramRingOrder]]),
                                        " ".join([Constants_Arguments.c_strCircladerTicks,sFileConfiguration[c_strConfigCladogramTicks]]),
-                                       " ".join([Constants_Arguments.c_strEnrichmentThreshold,sFileConfiguration[c_strConfigCladogramAlpha]])))
+                                       " ".join([Constants_Arguments.c_strEnrichmentThreshold,sFileConfiguration[c_strConfigCladogramAlpha]]),
+                                       " ".join([Constants_Arguments.c_strOccurenceFilterSequenceCount,sFileConfiguration[c_strOccurenceFilterMinSequence]]),
+                                       " ".join([Constants_Arguments.c_strOccurenceFilterSampleCount,sFileConfiguration[c_strOccurenceFilterMinSample]])))
 
     #Create figure 3 HCL version
 #    #Selection in Stratification
@@ -610,6 +664,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                    " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadata,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                    strPredictFileArgument))
 
       Command(sOutputFigure4CombinedPCoA, [c_fileProgCombinedStratifiedPCoAFigure, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcCombinedStratifiedPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
@@ -618,6 +674,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                    " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadata,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                    lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
 
     #Add input files to be later summarized in the metaplots
@@ -673,5 +731,7 @@ if c_fRunCollectionCurve:
                               " ".join([Constants_Arguments.c_strSampleNameRowArgument, curSampleNameRow]),
                               " ".join([Constants_Arguments.c_strFirstDataRow, curFirstDataRow]),
                               " ".join([Constants_Arguments.c_strInvertArgument, curInvert]),
+                              " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                              " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                               " ".join([Constants_Arguments.c_strPlotSelectedArgument]+lsPlotCollectorSelectionMethods)))
 

@@ -19,7 +19,6 @@ import argparse
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
-from FileIO import FileIO
 import logging
 import numpy as np
 import os

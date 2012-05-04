@@ -13,7 +13,6 @@ from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
 import csv
 from Diversity import Diversity
-from FileIO import FileIO
 from MicroPITA import MicroPITA
 import numpy as np
 import os
@@ -232,8 +231,7 @@ class Utility_Data():
         #Delete current file before writing
         if(os.path.isfile(strOutputFile)):
             os.remove(strOutputFile)
-        #File writer
-        outToFile = FileIO(strOutputFile,False,True,True)
+
         #Data to output
         outputContents = []
         #Output sample id header
@@ -247,8 +245,9 @@ class Utility_Data():
                 taxaData.append(str(sampleAbundance))
             taxaData = Constants.TAB.join(taxaData)
             outputContents.append(Constants.TAB.join([taxaNames[row],taxaData]))
-        outToFile.writeToFile(Constants.ENDLINE.join(outputContents))
-        outToFile.close()
+        with open(strFileName,'a') as f:
+            f.write(Constants.ENDLINE.join(outputContents))
+        f.close()
 
         #Write actual file
         strOutputContent = ""
