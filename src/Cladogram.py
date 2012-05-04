@@ -51,12 +51,14 @@ class Cladogram:
   strImageName = "Cladogram.png"
   #String used to call the sample id column
   strSampleID = "ID"
+  strUnclassified = "unclassified"
 
   #Minimum size of clade (terminal node count for clade)
   iMinCladeSize = 1
   #Level of ancestry to filter at (starts with 0 and based on the input file)
   iCladeLevelToMeasure = 1
   iCladeLevelToReduce = 1
+  cFeatureDelimiter = "|"
 
   #Flags
   #Turns on (True) or off (False) abundance-based filtering
@@ -151,13 +153,11 @@ class Cladogram:
     """
     self.strRoot = strRoot
 
-  def generate(self, abtbData, strImageName, strStyleFile, sTaxaFileName, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
+  def generate(self, strImageName, strStyleFile, sTaxaFileName, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This is the method to call to generate a cladogram using circlader.
     The default data file is an abundance table unless the getDa function is overwritten.
 
-    :param abtbData AbundanceTable of data
-    :type abtbData AbundanceTable
     :param strImageName File name to save the output cladogram image
     :type strImageName File name (string)
     :param strStyleFile File path indicating the style file to use
@@ -173,16 +173,16 @@ class Cladogram:
     :param strSizeFile File path indicating the size file to use
     :type strSizeFile File path (string)
     """
+
+    if self.npaAbundance == None:
+      print "Cladogram::generate. The data was not set so an image could not be generated"
+      return False
+
     #Set output file name
     self.strImageName = strImageName
 
     #Check files exist and remove files which will be written
     self.manageFilePaths(sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName)
-
-    #Read in the data
-    self.npaAbundance = abtbData.funcGetAbundanceCopy()
-    self.strSampleID = abtbData.funcGetIDMetadataName()
-    self.lsSampleNames = abtbData.funcGetSampleNames()
 
     #Get IDs
     lsIDs = [strId for strId in list(self.npaAbundance[self.strSampleID])]
@@ -217,7 +217,8 @@ class Cladogram:
           dictRootedLabels[strUpdatedKey[0]]=self.dictRelabels[sKey]
         self.dictRelabels = dictRootedLabels
 
-    #Filter by clade size
+    #Filter by clade size Should be the last filter.
+    #It is not a strong filter but cleans up images
     if(self.fCladeSizeFilter):
       lsIDs = self.filterByCladeSize(lsIDs)
 
@@ -281,6 +282,15 @@ class Cladogram:
         self.dictColors[Constants_Figures.c_strBackgroundColorName]=Constants_Figures.c_strBackgroundColor
 
   #Not tested
+  def setAbundanceData(self, abtbAbundanceTable):
+    """
+    Sets the abundance data the Cladogram will use to plot
+    """
+    self.npaAbundance = abtbAbundanceTable.funcGetAbundanceCopy()
+    self.strSampleID = abtbAbundanceTable.funcGetIDMetadataName()
+    self.lsSampleNames = abtbAbundanceTable.funcGetSampleNames()
+
+  #Not tested
   def setFilterByAbundance(self, fAbundanceFilter, dPercentileCutOff = 90.0,  dPercentageAbovePercentile = 1.0):
     """
     Switch filtering by abundance on and off.
@@ -304,7 +314,7 @@ class Cladogram:
     self.c_dCircleScale = iScale
 
   #Not tested
-  def setFilterByCladeSize(self, fCladeSizeFilter, iCladeLevelToMeasure = 3, iCladeLevelToReduce = 1, iMinimumCladeSize = 5):
+  def setFilterByCladeSize(self, fCladeSizeFilter, iCladeLevelToMeasure = 3, iCladeLevelToReduce = 1, iMinimumCladeSize = 5, cFeatureDelimiter = "|", strUnclassified="unclassified"):
     """
     Switch filtering by clade size on and off.
     fCladeSizeFilter == True indicates filtering is on
@@ -326,6 +336,10 @@ class Cladogram:
         self.iCladeLevelToReduce = iCladeLevelToReduce
     if iMinimumCladeSize > 0:
         self.iMinCladeSize = iMinimumCladeSize
+    if cFeatureDelimiter:
+        self.cFeatureDelimiter = cFeatureDelimiter
+    if strUnclassified:
+        self.strUnclassified = strUnclassified
 
   #Not tested
   def setTicks(self, llsTicks):
@@ -629,6 +643,49 @@ class Cladogram:
       self.writeToFile(self.strTreeFilePath, Constants.ENDLINE.join(lsFullTree), False)
     return True
 
+  ##Returns only terminal nodes given the list's structure
+  @staticmethod
+  def funcGetTerminalNodes(lsTaxa,cDelim):
+    #Return list
+    lsRetList = list()
+
+    #Build hash
+    dictCounts = dict()
+    for strTaxaName in lsTaxa:
+      #Split into the elements of the clades
+      lsClades = filter(None,strTaxaName.split(cDelim))
+      #Count clade levels
+      iCladeLength = len(lsClades)
+    
+      #Make sure there is data to work with
+      if iCladeLength < 0:
+        pass
+
+      #Evaluate first element
+      sClade = lsClades[0]
+      if sClade in dictCounts:
+        dictCounts[sClade] = False
+      else:
+        dictCounts[sClade] = True
+
+      #Evaluate the rest of the elements
+      if iCladeLength > 1:
+        for iIndex in xrange(1,iCladeLength):
+          prevClade = sClade
+          sClade = cDelim.join([sClade,lsClades[iIndex]])
+          if sClade in dictCounts:
+            dictCounts[sClade] = False
+            dictCounts[prevClade] = False
+          else:
+            dictCounts[sClade] = True
+            dictCounts[prevClade] = False
+
+    #Return only the elements that were of count 1
+    for sName in dictCounts:
+      if dictCounts[sName]==True:
+        lsRetList.append(sName)
+    return lsRetList
+
   #Happy Path tested
   def filterByAbundance(self, lsIDs):
     """
@@ -640,7 +697,7 @@ class Cladogram:
     """
     #list of ids to return that survived the filtering
     retls = list()
-    if(self.npaAbundance is not None):
+    if not self.npaAbundance is None:
       #Hold the cuttoff score (threshold) for the percentile of interest {SampleName(string):score(double)}
       dictPercentiles = dict()
       for index in xrange(1,len(self.npaAbundance.dtype.names)):
@@ -666,7 +723,6 @@ class Cladogram:
             retls.append(sCurTaxaName)
     return retls
 
-  #TODO need to test, definition of filtering redefined
   def filterByCladeSize(self, lsIDs):
     """
     Filter by the count of individuals in the clade.
@@ -674,24 +730,44 @@ class Cladogram:
     :param lsIDs Ids to filter
     :type lsIDs List of strings
     """
-    #Count how many of a given level are in the clade
-    dictCladeCount = dict()
-    for sID in lsIDs:
-        sIDElements = re.split("\|",sID)
-        if((len(sIDElements) >= self.iCladeLevelToMeasure) or ((sIDElements[-1] == "unclassified") and (len(sIDElements) >= self.iCladeLevelToReduce))):
-          for iElementIndex in xrange(self.iCladeLevelToMeasure):
-              currentClade = "|".join(sIDElements[0:self.iCladeLevelToMeasure])
-              if not currentClade in dictCladeCount:
-                  dictCladeCount[currentClade] = 0
-              dictCladeCount[currentClade] = dictCladeCount[currentClade] + 1
+    #First get terminal nodes
+    lsTerminalNodes = Cladogram.funcGetTerminalNodes(lsIDs,self.cFeatureDelimiter)
 
+    #Count up clades
+    cladeCounts = dict()
+    
+    print "TERMINAL NODES"
+    print len(lsTerminalNodes)
+    #For each terminal node count the
+    #Clades at clade levels
+    for sTerminalNode in lsTerminalNodes:
+        lsLineage = sTerminalNode.split(self.cFeatureDelimiter)
+        iLineageCount = len(lsLineage)
+        #If the lineage is shorter than the reduced clade level then no need to filter it
+        if iLineageCount >= self.iCladeLevelToReduce:
+            #If the lineage is longer than the reduced clade level and measuring clade level then count
+            #or If the lineage is longer than the reduced clade level but shorter than the measuring clade,
+            #only count if the last element is unclassified
+            if (iLineageCount >= self.iCladeLevelToMeasure) or (lsLineage[-1] == self.strUnclassified):
+                sLineage = self.cFeatureDelimiter.join(lsLineage[0:self.iCladeLevelToReduce])
+                cladeCounts[sLineage] = cladeCounts.get(sLineage,0) + 1
+
+    #Go through the IDs and reduce as needed using the clade counts
     retls = list()
-    for strID in lsIDs:
-        strIDElements = re.split("\|",strID)
-        if(len(strIDElements) >= self.iCladeLevelToMeasure):
-            if( strIDElements[self.iCladeLevelToReduce] in dictCladeCount):
-                if dictCladeCount[strIDElements[self.iCladeLevelToReduce]] >= self.iMinCladeSize:
-                    retls.append(strID)
+    for sID in lsIDs:
+        lsID = sID.split(self.cFeatureDelimiter)
+        iIDCount = len(lsID)
+
+        #Too short to filter
+        if iLineageCount < self.iCladeLevelToReduce:
+            retls.append(sID)
+        #Check to see if the clade which is being reduced made the cut
+        if (iIDCount >= self.iCladeLevelToMeasure) or (lsID[-1] == self.strUnclassified):
+            if cladeCounts[self.cFeatureDelimiter.join(lsID[0:self.iCladeLevelToReduce])] >= self.iMinCladeSize:
+                retls.append(sID)
+
+    print "RETURNING NODES"
+    print len(retls)
     return retls
 
   #Happy path tested

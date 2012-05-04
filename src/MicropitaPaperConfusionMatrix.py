@@ -64,7 +64,7 @@ def _main( ):
     with open(args.strActualFile, 'r') as f:
         lsActualFileContents = f.read()
         lsActualFileContents = filter(None,re.split("\n",lsActualFileContents))
-        f.close()
+    f.close()
 
     #Parse designated attributes (actual)
     dictActual = dict()
@@ -86,7 +86,7 @@ def _main( ):
     with open(args.strSelectionFile, 'r') as f:
         lsPredictedFileContents = f.read()
         lsPredictedFileContents = filter(None,re.split("\n",lsPredictedFileContents))
-        f.close()
+    f.close()
 
     #Parse selection Predicted
     dictPredicted = dict()
@@ -101,7 +101,6 @@ def _main( ):
 
         #Add to dict
         dictPredicted[sCurSelectionMethodName]=astrSelectedSamples
-
 
     print("dictPredicted")
     print(dictPredicted)

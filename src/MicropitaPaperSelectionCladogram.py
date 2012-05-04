@@ -116,7 +116,7 @@ def _main( ):
     #Delimiter for taxa/otu lineages
     c_strLineageDelim = "|"
 
-    #Abundance table
+    #Get Abundance table data
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=args.fIsNormalized,
                                           fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
                                           iFirstDataRow = int(args.iFirstDataRow),cFeatureNameDelimiter=c_strLineageDelim)
@@ -133,7 +133,7 @@ def _main( ):
       rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
 
     if c_Normalize:
-      rawData.normalize()
+      rawData.funcNormalize()
 
     abundance = rawData.funcGetAbundanceCopy()
     strSampleID = rawData.funcGetIDMetadataName()
@@ -142,11 +142,14 @@ def _main( ):
     #All taxa in the study
     lsAllTaxa = [strTaxaId for strTaxaId in list(abundance[strSampleID])]
 
-    #Terminal taxa in the study
-    lsTerminalTaxa = funcGetTerminalNodes(lsAllTaxa, c_strLineageDelim)
-
     #Create a cladogram object
     cladogram = Cladogram()
+
+    #Set the Abundance data
+    cladogram.setAbundanceData(rawData)
+
+    #Terminal taxa in the study
+    lsTerminalTaxa = Cladogram.funcGetTerminalNodes(lsAllTaxa, c_strLineageDelim)
 
     #Genus Level of the ancestry to filter on
     fFilterClades = (not args.iCladeFilterLevel.lower() == "none")
@@ -157,7 +160,7 @@ def _main( ):
       iCladeLevelForFiltering = int(args.iCladeFilterMeasure)
       iCladeLevelForReducing = int(args.iCladeFilterLevel)
       iCladeLevelMinimumCount = int(args.iCladeFilterMinNumber)
-    cladogram.setFilterByCladeSize(fCladeSizeFilter = fFilterClades, iCladeLevelToMeasure = iCladeLevelForFiltering, iCladeLevelToReduce = iCladeLevelForReducing, iMinimumCladeSize = iCladeLevelMinimumCount)
+    cladogram.setFilterByCladeSize(fCladeSizeFilter = fFilterClades, iCladeLevelToMeasure = iCladeLevelForFiltering, iCladeLevelToReduce = iCladeLevelForReducing, iMinimumCladeSize = iCladeLevelMinimumCount, cFeatureDelimiter=c_strLineageDelim)
 
     #Read in selection file
     fHndlInput = open(args.strSelectionFile,'r')
@@ -320,49 +323,7 @@ def _main( ):
           cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
 
     #Generate cladogram
-    cladogram.generate(abtbData=rawData, strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
-
-##Returns only terminal nodes given the list's structure
-def funcGetTerminalNodes(lsTaxa,cDelim):
-  #Return list
-  lsRetList = list()
-
-  #Build hash
-  dictCounts = dict()
-  for strTaxaName in lsTaxa:
-    #Split into the elements of the clades
-    lsClades = filter(None,strTaxaName.split(cDelim))
-    #Count clade levels
-    iCladeLength = len(lsClades)
-    
-    #Make sure there is data to work with
-    if iCladeLength < 0:
-      pass
-
-    #Evaluate first element
-    sClade = lsClades[0]
-    if sClade in dictCounts:
-      dictCounts[sClade] = False
-    else:
-      dictCounts[sClade] = True
-
-    #Evaluate the rest of the elements
-    if iCladeLength > 1:
-      for iIndex in xrange(1,iCladeLength):
-        prevClade = sClade
-        sClade = cDelim.join([sClade,lsClades[iIndex]])
-        if sClade in dictCounts:
-          dictCounts[sClade] = False
-          dictCounts[prevClade] = False
-        else:
-          dictCounts[sClade] = True
-          dictCounts[prevClade] = False
-
-  #Return only the elements that were of count 1
-  for sName in dictCounts:
-    if dictCounts[sName]==True:
-      lsRetList.append(sName)
-  return lsRetList
+    cladogram.generate(strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
 
 if __name__ == "__main__":
     _main( )

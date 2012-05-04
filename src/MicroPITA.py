@@ -406,6 +406,20 @@ class MicroPITA:
         #Get taxa names
         allTaxaNames = tempMatrix[tempMatrix.dtype.names[0]]
 
+        #If the taxa to be selected are not in the list
+        #Return nothing and log
+        for tempTaxa in tempTargetedTaxa:
+            lsMissing = []
+            if not tempTaxa in allTaxaNames:
+                lsMissing.append(tempTaxa)
+            else:
+                #Check to make sure the taxa of interest is not average abundance of 0
+                if sum(tempMatrix[np.where(allTaxaNames==tempTaxa)[0],:][1:]) == 0:
+                    lsMissing.append(tempTaxa)
+        if len(lsMissing) > 0:
+            logging.error("".join(["MicroPITA.getAverageRanksSamples. The following feature/s is not in the data set or has the abundance of 0. ",",".join(lsMissing)]))
+            return False        
+
         #For each sample name get the ranks
         for name in sampleNames:
             #Lists of taxa with the following information [[taxa name,value,rank]]
@@ -464,10 +478,12 @@ class MicroPITA:
       userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
 
       #Select the top samples
-#      topRankedSamples = userRankedSamples[0:(sampleSelectionCount-1):]
-      topRankedSamples = userRankedSamples[(sampleSelectionCount*-1):]
-      topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
-      return [item for sublist in topRankedSamplesNames for item in sublist]
+      if userRankedSamples:
+          topRankedSamples = userRankedSamples[(sampleSelectionCount*-1):]
+          topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
+          return [item for sublist in topRankedSamplesNames for item in sublist]
+      else:
+          return []
 
 ####Group 5## Random
 

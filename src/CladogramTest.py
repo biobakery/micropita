@@ -8,6 +8,7 @@
 #######################################################
 
 #Import local code
+from AbundanceTable import AbundanceTable
 import os
 import unittest
 from Cladogram import Cladogram
@@ -92,9 +93,9 @@ class CladogramTest(unittest.TestCase):
 
         #Filter settings
         fFilter = True
-        iMeasureLevel = 5
+        iMeasureLevel = 2
         iReduceLevel = 1
-        iCladeSize = 5#
+        iCladeSize = 5
         cladogram = Cladogram()
         cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
                                        iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
@@ -105,19 +106,39 @@ class CladogramTest(unittest.TestCase):
         self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
 
     def testFilterByCladeSizeForSomeFiltering(self):
-        methodName = "testFilterByCladeSizeSomeNoFiltering"
+        methodName = "testFilterByCladeSizeSomeFiltering"
 
-        lsIds = ["A|B|C|1","A2|B|C|6","A|B|2","A3|B|C|6","A3|B|C|6","A|B|C|3","A|B|4","A4|B|C|6","A|B|C|5"]
+        lsIds = ["A|B|C|1","A2|B|C|6","A|B|2","A3|B|C|7","A3|B|C|6","A|B|C|3","A|B|4","A4|B|C|6","A|B|C|5"]
         answerFileContents = ["A|B|C|1","A|B|2","A|B|C|3","A|B|4","A|B|C|5"]
 
         #Filter settings
         fFilter = True
-        iMeasureLevel = 5
+        iMeasureLevel = 2
         iReduceLevel = 1
         iCladeSize = 5
         cladogram = Cladogram()
         cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
                                        iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize)
+
+        #Run to get result
+        lsRet = cladogram.filterByCladeSize(lsIds)
+
+        self.assertEquals(answerFileContents,lsRet, methodName+"Did not get the correct file, expected:"+str(answerFileContents)+" but received:"+str(lsRet)+".")
+
+    def testFilterByCladeSizeForSomeFilteringUnclassified(self):
+        methodName = "testFilterByCladeSizeSomeFilteringUnclassified"
+
+        lsIds = ["A|B|C|1","A2|B|C|6","A|B|2","A3|B|C|7","A3|B|C|6","A|B|unclassified","A|B|4","A4|B|unclassified","A|B|C|5"]
+        answerFileContents = ["A|B|C|1","A|B|2","A|B|unclassified","A|B|4","A|B|C|5"]
+
+        #Filter settings
+        fFilter = True
+        iMeasureLevel = 2
+        iReduceLevel = 1
+        iCladeSize = 5
+        cladogram = Cladogram()
+        cladogram.setFilterByCladeSize(fCladeSizeFilter=fFilter, iCladeLevelToMeasure = iMeasureLevel,
+                                       iCladeLevelToReduce = iReduceLevel, iMinimumCladeSize = iCladeSize, strUnclassified="unclassified")
 
         #Run to get result
         lsRet = cladogram.filterByCladeSize(lsIds)
@@ -751,17 +772,17 @@ class CladogramTest(unittest.TestCase):
         methodName = "testFilterByAbundanceForGoodCase"
 
         strTestFile = "".join([Constants_Testing.c_strTestingData,"FilterByAbundance.txt"])
-        charCurDelimiter = "\t"
         iCurNameRow = 0
         iCurFirstDataRow = 1
-        fCurNormalize = False
         lsIds = ["Taxa1","Taxa2","Taxa3","Taxa4","Taxa5","Taxa6","Taxa7","Taxa8","Taxa9","Taxa10"]
         lsCorrectIds = ["Taxa1","Taxa2","Taxa8","Taxa9","Taxa10"]
 
+        #Get Abundance table data
+        rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
+                                          fIsSummed=True, iNameRow = iCurNameRow,
+                                          iFirstDataRow = iCurFirstDataRow)
         cladogram = Cladogram()
-        npaAbundance, strSampleID = cladogram.readData(strTestFile, charDelimiter=charCurDelimiter, iNameRow=iCurNameRow, iFirstDataRow=iCurFirstDataRow, fNormalize=fCurNormalize)
-        cladogram.npaAbundance = npaAbundance
-        cladogram.lsSampleNames = cladogram.npaAbundance.dtype.names[1:]
+        cladogram.setAbundanceData(rawData)
 
         lsRet = cladogram.filterByAbundance(lsIds)
 
@@ -772,21 +793,22 @@ class CladogramTest(unittest.TestCase):
         methodName = "testCreateSizeFileForGoodCase"
 
         strTestFile = "".join([Constants_Testing.c_strTestingData,"SmallAbundance.txt"])
-        charCurDelimiter = "\t"
         iCurNameRow = 0
         iCurFirstDataRow = 1
-        fCurNormalize = False
         lsIds = ["Taxa1","Taxa2","Taxa3","Taxa4","Taxa5"]
         answerFileContents = "Taxa1\t19.1938205472\nTaxa2\t24.2073385653\nTaxa3\t0.000130281830588\nTaxa4\t20.7493620036\nTaxa5\t23.3284684971"
 
+        #Get Abundance table data
+        rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
+                                              fIsSummed=True, iNameRow = iCurNameRow,
+                                              iFirstDataRow = iCurFirstDataRow)
         cladogram = Cladogram()
-        cladogram.strSizeFilePath = "".join([Constants_Testing.c_strTestingTMP,"testCreateSizeFileForGoodCase.txt"])
+        cladogram.setAbundanceData(rawData)
+
+        lsRet = cladogram.filterByAbundance(lsIds)
 
         if(os.path.exists(cladogram.strSizeFilePath)):
           os.remove(cladogram.strSizeFilePath)
-
-        npaAbundance, strSampleID = cladogram.readData(strTestFile, charDelimiter=charCurDelimiter, iNameRow=iCurNameRow, iFirstDataRow=iCurFirstDataRow, fNormalize=fCurNormalize)
-        cladogram.npaAbundance = npaAbundance
 
         cladogram.createSizeFile(lsIds)
         fhdlResultFile = open(cladogram.strSizeFilePath,"r")
