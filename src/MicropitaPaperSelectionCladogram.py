@@ -120,6 +120,7 @@ def _main( ):
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=args.fIsNormalized,
                                           fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
                                           iFirstDataRow = int(args.iFirstDataRow),cFeatureNameDelimiter=c_strLineageDelim)
+    rawData.funcSumClades()
 
     #Filtering
     #Indicate Filtering

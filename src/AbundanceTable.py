@@ -13,6 +13,8 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #External libraries
+import blist
+from CClade import CClade
 from Constants import Constants
 import csv
 import copy
@@ -22,6 +24,11 @@ import re
 import scipy.stats
 import string
 from ValidateData import ValidateData
+
+c_dTarget	= 1.0
+c_fRound	= False
+c_iSumAllCladeLevels = -1
+c_fOutputLeavesOnly = False
 
 class AbundanceTable:
 
@@ -315,7 +322,7 @@ class AbundanceTable:
     #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
         if self._fIsSummed:
-            return self.funcNormalizeColumnsByHeirarchy()
+            return self.funcNormalizeColumnsWithSummedClades()
         else:
             return self.funcNormalizeColumnsBySum()
 
@@ -347,12 +354,11 @@ class AbundanceTable:
 
         return True
 
-    #TODO
     #Normalizes a summed Abundance Table
     #If this is called on a dataset which is not summed and not normalized
     #The data will be summed first and then normalized
     #If already normalized, the current normalization is kept
-    def funcNormalizeColumnsByHeirarchy(self):
+    def funcNormalizeColumnsWithSummedClades(self):
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
             return False
@@ -361,21 +367,90 @@ class AbundanceTable:
             print "This table does not have clades summed, this normalization is not appropriate until the clades are summed. The clades are being summed now before normalization."
             self.funcSumClades()
 
-        print "funcNormalizeColumnsByHeirarchy IS NOT IMPLEMENTED"
+        #Load a hash table with root data {sKey: npaAbundances}
+        hashRoots = {}
+        for npaRow in self._npaFeatureAbundance:
+
+            curldAbundance = np.array(list(npaRow)[1:])
+            curFeatureNameLength = len(npaRow[0].split(self._cFeatureDelimiter))
+            curlRootData = hashRoots.get(npaRow[0].split(self._cFeatureDelimiter)[0])
+
+            if not curlRootData:
+                hashRoots[npaRow[0].split(self._cFeatureDelimiter)[0]] = [curFeatureNameLength, curldAbundance]
+            elif curlRootData[0] > curFeatureNameLength:
+                hashRoots[npaRow[0].split(self._cFeatureDelimiter)[0]] = [curFeatureNameLength, curldAbundance]
+
+        #Normalize each feature by thier root feature
+        dataMatrix = list()
+        for npaRow in self._npaFeatureAbundance:
+
+            curHashRoot = list(hashRoots[npaRow[0].split(self._cFeatureDelimiter)[0]][1])
+            dataMatrix.append(tuple([npaRow[0]]+[npaRow[i+1]/curHashRoot[i] if curHashRoot[i] > 0 else 0 for i in xrange(len(curHashRoot))]))
+
+        self._npaFeatureAbundance = np.array(dataMatrix,self._npaFeatureAbundance.dtype)
+
         #Indicate normalization has occured
         self._fIsNormalized = True
 
-        return False
+        return True
 
-    #TODO
     #Sums abundance data by clades indicated in the feature name (as consensus lineages)
     def funcSumClades(self):
-        if not self._fIsSummed:
-          print "funcSumClades IS NOT IMPLEMENTED"
-          return False
+        if not self.funcIsSummed():
 
-        #Indicate summation has occured
-        self._fIsSummed = True
+            #Read in the data
+            #Find the header column (iCol) assumed to be 1 or 2 depending on the location of "NAME"
+            #Create a list (adSeq) that will eventually hold the sum of the columns of data
+            astrHeaders = iCol = None
+            adSeqs = np.array([0] * len(self.funcGetSampleNames()))
+            pTree = CClade( )
+            aastrRaw = []
+
+            #For each row in the npaAbundance
+            #Get the feature name, feature abundances, and sum up the abudance columns
+            #Keep the sum for later normalization
+            #Give a tree the feature name and abundance
+            for dataRow in self._npaFeatureAbundance:
+                
+                sFeatureName = dataRow[0]
+                ldAbundances = list(dataRow)[1:]
+
+                #Add to the sum of the columns (samples)
+                adSeqs = adSeqs + np.array(list(dataRow)[1:])
+
+                #Build tree
+                pTree.get( sFeatureName.split(self._cFeatureDelimiter) ).set( ldAbundances )
+
+            #Create tree of data
+            #Input missing data
+            #Fill hashFeatures with the clade name (key) and a blist of values (value) of the specified level interested.
+            pTree.impute( )
+            hashFeatures = {}
+            pTree.freeze( hashFeatures, c_iSumAllCladeLevels, c_fOutputLeavesOnly )
+            setstrFeatures = hashFeatures.keys( )
+
+            #Remove parent clades that are identical to child clades
+            for strFeature, adCounts in hashFeatures.items( ):
+                    astrFeature = strFeature.strip( ).split( "|" )
+                    while len( astrFeature ) > 1:
+                        astrFeature = astrFeature[:-1]
+                        strParent = "|".join( astrFeature )
+                        adParent = hashFeatures.get( strParent )
+                        if adParent == adCounts:
+                            del hashFeatures[strParent]
+                            setstrFeatures.remove( strParent )
+
+            #Sort features to be nice
+            astrFeatures = sorted( setstrFeatures )
+
+            #Change the hash table to an array
+            dataMatrix = list()
+            for sFeature in astrFeatures:
+                dataMatrix.append(tuple([sFeature]+list(hashFeatures[sFeature])))
+            self._npaFeatureAbundance=np.array(dataMatrix,self._npaFeatureAbundance.dtype)
+
+            #Indicate summation has occured
+            self._fIsSummed = True
 
         return True
 

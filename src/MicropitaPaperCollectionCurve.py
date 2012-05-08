@@ -236,7 +236,7 @@ def _main( ):
     #Manage the cases where there are no or 1 selection file given
     if args.strSelectionFiles == None:
       logging.warning("MicropitaPaperCollectionCurve. No files were provided indicating sample selection so the collection curve was not made.")
-      return
+      return False
     if isinstance(args.strSelectionFiles, basestring):
       args.strSelectionFiles = [args.strSelectionFiles]
 
@@ -245,6 +245,11 @@ def _main( ):
     totalData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
                                             fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
                                             iFirstDataRow = int(args.iFirstDataRow))
+
+    #Do not produce a plot for summed or normalized data
+    if totalData.funcIsSummed() or totalData.funcIsNormalized():
+        logging.error("MicropitaPaperCollectionCurve. Will not produce a Refraction curve on normalized or summed data.")
+        return False
 
     rawAbundance = rawData.funcGetAbundanceCopy()
     lsSampleNames = rawData.funcGetSampleNames()

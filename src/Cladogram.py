@@ -736,8 +736,6 @@ class Cladogram:
     #Count up clades
     cladeCounts = dict()
     
-    print "TERMINAL NODES"
-    print len(lsTerminalNodes)
     #For each terminal node count the
     #Clades at clade levels
     for sTerminalNode in lsTerminalNodes:
@@ -766,8 +764,6 @@ class Cladogram:
             if cladeCounts[self.cFeatureDelimiter.join(lsID[0:self.iCladeLevelToReduce])] >= self.iMinCladeSize:
                 retls.append(sID)
 
-    print "RETURNING NODES"
-    print len(retls)
     return retls
 
   #Happy path tested

@@ -694,6 +694,8 @@ for fileConfigMicropita in lMicropitaFiles:
     dictSelectionFiles[sKey][c_strConfigSampleRow] = sFileConfiguration[c_strConfigSampleRow]
     dictSelectionFiles[sKey][c_strConfigDataRow] = sFileConfiguration[c_strConfigDataRow]
     dictSelectionFiles[sKey][c_strConfigInvertImage] = sFileConfiguration[c_strConfigInvertImage]
+    dictSelectionFiles[sKey][c_strConfigFileIsNormalized] = sFileConfiguration[c_strConfigFileIsNormalized]
+    dictSelectionFiles[sKey][c_strConfigFileIsSummed] = sFileConfiguration[c_strConfigFileIsSummed]
 
   #If this configuration file had multiple sampling
   if fMakeMovies:
@@ -711,23 +713,27 @@ if c_fRunCollectionCurve:
   #Create collection curves
   for strInputSummaryKey in dictSelectionFiles:
     curSummaryDict = dictSelectionFiles[strInputSummaryKey]
-    curInputFile = curSummaryDict[c_strConfigInputFile]
-    curListofSelection = curSummaryDict[c_strSelectionFiles]
-    curLogging = curSummaryDict[c_strConfigLogging]
-    curSampleNameRow = curSummaryDict[c_strConfigSampleRow]
-    curFirstDataRow = curSummaryDict[c_strConfigDataRow]
-    curInvert = curSummaryDict[c_strConfigInvertImage]
 
-    lsPlotCollectorSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniquesCollectorCurve]))
+    if (curSummaryDict[c_strConfigFileIsNormalized].tolower()=="false"
+        ) and (curSummaryDict[c_strConfigFileIsSummed].tolower()=="false"):
 
-    #Make more files, now for figure 5 Collection Curve
-    sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
-    sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
+      curInputFile = curSummaryDict[c_strConfigInputFile]
+      curListofSelection = curSummaryDict[c_strSelectionFiles]
+      curLogging = curSummaryDict[c_strConfigLogging]
+      curSampleNameRow = curSummaryDict[c_strConfigSampleRow]
+      curFirstDataRow = curSummaryDict[c_strConfigDataRow]
+      curInvert = curSummaryDict[c_strConfigInvertImage]
 
-    #Create Figure 5
-    #Collection Curve
-    Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
-        funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
+      lsPlotCollectorSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniquesCollectorCurve]))
+
+      #Make more files, now for figure 5 Collection Curve
+      sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
+      sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
+
+      #Create Figure 5
+      #Collection Curve
+      Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
+          funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
                               " ".join([Constants_Arguments.c_strSampleNameRowArgument, curSampleNameRow]),
                               " ".join([Constants_Arguments.c_strFirstDataRow, curFirstDataRow]),
                               " ".join([Constants_Arguments.c_strInvertArgument, curInvert]),

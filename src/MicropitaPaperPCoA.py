@@ -87,8 +87,11 @@ def _main( ):
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
                                             fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
                                             iFirstDataRow = int(args.iFirstDataRow))
+
+    #Normalize if needed and sum clades
     if c_Normalize:
         rawData.funcNormalize()
+    rawData.funcSumClades()
 
     metadata = rawData.funcGetMetadataCopy()
     sampleNames = rawData.funcGetSampleNames()

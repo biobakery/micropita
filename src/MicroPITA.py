@@ -807,7 +807,7 @@ class MicroPITA:
         #Abundance table object to read in and manage data
         totalAbundanceTable = AbundanceTable.makeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
                                    cDelimiter=cDelimiter, iNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, cFeatureNameDelimiter=cFeatureNameDelimiter)
-
+        totalAbundanceTable.funcSumClades()
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
         #Log metadata keys

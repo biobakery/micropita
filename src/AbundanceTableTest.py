@@ -587,6 +587,49 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
+    def testFuncSumCladesForGoodCase(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/test1.otu"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        normalize = False
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+        data.funcSumClades()
+        result = data._npaFeatureAbundance
+
+        #Correct Answer
+        answer = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncNormalizeColumnsWithSummedCladesForGoodCase(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/test1.otu"])
+        delimiter = Constants.TAB
+        nameRow = 0
+        firstDataRow = 2
+        normalize = False
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+        data.funcSumClades()
+        data.funcNormalizeColumnsWithSummedClades()
+        result = data._npaFeatureAbundance
+
+        #Correct Answer
+        answer = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
 ##
 #Creates a suite of tests
 def suite():
