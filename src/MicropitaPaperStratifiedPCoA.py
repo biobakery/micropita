@@ -45,6 +45,7 @@ argp.add_argument(Constants_Arguments.c_strPredictFilePath, dest = "sSVMPredicti
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
 
 #Abundance file
 argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
@@ -79,6 +80,11 @@ def _main( ):
     c_fInvert = (args.fInvert == "True")
     c_Normalize = (args.fNormalize == "True")
 
+    #Is summed and normalized
+    fIsSummed = (args.fIsSummed.lower() == "true")
+    fIsNormalized = (args.fIsNormalized.lower() == "true")
+    fSumData = (args.fSumData.lower() == "true")
+
     #Color manager
     objFigureControl = Constants_Figures()
     objFigureControl.invertColors(fInvert=c_fInvert)
@@ -88,14 +94,15 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
-                                            fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+                                            fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
                                             iFirstDataRow = int(args.iFirstDataRow))
 
     #Normalize if needed and sum clades
+    if fSumData:
+        rawData.funcSumClades()
     if c_Normalize:
         rawData.funcNormalize()
-    rawData.funcSumClades()
 
     sampleNames = rawData.funcGetSampleNames()
 

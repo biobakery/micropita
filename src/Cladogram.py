@@ -227,13 +227,16 @@ class Cladogram:
     lsIDs = list(set(lsIDs))
 
     #Create circle files (needs to be after any filtering because it has a forcing option).
-    self.createCircleFile(lsIDs)
+    if not self.createCircleFile(lsIDs):
+      return False
 
     #Generate / Write Tree file
-    self.createTreeFile(lsIDs)
+    if not self.createTreeFile(lsIDs):
+      return False
 
     #Generate / Write Highlight file
-    self.createHighlightFile(lsIDs)
+    if not self.createHighlightFile(lsIDs):
+      return False
 
     #Generate / write color file
     if(self.dictColors is not None):
@@ -248,7 +251,8 @@ class Cladogram:
         self.fTickFileMade=True
 
     #Generate / Write size data
-    self.createSizeFile(lsIDs)
+    if not self.createSizeFile(lsIDs):
+      return False
 
     #Call commandline
     lsCommand = [self.circladerScript, self.strTreeFilePath, self.strImageName, "--style_file", self.strStyleFilePath, "--tree_format", "tabular"]

@@ -104,7 +104,11 @@ class Constants_Arguments():
 
     #s Supervised Label
     c_strSupervisedLabel = "-s"
-    c_strSupervisedLabelCountHelp = "The name of the phenotype data row on which to perform supervised methods"    
+    c_strSupervisedLabelCountHelp = "The name of the phenotype data row on which to perform supervised methods"
+
+    #-sd SUm data
+    c_strSumDataArgument = "-sd"
+    c_strSumDataHelp = "The analysis/plotting should be performed on data with clades which are summed. If data is not provided this way, summation will occur before analysis and plotting as needed."
 
     #sc Supervised label count
     c_strSupervisedLabelCount = "-sc"

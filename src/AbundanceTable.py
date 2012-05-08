@@ -216,9 +216,10 @@ class AbundanceTable:
     #Returns the current feature count
     def funcGetFeatureCount(self):
         if not self._npaFeatureAbundance == None:
-            return 0
+            return self._npaFeatureAbundance.shape[0]
         else:
-            self._npaFeatureAbundance.shape[0]
+            return 0
+
 
     #The delimiter of the file the data was read from and which is also the
     #delimiter which would be used to write the data to a file
@@ -321,6 +322,7 @@ class AbundanceTable:
 
     #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
+        print "AbundanceTable:funcNormalize called"
         if self._fIsSummed:
             return self.funcNormalizeColumnsWithSummedClades()
         else:
@@ -332,6 +334,7 @@ class AbundanceTable:
     #@returns Normalized structured array or False on error. 
     #All columns are returned, this could be no normalization, all normalization or mixed normalized columns.
     def funcNormalizeColumnsBySum(self):
+        print "AbundanceTable:funcNormalizeColumnsBySum called"
 
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
@@ -359,6 +362,8 @@ class AbundanceTable:
     #The data will be summed first and then normalized
     #If already normalized, the current normalization is kept
     def funcNormalizeColumnsWithSummedClades(self):
+        print "AbundanceTable:funcNormalizeColumnsWithSummedClades called"
+
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
             return False
@@ -564,13 +569,13 @@ class AbundanceTable:
             #Write Ids
             f.write(cDelimiter.join([self.funcGetIDMetadataName()]+list(self.funcGetSampleNames()))+Constants.ENDLINE)
             #Write metadata
-            f.write(Constants.ENDLINE.join([cDelimiter.join([sMetaKey]+self.funcGetMetadata(sMetaKey)) for sMetaKey in self._dictTableMetadata]))
+            f.write(Constants.ENDLINE.join([cDelimiter.join([sMetaKey]+self.funcGetMetadata(sMetaKey)) for sMetaKey in self._dictTableMetadata])+Constants.ENDLINE)
             #Write abundance
             lsOutput = list()
             curAbundance = self._npaFeatureAbundance.tolist()
             for curAbundanceRow in curAbundance:
                 lsOutput.append(cDelimiter.join([str(curAbundanceElement) for curAbundanceElement in curAbundanceRow]))
-                f.write(Constants.ENDLINE.join(lsOutput))
+            f.write(Constants.ENDLINE.join(lsOutput))
             f.close()
 
     #Static methods

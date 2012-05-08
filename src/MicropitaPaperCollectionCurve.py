@@ -227,6 +227,10 @@ def _main( ):
     #Invert figure
     fInvert = (args.fInvert.lower() == "true")
 
+    #Is summed and normalized
+    fIsSummed = (args.fIsSummed.lower() == "true")
+    fIsNormalized = (args.fIsNormalized.lower() == "true")
+
     #Instance of plot collection curve script
     mCC = MicropitaPaperCollectionCurve()
 
@@ -242,8 +246,8 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    totalData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=args.fIsNormalized,
-                                            fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+    totalData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+                                            fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
                                             iFirstDataRow = int(args.iFirstDataRow))
 
     #Do not produce a plot for summed or normalized data

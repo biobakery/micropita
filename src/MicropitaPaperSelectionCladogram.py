@@ -70,6 +70,7 @@ argp.add_argument(Constants_Arguments.c_strOccurenceFilterSampleCount, dest ="iM
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
 
 #Outputfile
 argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
@@ -97,6 +98,11 @@ def _main( ):
     #Normalize
     c_Normalize = (args.fNormalize.lower() == "true")
 
+    #Is summed and normalized
+    fIsSummed = (args.fIsSummed.lower() == "true")
+    fIsNormalized = (args.fIsNormalized.lower() == "true")
+    fSumData = (args.fSumData.lower() == "true")
+
     #Position holders in t-stats data list
     c_IDINDEX = 0
     c_TSCOREINDEX = 1
@@ -117,21 +123,29 @@ def _main( ):
     c_strLineageDelim = "|"
 
     #Get Abundance table data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=args.fIsNormalized,
-                                          fIsSummed=args.fIsSummed, iNameRow = int(args.iSampleNameRow),
+    rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=fIsNormalized,
+                                          fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
                                           iFirstDataRow = int(args.iFirstDataRow),cFeatureNameDelimiter=c_strLineageDelim)
-    rawData.funcSumClades()
+
+    #Sum clades before normalization and filtering
+    if fSumData:
+        rawData.funcSumClades()
 
     #Filtering
     #Indicate Filtering
     fFilterAbundance = (not args.iAbundanceFilterPercentile.lower() == "none")
     fFilterOccurence = (not args.iMinSequenceCount.lower() == "none")
 
+    if fFilterOccurence:
+      print "Before occurence filtering the feature count is "+str(rawData.funcGetFeatureCount())
+      rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
+      print "After occurence filtering the feature count is "+str(rawData.funcGetFeatureCount())
+
     if fFilterAbundance:
+      print "Before abundance filtering the feature count is "+str(rawData.funcGetFeatureCount())
       rawData.funcFilterAbundanceByPercentile(dPercentileCutOff = float(args.iAbundanceFilterPercentile),
                                           dPercentageAbovePercentile = float(args.iAbundanceFilterPercentCuttoff))
-    elif fFilterOccurence:
-      rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
+      print "After abundance filtering the feature count is "+str(rawData.funcGetFeatureCount())
 
     if c_Normalize:
       rawData.funcNormalize()

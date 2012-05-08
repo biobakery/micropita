@@ -408,14 +408,15 @@ class MicroPITA:
 
         #If the taxa to be selected are not in the list
         #Return nothing and log
+        lsMissing = []
         for tempTaxa in tempTargetedTaxa:
-            lsMissing = []
             if not tempTaxa in allTaxaNames:
                 lsMissing.append(tempTaxa)
             else:
                 #Check to make sure the taxa of interest is not average abundance of 0
-                if sum(tempMatrix[np.where(allTaxaNames==tempTaxa)[0],:][1:]) == 0:
+                if sum(list(tempMatrix[np.where(allTaxaNames==tempTaxa)[0],:][0])[1:]) == 0:
                     lsMissing.append(tempTaxa)
+
         if len(lsMissing) > 0:
             logging.error("".join(["MicroPITA.getAverageRanksSamples. The following feature/s is not in the data set or has the abundance of 0. ",",".join(lsMissing)]))
             return False        
@@ -467,7 +468,7 @@ class MicroPITA:
 
         #Sort based on average
         sampleRankAverages = sorted(sampleRankAverages, key = lambda sampleData: sampleData[1], reverse = True)
-            
+
         #return
         return sampleRankAverages
 
@@ -476,7 +477,7 @@ class MicroPITA:
         logging.error("MicroPITA.getAverageRanksSamples. Taxa defined selection was requested but no taxa were given.")
       #Rank the samples
       userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
-
+      
       #Select the top samples
       if userRankedSamples:
           topRankedSamples = userRankedSamples[(sampleSelectionCount*-1):]
@@ -719,7 +720,7 @@ class MicroPITA:
     #Start micropita selection
     def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
             strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1,
-            strSelectionTechnique=None, strLabel=None, strStratify=None, iSampleNameRow=0, iFirstDataRow=1):
+            strSelectionTechnique=None, strLabel=None, strStratify=None, iSampleNameRow=0, iFirstDataRow=1, fSumData=True):
         #microPITA object0
         microPITA = MicroPITA()
 
@@ -807,7 +808,8 @@ class MicroPITA:
         #Abundance table object to read in and manage data
         totalAbundanceTable = AbundanceTable.makeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
                                    cDelimiter=cDelimiter, iNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, cFeatureNameDelimiter=cFeatureNameDelimiter)
-        totalAbundanceTable.funcSumClades()
+        if fSumData:
+            totalAbundanceTable.funcSumClades()
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
         #Log metadata keys
@@ -1059,6 +1061,7 @@ argp.add_argument(Constants_Arguments.c_strSupervisedLabelCount, dest="iSupervis
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
 
 #SVM label
 #Label parameter to be used with SVM
@@ -1087,6 +1090,11 @@ def _main( ):
     if args.strFileTaxa == "None":
       args.strFileTaxa = None
 
+    #Is summed and normalized
+    fIsSummed = (args.fIsSummed.lower() == "true")
+    fIsNormalized = (args.fIsNormalized.lower() == "true")
+    fSumData = (args.fSumData.lower() == "true")
+
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
@@ -1096,12 +1104,12 @@ def _main( ):
     #Run micropita
     logging.info("Start microPITA")
     microPITA = MicroPITA()
-    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
+    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, strOutputFile=args.strOutFile,
                                         cDelimiter=Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=args.strFileAbund,
                                         strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount),
                                         iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel,
                                         strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection,
-                                        iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow))
+                                        iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow), fSumData=fSumData)
     logging.info("End microPITA")
 
     #Log output for debugging
