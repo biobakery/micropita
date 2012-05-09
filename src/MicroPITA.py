@@ -816,10 +816,10 @@ class MicroPITA:
         logging.debug(" ".join(["Micropita:run.","Received metadata keys=",str(dictTotalMetadata.keys())]))
 
         #If there is only 1 unique value for the labels, do not run the Supervised methods
-        if len(set(dictTotalMetadata[strLabel])) < 2:
+        if len(set(dictTotalMetadata.get(strLabel,[]))) < 2:
             c_RUN_DISCRIMINANT = False
             c_RUN_DISTINCT = False
-            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+dictTotalMetadata[strLabel]))
+            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
 
         logging.debug(" ".join(["Micropita:run.","Received metadata=",str(dictTotalMetadata)]))
 

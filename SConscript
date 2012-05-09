@@ -13,7 +13,7 @@ pE = DefaultEnvironment( )
 
 #Process flags
 c_fGenerateInSilicoDataSets = False
-c_fRunCollectionCurve = False
+c_fRunCollectionCurve = True
 fMakeMovies = False
 
 #Normalize
@@ -722,8 +722,7 @@ if c_fRunCollectionCurve:
   for strInputSummaryKey in dictSelectionFiles:
     curSummaryDict = dictSelectionFiles[strInputSummaryKey]
 
-    if (curSummaryDict[c_strConfigFileIsNormalized].tolower()=="false"
-        ) and (curSummaryDict[c_strConfigFileIsSummed].tolower()=="false"):
+    if (curSummaryDict[c_strConfigFileIsNormalized].lower()=="false") and (curSummaryDict[c_strConfigFileIsSummed].lower()=="false"):
 
       curInputFile = curSummaryDict[c_strConfigInputFile]
       curListofSelection = curSummaryDict[c_strSelectionFiles]

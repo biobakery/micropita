@@ -246,7 +246,7 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    totalData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+    totalData = AbundanceTable.makeFromFile(strInputFile=args.strAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
                                             iFirstDataRow = int(args.iFirstDataRow))
 
@@ -255,8 +255,8 @@ def _main( ):
         logging.error("MicropitaPaperCollectionCurve. Will not produce a Refraction curve on normalized or summed data.")
         return False
 
-    rawAbundance = rawData.funcGetAbundanceCopy()
-    lsSampleNames = rawData.funcGetSampleNames()
+    rawAbundance = totalData.funcGetAbundanceCopy()
+    lsSampleNames = totalData.funcGetSampleNames()
 
     #Calculate individual counts per sample (row)
     #Sort the sample names by their diversity and store the names (Lowest diversity first)
