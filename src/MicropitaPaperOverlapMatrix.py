@@ -19,6 +19,7 @@ import argparse
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 import logging
+from MicroPITA import MicroPITA
 import numpy as np
 import os
 from PlotMatrix import PlotMatrix
@@ -53,30 +54,12 @@ def _main( ):
 
     logging.info("Start MicropitaPaperOverlapMatrix")
 
-    #Read and parse predicted data
-    #Get predicted
-    lsPredictedFileContents = []
-    with open(args.strSelectionFile, 'r') as f:
-        lsPredictedFileContents = f.read()
-        lsPredictedFileContents = filter(None,re.split("\n",lsPredictedFileContents))
-        f.close()
-
-    #Parse selection Predicted
-    dictPredicted = dict()
-    for strSelectionMethod in lsPredictedFileContents:
-        #Get method name
-        astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
-        sCurSelectionMethodName = astrSelectionMethod[0]
-
-        #Parse samples selected by the method
-        astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
-        astrSelectedSamples = [strSelectedSample.strip() for strSelectedSample in astrSelectedSamples]
-
-        #Add to dict
-        dictPredicted[sCurSelectionMethodName]=astrSelectedSamples
+    #Read and parse predicted data into a dictionary
+    dictPredicted = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
 
     #Get labels
     lsLabels = dictPredicted.keys()
+
     #Subset them to just what is interested in looking at.
     lsLabels = list(set(lsLabels) & set(args.strSelectionMethods))
     iLabelLength = len(lsLabels)

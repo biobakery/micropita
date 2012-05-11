@@ -604,7 +604,9 @@ for fileConfigMicropita in lMicropitaFiles:
         #Create alt figure 1B confusion matrix
         #Selection of samples by selection method
         Command(sOutputFigure1BConfusion, [c_fileProgConfusionMatrixFigure, sMicropitaOutput, File( sfle.d( fileDirInput,sFileConfiguration[c_strConfigActualFile] ))] + ls_srcFig1, 
-            funcConfusionMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
+            funcConfusionMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
 
     #Create a cladogram figure 2
     #Manage files which are optional

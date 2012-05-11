@@ -85,13 +85,15 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
-    print("Start Circlader")
-    print(args)
+
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
         raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
+
+    logging.info("Start Circlader")
+    logging.info(args)
 
     #Invert
     c_fInvert = (args.fInvert.lower() == "true")
@@ -137,15 +139,15 @@ def _main( ):
     fFilterOccurence = (not args.iMinSequenceCount.lower() == "none")
 
     if fFilterOccurence:
-      print "Before occurence filtering the feature count is "+str(rawData.funcGetFeatureCount())
+      logging.debug("Before occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
       rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
-      print "After occurence filtering the feature count is "+str(rawData.funcGetFeatureCount())
+      logging.debug("After occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
 
     if fFilterAbundance:
-      print "Before abundance filtering the feature count is "+str(rawData.funcGetFeatureCount())
+      logging.debug("Before abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
       rawData.funcFilterAbundanceByPercentile(dPercentileCutOff = float(args.iAbundanceFilterPercentile),
                                           dPercentageAbovePercentile = float(args.iAbundanceFilterPercentCuttoff))
-      print "After abundance filtering the feature count is "+str(rawData.funcGetFeatureCount())
+      logging.debug("After abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
 
     if c_Normalize:
       rawData.funcNormalize()

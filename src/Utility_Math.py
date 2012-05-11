@@ -70,7 +70,10 @@ class Utility_Math():
     if iSelect and aData:
       iDataSize = len(aData)
       funcRandom, funcInt = random.random, int
-      return operator.itemgetter(*[funcInt(funcRandom() * iDataSize) for selected in itertools.repeat(None, iSelect)])(aData)
+      lsSampling =  operator.itemgetter(*[funcInt(funcRandom() * iDataSize) for selected in itertools.repeat(None, iSelect)])(aData)
+      if isinstance(lsSampling, basestring):
+        lsSampling = [lsSampling]
+      return lsSampling
     return []
 
   #Takes the column indices of a npArray and sums the rows into one column

@@ -19,11 +19,88 @@ import argparse
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 import logging
-#from MicroPITA import MicroPITA
+from MicroPITA import MicroPITA
 import numpy as np
 import os
 from PlotMatrix import PlotMatrix
 import re
+
+def funcReadActualClassFile(strInputFile):
+
+    #Read in file
+    strSelection = ""
+    with open(strInputFile,'r') as fHndlInput:
+        strSelection = fHndlInput.read()
+    fHndlInput.close()
+
+    #Break down content into lines
+    lsSelection = filter(None,strSelection.split(Constants.ENDLINE))
+    strSelection = None
+
+    #Store information by classes
+    #{"ClassName":["sample"...]
+    #Will eventually change the list to sets
+    dictClasses = {}
+    iClassPrefixLength = len(Constants.c_strClassPrefix)
+    for sSelection in lsSelection:
+        if sSelection[0:iClassPrefixLength] == Constants.c_strClassPrefix:
+
+            lsSelectionPieces = sSelection.split(Constants.COLON)
+            if not len(lsSelectionPieces) == 2:
+                logging.error("A line in the actual file was not formated corrected. Expected two pieces divided by a :. (Parsing class data)")
+                return False
+            sClass = lsSelectionPieces[0][iClassPrefixLength:].strip()
+            dictClasses[sClass]= [s.strip() for s in lsSelectionPieces[1].split(Constants.COMMA)]
+
+    #Get class count and make sure class information was parsed
+    iClassCount = len(dictClasses.keys())
+    if iClassCount < 1:
+        logging.error("Did not read a class from the actual file.")
+        return False
+
+    #Given we have class information change the lists to sets
+    for sClass in dictClasses:
+        dictClasses[sClass] = set(dictClasses[sClass])
+
+    #Will hold the amount of overlapp in sample groups (how many classes they come from)
+    dictOverlap = dict()
+
+    #Get correct sample selection
+    dictActualClassSamples = dict()
+    for sSelection in lsSelection:
+        if not sSelection[0:iClassPrefixLength] == Constants.c_strClassPrefix:
+
+            lsSelectionPieces = sSelection.split(Constants.COLON)
+            if not len(lsSelectionPieces) == 2:
+                logging.error("A line in the actual file was not formated corrected. Expected two pieces divided by a :. (Parsing sample data)")
+                return False
+
+            sSelectionMethodology = lsSelectionPieces[0].strip()
+            dictActualClassSamples[sSelectionMethodology] = []
+            for sSampleGrouping in lsSelectionPieces[1].split(Constants.COMMA):
+                sSampleGrouping = sSampleGrouping.strip()
+                if len(sSampleGrouping) > iClassPrefixLength:
+                    if sSampleGrouping[0:iClassPrefixLength] == Constants.c_strClassPrefix:
+                        dictActualClassSamples[sSelectionMethodology].extend(dictClasses[sSampleGrouping[iClassPrefixLength:]])
+                        dictOverlap[sSelectionMethodology] = dictOverlap.get(sSelectionMethodology,0)+1
+                    else:
+                        dictActualClassSamples[sSelectionMethodology].append(sSampleGrouping)
+                else:
+                    dictActualClassSamples[sSelectionMethodology].append(sSampleGrouping)
+
+    #Get sample grouping count and make sure information was parsed
+    iGroupCount = len(dictActualClassSamples.keys())
+    if iGroupCount < 1:
+        logging.error("Did not read sample groupings from the actual file.")
+        return False
+
+    #Given we have sample grouping information change the lists to sets
+    for sGroup in dictActualClassSamples:
+        dictActualClassSamples[sGroup] = set(dictActualClassSamples[sGroup])
+
+    #return the count of classes and the sample groupings per methodlogy
+    #[int, {"sClass":[(sSample,sSample,sSample...)]}, {"sMethodology":[(sSample,sSample,sSample...)]}]
+    return [iClassCount, dictActualClassSamples, dictClasses, dictOverlap]
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperConfusionMatrix.py", description = """Creates a confusion matrix from microPITA output.""" )
@@ -31,6 +108,7 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperConfusionMatrix.py", descr
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
+
 #Micropita selection file (predicted samples)
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 #Actual sample selection
@@ -56,58 +134,23 @@ def _main( ):
     c_fFlipYLabels = False
 
     logging.info("Start MicropitaPaperConfusionMatrix")
-    print("Start MicropitaPaperConfusionMatrix")
 
-    #Read and parse actual data
-    #Get actual
-    lsActualFileContents = []
-    with open(args.strActualFile, 'r') as f:
-        lsActualFileContents = f.read()
-        lsActualFileContents = filter(None,re.split("\n",lsActualFileContents))
-    f.close()
+    #Read and parse actual data into a dictionary
+    lsActualData = funcReadActualClassFile(args.strActualFile)
+    if not lsActualData:
+        logging.error("Did not receive data from parsing the actual data file. Returning without generating a plot.")
+        return False
+    iClassCount,dictActual,dictClasses,dictOverlapMeasure = lsActualData
 
-    #Parse designated attributes (actual)
-    dictActual = dict()
-    for strActualMethod in lsActualFileContents:
-        #Get method name
-        astrActualMethod = strActualMethod.split(Constants.COLON)
-        sCurActualMethodName = astrActualMethod[0]
+    #Read and parse predicted data into a dictionary
+    dictPredicted = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
 
-        #Parse samples selected by the method
-        astrActualSamples = astrActualMethod[1].split(Constants.COMMA)
-        astrActualSamples = [strActualSample.strip() for strActualSample in astrActualSamples]
+    logging.debug("dictPredicted")
+    logging.debug(dictPredicted)
+    logging.debug("dictActual")
+    logging.debug(dictActual)
 
-        #Add to dict
-        dictActual[sCurActualMethodName]=astrActualSamples
-
-    #Read and parse predicted data
-    #Get predicted
-    lsPredictedFileContents = []
-    with open(args.strSelectionFile, 'r') as f:
-        lsPredictedFileContents = f.read()
-        lsPredictedFileContents = filter(None,re.split("\n",lsPredictedFileContents))
-    f.close()
-
-    #Parse selection Predicted
-    dictPredicted = dict()
-    for strSelectionMethod in lsPredictedFileContents:
-        #Get method name
-        astrSelectionMethod = strSelectionMethod.split(Constants.COLON)
-        sCurSelectionMethodName = astrSelectionMethod[0]
-
-        #Parse samples selected by the method
-        astrSelectedSamples = astrSelectionMethod[1].split(Constants.COMMA)
-        astrSelectedSamples = [strSelectedSample.strip() for strSelectedSample in astrSelectedSamples]
-
-        #Add to dict
-        dictPredicted[sCurSelectionMethodName]=astrSelectedSamples
-
-    print("dictPredicted")
-    print(dictPredicted)
-    print("dictActual")
-    print(dictActual)
-
-    #Get labels
+    #Get labels, make sure the labels are in common between actual predicted and those indicated to be plotted (intersection of all three classes)
     lsLabels = list(set(dictPredicted.keys()) & set(dictActual.keys()) & set(args.strSelectionMethods))
     iLabelLength = len(lsLabels)
     if iLabelLength == 0:
@@ -117,49 +160,75 @@ def _main( ):
         logging.error("".join(["MicropitaPaperConfusionMatrix. Only one actual and predicted labels were in common so a confusion matrix could not be generated. Actual Labels=",
                                str(dictPredicted.keys())," Predicted Labels=",str(dictActual.keys())]))
 
-    #make a y axis
+    #Make a y axis
     yLabels = lsLabels
     if c_fFlipYLabels:
         yLabels.reverse()
 
     #Setup data for confusion matrix
     liConfusion = []
-    for xLabel in lsLabels:
-        setPredicted = set(dictPredicted[xLabel])
-        print("xLabel")
-        print(xLabel)
-        print("setPredicted")
-        print(setPredicted)
-        setXActual = set(dictActual[xLabel])
-        for yLabel in yLabels:
-            print("yLabel")
-            print(yLabel)
-            setYActual = set(dictActual[yLabel])
-            print("setYActual")
-            print(setYActual)
-            #If comparing the amount correct just look at actual and predicted classes
-            if xLabel == yLabel:
-                print("len(setPredicted & setYActual)")
-                print(len(setPredicted & setYActual))
-                liConfusion.append(len(setPredicted & setYActual))
-            #If looking at missclassification remember that the classes here are overlapping.
-            #It is expected that A diversity sample is selected by representative methodology for example
-            #So make sure to first remove samples that may be in other classes but are ok to be selected
-            #Before determining error.
+    #Go through each label
+    #Get the predicted and actual samples for the label
+    #For all classes but representative:
+    #Indicate which are correct by intersecting the predicted and actual results
+    #In missclassification
+    for yLabel in yLabels:
+        setYActual = set(dictActual[yLabel])
+        for xLabel in lsLabels:
+            setXPredicted = set(dictPredicted[xLabel])
+            setXPredictedPossible = set(dictActual[xLabel])
+            iCountPredictedSamples = len(setXPredicted)
+            iMaxSamplesPerClass = int(round(iCountPredictedSamples/float(iClassCount)))
+
+            #Representative techniques are different because they do not have specific samples to
+            #to select in a priori classes. Correct selection is defined by the shape of the data and how many data are sampled.
+            #Given this it is impossible to know before hand what samples should be selected.
+            #It is possible to know that the samples should be equally sampled between sample classes (as long as the sample
+            #classes are truly different and have some defining characteristic that the algorithm will use to recognize.
+            #So here we evaluate representative by how even it samples in the known sample groups
+            if yLabel == xLabel:
+                #If this is an evenly sampling method, check counts per class
+                if Constants.c_strEvenSelection in setYActual:
+                    iMisclassificationCount = 0
+                    for sClass in dictClasses:
+                        iClassSelectionCount = len(dictClasses[sClass]&setXPredicted)
+                        if iClassSelectionCount > iMaxSamplesPerClass:
+                            iMisclassificationCount = iClassSelectionCount - iMaxSamplesPerClass
+                    liConfusion.append(iCountPredictedSamples - iMisclassificationCount)
+                #Treat as a normal sample with a defined a prior classification
+                #If comparing the amount correct just look at actual and predicted classes
+                else:
+                    liConfusion.append(len(setXPredicted & setYActual))
+
             else:
-                setSamplesNotInClassification = setYActual - setXActual
-                print("setSamplesNotInClassification")
-                print(setSamplesNotInClassification)
-                print("setPredicted & setSamplesNotInClassification")
-                print(setPredicted & setSamplesNotInClassification)
-                liConfusion.append(len(setPredicted & setSamplesNotInClassification))
+                #If this is an evenly sampling method,
+                #Return 0, these do not have specific samples associated with them
+                if Constants.c_strEvenSelection in setYActual:
+                    liConfusion.append(0)
+                #If the predicted label is the evenly sampled group
+                #Return if it samples more than it is allowed with the actual group
+                #This means there could be a column or row total of more than the total samples
+                #sampled if the actual groups overlapp.
+                elif Constants.c_strEvenSelection in setXPredictedPossible:
+                    iCountSamplesInCommon = len(setXPredicted & setYActual)
+                    iTotalAllowed = dictOverlapMeasure.get(yLabel, 1)*iMaxSamplesPerClass
+                    if iCountSamplesInCommon > iTotalAllowed:
+                        liConfusion.append(iCountSamplesInCommon-iTotalAllowed)
+                    else:
+                        liConfusion.append(0)
+                #Treat as a normal sample with a defined a prior classification
+                #If looking at missclassification remember that the classes here are overlapping.
+                #It is expected that A diversity sample is selected by representative methodology for example
+                #So make sure to first remove samples that may be in other classes but are ok to be selected
+                #Before determining error.
+                else:
+                    liConfusion.append(len(setXPredicted & (setYActual - setXPredictedPossible)))
 
     #Plot confusion matrix
     liConfusion = np.array(liConfusion)
     liConfusion.shape=iLabelLength,iLabelLength
     PlotMatrix.funcPlotMatrix(npMatrix=np.array(liConfusion), lsLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
 
-    print("Stop MicropitaPaperConfusionMatrix")
     logging.info("Stop MicropitaPaperConfusionMatrix")
 
 if __name__ == "__main__":
