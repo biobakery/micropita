@@ -256,16 +256,12 @@ class SVM:
     #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
     #@tempDelimiter Delimiter of the Abundance table
     #@tempLabels Ordered labels to use to classify the samples in the abundance table
-    #@tempFirstDataRow The index of the first row in the abundance table representing data
+    #@sLastMetadataName The name of the last row in the abundance table representing metadata
     #@tempSkipFirstColumn Boolean Indicates to skip the first column (true) (for instance if it contains taxonomy identifiers)
     #@tempNormalize Boolean to indicate if the abundance data should be normalized (true) before creating the file (normalized by total sample abundance)
     @staticmethod
-    def convertAbundanceFileToSVMFile(tempInputFile=None, tempOutputSVMFile=None, tempDelimiter=None, tempLabels=None, tempFirstDataRow=None, tempSkipFirstColumn = True, tempNormalize=None):
+    def convertAbundanceFileToSVMFile(tempInputFile=None, tempOutputSVMFile=None, tempDelimiter=None, tempLabels=None, sLastMetadataName=None, tempSkipFirstColumn = True, tempNormalize=None):
         #Validate parameters
-
-        print("tempLabels")
-        print(tempLabels)
-        print(len(tempLabels))
         if(not ValidateData.isValidFileName(tempInputFile)):
             print "Error, file not valid. File:"+str(tempInputFile)
             return False
@@ -278,8 +274,8 @@ class SVM:
         if(not ValidateData.isValidList(tempLabels)):
             print "Error, tempNameRow was invalid. Value ="+str(tempLabels)
             return False
-        if(not ValidateData.isValidPositiveInteger(tempFirstDataRow, tempZero = True)):
-            print "Error, tempFirstDataRow was invalid. Value ="+str(tempFirstDataRow)
+        if(not ValidateData.isValidString(sLastMetadataName)):
+            print "Error, sLastMetadataName was invalid. Value ="+str(sLastMetadataName)
             return False
         if(not ValidateData.isValidBoolean(tempNormalize)):
             print "Error, tempNormalize was invalid. Value ="+str(tempNormalize)
@@ -301,6 +297,12 @@ class SVM:
         #Turn to lines of the file
         contents = contents.replace(Constants.QUOTE,"")
         contents = contents.split(Constants.ENDLINE)
+
+        tempFirstDataRow = -1
+        for iIndex, sLine in enumerate(contents):
+            if sLine.split(tempDelimiter)[0].strip() == sLastMetadataName:
+                tempFirstDataRow = iIndex + 1
+                break
 
         #Run through data and create a list of column lists
         columnCount = len(contents[tempFirstDataRow].split(tempDelimiter))

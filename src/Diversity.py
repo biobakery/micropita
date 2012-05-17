@@ -49,6 +49,9 @@ class Diversity:
     c_INVERSE_UNIFRAC_B_DIVERSITY = "InuUnifrac"
     c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY = "InwUnifrac"
 
+    #Richness
+    c_OBSERVED_COUNT = "Observed_Count"
+
     #Alpha diversity
     #Testing: Happy Path
     #Calculates the Simpsons diversity index as defined as sum(Pi*Pi)
@@ -210,3 +213,53 @@ class Diversity:
         else:
             print "".join(["Diversity.getUnifracDistance. Invalid tempSampleTaxaAbundancies filename. Received=",str(tempSampleTaxaAbundancies)])
             return False
+
+    #Testing: Happy Path Tested (4)
+    #TODO Need to figure out how to combine the non normalized and normalized metric values going in and going out of metric creation
+    #Get alpha abundance of the metric for the vector
+    #@params tempAbundancies List of values to compute diversity
+    #@params tempMetric Alpha metric to use to define diversity
+    #@return float
+    @staticmethod
+    def getAlphaMetric(tempAbundancies=None, tempMetric=None):
+        if(not ValidateData.isValidString(tempMetric)):
+            return False
+        elif(tempMetric == Diversity.c_SHANNON_A_DIVERSITY):
+            return Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+        elif(tempMetric == Diversity.c_SIMPSON_A_DIVERSITY):
+            return Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+        elif(tempMetric == Diversity.c_INV_SIMPSON_A_DIVERSITY):
+            return Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+        elif(tempMetric == Diversity.c_OBSERVED_COUNT):
+            return Diversity.getObservedCount(tempSampleAbundances=tempAbundancies)
+        #Needs NOT Normalized Abundance
+        elif(tempMetric == Diversity.c_CHAO1_A_DIVERSITY):
+            return Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+        else:
+            return False
+
+    #Testing: Happy path Testing (3)
+    #Build a matrix of alpha diversity metrics for each sample
+    #Row = metric, column = sample
+    #@params tempSampleAbundance Observations (Taxa (row) x sample (column))
+    #@params tempSampleNames List of sample names of samples to measure (do not include the taxa id column name or other column names which should not be read)
+    #@params tempDiversityMetricAlpha List of diversity metrics to use in measuring
+    #@return A lists of lists. Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
+    #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+    @staticmethod
+    def buildAlphaMetricsMatrix(tempSampleAbundance = None, tempSampleNames = None, tempDiversityMetricAlpha = None):
+        #Create return
+        returnMetricsMatrix = []
+        [returnMetricsMatrix.append(list()) for index in tempDiversityMetricAlpha]
+
+        #Get amount of metrics
+        metricsCount = len(tempDiversityMetricAlpha)
+
+        #For each sample get all metrics
+        #Place in list of lists
+        #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+        for sample in tempSampleNames:
+            sampleAbundance = tempSampleAbundance[sample]
+            for metricIndex in xrange(0,metricsCount):
+                returnMetricsMatrix[metricIndex].append(Diversity.getAlphaMetric(tempAbundancies = sampleAbundance, tempMetric = tempDiversityMetricAlpha[metricIndex]))
+        return returnMetricsMatrix

@@ -13,7 +13,6 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #External libraries
-from AbundanceTable import AbundanceTable
 from Constants import Constants
 from Constants_Figures import Constants_Figures
 from Diversity import Diversity

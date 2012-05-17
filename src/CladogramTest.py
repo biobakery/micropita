@@ -772,15 +772,14 @@ class CladogramTest(unittest.TestCase):
         methodName = "testFilterByAbundanceForGoodCase"
 
         strTestFile = "".join([Constants_Testing.c_strTestingData,"FilterByAbundance.txt"])
-        iCurNameRow = 0
-        iCurFirstDataRow = 1
+        sMetadataID = "sample"
+        sLastMetadata = "sample"
         lsIds = ["Taxa1","Taxa2","Taxa3","Taxa4","Taxa5","Taxa6","Taxa7","Taxa8","Taxa9","Taxa10"]
         lsCorrectIds = ["Taxa1","Taxa2","Taxa8","Taxa9","Taxa10"]
 
         #Get Abundance table data
         rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
-                                          fIsSummed=True, iNameRow = iCurNameRow,
-                                          iFirstDataRow = iCurFirstDataRow)
+                                          fIsSummed=True, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
         cladogram = Cladogram()
         cladogram.setAbundanceData(rawData)
 
@@ -793,15 +792,15 @@ class CladogramTest(unittest.TestCase):
         methodName = "testCreateSizeFileForGoodCase"
 
         strTestFile = "".join([Constants_Testing.c_strTestingData,"SmallAbundance.txt"])
-        iCurNameRow = 0
-        iCurFirstDataRow = 1
+        sMetadataID = "sample"
+        sLastMetadata = "sample"
         lsIds = ["Taxa1","Taxa2","Taxa3","Taxa4","Taxa5"]
         answerFileContents = "Taxa1\t19.1938205472\nTaxa2\t24.2073385653\nTaxa3\t0.000130281830588\nTaxa4\t20.7493620036\nTaxa5\t23.3284684971"
 
         #Get Abundance table data
         rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
-                                              fIsSummed=True, iNameRow = iCurNameRow,
-                                              iFirstDataRow = iCurFirstDataRow)
+                                          fIsSummed=True, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
+
         cladogram = Cladogram()
         cladogram.setAbundanceData(rawData)
 

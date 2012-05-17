@@ -41,9 +41,6 @@ class MicroPITA:
     Micropita class
     """
     #Constants
-    #Controls if the bias correcting Chao1 is used (false = not used, uses intead original non bias correcting formula)
-    c_CHAO_CORRECT_BIAS = False
-
     #Diversity metrics Alpha
     c_SHANNON_A_DIVERSITY = Diversity.c_SHANNON_A_DIVERSITY
     c_SIMPSON_A_DIVERSITY = Diversity.c_SIMPSON_A_DIVERSITY
@@ -83,6 +80,9 @@ class MicroPITA:
     c_SVM_CLOSE = c_strDiscriminant
     c_SVM_FAR = c_strDistinct
 
+    #Technique groupings
+    c_lsDiversityMethods = [c_DIVERSITY_1,c_DIVERSITY_2]
+
     #Converts ecology metrics into standardized method selection names
     convertAMetricDiversity = {c_INV_SIMPSON_A_DIVERSITY:c_DIVERSITY_1, c_CHAO1_A_DIVERSITY:c_DIVERSITY_2}
     convertBMetricRepresentative = {c_BRAY_CURTIS_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_1, c_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_2, c_WEIGHTED_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_3}
@@ -103,20 +103,20 @@ class MicroPITA:
     #@params tempAbundancies List of values to compute diversity
     #@params tempMetric Alpha metric to use to define diversity
     #@return float
-    def getAlphaMetric(self, tempAbundancies=None, tempMetric=None):
-        if(not ValidateData.isValidString(tempMetric)):
-            return False
-        elif(tempMetric == self.c_SHANNON_A_DIVERSITY):
-            return Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-        elif(tempMetric == self.c_SIMPSON_A_DIVERSITY):
-            return Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-        elif(tempMetric == self.c_INV_SIMPSON_A_DIVERSITY):
-            return Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-        #Needs NOT Normalized Abundance
-        elif(tempMetric == self.c_CHAO1_A_DIVERSITY):
-            return Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=tempAbundancies, tempCorrectForBias=self.c_CHAO_CORRECT_BIAS)
-        else:
-            return False
+#    def getAlphaMetric(self, tempAbundancies=None, tempMetric=None):
+#        if(not ValidateData.isValidString(tempMetric)):
+#            return False
+#        elif(tempMetric == self.c_SHANNON_A_DIVERSITY):
+#            return Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+#        elif(tempMetric == self.c_SIMPSON_A_DIVERSITY):
+#            return Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+#        elif(tempMetric == self.c_INV_SIMPSON_A_DIVERSITY):
+#            return Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+#        #Needs NOT Normalized Abundance
+#        elif(tempMetric == self.c_CHAO1_A_DIVERSITY):
+#            return Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
+#        else:
+#            return False
 
     #Testing: Happy path Testing (3)
     #Build a matrix of alpha diversity metrics for each sample
@@ -126,22 +126,22 @@ class MicroPITA:
     #@params tempDiversityMetricAlpha List of diversity metrics to use in measuring
     #@return A lists of lists. Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
     #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-    def buildAlphaMetricsMatrix(self, tempSampleAbundance = None, tempSampleNames = None, tempDiversityMetricAlpha = None):
-        #Create return
-        returnMetricsMatrix = []
-        [returnMetricsMatrix.append(list()) for index in tempDiversityMetricAlpha]
-
-        #Get amount of metrics
-        metricsCount = len(tempDiversityMetricAlpha)
-
-        #For each sample get all metrics
-        #Place in list of lists
-        #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-        for sample in tempSampleNames:
-            sampleAbundance = tempSampleAbundance[sample]
-            for metricIndex in xrange(0,metricsCount):
-                returnMetricsMatrix[metricIndex].append(self.getAlphaMetric(tempAbundancies = sampleAbundance, tempMetric = tempDiversityMetricAlpha[metricIndex]))
-        return returnMetricsMatrix
+#    def buildAlphaMetricsMatrix(self, tempSampleAbundance = None, tempSampleNames = None, tempDiversityMetricAlpha = None):
+#        #Create return
+#        returnMetricsMatrix = []
+#        [returnMetricsMatrix.append(list()) for index in tempDiversityMetricAlpha]
+#
+#        #Get amount of metrics
+#        metricsCount = len(tempDiversityMetricAlpha)
+#
+#        #For each sample get all metrics
+#        #Place in list of lists
+#        #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+#        for sample in tempSampleNames:
+#            sampleAbundance = tempSampleAbundance[sample]
+#            for metricIndex in xrange(0,metricsCount):
+#                returnMetricsMatrix[metricIndex].append(self.getAlphaMetric(tempAbundancies = sampleAbundance, tempMetric = tempDiversityMetricAlpha[metricIndex]))
+#        return returnMetricsMatrix
 
 
     #Testing: Happy path Testing (8)
@@ -528,12 +528,15 @@ class MicroPITA:
     #@params tempDelimiter Delimiter to use to parse the input file
     #@params tempOutputSVMFile String File path and name to output in SVM format based on the input file
     #@params tempMatrixLabels List of labels (does not have to be strings, just have to be appropriate for labels when casted to string type
-    #@params tempFirstDataRow Integer First row to read (skips header rows) (0-based)
+    #@params sLastMetadataName String Found immediately before the first row to read (skips header rows)
     #@params tempSkipFirstColumn Boolean True indicates the first column will be skipped (due to it containing row identifying information like OTU names).
     #@params tempNormalize Boolean True indicates normalizes to relative abundancy per sample (column)
     #@return Dictionary of file paths which were generated by the model and prediction steps
-    def runSVM(self, tempInputFile=None, tempDelimiter=Constants.TAB, tempOutputSVMFile=None, tempMatrixLabels=None, tempFirstDataRow=2, tempSkipFirstColumn=True, tempNormalize=True, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
+    def runSVM(self, tempInputFile=None, tempDelimiter=Constants.TAB, tempOutputSVMFile=None, tempMatrixLabels=None, sLastMetadataName=None, tempSkipFirstColumn=True, tempNormalize=True, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
         #Validate data
+        if not sLastMetadataName:
+            logging.error("MicroPITA::runSVM Did not received a value for sLastMetadataName and so did not run.")
+            return False
 
         #Create SVM object
         svm = SVM()
@@ -554,12 +557,10 @@ class MicroPITA:
                 metadataLabelToIndex[metadataLabel] = indexCount
                 indexCount += 1
         #Create a new label list but coded as integers
-        metadataLabelsAsIntegerCodes = list()
-        for data in tempMatrixLabels:
-            metadataLabelsAsIntegerCodes.append(metadataLabelToIndex[data])
+        metadataLabelsAsIntegerCodes = [metadataLabelToIndex[data] for data in tempMatrixLabels]
 
         #Convert abundancies file to SVM file
-        noError = svm.convertAbundanceFileToSVMFile(tempInputFile=tempInputFile, tempOutputSVMFile=tempOutputSVMFile, tempDelimiter=tempDelimiter, tempLabels=metadataLabelsAsIntegerCodes, tempFirstDataRow=tempFirstDataRow, tempSkipFirstColumn=tempSkipFirstColumn, tempNormalize=tempNormalize)
+        noError = svm.convertAbundanceFileToSVMFile(tempInputFile=tempInputFile, tempOutputSVMFile=tempOutputSVMFile, tempDelimiter=tempDelimiter, tempLabels=metadataLabelsAsIntegerCodes, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=tempSkipFirstColumn, tempNormalize=tempNormalize)
 
         modelFiles = False
         predictionFiles = False
@@ -581,7 +582,7 @@ class MicroPITA:
     #Run the supervised methods
     def runSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
                                    strOuputSVMFile, strSupervisedMetadata, sampleSVMSelectionCount,
-                                   iFirstDataRow, fSkipFirstColumn, fNormalize,
+                                   sLastMetadataName, fSkipFirstColumn, fNormalize,
                                    iScaleLowestBound, strCostRange, fProbabilitic):
         #Run supervised blocks
         #Select supervised (using SVM)
@@ -593,7 +594,7 @@ class MicroPITA:
         #Run linear SVM
         svmRelatedData = self.runSVM(tempInputFile=abundanceTable.funcGetName(), tempDelimiter=abundanceTable.funcGetFileDelimiter(),
                                      tempOutputSVMFile=strOuputSVMFile,
-                                     tempMatrixLabels=abundanceTable.funcGetMetadata(strSupervisedMetadata), tempFirstDataRow=iFirstDataRow,
+                                     tempMatrixLabels=abundanceTable.funcGetMetadata(strSupervisedMetadata), sLastMetadataName=sLastMetadataName,
                                      tempSkipFirstColumn=fSkipFirstColumn,
                                      tempNormalize=fNormalize, tempSVMScaleLowestBound=iScaleLowestBound,
                                      tempSVMLogC=strCostRange, tempSVMProbabilistic=fProbabilitic)
@@ -720,7 +721,7 @@ class MicroPITA:
     #Start micropita selection
     def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
             strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1,
-            strSelectionTechnique=None, strLabel=None, strStratify=None, iSampleNameRow=0, iFirstDataRow=1, fSumData=True):
+            strSelectionTechnique=None, strLabel=None, strStratify=None, sMetadataID=None, sLastMetadataName=None, fSumData=True):
         #microPITA object0
         microPITA = MicroPITA()
 
@@ -798,16 +799,21 @@ class MicroPITA:
         selectedSamples = dict()
 
         #Check/reduce raw abundance data
-        if(not os.path.exists("".join([inputFilePrefix,"-checked.txt"]))):
-            strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, iFirstDataIndex=iFirstDataRow, strOutputFileName=inputFilePrefix+"-checked.txt")
+        if(not os.path.exists("".join([inputFilePrefix,"-checked",inputFileComponents[1]]))):
+            strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, strOutputFileName="".join([inputFilePrefix,"-checked",inputFileComponents[1]]))
         else:
-            strInputAbundanceFile = inputFilePrefix+"-checked.txt"
+            strInputAbundanceFile = "".join([inputFilePrefix,"-checked",inputFileComponents[1]])
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
         #Abundance table object to read in and manage data
         totalAbundanceTable = AbundanceTable.makeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
-                                   cDelimiter=cDelimiter, iNameRow=iSampleNameRow, iFirstDataRow=iFirstDataRow, cFeatureNameDelimiter=cFeatureNameDelimiter)
+                                   cDelimiter=cDelimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter)
+        
+        if not totalAbundanceTable:
+            logging.error("MicroPITA.run. Could not read abundance table. Stopped.")
+            return False
+
         if fSumData:
             totalAbundanceTable.funcSumClades()
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
@@ -827,7 +833,7 @@ class MicroPITA:
         if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
             selectedSamples.update(self.runSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
                                    strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
-                                   strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, iFirstDataRow=iFirstDataRow,
+                                   strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, sLastMetadataName=sLastMetadataName,
                                    fSkipFirstColumn=c_SKIP_FIRST_COLUMN, fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
                                    iScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, strCostRange=c_SVM_COST_RANGE, fProbabilitic=c_SVM_PROBABILISTIC))
             logging.info("Selected Samples Unsupervised")
@@ -859,7 +865,7 @@ class MicroPITA:
                         #Must first generate metrics that do not want normalization before normalization occurs
                         #Expects Observations (Taxa (row) x sample (column))
                         #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                        internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
+                        internalAlphaMatrix = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
                         #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                         #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
                         mostDiverseAlphaSamplesIndexesNoNorm = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=lsSampleNames, tempTopAmount=sampleSelectionCount)
@@ -919,7 +925,7 @@ class MicroPITA:
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
+                internalAlphaMatrix = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
                 #Get top ranked alpha diversity by most diverse
                 #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                 #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
@@ -1053,9 +1059,9 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 #Abundance associated
-argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
-argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
-                  help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "Name_of_Sample_ID", default=None, help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "Last_Row_of_Metadata", default=None, 
+                  help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strSupervisedLabelCount, dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
                   help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
@@ -1101,6 +1107,14 @@ def _main( ):
         raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
+    #TODO does this stop the full analysis process? Not if the selection file already exists...
+    if not args.sIDName:
+        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run.")
+        return False
+    if not args.sLastMetadataName:
+        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run.")
+        return False
+
     #Run micropita
     logging.info("Start microPITA")
     microPITA = MicroPITA()
@@ -1109,7 +1123,7 @@ def _main( ):
                                         strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount),
                                         iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel,
                                         strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection,
-                                        iSampleNameRow=int(args.iSampleNameRow), iFirstDataRow=int(args.iFirstDataRow), fSumData=fSumData)
+                                        sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=fSumData)
     logging.info("End microPITA")
 
     #Log output for debugging

@@ -33,185 +33,6 @@ from scikits.learn.cluster import AffinityPropagation
 #Tests the Blog object
 class MicroPITATest(unittest.TestCase):
 
-    ##### GetAlphaMetric
-    def testGetAlphaMetricForGoodCaseAbridgedData1(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = MicroPITA()
-        metric = microPITA.c_SIMPSON_A_DIVERSITY
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
-
-        #Correct Answer
-        answer = "0.432098765432"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testGetAlphaMetricForGoodCaseAbridgedData2(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = MicroPITA()
-        metric = microPITA.c_INV_SIMPSON_A_DIVERSITY
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
-
-        #Correct Answer
-        answer = "2.31428571429"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testGetAlphaMetricForGoodCaseAbridgedData3(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = MicroPITA()
-        metric = microPITA.c_SHANNON_A_DIVERSITY
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
-
-        #Correct Answer
-        answer = "0.936888307539"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testGetAlphaMetricForGoodCaseAbridgedData4(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        microPITA = MicroPITA()
-        metric = microPITA.c_CHAO1_A_DIVERSITY
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
-
-        #Correct Answer
-        answer = "3"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    ##### BuildAlphaMetricsMatrix
-    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData1Metric(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = MicroPITA()
-        metric = [microPITA.c_SIMPSON_A_DIVERSITY]
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-
-        #Correct Answer
-        answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0]]"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedDataChaoMetric(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = False
-        microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-
-        #Correct Answer
-        answer = "[[3, 2, 0, 5, 2, 3, 1, 5.0, 5, 0]]"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-
-    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData3Metric(self):
-
-        #Inputs
-        inputFile = "./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
-        normalize = True
-        microPITA = MicroPITA()
-        metric = [microPITA.c_SIMPSON_A_DIVERSITY,microPITA.c_INV_SIMPSON_A_DIVERSITY,microPITA.c_SHANNON_A_DIVERSITY]
-
-        #Generate data
-        abundance = AbundanceTable().textToStructuredArray(tempInputFile=inputFile, tempDelimiter=delimiter, tempNameRow=nameRow, tempFirstDataRow=firstDataRow, tempNormalize=normalize)
-        abundance = abundance[0]
-        sampleNames = abundance.dtype.names[1:]
-
-        #Get results
-        result = microPITA.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-
-        #Correct Answer
-        answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0], [2.3142857142857141, 1.4235294117647057, False, 3.6054081121682522, 1.7999999999999998, 1.5493562231759654, 1.0, 2.6666666666666665, 4.9999999999999991, False], [0.93688830753901586, 0.47413931305783735, 0.0, 1.3667866091157435, 0.63651416829481278, 0.66057888765207562, 0.0, 1.0397207708399179, 1.6094379124341005, 0.0]]"
-
-        #Check result against answer
-        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
-
-
     ##### GetTopRankedSamples
     def testGetTopRankedSamplesForGoodCase1(self):
         
@@ -888,7 +709,7 @@ class MicroPITATest(unittest.TestCase):
         outputFile="./input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.SVM.txt"
         delimiter=Constants.TAB
         nameRow=0
-        firstDataRow=2
+        sLastMetadataName="STSite"
         skipColumn1=True
         normalize=True
         lowestScaleBound=0
@@ -901,7 +722,7 @@ class MicroPITATest(unittest.TestCase):
         labels = [0,0,0,0,0,1,1,1,1,1]
 
         #Generate data
-        microPITA.runSVM(tempInputFile=inputFile, tempDelimiter=Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, tempFirstDataRow=firstDataRow, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
+        microPITA.runSVM(tempInputFile=inputFile, tempDelimiter=Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
 
         #Get results
         result = ""

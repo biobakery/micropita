@@ -26,7 +26,7 @@ class Constants_Testing():
     VALUE_VALUE_POSITION = 0
     VALUE_VALIDITY_POSITION = 1
 
-    #The value to indicate a falied test case returns an exception
+    #The value to indicate a failed test case returns an exception
     RETURNS_EXCEPTION = "EXCEPT_RETURN_TYPE"
 
     #Value Types

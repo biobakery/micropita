@@ -344,10 +344,10 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
         answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)\n ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)]"
@@ -364,17 +364,17 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
         normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
 
         #Call method
-        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
+        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -384,16 +384,16 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"])
         delimiter = Constants.WHITE_SPACE
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
 
         #Call method
-        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
+        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -404,17 +404,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering-Answer.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         iMinSampleThreshold = 2
         iMinSequenceThreshold = 2
 
         #Correct Answer
-        abndDataAnswer, metadataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer, metadataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceBySequenceOccurence(iMinSequence = iMinSequenceThreshold, iMinSamples = iMinSampleThreshold)
@@ -428,17 +428,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer1.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 50
         dPercentageAboveThreshold = 60
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -452,17 +452,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer2.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 70
         dPercentageAboveThreshold = 70
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -476,17 +476,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer3.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 90
         dPercentageAboveThreshold = 20
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -500,17 +500,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer3.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 90
         dPercentageAboveThreshold = 20
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -524,17 +524,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-AnswerAllGone.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 90
         dPercentageAboveThreshold = 100
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -548,17 +548,17 @@ class AbundanceTableTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering.txt"])
         strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestPercentileFiltering-Answer.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dPercentileCutOffThreshold = 50
         dPercentageAboveThreshold = 30
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)  
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -572,13 +572,11 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
         normalize = False
-
-        #Make array
+        nameRow = "TID"
+        firstDataRow = "STSite"
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcToArray()
 
         #Correct Answer
@@ -592,13 +590,13 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/test1.otu"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
         normalize = False
+        nameRow = "#OTU ID"
+        firstDataRow = "#OTU ID"
 
         #Make array
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcSumClades()
         result = data._npaFeatureAbundance
 
@@ -613,13 +611,13 @@ class AbundanceTableTest(unittest.TestCase):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/test1.otu"])
         delimiter = Constants.TAB
-        nameRow = 0
-        firstDataRow = 2
         normalize = False
+        nameRow = "#OTU ID"
+        firstDataRow = "#OTU ID"
 
         #Make array
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
-                                             iNameRow = nameRow, iFirstDataRow = firstDataRow, cFeatureNameDelimiter="|")
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcSumClades()
         data.funcNormalizeColumnsWithSummedClades()
         result = data._npaFeatureAbundance
@@ -629,6 +627,57 @@ class AbundanceTableTest(unittest.TestCase):
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncPairTablesForGoodCase(self):
+        
+        #Inputs
+        sInputFileOne = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/PairTables1.txt"])
+        sInputFileTwo = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/PairTables2.txt"])
+        cDelimiter = Constants.TAB
+        sIdentifier = "ID"
+        sOutputFileOne = "".join([Constants_Testing.c_strTestingTMP,"PairTables1with2.txt"])
+        sOutputFileTwo = "".join([Constants_Testing.c_strTestingTMP,"PairTables2with1.txt"])
+
+        #Answer files
+        sAnswerFile1 = "".join([Constants_Testing.c_strTestingTruth,"PairedTables1with2-Correct.txt"])
+        sAnswerFile2 = "".join([Constants_Testing.c_strTestingTruth,"PairedTables2with1-Correct.txt"])
+
+        #Collects all the errors to display
+        sError = ""
+
+        #Pair files
+        result = AbundanceTable.funcPairTables(strFileOne=sInputFileOne, strFileTwo=sInputFileTwo,
+                                      strIdentifier=sIdentifier, cDelimiter=cDelimiter,
+                                      strOutFileOne=sOutputFileOne, strOutFileTwo=sOutputFileTwo)
+        if not result:
+            sError = "AbundanceTableTest.testFuncPairTablesForGoodCase::Received false when calling the AbundanceTable.funcPairTables()"
+
+        #Check answers
+        if result:
+            sCorrect = None
+            sResult = None
+            with open(sOutputFileOne, 'r') as f:
+                sResult = f.read()
+            f.close()
+            with open(sAnswerFile1, 'r') as f:
+                sCorrect = f.read()
+            f.close()
+            if not sCorrect.strip() == sResult:
+                sError = " ".join([sError, "Did not receive the correct output for file 1. Expected:",sCorrect,". Received:",sResult,"."])
+
+            sCorrect = None
+            sResult = None
+            with open(sOutputFileTwo, 'r') as f:
+                sResult = f.read()
+            f.close()
+            with open(sAnswerFile2, 'r') as f:
+                sCorrect = f.read()
+            f.close()
+            if not sCorrect.strip() == sResult:
+                sError = " ".join([sError, "Did not receive the correct output for file 2. Expected:",sCorrect,". Received:",sResult,"."])
+
+        #Check result against answer
+        self.assertEqual("",sError,sError)
 
 ##
 #Creates a suite of tests

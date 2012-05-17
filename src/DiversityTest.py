@@ -13,7 +13,9 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
+from AbundanceTable import AbundanceTable
 from Constants import Constants
+from Constants_Testing import Constants_Testing
 from Diversity import Diversity
 import numpy as np
 import unittest
@@ -21,6 +23,181 @@ import unittest
 ##
 #Tests the Diversity object
 class DiversityTest(unittest.TestCase):
+
+    ##### GetAlphaMetric
+    def testGetAlphaMetricForGoodCaseAbridgedData1(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = True
+        metric = Diversity.c_SIMPSON_A_DIVERSITY
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance.funcNormalize()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+
+        #Correct Answer
+        answer = "0.432098765432"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testGetAlphaMetricForGoodCaseAbridgedData2(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = True
+        metric = Diversity.c_INV_SIMPSON_A_DIVERSITY
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance.funcNormalize()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+
+        #Correct Answer
+        answer = "2.31428571429"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testGetAlphaMetricForGoodCaseAbridgedData3(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = True
+        metric = Diversity.c_SHANNON_A_DIVERSITY
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance.funcNormalize()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+
+        #Correct Answer
+        answer = "0.936888307539"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testGetAlphaMetricForGoodCaseAbridgedData4(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        metric = Diversity.c_CHAO1_A_DIVERSITY
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+
+        #Correct Answer
+        answer = "3"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    ##### BuildAlphaMetricsMatrix
+    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData1Metric(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = True
+        metric = [Diversity.c_SIMPSON_A_DIVERSITY]
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance.funcNormalize()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+
+        #Correct Answer
+        answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0]]"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedDataChaoMetric(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        metric = [Diversity.c_CHAO1_A_DIVERSITY]
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+
+        #Correct Answer
+        answer = "[[3, 2, 0, 5, 2, 3, 1, 5.0, 5, 0]]"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testBuildAlphaMetricsMatrixForGoodCaseAbridgedData3Metric(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = True
+        metric = [Diversity.c_SIMPSON_A_DIVERSITY,Diversity.c_INV_SIMPSON_A_DIVERSITY,Diversity.c_SHANNON_A_DIVERSITY]
+        sMetadataID = "TID"
+        sLastMetadata = "STSite"
+
+        #Generate data
+        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        sampleNames = abundance.funcGetSampleNames()
+        abundance.funcNormalize()
+        abundance = abundance.funcGetAbundanceCopy()
+
+        #Get results
+        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+
+        #Correct Answer
+        answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0], [2.3142857142857141, 1.4235294117647057, False, 3.6054081121682522, 1.7999999999999998, 1.5493562231759654, 1.0, 2.6666666666666665, 4.9999999999999991, False], [0.93688830753901586, 0.47413931305783735, 0.0, 1.3667866091157435, 0.63651416829481278, 0.66057888765207562, 0.0, 1.0397207708399179, 1.6094379124341005, 0.0]]"
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
     def testGetSimpsonsDiversityIndexForGoodCase1(self):
         

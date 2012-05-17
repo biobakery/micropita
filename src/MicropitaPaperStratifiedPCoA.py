@@ -32,10 +32,8 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperStratifiedPCoA.py", descri
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, 
                   help= Constants_Arguments.c_strLoggingHelp)
-argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, 
-                  help= Constants_Arguments.c_strSampleNameRowHelp)
-argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, 
-                  help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
+argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadata, dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
                   help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
@@ -95,8 +93,7 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
-                                            fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
-                                            iFirstDataRow = int(args.iFirstDataRow))
+                                            fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Normalize if needed and sum clades
     if fSumData:
@@ -115,7 +112,6 @@ def _main( ):
     #Generate PCoA
     #LoadData
     analysis.loadData(xData=rawData, fIsRawData=True)
-#    analysis.loadData(tempReadData=args.strFileAbund, tempIsRawData=True, tempDelimiter=Constants.TAB, tempNameRow=int(args.iSampleNameRow), tempFirstDataRow=int(args.iFirstDataRow), tempNormalize=c_Normalize, tempCheckFile=c_fCheckFile)
     #Make distance matrix
     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 

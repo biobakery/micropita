@@ -167,8 +167,8 @@ class Utility_MathTest(unittest.TestCase):
       #Inputs
       inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
       delimiter = Constants.TAB
-      nameRow = 0
-      firstDataRow = 2
+      sMetadataID = "TID"
+      sLastMetadata = "STSite"
       normalize = False
       removeAdornment = False
 
@@ -176,7 +176,8 @@ class Utility_MathTest(unittest.TestCase):
       answer = "[[ 'Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72'\n  'Bacteria|unclassified|4904'\n  'Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361'\n  'Bacteria|3417'\n  'Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368']\n ['1.0' '0.0' '3.0' '0.0' '5.0']\n ['0.0' '10.0' '0.0' '45.0' '0.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']\n ['12.0' '43.0' '29.0' '34.0' '2.0']\n ['0.0' '6.0' '0.0' '3.0' '0.0']\n ['6.0' '0.0' '45.0' '0.0' '6.0']\n ['0.0' '23.0' '0.0' '0.0' '0.0']\n ['2.0' '0.0' '1.0' '0.0' '1.0']\n ['1.0' '1.0' '1.0' '1.0' '1.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
+      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+                                           cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
       result = Utility_Math.transposeDataMatrix(tempMatrix=result.funcGetAbundanceCopy(), tempRemoveAdornments=removeAdornment)
 
       #Check result against answer
@@ -187,15 +188,16 @@ class Utility_MathTest(unittest.TestCase):
       #Inputs
       inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
       delimiter = Constants.TAB
-      nameRow = 0
-      firstDataRow = 2
+      sMetadataID = "TID"
+      sLastMetadata = "STSite"
       removeAdornment = True
 
       #Correct Answer
       answer = "[[  1.   0.   3.   0.   5.]\n [  0.  10.   0.  45.   0.]\n [  0.   0.   0.   0.   0.]\n [ 12.  43.  29.  34.   2.]\n [  0.   6.   0.   3.   0.]\n [  6.   0.  45.   0.   6.]\n [  0.  23.   0.   0.   0.]\n [  2.   0.   1.   0.   1.]\n [  1.   1.   1.   1.   1.]\n [  0.   0.   0.   0.   0.]]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter=delimiter, iNameRow=nameRow, iFirstDataRow=firstDataRow)
+      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+                                           cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
       result = Utility_Math.transposeDataMatrix(tempMatrix=result.funcGetAbundanceCopy(), tempRemoveAdornments=removeAdornment)
 
       #Check result against answer

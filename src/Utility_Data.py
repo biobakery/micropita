@@ -282,6 +282,7 @@ class Utility_Data():
         #Write rows/taxa
         for row in dataMatrix:
             fileOutput.writerow(row)
+        fileOutput.close()
       
     ##
     #Generate matrix for microPITA focused on diversity

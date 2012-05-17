@@ -79,16 +79,17 @@ class AbundanceTable:
 
     #Allows an Abundance Table to be directly made from a file
     @staticmethod
-    def makeFromFile(strInputFile, fIsNormalized, fIsSummed, cDelimiter = Constants.TAB, iNameRow = 0, iFirstDataRow = 0, cFeatureNameDelimiter="|"):
+    def makeFromFile(strInputFile, fIsNormalized, fIsSummed, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None, cFeatureNameDelimiter="|"):
 
       #Read in from text file to create the abundance and metadata structures
       lContents = AbundanceTable._textToStructuredArray(strInputFile=strInputFile, cDelimiter=cDelimiter,
-                                              iNameRow=iNameRow, iFirstDataRow=iFirstDataRow)
+                                                        sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
 
       #If contents is not a false then set contents to appropriate objects
       if lContents:
         return AbundanceTable(npaAbundance=lContents[0], dictMetadata=lContents[1], strName=strInputFile, 
                               fIsNormalized=fIsNormalized, fIsSummed=fIsSummed, cFileDelimiter=cDelimiter, cFeatureNameDelimiter=cFeatureNameDelimiter)
+      return False
 
     #Private Methods
 
@@ -102,7 +103,7 @@ class AbundanceTable:
     #Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
     #Metadata include the taxa ID column name if one is given
     @staticmethod
-    def _textToStructuredArray(strInputFile = None, cDelimiter = Constants.TAB, iNameRow = 0, iFirstDataRow = 0):
+    def _textToStructuredArray(strInputFile = None, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None):
     #Validate parameters
         if(not ValidateData.isValidFileName(strInputFile)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, input file not valid. File:",str(strInputFile)])
@@ -110,11 +111,11 @@ class AbundanceTable:
         if(not ValidateData.isValidStringType(cDelimiter)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, cDelimiter was invalid. Value =",str(cDelimiter)])
             return False
-        if(not ValidateData.isValidPositiveInteger(iNameRow, tempZero = True)):
-            print "".join(["AbundanceTable:textToStructuredArray::Error, iNameRow was invalid. Value =",str(iNameRow)])
+        if(not ValidateData.isValidString(sMetadataID)):
+            print "".join(["AbundanceTable:textToStructuredArray::Error, sMetadataID was invalid. Value =",str(sMetadataID)])
             return False
-        if(not ValidateData.isValidPositiveInteger(iFirstDataRow, tempZero = True)):
-            print "".join(["AbundanceTable:textToStructuredArray::Error, iFirstDataRow was invalid. Value =",str(iFirstDataRow)])
+        if(not ValidateData.isValidString(sLastMetadata)):
+            print "".join(["AbundanceTable:textToStructuredArray::Error, sLastMetadata was invalid. Value =",str(sLastMetadata)])
             return False
 
         #Read in file
@@ -125,19 +126,30 @@ class AbundanceTable:
         #Turn to lines of the file
         contents = contents.replace("\"","")
         contents = filter(None,contents.split(Constants.ENDLINE))
-        namesRow = contents[iNameRow]
-        namesRow = namesRow.split(cDelimiter)
 
-        #Get metadata lines
+        #Get metadata and sample ids
+        iFirstDataRow = -1
+        namesRow = None
         metadata = dict()
-        if((iFirstDataRow-iNameRow)>1):
-            for line in contents[iNameRow+1:iFirstDataRow]:
-                asmetadataElements = line.split(cDelimiter)
-                metadata[asmetadataElements[0]]=asmetadataElements[1:]
+        for iIndex, line in enumerate(contents):
+            lsLineElements = line.split(cDelimiter)
+            sIdElement = lsLineElements[0].strip()
+            if sIdElement == sMetadataID:
+                namesRow = lsLineElements
+            else:
+                metadata[sIdElement]=lsLineElements[1:]
+            if sIdElement == sLastMetadata:
+                iFirstDataRow = iIndex + 1
+                break
 
         #Check to make sure there is abundance
         if len(contents) <= iFirstDataRow:
             return [np.array([]),metadata]
+
+        #Make sure the names are found
+        if namesRow == None:
+            print "".join(["AbundanceTable:textToStructuredArray::Error, did not find the row for the unique sample/column. File:",str(strInputFile)," Identifier:",str(sMetadataID)])
+            return False
 
         #Build data type object (data name,data type)
         incompleteDataTypeVector = []
@@ -219,7 +231,6 @@ class AbundanceTable:
             return self._npaFeatureAbundance.shape[0]
         else:
             return 0
-
 
     #The delimiter of the file the data was read from and which is also the
     #delimiter which would be used to write the data to a file
@@ -459,35 +470,6 @@ class AbundanceTable:
 
         return True
 
-    #Happy path tested
-    #Expectes a structured array for npData (rows = Taxa/OTU)
-    #Expectes the first entry of every row to be an id that is ignored but carried forward
-    #Metadata is used to collapse by
-#    def funcStratifyDataByMetadata(self,lsMetadata, npData):
-#        dictAbundanceBlocks = dict()
-#        setValues = set(lsMetadata)
-#        lsNames = npData.dtype.names
-#        #Get index of values to break up
-#        for value in setValues:
-#            fDataIndex = [sData==value for sData in lsMetadata]
-#            #The true is added to keep the first column which should be the feature id
-#            dictAbundanceBlocks[value] = npData[np.compress([True]+fDataIndex,lsNames)]
-#        return dictAbundanceBlocks
-#
-#    def funcStratifyMetadataByMetadata(self, lsMetadata, dictMetadataToStratify):
-#        dictMetadataBlocks = dict()
-#        setValues = set(lsMetadata)
-#        #Get index of values to break up
-#        for value in setValues:
-#            fDataIndex = [sData==value for sData in lsMetadata]
-#            dictBrokenMetadata = dict()
-#            for metadataType in dictMetadataToStratify:
-#                dictValues = dictMetadataToStratify[metadataType]
-#                dictBrokenMetadata[metadataType] = np.compress(fDataIndex,dictValues).tolist()
-#            #The true is added to keep the first column which should be the feature id
-#            dictMetadataBlocks[value] = dictBrokenMetadata
-#        return dictMetadataBlocks
-
     #Stratifies the AbundanceTable by the given metadata.
     #Will write each stratified abundance table to file
     #if fWriteToFile is True the object will used it's internally stored name as a file to write to
@@ -580,6 +562,166 @@ class AbundanceTable:
 
     #Static methods
 
+    #Testing Status: 1 Happy path test
+    #This method will read in two files and abridge both files (saved as new files)
+    #to just the samples in common between the two files given a common identifier.
+    #Expects the files to have the sample delimiters
+    @staticmethod
+    def funcPairTables(strFileOne, strFileTwo, strIdentifier, cDelimiter, strOutFileOne, strOutFileTwo, lsIgnoreValues=None):
+        #Validate parameters
+        if(not ValidateData.isValidFileName(strFileOne)):
+            print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strFileOne)
+            return False
+        #Validate parameters
+        if(not ValidateData.isValidFileName(strFileTwo)):
+            print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strFileTwo)
+            return False
+
+        #Make file one
+        #Read in file
+        with open(strFileOne,'r') as f:
+            sContentsOne = f.read()
+        f.close()
+
+        #Get the file identifier for file one
+        fileOneIdentifier = None
+        for sLine in filter(None, sContentsOne.split(Constants.ENDLINE)):
+            lsLineContents = sLine.split(cDelimiter)
+            if lsLineContents[0] == strIdentifier:
+                fileOneIdentifier = lsLineContents
+                break
+
+        #Make file two
+        #Read in file
+        with open(strFileTwo,'r') as f:
+            sContentsTwo = f.read()
+        f.close()
+
+        #Get the file identifier for file two
+        fileTwoIdentifier = None
+        for sLine in filter(None, sContentsTwo.split(Constants.ENDLINE)):
+            lsLineContents = sLine.split(cDelimiter)
+            if lsLineContents[0] == strIdentifier:
+                fileTwoIdentifier = lsLineContents
+                break
+
+        #Get what is in common between the identifiers
+        #And find which columns to keep in the tables based on the common elements
+        setsCommonIdentifiers = set(fileOneIdentifier) & set(fileTwoIdentifier)
+        if lsIgnoreValues:
+            setsCommonIdentifiers = setsCommonIdentifiers - set(lsIgnoreValues)
+        lfFileOneElements = [sIdentifier in setsCommonIdentifiers for sIdentifier in fileOneIdentifier]
+        lfFileTwoElements = [sIdentifier in setsCommonIdentifiers for sIdentifier in fileTwoIdentifier]
+
+        #Write out file one
+        with open(strOutFileOne, 'w') as f:
+            f.write(Constants.ENDLINE.join([cDelimiter.join(np.compress(lfFileOneElements,sLine.split(cDelimiter)))
+                                           for sLine in filter(None, sContentsOne.split(Constants.ENDLINE))]))
+        f.close()
+
+        #Write out file two
+        with open(strOutFileTwo, 'w') as f:
+            f.write(Constants.ENDLINE.join([cDelimiter.join(np.compress(lfFileTwoElements,sLine.split(cDelimiter)))
+                                           for sLine in filter(None, sContentsTwo.split(Constants.ENDLINE))]))
+        f.close()
+
+        return True
+
+    #Testing Status: Light happy path testing
+    #Check the input otu or phlotype abundance table
+    #Currently reduces the taxa that have no occurence
+    #Also inserts a NA for blank metadta and a 0 for blank abundance data
+    #@params strReadDataFileName String. Data file name
+    #@params strOutputFileName String. The file path to save the checked file as.
+    #If left empty (defualt) a path will be created from the input file name
+    #Placing the file in the same directory as the current file.
+    #@params cDelimiter Character. Delimiter for the data
+    #@return Return string file path
+    @staticmethod
+    def funcCheckRawDataFile(strReadDataFileName, iFirstDataIndex= -1, sLastMetadataName = None, strOutputFileName = "", cDelimiter = Constants.TAB):
+        #Validate parameters
+        if(not ValidateData.isValidFileName(strReadDataFileName)):
+            print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strReadDataFileName)
+            return False
+        if(not ValidateData.isValidStringType(cDelimiter)):
+            print "AbundanceTable:checkRawDataFile::Error, Delimiter is not a valid string/char type. Delimiter ="+str(cDelimiter)+"."
+            return False
+        if (iFirstDataIndex == -1) and (sLastMetadataName == None):
+            print "AbundanceTable:checkRawDataFile::Error, either iFirstDataIndex or sLastMetadataNamemust be given."
+            return False
+
+        #Get output file and remove if existing
+        outputFile = strOutputFileName
+        if not strOutputFileName:
+            outputFile = os.path.splitext(strReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Read input file lines
+        #Drop blank lines
+        readData = ""
+        with open(strReadDataFileName,'r') as f:
+            readData = f.read()
+        f.close()
+        readData = filter(None,readData.split(Constants.ENDLINE))
+
+        #Read the length of each line and make sure there is no jagged data
+        #Also hold row count for the metadata
+        iLongestLength = len(readData[0].split(cDelimiter))
+        iMetadataRow = -1
+        if not sLastMetadataName:
+            sLastMetadataName = "None"
+        for iIndex, strLine in enumerate(readData):
+            sLineElements = strLine.split(cDelimiter)
+            if sLineElements[0] == sLastMetadataName:
+                iMetadataRow = iIndex
+            iLongestLength = max(iLongestLength, len(sLineElements))
+
+        #If not already set, set iFirstDataIndex
+        if iFirstDataIndex < 0:
+            iFirstDataIndex = iMetadataRow + 1
+
+        #File writer
+        with open(strOutputFileName,'a') as f:
+
+            #Write metadata
+            #Empty data is changed to a default
+            #Jagged ends are filled with a default
+            for strDataLine in readData[0:iFirstDataIndex]:
+                lsLineElements = strDataLine.split(cDelimiter)
+                for iindex, sElement in enumerate(lsLineElements):
+                    if not sElement.strip():
+                        lsLineElements[iindex] = Constants.c_strEmptyDataMetadata
+                if len(lsLineElements) < iLongestLength:
+                    lsLineElements = lsLineElements + (["NA"]*(iLongestLength-len(lsLineElements)))
+                f.write(cDelimiter.join(lsLineElements)+Constants.ENDLINE)
+
+            #For each data line in the table
+            for line in readData[iFirstDataIndex:]:
+                writeToFile = False
+                cleanLine = list()
+                #Break line into delimited elements
+                lineElements = line.split(cDelimiter)
+
+                #For each element but the first (taxa name)
+                #Element check to see if not == zero
+                #If so add to output
+                for element in lineElements[1:]:
+                    if(element.strip() in string.whitespace):
+                        cleanLine.append(Constants.c_strEmptyAbundanceData)
+                    #Set abundance of 0 but do not indicate the line should be saved
+                    elif(element == "0"):
+                        cleanLine.append(element)
+                    #If an abundance is found set the line to be saved.
+                    else:
+                        cleanLine.append(element)
+                        writeToFile = True
+                #Write to file
+                if(writeToFile):    
+                    f.write(lineElements[0]+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
+        f.close()
+        return outputFile
+
     #Testing Status: Light happy path testing
     #Splits an abundance table into multiple abundance tables stratified by the metadata
     #@params strInputFile String file path to read in and stratify
@@ -608,12 +750,13 @@ class AbundanceTable:
 
         #Get the base of the file path
         #This is dependent on the given output directory and the prefix of the file name of the input file
-        #If no output file is given then the input fiel directory is used.
+        #If no output file is given then the input file directory is used.
         baseFilePath = strDirectory
+        lsFilePiecesExt = os.path.splitext(strInputFile)
         if baseFilePath:
             baseFilePath = baseFilePath + os.path.splitext(os.path.split(strInputFile)[1])[0]
         else:
-            baseFilePath = os.path.splitext(strInputFile)[0]
+            baseFilePath = lsFilePiecesExt[0]
 
         #Read in file
         sFileContents = None
@@ -680,93 +823,10 @@ class AbundanceTable:
         #Write to file
         lsFilesWritten = []
         for metadata in stratifiedAbundanceTables:
-            sOutputFile = baseFilePath+"-by-"+metadata.strip("\"")+".txt"
+            sOutputFile = baseFilePath+"-by-"+metadata.strip("\"")+lsFilePiecesExt[1]
             with open(sOutputFile,'w') as f:
                 sFileContents = f.write(Constants.ENDLINE.join(stratifiedAbundanceTables[metadata]))
                 lsFilesWritten.append(sOutputFile)
             f.close()
 
         return lsFilesWritten
-
-    #Testing Status: Light happy path testing
-    #Check the input otu or phlotype abundance table
-    #Currently reduces the taxa that have no occurence
-    #Also inserts a NA for blank metadta and a 0 for blank abundance data
-    #@params strReadDataFileName String. Data file name
-    #@params strOutputFileName String. The file path to save the checked file as.
-    #If left empty (defualt) a path will be created from the input file name
-    #Placing the file in the same directory as the current file.
-    #@params cDelimiter Character. Delimiter for the data
-    #@return Return string file path
-    @staticmethod
-    def funcCheckRawDataFile(strReadDataFileName, iFirstDataIndex, strOutputFileName = "", cDelimiter = Constants.TAB):
-        #Validate parameters
-        if(not ValidateData.isValidFileName(strReadDataFileName)):
-            print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strReadDataFileName)
-            return False
-        if(not ValidateData.isValidStringType(cDelimiter)):
-            print "AbundanceTable:checkRawDataFile::Error, Delimiter is not a valid string/char type. Delimiter ="+str(cDelimiter)+"."
-            return False
-
-        #Get output file and remove if existing
-        outputFile = strOutputFileName
-        if not strOutputFileName:
-            outputFile = os.path.splitext(strReadDataFileName)[0]+Constants.OUTPUT_SUFFIX
-            if(os.path.exists(outputFile)):
-                os.remove(outputFile)
-
-        #Read input file lines
-        #Drop blank lines
-        readData = ""
-        with open(strReadDataFileName,'r') as f:
-            readData = f.read()
-        f.close()
-        readData = filter(None,readData.split(Constants.ENDLINE))
-
-        #Read the length of each line and make sure there is no jagged data
-        iLongestLength = len(readData[0].split(cDelimiter))
-        for strLine in readData:
-            iLongestLength = max(iLongestLength, len(strLine.split(cDelimiter)))
-
-        #File writer
-        with open(strOutputFileName,'a') as f:
-
-            #Write metadata
-            #Empty data is changed to a default
-            #Jagged ends are filled with a default
-            for strDataLine in readData[0:iFirstDataIndex]:
-                lsLineElements = strDataLine.split(cDelimiter)
-                for iindex, sElement in enumerate(lsLineElements):
-                    if not sElement.strip():
-                        lsLineElements[iindex] = Constants.c_strEmptyDataMetadata
-                if len(lsLineElements) < iLongestLength:
-                    lsLineElements = lsLineElements + (["NA"]*(iLongestLength-len(lsLineElements)))
-                f.write(cDelimiter.join(lsLineElements)+Constants.ENDLINE)
-
-            #For each data line in the table
-            for line in readData[iFirstDataIndex:]:
-                writeToFile = False
-                cleanLine = list()
-                #Break line into delimited elements
-                lineElements = line.split(cDelimiter)
-
-                #For each element but the first (taxa name)
-                #Element check to see if not == zero
-                #If so add to output
-                for element in lineElements[1:]:
-                    if(element.strip() in string.whitespace):
-                        cleanLine.append(Constants.c_strEmptyAbundanceData)
-                    #Set abundance of 0 but do not indicate the line should be saved
-                    elif(element == "0"):
-                        cleanLine.append(element)
-                    #If an abundance is found set the line to be saved.
-                    else:
-                        cleanLine.append(element)
-                        writeToFile = True
-                #Write to file
-                if(writeToFile):    
-                    f.write(lineElements[0]+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
-        f.close()
-        return outputFile
-
-

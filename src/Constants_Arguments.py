@@ -69,9 +69,13 @@ class Constants_Arguments():
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
 
-    #n Index of the sample id row
-    c_strSampleNameRowArgument = "-n"
-    c_strSampleNameRowHelp = "The row in the abundance file that is the sample name/id row (default 0). 0 Based numbering."
+    #m The name of the last metadata
+    c_strLastMetadataName = "-m"
+    c_strLastMetadataNameHelp = "The row in the abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
+
+    #n Name of the sample id row
+    c_strIDName = "-n"
+    c_strIDNameHelp = "The row in the abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
 
     #o Circlader ring order
     c_strRingOrder = "-o"
@@ -150,6 +154,7 @@ class Constants_Arguments():
     c_strMicropitaActualFileHelp = "A file containing indications of how in silico samples were actually intended on being sampled by sampling methods."
     c_strMicropitaSelectFileHelp = "A file containing the samples selected which will be visualized."
     c_strSelectionMethodsHelp = "Select techniques listed one after another."
+    c_strOutputFileHelp = "A file to write the output."
 
     ####################################
     #Arg choices

@@ -61,8 +61,8 @@ argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbund
 	help = Constants_Arguments.c_strAbundanceFilterCutoffHelp)
 argp.add_argument(Constants_Arguments.c_strRingOrder, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrder)
 argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
-argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
-argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
+argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
 argp.add_argument(Constants_Arguments.c_strEnrichmentThreshold, dest = "dAlpha", action = "store", default = 0.05, help = Constants_Arguments.c_strEnrichmentThresholdHelp)
 argp.add_argument(Constants_Arguments.c_strOccurenceFilterSequenceCount, dest ="iMinSequenceCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSequenceHelp)
@@ -126,8 +126,8 @@ def _main( ):
 
     #Get Abundance table data
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=fIsNormalized,
-                                          fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
-                                          iFirstDataRow = int(args.iFirstDataRow),cFeatureNameDelimiter=c_strLineageDelim)
+                                          fIsSummed=fIsSummed, sMetadataID=args.sIDName, 
+                                          sLastMetadata=args.sLastMetadataName,cFeatureNameDelimiter=c_strLineageDelim)
 
     #Sum clades before normalization and filtering
     if fSumData:

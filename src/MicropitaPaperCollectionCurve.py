@@ -21,6 +21,7 @@ from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 from Diversity import Diversity
+import itertools
 import logging
 from pylab import *
 from MicroPITA import MicroPITA
@@ -182,6 +183,24 @@ class MicropitaPaperCollectionCurve:
         logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedMetric")
         return np.median(ldMeasurePerIteration)
 
+    def funcGetHighestPossibleCounts(self, iSampleSelectionCount, rawAbundance, lsSampleNames):
+#        iBestCount = 0
+#        for lsSelection in itertools.permutations(lsSampleNames,iSampleSelectionCount):
+#            iCurCount = Diversity.getObservedCount(tempSampleAbundances= np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, lsSelection)))
+#            if iCurCount > iBestCount:
+#                iBestCount = iCurCount
+#        return iBestCount
+        return 0
+
+    def funcGetLeastPossibleCounts(self, iSampleSelectionCount, rawAbundance, lsSampleNames):
+#        iLeastCount = 10000000
+#        for lsSelection in itertools.permutations(lsSampleNames,iSampleSelectionCount):
+#            iCurCount = Diversity.getObservedCount(tempSampleAbundances= np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, lsSelection)))
+#            if iCurCount < iLeastCount:
+#                iLeastCount = iCurCount
+#        return iLeastCount
+        return 0
+
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py", 
     description = """Generates a collection curve of diversity and top ranked abudance Taxa/OTU given method and number of samples selected in studies.""" )
@@ -190,8 +209,8 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py",
 #Logging
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
-argp.add_argument(Constants_Arguments.c_strSampleNameRowArgument, dest="iSampleNameRow", metavar= "SampleNameRow", default=0, help= Constants_Arguments.c_strSampleNameRowHelp)
-argp.add_argument(Constants_Arguments.c_strFirstDataRow, dest="iFirstDataRow", metavar= "FirstDataRow", default=1, help= Constants_Arguments.c_strFirstDataRowHelp)
+argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
+argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
@@ -247,8 +266,7 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     totalData = AbundanceTable.makeFromFile(strInputFile=args.strAbundanceFile, fIsNormalized=fIsNormalized,
-                                            fIsSummed=fIsSummed, iNameRow = int(args.iSampleNameRow),
-                                            iFirstDataRow = int(args.iFirstDataRow))
+                                            fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Do not produce a plot for summed or normalized data
     if totalData.funcIsSummed() or totalData.funcIsNormalized():
@@ -261,9 +279,9 @@ def _main( ):
     #Calculate individual counts per sample (row)
     #Sort the sample names by their diversity and store the names (Lowest diversity first)
     #the abundances will be used for pooling later and so will need to stay unnormalized.
-    lStudyMetrics = zip([Diversity.getObservedCount(rawAbundance[sSample]) for sSample in lsSampleNames],lsSampleNames)
-    lStudyMetrics.sort(key=operator.itemgetter(0))
-    lStudyMetrics = [tplSample[1] for tplSample in lStudyMetrics]
+#    lStudyMetrics = zip([Diversity.getObservedCount(rawAbundance[sSample]) for sSample in lsSampleNames],lsSampleNames)
+#    lStudyMetrics.sort(key=operator.itemgetter(0))
+#    lStudyMetrics = [tplSample[1] for tplSample in lStudyMetrics]
 
     #Read through selection files and place contents in dictionary
     dictAllSelectionStudies = dict()
@@ -322,16 +340,9 @@ def _main( ):
     #Per sample selection count get the metric of the most, least, and bootstrapped samples given the metric
     for strSelectionCount in setSampleCounts:
         #Get Most and least diverse sample per N
-        ldMostSamples = lStudyMetrics[-1*int(strSelectionCount):]
-        ldLeastSamples = lStudyMetrics[0:int(strSelectionCount)]
-
-        #Select most diverse samples, pool, and optionally normalize
-        ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, ldMostSamples))
-        dictdMostMetricSamplesAtN[strSelectionCount] = Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
-
-        #Select least diverse samples, pool, and optionally normalize
-        ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, ldLeastSamples))
-        dictdLeastMetricSamplesAtN[strSelectionCount] = Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
+        iSampleSelectionCount = int(strSelectionCount)
+        dictdMostMetricSamplesAtN[strSelectionCount] = mCC.funcGetHighestPossibleCounts(iSampleSelectionCount, rawAbundance, lsSampleNames)
+        dictdLeastMetricSamplesAtN[strSelectionCount] = mCC.funcGetLeastPossibleCounts(iSampleSelectionCount, rawAbundance, lsSampleNames)
 
         #Get bootstrapped metric
         dictdBootstrappedMetricAtN[strSelectionCount] = mCC.getMedianBootstrappedMetric(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = int(strSelectionCount), iBootStrappingItr = mCC.c_BootstrapItr, microPITA = microPITA)
