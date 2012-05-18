@@ -85,6 +85,7 @@ class MicroPITA:
 
     #Converts ecology metrics into standardized method selection names
     convertAMetricDiversity = {c_INV_SIMPSON_A_DIVERSITY:c_DIVERSITY_1, c_CHAO1_A_DIVERSITY:c_DIVERSITY_2}
+    convertMicroPITAToAMetric = {c_DIVERSITY_1:c_INV_SIMPSON_A_DIVERSITY, c_DIVERSITY_2:c_CHAO1_A_DIVERSITY}
     convertBMetricRepresentative = {c_BRAY_CURTIS_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_1, c_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_2, c_WEIGHTED_UNIFRAC_B_DIVERSITY:c_REPRESENTATIVE_DISSIMILARITY_3}
     convertBMetricExtreme = {c_INVERSE_BRAY_CURTIS_B_DIVERSITY:c_EXTREME_DISSIMILARITY_1, c_INVERSE_UNIFRAC_B_DIVERSITY:c_EXTREME_DISSIMILARITY_2, c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY:c_EXTREME_DISSIMILARITY_3}
 
@@ -96,53 +97,6 @@ class MicroPITA:
     c_HIERARCHICAL_CLUSTER_METHOD = 'average'
 
 ####Group 1## Diversity
-
-    #Testing: Happy Path Tested (4)
-    #TODO Need to figure out how to combine the non normalized and normalized metric values going in and going out of metric creation
-    #Get alpha abundance of the metric for the vector
-    #@params tempAbundancies List of values to compute diversity
-    #@params tempMetric Alpha metric to use to define diversity
-    #@return float
-#    def getAlphaMetric(self, tempAbundancies=None, tempMetric=None):
-#        if(not ValidateData.isValidString(tempMetric)):
-#            return False
-#        elif(tempMetric == self.c_SHANNON_A_DIVERSITY):
-#            return Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-#        elif(tempMetric == self.c_SIMPSON_A_DIVERSITY):
-#            return Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-#        elif(tempMetric == self.c_INV_SIMPSON_A_DIVERSITY):
-#            return Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-#        #Needs NOT Normalized Abundance
-#        elif(tempMetric == self.c_CHAO1_A_DIVERSITY):
-#            return Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=tempAbundancies)
-#        else:
-#            return False
-
-    #Testing: Happy path Testing (3)
-    #Build a matrix of alpha diversity metrics for each sample
-    #Row = metric, column = sample
-    #@params tempSampleAbundance Observations (Taxa (row) x sample (column))
-    #@params tempSampleNames List of sample names of samples to measure (do not include the taxa id column name or other column names which should not be read)
-    #@params tempDiversityMetricAlpha List of diversity metrics to use in measuring
-    #@return A lists of lists. Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
-    #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-#    def buildAlphaMetricsMatrix(self, tempSampleAbundance = None, tempSampleNames = None, tempDiversityMetricAlpha = None):
-#        #Create return
-#        returnMetricsMatrix = []
-#        [returnMetricsMatrix.append(list()) for index in tempDiversityMetricAlpha]
-#
-#        #Get amount of metrics
-#        metricsCount = len(tempDiversityMetricAlpha)
-#
-#        #For each sample get all metrics
-#        #Place in list of lists
-#        #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-#        for sample in tempSampleNames:
-#            sampleAbundance = tempSampleAbundance[sample]
-#            for metricIndex in xrange(0,metricsCount):
-#                returnMetricsMatrix[metricIndex].append(self.getAlphaMetric(tempAbundancies = sampleAbundance, tempMetric = tempDiversityMetricAlpha[metricIndex]))
-#        return returnMetricsMatrix
-
 
     #Testing: Happy path Testing (8)
     #Returns the indices of the top numbers
@@ -333,17 +287,17 @@ class MicroPITA:
     #@params tempMatrix Structured array [("taxa label",numeric,numeric,numeric),...]
     #@params tempTaxa List of string which are the taxa labels
     #@return Structured array of just the given taxa
-    def reduceToTaxa(self, tempMatrix = None, tempTaxa = None):
-        #Validate parameters
-
-        #To indicate how to reduce rows
-        reduceIndex = []
-        for row in tempMatrix:
-            taxa = row[0]
-            reduceIndex.append(taxa in tempTaxa)
-
-        #Reduce
-        return np.compress(reduceIndex, tempMatrix, axis = 0)
+#    def reduceToTaxa(self, tempMatrix = None, tempTaxa = None):
+#        #Validate parameters
+#
+#        #To indicate how to reduce rows
+#        reduceIndex = []
+#        for row in tempMatrix:
+#            taxa = row[0]
+#            reduceIndex.append(taxa in tempTaxa)
+#
+#        #Reduce
+#        return np.compress(reduceIndex, tempMatrix, axis = 0)
 
     #Returns Rank Average of samples given abundancy in input taxa
     #Expects (Taxa (row) by Samples (column))

@@ -21,6 +21,7 @@ if(not Constants.COGENT_SRC in sys.path):
     sys.path.append(Constants.COGENT_SRC)
 if(not Constants.QIIME_SRC in sys.path):
     sys.path.append(Constants.QIIME_SRC)
+from ValidateData import ValidateData
 
 #External libraries
 from cogent.maths.stats.alpha_diversity import chao1_uncorrected, chao1_bias_corrected
@@ -248,6 +249,10 @@ class Diversity:
     #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
     @staticmethod
     def buildAlphaMetricsMatrix(tempSampleAbundance = None, tempSampleNames = None, tempDiversityMetricAlpha = None):
+
+        if not ValidateData.isValidList(tempDiversityMetricAlpha):
+            tempDiversityMetricAlpha = [tempDiversityMetricAlpha]
+
         #Create return
         returnMetricsMatrix = []
         [returnMetricsMatrix.append(list()) for index in tempDiversityMetricAlpha]

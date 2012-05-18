@@ -59,6 +59,9 @@ class Constants_Figures():
 
     c_SELECTED_SAMPLE = "#FF0000" #Indicates a sample that is selected
 
+    #General plotting
+    c_strGridLineColor = "#CCCCCC"
+
     #PCOA related
     c_charNoSelect = "#FFFFFF" # White
     c_charPCOAShape = "o"

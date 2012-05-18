@@ -69,7 +69,7 @@ class AbundanceTable:
       self._cDelimiter = cFileDelimiter
 
       #If contents is not a false then set contents to appropriate objects
-      if (not npaAbundance == None) and (not dictMetadata == None):
+      if (not npaAbundance == None) and dictMetadata:
         self._npaFeatureAbundance = npaAbundance
         self._dictTableMetadata = dictMetadata
         self._iOriginalFeatureCount = self._npaFeatureAbundance.shape[0]
@@ -136,8 +136,7 @@ class AbundanceTable:
             sIdElement = lsLineElements[0].strip()
             if sIdElement == sMetadataID:
                 namesRow = lsLineElements
-            else:
-                metadata[sIdElement]=lsLineElements[1:]
+            metadata[sIdElement]=lsLineElements[1:]
             if sIdElement == sLastMetadata:
                 iFirstDataRow = iIndex + 1
                 break
@@ -202,7 +201,7 @@ class AbundanceTable:
     #Returns the samples of the Abundance table
     #Returns an empty list on error or no underlying table
     def funcGetSampleNames(self):
-        if not self._npaFeatureAbundance == None:
+        if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.dtype.names[1:]
         else:
             return []
@@ -210,15 +209,32 @@ class AbundanceTable:
     #Returns the metadata name which links to the metadata used
     #as IDs (for instance Sample Ids)
     def funcGetIDMetadataName(self):
-        if not self._npaFeatureAbundance == None:
+        if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.dtype.names[0]
         else:
             return []
 
     #Returns a deep copy of the abundance data
     def funcGetAbundanceCopy(self):
-        if not self._npaFeatureAbundance == None:
+        if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.copy()
+        return None
+
+    #Returns a copy of the current abundance table with the abundance of just the given features
+    def funcGetFeatureAbundanceTable(self, lsFeatures):
+        if (not self._npaFeatureAbundance == None) and lsFeatures:
+            #Get a list of boolean indicators that the row is from the features list
+            lfFeatureData = [sRowID.strip() in lsFeatures for sRowID in self.funcGetFeatureNames()]
+
+            #compressed version as an Abundance table
+            abndTableRet = AbundanceTable(npaAbundance=np.compress(lfFeatureData, self._npaFeatureAbundance, axis = 0),
+                           dictMetadata = self.funcGetMetadataCopy(), strName = self.funcGetIDMetadataName(),
+                           fIsNormalized = self.funcIsNormalized(), fIsSummed = self.funcIsSummed(),
+                           cFileDelimiter = self.funcGetFileDelimiter(), cFeatureNameDelimiter= self.funcGetFeatureDelimiter())
+
+            #Make sure the features are all found
+            if ",".join(sorted(lsFeatures)) == ",".join(sorted(abndTableRet.funcGetFeatureNames())):
+                return abndTableRet
         return None
 
     #The delimiter of the feature names (concensus lineages)
@@ -227,20 +243,30 @@ class AbundanceTable:
 
     #Returns the current feature count
     def funcGetFeatureCount(self):
-        if not self._npaFeatureAbundance == None:
+        if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.shape[0]
         else:
             return 0
+
+    def funcGetFeatureNames(self):
+        if (not self._npaFeatureAbundance == None):
+            return self._npaFeatureAbundance[self.funcGetIDMetadataName()]
+        return []
 
     #The delimiter of the file the data was read from and which is also the
     #delimiter which would be used to write the data to a file
     def funcGetFileDelimiter(self):
         return self._cDelimiter
 
+    def funcGetSample(self,sSampleName):
+        if (not self._npaFeatureAbundance == None):
+            return self._npaFeatureAbundance[sSampleName].copy()
+        return []
+
     #Returns a specific list of metadata associated with the
     #metadata name (key) that is given
     def funcGetMetadata(self, strMetadataName):
-        if not self._dictTableMetadata == None:
+        if self._dictTableMetadata:
             retValue = self._dictTableMetadata.get(strMetadataName,None)
             if retValue:
                 retValue = copy.deepcopy(retValue)
@@ -249,7 +275,7 @@ class AbundanceTable:
 
     #Returns a deep copy of the metadata
     def funcGetMetadataCopy(self):
-        if not self._dictTableMetadata == None:
+        if self._dictTableMetadata:
             return copy.deepcopy(self._dictTableMetadata)
         return None
 
@@ -263,6 +289,14 @@ class AbundanceTable:
     #True indicates it is normalized
     def funcIsNormalized(self):
         return self._fIsNormalized
+
+    #True indicates the metadata exists and are of unique values
+    def funcIsPrimaryIdMetadata(self,sMetadataName):
+        lMetadata = self.funcGetMetadata(sMetadataName)
+        if not lMetadata:
+            return False
+        return (len(lMetadata) == len(set(lMetadata)))
+        
 
     #True indicates the clades are summed
     def funcIsSummed(self):
@@ -479,7 +513,7 @@ class AbundanceTable:
     def funcStratifyByMetadata(self,strMetadata,xWriteToFile=False):
         retlAbundanceTables = []
 
-        if (not self._npaFeatureAbundance == None) and (not self._dictTableMetadata == None):
+        if (not self._npaFeatureAbundance == None) and self._dictTableMetadata :
             dictAbundanceBlocks = dict()
             #Get unique metadata values to stratify by
             lsMetadata = self._dictTableMetadata.get(strMetadata,[])
@@ -502,7 +536,7 @@ class AbundanceTable:
             lsNames = self.funcGetSampleNames()
             #Get index of values to break up
             for value in setValues:
-                fDataIndex = [sData==value for sData in lsMetadata]
+                ffuncGetIDMetadataNameDataIndex = [sData==value for sData in lsMetadata]
                 #Get abundance data for the metadata value
                 #The true is added to keep the first column which should be the feature id
                 npaStratfiedAbundance = self._npaFeatureAbundance[[self.funcGetIDMetadataName()]+list(np.compress(fDataIndex,lsNames))]
@@ -530,6 +564,35 @@ class AbundanceTable:
                 retlAbundanceTables.append(objStratifiedAbundanceTable)
 
         return retlAbundanceTables
+
+    #Takes the given data values in one metadata and translates it to values in another
+    #metadata of the sample samples holding the values of the first metadata
+    #FPrimaryIds, if true the sMetadataFrom are checked for unique values,
+    #if the sMetadataFrom has any duplicates the function fails and return false
+    def funcTranslateIntoMetadata(self, lsValues, sMetadataFrom, sMetadataTo, fFromPrimaryIds=True):
+
+        #Get metadata
+        lFromMetadata = self.funcGetMetadata(sMetadataFrom)
+        if not lFromMetadata:
+                print "Abundancetable::funcTranlateIntoMetadata. Did not receive lFromMetadata."
+                return False
+
+        lToMetadata = self.funcGetMetadata(sMetadataTo)
+        if not lToMetadata:
+                print "Abundancetable::funcTranlateIntoMetadata. Did not receive lToMetadata."
+                return False
+
+        #Check to see if the values are unique if indicated to do so
+        if fFromPrimaryIds:
+            if not len(lFromMetadata) == len(set(lFromMetadata)):
+                print "Abundancetable::funcTranlateIntoMetadata. sMetadataFrom did not have unique values."
+                return False
+
+        #Translate over
+        if lFromMetadata and lToMetadata:
+            return [lToMetadata[iIndex] for iIndex in [lFromMetadata.index(value) for value in lsValues]]
+
+        return False
 
 
     #Returns a numpy array of the current Abundance Table.

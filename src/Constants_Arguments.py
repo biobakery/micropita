@@ -73,6 +73,10 @@ class Constants_Arguments():
     c_strLastMetadataName = "-m"
     c_strLastMetadataNameHelp = "The row in the abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
 
+    #metric The metric used for evaluation
+    c_strMetric = "-metric"
+    c_strMetricHelp = "The metric used for measurement."
+
     #n Name of the sample id row
     c_strIDName = "-n"
     c_strIDNameHelp = "The row in the abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
@@ -81,17 +85,21 @@ class Constants_Arguments():
     c_strRingOrder = "-o"
     c_StrRingOrderHelp = "The order to use for the cladogram rings from inner ring to outer ring." 
 
-    #ofe
+    #ofe Occurence filtering minimum sequence count
     c_strOccurenceFilterSequenceCount = "-ofe"
     c_strOccurenceFilterSequenceHelp = "The minimum sequence count of a feature to be kept in occurence filtering. (A positive value activates the filter)."
 
-    #ofa
+    #ofa Occurence filtering minimum sample count
     c_strOccurenceFilterSampleCount = "-ofa"
     c_strOccurenceFilterSampleHelp = "The minimum sample the c_strOccurenceFilterSequenceCount must occur in for a feature to be kept."
 
     #p Predict file path
     c_strPredictFilePath = "-p"
     c_strPredictFilePathHelp = "Predict file path used to plot prediction if supervised methods occured."
+
+    #pair Pairing metadata
+    c_strPairingMetadata = "-pair"
+    c_strPairingMetadataHelp = "Metadata used to pair samples."
 
     #pltSel PLot the selected methods (used for teh collection curve figure because I need two nargs=* and
     #so need flags for this argument. Is the same as c_strSelectionTechniques
@@ -108,9 +116,9 @@ class Constants_Arguments():
 
     #s Supervised Label
     c_strSupervisedLabel = "-s"
-    c_strSupervisedLabelCountHelp = "The name of the phenotype data row on which to perform supervised methods"
+    c_strSupervisedLabelHelp = "The name of the phenotype data row on which to perform supervised methods"
 
-    #-sd SUm data
+    #-sd Sum data
     c_strSumDataArgument = "-sd"
     c_strSumDataHelp = "The analysis/plotting should be performed on data with clades which are summed. If data is not provided this way, summation will occur before analysis and plotting as needed."
 
@@ -125,6 +133,23 @@ class Constants_Arguments():
     #u Unsupervised stratify metadata
     c_strUnsupervisedStratifyMetadata = "-u"
     c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
+
+    #vin flag indicating the original file is normalized as read in
+    c_strValidationIsNormalizedArgument = "-vin"
+    c_strValidationIsNormalizedHelp = "Indicates if the validation file is normalized when read in (True indicates normalized)."
+
+    #vis flag indicating the original file is summed as read in
+    c_strValidationIsSummedArgument = "-vis"
+    c_strValidationIsSummedHelp = "Indicates if the validation file is summed when read in (True indicates summed)."
+
+    #vm The name of the last metadata in the validation data set (when you need both)
+    c_strValidationLastMetadataName = "-vm"
+    c_strValidationLastMetadataNameHelp = "The row in the validation abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
+
+    #vn Name of the sample id row in the validation data set (when you need both)
+    c_strValidationIDName = "-vn"
+    c_strValidationIDNameHelp = "The row in the validation abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
+
 
     #Data key to indicate which insilico data set to generate
     c_dataSetKeyHelp = "Key to indicate which data set to generate. Valid values are Diversity, Unbalanced."
@@ -155,6 +180,8 @@ class Constants_Arguments():
     c_strMicropitaSelectFileHelp = "A file containing the samples selected which will be visualized."
     c_strSelectionMethodsHelp = "Select techniques listed one after another."
     c_strOutputFileHelp = "A file to write the output."
+    c_strValidationAbundanceFileHelp = "Abundance table wit which to validate the selection"
+    c_strSelectionAbundanceFileHelp = "Abundance table where the selection, which is being validated, occured."
 
     ####################################
     #Arg choices

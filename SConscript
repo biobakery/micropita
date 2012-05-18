@@ -8,6 +8,7 @@ Import( "*" )
 #TODO make this dynamic
 sys.path.append("/home/ttickle/Desktop/ttickle/sfle/input/micropita/src")
 from Constants_Arguments import Constants_Arguments
+#from MicroPITA import MicroPITA
 
 pE = DefaultEnvironment( )
 
@@ -57,7 +58,12 @@ c_strSufStratHCLUSTFig = "-StratHCL.pdf"
 c_strSufStratHCLUSTLabel = "-Strat.HCLLabel"
 c_strSufStratPCOA = "-StratPCoA.pdf"
 c_strSufUncheckedTable = c_strSufTable
-c_strValidatedDiversity = "-ValidatedDiversity.pdf"
+c_strSufValidatedDiversity = "-ValidatedMaxDiv.pdf"
+c_strSufValidatedFeature = "-ValidatedFeature.pdf"
+c_strSufValidatedExtreme = "-ValidatedMaxDis.pdf"
+c_strSufValidatedRepresentative = "-ValidatedMaxRep.pdf"
+c_strSufValidatedDistinct = "-ValidatedDistinct.pdf"
+c_strSufValidatedDiscriminant = "-ValidatedDisrciminant.pdf"
 
 #Dict keys
 c_strSelectionFiles = "SelectionFiles"
@@ -67,6 +73,16 @@ c_strConfigFileHeaderChar = "["
 c_strConfigFileCommentChar = "#"
 c_strExtDelim = "."
 c_strPathDelim = "/"
+
+#Metrics
+c_DIVERSITY = "Diversity"
+c_TARGETED_TAXA = "Taxa_Defined"
+c_EXTREME = "Extreme"
+c_EXTREME_DISSIMILARITY_1 = "ExtremeB"
+c_REPRESENTATIVE = "Representative"
+c_REPRESENTATIVE_DISSIMILARITY_1 = "Representative_B"
+c_DISCRIMINANT = "Discriminant"
+c_DISTINCT = "Distinct"
 
 #Directories
 strOutputSummaryFolder = "".join([c_strPathDelim,"Metasummary"])
@@ -111,6 +127,7 @@ c_strOccurenceFilterMinSequence = "[Occurence Filter Minimum Sequence]"
 c_strOccurenceFilterMinSample = "[Occurence Filter Minimum Sample]"
 c_strConfigPlotCombinedSelectionTechniques = "[Unsupervised Selection Methods to plot in a combined graph]"
 c_strConfigPlotCombinedSupervisedSelectionTechniques = "[Supervised Selection Methods to plot in a combined graph]"
+c_strConfigPairingMetadata = "[Pairing Metadata]"
 c_strConfigRoot = "[Root]"
 c_strConfigSampleRow = "[Sample ID Name]"
 c_strConfigSelection = "[Selection]"
@@ -122,12 +139,12 @@ c_strConfigSupervisedLabel = "[Supervised Label]"
 c_strConfigSupervisedCount = "[Supervised Selection Count]"
 c_strConfigUnsupervisedCount = "[Unsupervised Selection Count]"
 c_strConfigUnsupervisedStratify = "[Stratify by Metadata]"
-c_strValidationFile = "[Validation Input File]"
-c_strValidationIsNormalized = "[Validation File is Already Normalized]"
-c_strValidationIsSummed = "[Validation File is Already Summed]"
-c_strValidationIDName = "[Validation Sample ID Name]"
-c_strValidationLastMetadataName = "[Validation Last Metadata Name]"
-c_strValidationMethodologies = "[Validation Selection Techniques]"
+c_strConfigValidationFile = "[Validation Input File]"
+c_strConfigValidationIsNormalized = "[Validation File is Already Normalized]"
+c_strConfigValidationIsSummed = "[Validation File is Already Summed]"
+c_strConfigValidationIDName = "[Validation Sample ID Name]"
+c_strConfigValidationLastMetadataName = "[Validation Last Metadata Name]"
+c_strConfigValidationMethodologies = "[Validation Selection Techniques]"
 
 #Cladogram style file for micropita
 c_fileCladogramStyleFile = File(sfle.d( fileDirInput, c_strPathDelim.join([strDataFolder,"microPITA"])+c_strSufCircStyle ))
@@ -162,6 +179,8 @@ c_fileProgSVM = File( sfle.d( fileDirSrc, "SVM.py" ) )
 c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSets.py" ) )
 c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
 c_fileProgValidateDiversity = File( sfle.d( fileDirSrc, "MicropitaPaperValidateDiversity.py" ))
+c_fileProgValidateFeature = File( sfle.d( fileDirSrc, "MicropitaPaperValidateFeatureAbundance.py" ))
+c_fileProgValidatePCoA = File( sfle.d( fileDirSrc, "MicropitaPaperValidatePCoA.py" ))
 
 #Lists of sources needed for different python scripts that are ran so that they can be used as libraries
 c_filesSecondarySrc = [c_fileProgAbundanceTable, c_fileProgCommandLine, c_fileProgConstants, c_fileProgDiversity,
@@ -209,10 +228,12 @@ def funcVisualizeInsilicoData( strXStart, strYStart ):
   return funcVisualizeInsilicoDataRet
 
 #Check abundance table data
-def funcCheckAbundanceData( target,source,env ):
-  strT, astrSs, = sfle.ts( target, source )
-  strProg, strInputDataFile = astrSs[0], astrSs[1]
-  return sfle.ex([strProg, strInputDataFile, strT])
+def funcCheckAbundanceData( sLogging, sMetadataName ):
+  def funcCheckAbundanceDataRet( target, source, env, sLogging=sLogging, sMetadataName=sMetadataName ):
+    strT, astrSs, = sfle.ts( target, source )
+    strProg, strInputDataFile = astrSs[0], astrSs[1]
+    return sfle.ex([strProg, sLogging, sMetadataName, strInputDataFile, strT])
+  return funcCheckAbundanceDataRet
 
 ##Call micropita to run
 def funcMicroPita( strLoggingLevel, iUnsupervisedCount, sIDName, sLastMetadata, iSupervisedCount, strSupervisedLabel, 
@@ -348,19 +369,44 @@ def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strLastMetada
   return funcCollectionCurveRet
 
 #Validation steps
-def funcMeasureDiversityByGroup( strLoggingLevel, strSampleNameRow, strLastMetadataName, strInvert, fNormalized, fSummed):
+#ValidateDiversity
+def funcMeasureDiversityByGroup( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
+                                 strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair):
   def funcMeasureDiversityByGroupRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
-                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed):
+                                      strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
+                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair):
     strFigureT, astrSs = sfle.ts( target, source )
-    strProg, strAbundance, strSelectionFile = astrSs[0], astrSs[1], astrSs[2]
-    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strInvert, fNormalized,
-                    fSummed, strAbundance, strSelectionFile, strFigureT])
-
+    strProg, strValidationAbundance, strAbundance, strSelectionFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, strValidationAbundance, strAbundance, strSelectionFile, strFigureT])
   return funcMeasureDiversityByGroupRet
 
-#def funcMeasureFeatureAbundance()
+#ValidateFeature
+def funcMeasureFeatureByGroup( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
+                               strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair):
+  def funcMeasureFeatureByGroupRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
+                                      strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
+                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair):
+    strFigureT, astrSs = sfle.ts( target, source )
+    strProg, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3], astrSs[4]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile, strFigureT])
+  return funcMeasureFeatureByGroupRet
 
-#def funcPlotSamplesInDataSet()
+#Validate Extreme, Representative
+def funcValidateInPCoA( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
+                        strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel):
+  def funcValidateInPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
+                                      strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
+                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair, sMetric=sMetric, sStratLabel=sStratLabel):
+    strFigureT, astrSs = sfle.ts( target, source )
+    strProg, strValidationAbundance, strAbundance, strSelectionFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel, strValidationAbundance, strAbundance, strSelectionFile, strFigureT])
+  return funcValidateInPCoARet
 
 ###################################### General methods
 #Make movies from a list of images
@@ -531,10 +577,12 @@ for fileConfigMicropita in lMicropitaFiles:
   fileCheckedValidationFile = None
 
   #Check the validation file
-  if(not c_strValidationFile.lower() == "none"):
-    fileValidationFile = File(sfle.d(fileDirInput.get_abspath(),sFileConfiguration[c_strValidationFile]))
-    fileCheckedValidationFile = File(sfle.d(fileDirInput.get_abspath(),sfle.rebase(sFileConfiguration[c_strValidationFile], c_strSufUncheckedTable, c_strSufCheckedTable)))
-    Command(fileCheckedValidationFile,[c_fileProgCheckFile, fileValidationFile], funcCheckAbundanceData)
+  if(not c_strConfigValidationFile.lower() == "none"):
+    fileValidationFile = File(sfle.d(fileDirInput.get_abspath(),sFileConfiguration[c_strConfigValidationFile]))
+    fileCheckedValidationFile = File(sfle.d(fileDirDataName,sfle.rebase(sFileConfiguration[c_strConfigValidationFile], c_strSufUncheckedTable, c_strSufCheckedTable)))
+    Command(fileCheckedValidationFile,[c_fileProgCheckFile, fileValidationFile], 
+            funcCheckAbundanceData( " ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                    " ".join([Constants_Arguments.c_strLastMetadataName, sFileConfiguration[c_strConfigValidationLastMetadataName]])))
 
   #Loop through the count selection using the unsupervised counts length for indexing
   for iCountIndex in xrange(0,len(lsIndexCounts)):
@@ -734,19 +782,110 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                    lsPlotCombinedSelectionMethods+lsPlotCombinedSupervisedSelectionMethods))
 
     #Validate data
-    #Validate diversity
+    #Validate diversityfuncMeasureDiversityByGroup
     if fileCheckedValidationFile:
-      print "****", File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strValidatedDiversity)]) )),
-      print c_fileProgValidateDiversity, fileCheckedValidationFile, sMicropitaOutput
+      if c_DIVERSITY in lsSelectionMethods:
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiversity)]) )),
+              [c_fileProgValidateDiversity, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+              funcMeasureDiversityByGroup(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]])))
 
-#      Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strValidatedDiversity)]) )),
-#          [c_fileProgValidateDiversity,fileCheckedValidationFile,sMicropitaOutput],
-#          funcMeasureDiversityByGroup(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
-#                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
-#                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
-#                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
-#                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
-#                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]])))
+      if c_TARGETED_TAXA in lsSelectionMethods:
+        #Validate Feature
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedFeature)]) )),
+              [c_fileProgValidateFeature, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput, cCladogramSelectedTaxa],
+              funcMeasureFeatureByGroup(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]])))
+
+      if c_EXTREME in lsSelectionMethods:
+        #Validate Extreme selection
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedExtreme)]) )),
+              [c_fileProgValidatePCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]]),
+                                      " ".join([Constants_Arguments.c_strMetric,c_EXTREME_DISSIMILARITY_1]),
+                                      " ".join([Constants_Arguments.c_strSupervisedLabel,"None"])))
+
+      if c_REPRESENTATIVE in lsSelectionMethods:
+        #Validate Representative selection
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedRepresentative)]) )),
+              [c_fileProgValidatePCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]]),
+                                      " ".join([Constants_Arguments.c_strMetric,c_REPRESENTATIVE_DISSIMILARITY_1]),
+                                      " ".join([Constants_Arguments.c_strSupervisedLabel,"None"])))
+
+      if c_DISTINCT in lsSelectionMethods:
+        #Validate Distinct selection
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDistinct)]) )),
+              [c_fileProgValidatePCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]]),
+                                      " ".join([Constants_Arguments.c_strMetric,c_DISTINCT]),
+                                      " ".join([Constants_Arguments.c_strSupervisedLabel,sFileConfiguration[c_strConfigSupervisedLabel]])))
+
+      if c_DISCRIMINANT in lsSelectionMethods:
+        #Validate Discriminant selection
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiscriminant)]) )),
+              [c_fileProgValidatePCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDName,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataName,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDName,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataName,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadata,sFileConfiguration[c_strConfigPairingMetadata]]),
+                                      " ".join([Constants_Arguments.c_strMetric,c_DISCRIMINANT]),
+                                      " ".join([Constants_Arguments.c_strSupervisedLabel,sFileConfiguration[c_strConfigSupervisedLabel]])))
 
     #Add input files to be later summarized in the metaplots
     #Create key combining abundance file and stratification status
