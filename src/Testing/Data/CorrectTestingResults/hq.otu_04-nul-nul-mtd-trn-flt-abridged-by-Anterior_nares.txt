@@ -1,0 +1,7 @@
+"TID"	700037478
+"STSite"	"Anterior_nares"
+"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"	0
+"Bacteria|unclassified|4904"	0
+"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"	0
+"Bacteria|3417"	0
+"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"	0

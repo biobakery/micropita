@@ -1,0 +1,7 @@
+"TID"	700098986	700037474	700037478	700098980
+"STSite"	"L_Antecubital_fossa"	"L_Antecubital_fossa"	"Anterior_nares"	"Subgingival_plaque"
+"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"	1	2	0	12
+"Bacteria|unclassified|4904"	0	0	0	43
+"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"	3	1	0	29
+"Bacteria|3417"	0	0	0	34
+"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"	5	1	0	2
