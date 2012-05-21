@@ -78,8 +78,8 @@ def _main( ):
     c_fCheckFile = False
     c_NotSelected = Constants_Figures.c_strPCOANotSelected
 
-    c_fInvert = (args.fInvert == "True")
-    c_Normalize = (args.fNormalize == "True")
+    c_fInvert = (args.fInvert.lower() == "true")
+    c_Normalize = (args.fNormalize.lower() == "true")
 
     #Is summed and normalized
     fIsSummed = (args.fIsSummed.lower() == "true")

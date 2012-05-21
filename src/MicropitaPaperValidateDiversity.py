@@ -58,9 +58,6 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 def _main( ):
     args = argp.parse_args( )
 
-    print("args")
-    print(args)
-
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
@@ -83,17 +80,23 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     #Validation table
-    totalData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
+    abndValidationData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
                                             fIsSummed=fValidationIsSummed, sMetadataID=args.sValidationIDName, sLastMetadata=args.sValidationLastMetadataName)
-    totalData.funcNormalize()
+    if not fValidationIsSummed:
+        abndValidationData.funcSumClades()
+    if not fValidationIsNormalized:
+        abndValidationData.funcNormalize()
 
     #Selection table
     abndSelectionTable = AbundanceTable.makeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
-    abndSelectionTable.funcNormalize()
+    if not fIsSummed:
+        abndSelectionTable.funcSumClades()
+    if not fIsNormalized:
+        abndSelectionTable.funcNormalize()
 
     #Get sample names as a set
-    setsSampleNames = set(totalData.funcGetSampleNames())
+    setsValidationMetadata = set(abndValidationData.funcGetMetadata(abndValidationData.funcGetIDMetadataName()))
 
     #Read in selection file
     dictAllSelectionStudies = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
@@ -109,10 +112,10 @@ def _main( ):
             setsDiversitySelection = set(dictAllSelectionStudies[sMethod])
 
             #Make sure the selection is in this data and there is other data to compare to
-            if len(setsDiversitySelection) < len(setsSampleNames):
+            if len(setsDiversitySelection) < len(setsValidationMetadata):
 
                 #Check to make sure the paired key is primary in both tables
-                if (not abndSelectionTable.funcIsPrimaryIdMetadata(args.sPairedMetadata)) or (not totalData.funcIsPrimaryIdMetadata(args.sPairedMetadata)):
+                if (not abndSelectionTable.funcIsPrimaryIdMetadata(args.sPairedMetadata)) or (not abndValidationData.funcIsPrimaryIdMetadata(args.sPairedMetadata)):
                     logging.error("".join(["MicropitaPaperValidateDiversity:: tried to validate on a none unique key:",args.sPairedMetadata]))
                     return False
 
@@ -124,8 +127,8 @@ def _main( ):
                     return False
 
                 #In the validation file go from the paired value to the sampleID
-                lsSelectedInValidation = totalData.funcTranslateIntoMetadata(lsValues=lsPairedSelected, sMetadataFrom=args.sPairedMetadata,
-                                                             sMetadataTo=totalData.funcGetIDMetadataName(), fFromPrimaryIds=True)
+                lsSelectedInValidation = abndValidationData.funcTranslateIntoMetadata(lsValues=lsPairedSelected, sMetadataFrom=args.sPairedMetadata,
+                                                             sMetadataTo=abndValidationData.funcGetIDMetadataName(), fFromPrimaryIds=True)
 
                 if not lsSelectedInValidation:
                     logging.error("MicropitaPaperValidateDiversity:: Did not recieve lsSelectedInValidation.")
@@ -161,8 +164,8 @@ def _main( ):
 
                     #Create selected and not selected groupings
                     #Measure diversity of selected and not selected groupings
-                    ldSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = totalData.funcGetAbundanceCopy(), tempSampleNames = lsSelectedInValidation, tempDiversityMetricAlpha = sMetric)
-                    ldNotSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = totalData.funcGetAbundanceCopy(), tempSampleNames = setsSampleNames-set(lsSelectedInValidation), tempDiversityMetricAlpha = sMetric)
+                    ldSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = lsSelectedInValidation, tempDiversityMetricAlpha = sMetric)
+                    ldNotSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = (setsValidationMetadata-set(lsSelectedInValidation)), tempDiversityMetricAlpha = sMetric)
 
                     #Make box plot
                     bp = plt.boxplot(x=[ldSelectedDiversity[0],ldNotSelectedDiversity[0]], notch=1, patch_artist=True)

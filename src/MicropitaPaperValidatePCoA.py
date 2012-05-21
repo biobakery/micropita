@@ -61,9 +61,6 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 def _main( ):
     args = argp.parse_args( )
 
-    print("args")
-    print(args)
-
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
@@ -97,59 +94,64 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     #Validation table
-    totalData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
+    abndValidationData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
                                             fIsSummed=fValidationIsSummed, sMetadataID=args.sValidationIDName, sLastMetadata=args.sValidationLastMetadataName)
-    totalData.funcNormalize()
+    if not fValidationIsSummed:
+        abndValidationData.funcSumClades()
+    if not fValidationIsNormalized:
+        abndValidationData.funcNormalize()
 
     #Selection table
     abndSelectionTable = AbundanceTable.makeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
-    abndSelectionTable.funcNormalize()
+    if not fIsSummed:
+        abndSelectionTable.funcSumClades()
+    if not fIsNormalized:
+        abndSelectionTable.funcNormalize()
 
     #Get sample names as a set
-    setsSampleNames = set(totalData.funcGetSampleNames())
+    setsSampleNames = set(abndValidationData.funcGetSampleNames())
 
     #Read in selection file
     dictAllSelectionStudies = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
 
     #Get a set of sample names from the validation set
-    setValidationSampleIds = set(totalData.funcGetSampleNames())
+    setValidationSampleIds = set(abndValidationData.funcGetSampleNames())
 
     #For each diversity methodology in the selection
     for sMethod in dictAllSelectionStudies.keys():
         if sMethod == args.sMetric:
 
             #Get the selection
-            setsDiversitySelection = set(dictAllSelectionStudies[sMethod])
+            setsMetricSelection = set(dictAllSelectionStudies[sMethod])
 
             #Make sure the selection is in this data and there is other data to compare to
-            if len(setsDiversitySelection) < len(setsSampleNames):
+            if len(setsMetricSelection) < len(setsSampleNames):
 
                 #Check to make sure the paired key is primary in both tables
-                if (not abndSelectionTable.funcIsPrimaryIdMetadata(args.sPairedMetadata)) or (not totalData.funcIsPrimaryIdMetadata(args.sPairedMetadata)):
+                if (not abndSelectionTable.funcIsPrimaryIdMetadata(args.sPairedMetadata)) or (not abndValidationData.funcIsPrimaryIdMetadata(args.sPairedMetadata)):
                     logging.error("".join(["MicropitaPaperValidatePCoA:: tried to validate on a none unique key:",args.sPairedMetadata]))
                     return False
 
                 #In the selection file go from the sampleID to the paired value
-                lsPairedSelected = abndSelectionTable.funcTranslateIntoMetadata(lsValues=setsDiversitySelection, sMetadataFrom=abndSelectionTable.funcGetIDMetadataName(),
+                lsPairedSelected = abndSelectionTable.funcTranslateIntoMetadata(lsValues=setsMetricSelection, sMetadataFrom=abndSelectionTable.funcGetIDMetadataName(),
                                                              sMetadataTo=args.sPairedMetadata, fFromPrimaryIds=True)
                 if not lsPairedSelected:
                     logging.error("MicropitaPaperValidatePCoA:: Did not recieve lsPairedSelected.")
                     return False
 
                 #In the validation file go from the paired value to the sampleID
-                lsSelectedInValidation = totalData.funcTranslateIntoMetadata(lsValues=lsPairedSelected, sMetadataFrom=args.sPairedMetadata,
-                                                             sMetadataTo=totalData.funcGetIDMetadataName(), fFromPrimaryIds=True)
-
+                lsSelectedInValidation = abndValidationData.funcTranslateIntoMetadata(lsValues=lsPairedSelected, sMetadataFrom=args.sPairedMetadata,
+                                                             sMetadataTo=abndValidationData.funcGetIDMetadataName(), fFromPrimaryIds=True)
                 if not lsSelectedInValidation:
                     logging.error("MicropitaPaperValidatePCoA:: Did not recieve lsSelectedInValidation.")
                     return False
 
-                if len(lsSelectedInValidation) == len(setsDiversitySelection):
+                if len(lsSelectedInValidation) == len(setsMetricSelection):
 
                     #Generate PCoA
                     #LoadData
-                    analysis.loadData(xData=totalData, fIsRawData=True)
+                    analysis.loadData(xData=abndValidationData, fIsRawData=True)
                     #Make distance matrix
                     pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
 
@@ -165,7 +167,7 @@ def _main( ):
                     charSelectedColor = objColors.dictConvertMethodToHEXColor[sMethod]
 
                     #Generate colors
-                    for strSample in setsSampleNames:
+                    for strSample in abndValidationData.funcGetMetadata(abndValidationData.funcGetIDMetadataName()):
                         if(strSample in lsSelectedInValidation):
                             acharColors.append(charSelectedColor)
                             acharSelection.append(sMethod)
@@ -175,7 +177,7 @@ def _main( ):
 
                     #If given a valid label, stratify otherwise normal PCoA
                     if args.sStratifyMetadata:
-                        lsStratify = totalData.funcGetMetadata(args.sStratifyMetadata)
+                        lsStratify = abndValidationData.funcGetMetadata(args.sStratifyMetadata)
                         if lsStratify:
                             #Stratified PCoA
                             analysis.plotList(lsLabelList=lsStratify,
