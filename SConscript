@@ -28,6 +28,7 @@ c_strCladogramMovieEnding = "/Cladogram.avi"
 c_strSufActualData = "-actual.txt"
 c_strSufCircCircle = ".CCircle"
 c_strSufCircColor = ".CColor"
+c_strSufCircDetail = ".CDetail"
 c_strSufCircHighlight = ".CHLight"
 c_strSufCircSize = ".CSize"
 c_strSufCircStyle = ".CStyle"
@@ -47,6 +48,9 @@ c_strSufHCLUSTData = ".HCLData"
 c_strSufHCLUSTFig = "-SHCL.pdf"
 c_strSufHCLUSTLabel = ".HCLLabel"
 c_strSufInsilicoData = c_strSufTable
+c_strSufMetaMatrix = ".meta"
+c_sufMetaConfusionMatrix = "-metaConfusion.pdf"
+c_sufMetaOverlapMatrix = "-metaOverlap.pdf"
 c_strSufMicropita = ".txt"
 c_strSufOverlapMatrix = "-overlap.pdf"
 c_strSufPCOA = "-PCoA.pdf"
@@ -73,12 +77,13 @@ c_strConfigFileHeaderChar = "["
 c_strConfigFileCommentChar = "#"
 c_strExtDelim = "."
 c_strPathDelim = "/"
+c_strComma = ","
 
 #Metrics
 c_DIVERSITY = "Diversity"
 c_TARGETED_TAXA = "Taxa_Defined"
 c_EXTREME = "Extreme"
-c_EXTREME_DISSIMILARITY_1 = "ExtremeB"
+c_EXTREME_DISSIMILARITY_1 = "Extreme_B"
 c_REPRESENTATIVE = "Representative"
 c_REPRESENTATIVE_DISSIMILARITY_1 = "Representative_B"
 c_DISCRIMINANT = "Discriminant"
@@ -128,6 +133,7 @@ c_strOccurenceFilterMinSample = "[Occurence Filter Minimum Sample]"
 c_strConfigPlotCombinedSelectionTechniques = "[Unsupervised Selection Methods to plot in a combined graph]"
 c_strConfigPlotCombinedSupervisedSelectionTechniques = "[Supervised Selection Methods to plot in a combined graph]"
 c_strConfigPairingMetadata = "[Pairing Metadata]"
+c_strConfigProjects = "[Projects]"
 c_strConfigRoot = "[Root]"
 c_strConfigSampleRow = "[Sample ID Name]"
 c_strConfigSelection = "[Selection]"
@@ -150,7 +156,7 @@ c_strConfigValidationMethodologies = "[Validation Selection Techniques]"
 c_fileCladogramStyleFile = File(sfle.d( fileDirInput, c_strPathDelim.join([strDataFolder,"microPITA"])+c_strSufCircStyle ))
 
 #External programs
-c_progHCLPath = "./external/hclust/hclust.py"
+#c_progHCLPath = "./external/hclust/hclust.py"
 c_progHCL = "../../external/hclust/hclust.py"
 
 #Src Code
@@ -166,6 +172,8 @@ c_fileProgConstants = File( sfle.d( fileDirSrc, "Constants.py" ) )
 c_fileProgConstantsFigures = File( sfle.d( fileDirSrc, "Constants_Figures.py" ) )
 c_fileProgDiversity = File( sfle.d( fileDirSrc, "Diversity.py" ) )
 c_fileProgMencoder = File("/usr/bin/mencoder")
+c_fileProgConfusionMatrixMetaFigure = File( sfle.d( fileDirSrc, "MicropitaPaperConfusionMetaMatrix.py" ) )
+c_fileProgOverlapMatrixMetaFigure = File( sfle.d( fileDirSrc, "MicropitaPaperOverlapMetaMatrix.py" ) )
 c_fileProgMicroPITA = File( sfle.d( fileDirSrc, "MicroPITA.py" ) )
 c_fileProgMLPYDistanceAdaptor = File( sfle.d( fileDirSrc, "MLPYDistanceAdaptor.py" ) )
 c_fileProgOverlapMatrixFigure = File( sfle.d( fileDirSrc, "MicropitaPaperOverlapMatrix.py" ) )
@@ -272,13 +280,13 @@ def funcCombinedPCoASelectionMethods( strLoggingLevel, sIDName, sLastMetadata, i
   return funcCombinedPCoARet
 
 #Visualize selected output with HCL (Figure 1B)
-def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
-  def funcHCLSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
-    strT, astrSs = sfle.ts( target, source )
-    strProg, strSelection = astrSs[0], astrSs[1]
-    strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
-    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, c_progHCLPath, strData, strColor, strLabel, strT])
-  return funcHCLSelectionRet
+#def funcHCLSelectionMethods( strLoggingLevel, strInvert ):
+#  def funcHCLSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert ):
+#    strT, astrSs = sfle.ts( target, source )
+#    strProg, strSelection = astrSs[0], astrSs[1]
+#    strData, strColor, strLabel = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath()
+#    return sfle.ex([strProg, strLoggingLevel, strInvert, strSelection, c_progHCLPath, strData, strColor, strLabel, strT])
+#  return funcHCLSelectionRet
 
 #Visualize selected output with Confusion matrix (Figure 1B Alt 1)
 def funcConfusionMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
@@ -308,9 +316,9 @@ def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHigh
                                  strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample, fSumData=fSumData):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
-    strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath()
+    strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strDetailFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath(), target[7].get_abspath()
     return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, sIDName, sLastMetadata, iNormalize, strInvert, fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT])
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT, strDetailFile])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -408,6 +416,21 @@ def funcValidateInPCoA( strLoggingLevel, strSampleNameRow, strLastMetadataName, 
                     fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel, strValidationAbundance, strAbundance, strSelectionFile, strFigureT])
   return funcValidateInPCoARet
 
+#Meta matrix creation
+def funcOverlapMetaMatrix( strLoggingLevel, strInvert, sSelectionMethods ):
+  def funcOverlapMetaMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, sSelectionMethods=sSelectionMethods ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, lsSelectionFiles = astrSs[0], astrSs[1:]
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strT, sSelectionMethods]+lsSelectionFiles)
+  return funcOverlapMetaMatrixRet
+
+def funcConfusionMetaMatrix( strLoggingLevel, strInvert, sSelectionMethods ):
+  def funcConfusionMetaMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, sSelectionMethods=sSelectionMethods ):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strActualFile, lsSelectionFiles = astrSs[0], astrSs[1], astrSs[2:]
+    return sfle.ex([strProg, strLoggingLevel, strInvert, strActualFile, strT, sSelectionMethods]+lsSelectionFiles)
+  return funcConfusionMetaMatrixRet
+
 ###################################### General methods
 #Make movies from a list of images
 def funcMakeMovie( lsImageFiles ):
@@ -471,7 +494,8 @@ def funcReadConfigFile( strConfigFile ):
 #Generate insilico data sets
 #Remember when creating insilico data sets, the Unbalanced test set's labels are off given built in randomness.
 #When you remake this data set you will have to adjust the labels
-lDataFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufInsilicoData)
+#lDataFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufInsilicoData)
+lDataFiles = Glob( sfle.d( fileDirInput, "".join(["*",c_strSufInsilicoData]) ) )
 lsInsilicoDataFiles = []
 
 if c_fGenerateInSilicoDataSets:
@@ -489,7 +513,8 @@ if c_fGenerateInSilicoDataSets:
         Command(File( sfle.d( fileDirInput,sfle.rebase(strInsilicoData,c_strSufInsilicoData,c_strSufHCLUSTFig) )),[c_progHCL,File( sfle.d( fileDirInput,strInsilicoData ))],funcVisualizeInsilicoData(strXStart="1", strYStart="3"))
 
 #Get micropita config files
-lMicropitaFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufConfig)
+#lMicropitaFiles = globFilesByExtension(strDirectory=fileDirInput,strExtension=c_strSufConfig)
+lMicropitaFiles = Glob( sfle.d( fileDirInput, "".join(["*",c_strSufConfig]) ) )
 
 #Collect input files later used for multistudy summary graphics
 #{"InputFile:[SelectionFile1],[SelectionFile2],[SelectionFile3]...]}
@@ -511,7 +536,7 @@ for fileConfigMicropita in lMicropitaFiles:
     sSupervisedCounts = sFileConfiguration[c_strConfigSupervisedCount]
     sFileConfiguration[c_strConfigSupervisedCount] = filter(None,re.split(",",sSupervisedCounts))
 
-  #Parse the unsupervised runs selection into multiple runs if needed
+  #Parse the unsupervised runs selection into multipley runs if needed
   if(c_strConfigUnsupervisedCount in sFileConfiguration):
     sSupervisedCounts = sFileConfiguration[c_strConfigUnsupervisedCount]
     sFileConfiguration[c_strConfigUnsupervisedCount] = filter(None,re.split(",",sSupervisedCounts))
@@ -577,7 +602,7 @@ for fileConfigMicropita in lMicropitaFiles:
   fileCheckedValidationFile = None
 
   #Check the validation file
-  if(not c_strConfigValidationFile.lower() == "none"):
+  if(not sFileConfiguration[c_strConfigValidationFile].lower() == "none"):
     fileValidationFile = File(sfle.d(fileDirInput.get_abspath(),sFileConfiguration[c_strConfigValidationFile]))
     fileCheckedValidationFile = File(sfle.d(fileDirDataName,sfle.rebase(sFileConfiguration[c_strConfigValidationFile], c_strSufUncheckedTable, c_strSufCheckedTable)))
     Command(fileCheckedValidationFile,[c_fileProgCheckFile, fileValidationFile], 
@@ -605,12 +630,16 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Make file names from the input micropita file in the temp directory
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufTable, c_strSufPredict )))
+    print "sMicropitaPredictFile", sMicropitaPredictFile
+    print "sCheckedAbundanceFile", sCheckedAbundanceFile
+    print "c_strSufTable", c_strSufTable
+    print "c_strSufPredict", c_strSufPredict
 
     #Make files names from the micropita output file
     sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
-    sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile =  [File(sfle.d( sOutputDir,
+    sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile, sCladogramDetailFile =  [File(sfle.d( sOutputDir,
     sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufConfusionMatrix,c_strSufOverlapMatrix,c_strSufHCLUSTData,c_strSufHCLUSTColor,
-    c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle)]
+    c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle, c_strSufCircDetail)]
 
     #Make more file names, these for cladogram options
     cCladogramSelectedTaxa = None
@@ -683,8 +712,8 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Create figure 1B HCL
     #Selection of samples by selection method
-    Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
-        funcHCLSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
+#    Command([sOutputFigure1BHCL,sHCLSelectData, sHCLSelectColor, sHCLSelectLabel], [c_fileProgSelectionHCLFigure, sMicropitaOutput] + ls_srcFig1, 
+#        funcHCLSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]), " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage])))
 
     #Create alt figure 1B overlapp matrix
     Command(sOutputFigure1BOverlap, [c_fileProgOverlapMatrixFigure, sMicropitaOutput] + ls_srcFig1, 
@@ -723,7 +752,7 @@ for fileConfigMicropita in lMicropitaFiles:
 #    print(sFileConfiguration)
 
     Command([sCladogramSelectFig, sCladogramTaxaFile, sCladogramColorFile, sCladogramTickFile, sCladogramHighlightFile,
-         sCladogramSizeFile, sCladogramCircleFile], lsFig2Sources + ls_srcFig2, 
+         sCladogramSizeFile, sCladogramCircleFile, sCladogramDetailFile], lsFig2Sources + ls_srcFig2, 
          funcCladogramSelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                        strTaxaArgForCladogram,
                                        strHighlightArgForCladogram,
@@ -950,4 +979,41 @@ if c_fRunCollectionCurve:
                               " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
                               " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                               " ".join([Constants_Arguments.c_strPlotSelectedArgument]+lsPlotCollectorSelectionMethods)))
+
+#Generate the Confusion and Overlap matrices based on multiple projects
+lMetamatrixConfigFiles = Glob( sfle.d( fileDirInput, "".join(["*",c_strSufMetaMatrix]) ) )
+for fileMetamatrixConfig in lMetamatrixConfigFiles:
+  sMetaFileName = fileMetamatrixConfig.get_abspath()
+  dictMetadetails = funcReadConfigFile(sMetaFileName)
+  
+  #Actual file
+  strActualFile = File(sfle.d(fileDirInput,dictMetadetails[c_strConfigActualFile]))
+  #Invert
+  strInvert = dictMetadetails[c_strConfigInvertImage]
+  #Logging
+  strLogging = dictMetadetails[c_strConfigLogging]
+  #Selection techniques
+  strSelectionTechniques = dictMetadetails[c_strConfigSelectionTechniques]
+  #Projects of whose output will be combined in the plot
+  strProjects = dictMetadetails[c_strConfigProjects]
+  #Projects as a list of files
+  sProjectFiles = [File(sfle.d(fileDirOutput,sFile)) for sFile in strProjects.split(c_strComma)]
+
+  #Create output file name for overlap matrix
+  sOutputFigure1BOverlapMeta = File(sfle.d(fileDirOutput.get_abspath()+strOutputSummaryFolder,"".join([os.path.splitext(os.path.split(sMetaFileName)[1])[0],c_sufMetaOverlapMatrix])))
+  sOutputFigure1BConfusionMeta = File(sfle.d(fileDirOutput.get_abspath()+strOutputSummaryFolder,"".join([os.path.splitext(os.path.split(sMetaFileName)[1])[0],c_sufMetaConfusionMatrix])))
+
+  #TODO add in import dependencies from inside script
+  #Create Figure 1B- Overlap matrix
+  Command(sOutputFigure1BOverlapMeta, [c_fileProgOverlapMatrixMetaFigure] + sProjectFiles, 
+    funcOverlapMetaMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, strLogging]),
+                          " ".join([Constants_Arguments.c_strInvertArgument, strInvert]),
+                          strSelectionTechniques))
+
+  #TODO add in import dependencies from inside script
+  #Create Figure 1B- Confusion matrix
+  Command(sOutputFigure1BConfusionMeta, [c_fileProgConfusionMatrixMetaFigure, strActualFile] + sProjectFiles, 
+    funcConfusionMetaMatrix(" ".join([Constants_Arguments.c_strLoggingArgument, strLogging]),
+                            " ".join([Constants_Arguments.c_strInvertArgument, strInvert]),
+                            strSelectionTechniques))
 

@@ -24,19 +24,19 @@ class PlotMatrix:
 
   #Given a matrix and labels consistent to the matrix, plot a matrix
   @staticmethod
-  def funcPlotMatrix(npMatrix, lsLabels, strOutputFigurePath, strXTitle="X Axis", strYTitle="Y Axis", fFlipYLabels=False, fInvert=False):
+  def funcPlotMatrix(npMatrix, lsXLabels, strOutputFigurePath, strXTitle="X Axis", strYTitle="Y Axis", fFlipYLabels=False, fInvert=False):
 
     plt.clf()
     figConfusionMatrix = plt.figure()
     objAxis = figConfusionMatrix.add_subplot(111)
 
     #Get y labels
-    lNewYLabels = lsLabels
+    lNewYLabels = list(lsXLabels)
     if fFlipYLabels:
-        lsLabels.reverse()
+        lNewYLabels.reverse()
 
     #Set x axis and position
-    objAxis.xaxis.set_ticklabels([""]+lsLabels)
+    objAxis.xaxis.set_ticklabels([""]+lsXLabels)
     objAxis.xaxis.set_ticks_position('top')
 
     #Set y axis

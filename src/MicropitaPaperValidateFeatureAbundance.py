@@ -112,17 +112,12 @@ def _main( ):
         logging.error("".join(["MicropitaPaperValidateFeatureAbundance:: Could not read features form the file:",args.strValidateFeatureFile]))
         return False
 
-    print "lsFeatures", lsFeatures
-
     #For each diversity methodology in the selection
     for sMethod in dictAllSelectionStudies.keys():
         if sMethod == MicroPITA.c_strTaxa:
-            
-            print "sMethod", sMethod
+
             #Get the selection
             setsSelection = set(dictAllSelectionStudies[sMethod])
-
-            print "setsSelection", setsSelection
 
             #Make sure the selection is in this data and there is other data to compare to
             if len(setsSelection) < len(setsSampleNames):
@@ -177,36 +172,34 @@ def _main( ):
                     #Create selected and not selected groupings
                     #Measure feature abundance of selected and not selected populations
                     abndFeatureTable = abndValidationData.funcGetFeatureAbundanceTable(lsFeatures)
-                    print "Received abndFeatureTable::",abndFeatureTable
                     if not abndFeatureTable:
                         logging.error("MicropitaPaperValidateFeatureAbundance:: did not receive a reduced feature abundance table.")
                         return False
 
-                    print "abndFeatureTable", abndFeatureTable.funcGetFeatureNames()
-                    print "Samples", setsSampleNames
-                    print "Samples selected", set(lsSelectedInValidation)
-                    print "Samples not selected", setsSampleNames-set(lsSelectedInValidation)
+                    #Get a copy of the abundance table with everything but the features of interest.
+                    abndOppositeFeatureTable = abndValidationData.funcGetFeatureAbundanceTable(set(abndValidationData.funcGetFeatureNames())-set(lsFeatures))
+                    if not abndOppositeFeatureTable:
+                        logging.error("MicropitaPaperValidateFeatureAbundance:: did not receive a abundance table with all but the feature.")
+                        return False
 
-                    print "abndValidationData", str(abndValidationData)
+                    if c_PlotAbundance:
+                        #Get average abundance per sample selection group and plot
+                        setsNotSelected = setsSampleNames-set(lsSelectedInValidation)
+                        dFeatureSampleLength = float(abndFeatureTable.funcGetFeatureCount())
+                        ldAverageSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSelectedInValidation]
+                        ldAverageNotSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in setsNotSelected]
 
-                    #Get average abundance per sample selection group and plot
-                    print "selected sum", [abndFeatureTable.funcGetSample(sSample) for sSample in lsSelectedInValidation]
-                    ldAverageSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/float(len(abndFeatureTable.funcGetSample(sSample)))
-                                                  for sSample in lsSelectedInValidation]
-                    ldAverageNotSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/float(len(abndFeatureTable.funcGetSample(sSample)))
-                                                     for sSample in setsSampleNames-set(lsSelectedInValidation)]
-                    print "selected", [abndFeatureTable.funcGetSample(sSample) for sSample in setsSampleNames-set(lsSelectedInValidation)]
-
-                    #Make box plot
-                    print "ldAverageSelectedAbundance", ldAverageSelectedAbundance
-                    print "ldAverageNotSelectedAbundance", ldAverageNotSelectedAbundance
-                    bp = plt.boxplot(x=[ldAverageSelectedAbundance,ldAverageNotSelectedAbundance], notch=1, patch_artist=True)
+                        #Make box plot
+                        bp = plt.boxplot(x=[ldAverageSelectedAbundance,ldAverageNotSelectedAbundance], notch=1, patch_artist=True)
+                    else:
+                        
 
                     #Color boxes
                     plt.setp(bp['boxes'], color=objFigureControl.c_strDetailsColorLetter, facecolor=objFigureControl.dictConvertMethodToHEXColor[sMethod], alpha=objFigureControl.c_dAlpha)
                     plt.setp(bp['whiskers'], color=objFigureControl.c_strDetailsColorLetter)
 
                     #Set ticks and title
+                    #xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected", "Diff Selected", "Diff Not Selected","x1","x2","x3","x4"])
                     xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected"])
                     imgSubplot.set_title("Targeted feature selection shown in validation data.")
 

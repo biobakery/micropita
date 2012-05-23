@@ -148,7 +148,7 @@ def _main( ):
                     imgFigure.set_facecolor(objFigureControl.c_strBackgroundColorWord)
                     imgSubplot = imgFigure.add_subplot(111,axisbg=objFigureControl.c_strBackgroundColorLetter)
                     imgSubplot.set_xlabel("Sample Population")
-                    imgSubplot.set_ylabel("Relative Abundance")
+                    imgSubplot.set_ylabel("Diversity (Inverse Simpson)")
                     imgSubplot.spines['top'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['bottom'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['left'].set_color(objFigureControl.c_strDetailsColorLetter)

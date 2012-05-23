@@ -45,7 +45,7 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
 argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp )
 argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = Constants_Arguments.c_strAbundanceFileHelp )
 argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFile )
-argp.add_argument(Constants_Arguments.c_strTaxaFilePath, dest="iTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
+argp.add_argument(Constants_Arguments.c_strTaxaFilePath, dest="strTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
 argp.add_argument(Constants_Arguments.c_strHighlightCladeFile, dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, help= Constants_Arguments.c_strHighlightCladeHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
 argp.add_argument(Constants_Arguments.c_strRoot, dest = "sRoot", metavar= "root", default="None", help = Constants_Arguments.c_strRootHelp )
@@ -80,6 +80,7 @@ argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = 
 argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerSizeFile )
 argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerCircleFile )
 argp.add_argument( "strOutFigure", metavar = "SelectionCladogram.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputFigure )
+argp.add_argument( "strDetailOutputFile", metavar = "SelectionDetail.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputDetails )
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -111,6 +112,11 @@ def _main( ):
     c_PVALUEINDEX = 2
     c_QVALUEINDEX = 3
 
+    #Enrichment values
+    c_IncreasedEnrichment = "^"
+    c_DecreasedEnrichment = "v"
+    c_NoChangeEnrichment = "R"
+
     #Get colors
     objColors = Constants_Figures()
     objColors.invertColors(c_fInvert)
@@ -124,10 +130,16 @@ def _main( ):
     #Delimiter for taxa/otu lineages
     c_strLineageDelim = "|"
 
+    #Contains details on the process that will be output
+    sCladogramDetails = "".join(["Input File:",args.strInputFile,Constants.ENDLINE])
+
     #Get Abundance table data
     rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=fIsNormalized,
                                           fIsSummed=fIsSummed, sMetadataID=args.sIDName, 
                                           sLastMetadata=args.sLastMetadataName,cFeatureNameDelimiter=c_strLineageDelim)
+
+    #Update detail: original feature count
+    sCladogramDetails = "".join([sCladogramDetails,"Original Feature Count=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
     #Sum clades before normalization and filtering
     if fSumData:
@@ -139,15 +151,25 @@ def _main( ):
     fFilterOccurence = (not args.iMinSequenceCount.lower() == "none")
 
     if fFilterOccurence:
-      logging.debug("Before occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      if rawData.funcIsNormalized():
+          logging.error("MicropitaPaperSelectionCladogram::Can not filter on occurence on a normalized file.")
+          return False 
+      logging.debug("MicropitaPaperSelectionCladogram::Before occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
       rawData.funcFilterAbundanceBySequenceOccurence(iMinSequence = int(args.iMinSequenceCount), iMinSamples = int(args.iMinSampleCount))
-      logging.debug("After occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      logging.debug("MicropitaPaperSelectionCladogram::After occurence filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      #Update detail: Occurence filter details
+      sCladogramDetails = "".join([sCladogramDetails,"Occurence Filtering:",Constants.ENDLINE,"Minimum Sequence count=",args.iMinSequenceCount,Constants.ENDLINE,
+          "Minimum sample count=",args.iMinSampleCount,Constants.ENDLINE,"Filtered Feature Count (After Occurence Filtering)=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
     if fFilterAbundance:
-      logging.debug("Before abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      logging.debug("MicropitaPaperSelectionCladogram::Before abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
       rawData.funcFilterAbundanceByPercentile(dPercentileCutOff = float(args.iAbundanceFilterPercentile),
                                           dPercentageAbovePercentile = float(args.iAbundanceFilterPercentCuttoff))
-      logging.debug("After abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      logging.debug("MicropitaPaperSelectionCladogram::After abundance filtering the feature count is "+str(rawData.funcGetFeatureCount()))
+      #Update detail: abundance feature details
+      sCladogramDetails = "".join([sCladogramDetails,"Abundance Filtering:",Constants.ENDLINE,"Percentile Abundance Threshold=",args.iAbundanceFilterPercentile,
+          Constants.ENDLINE,"Percent Samples Above Percentile=",args.iAbundanceFilterPercentCuttoff,Constants.ENDLINE,
+          "Filtered Feature Count (After Abundance Filtering)=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
     if c_Normalize:
       rawData.funcNormalize()
@@ -178,6 +200,10 @@ def _main( ):
       iCladeLevelForReducing = int(args.iCladeFilterLevel)
       iCladeLevelMinimumCount = int(args.iCladeFilterMinNumber)
     cladogram.setFilterByCladeSize(fCladeSizeFilter = fFilterClades, iCladeLevelToMeasure = iCladeLevelForFiltering, iCladeLevelToReduce = iCladeLevelForReducing, iMinimumCladeSize = iCladeLevelMinimumCount, cFeatureDelimiter=c_strLineageDelim)
+    #Update detail: Clade filtering
+    sCladogramDetails = "".join([sCladogramDetails,"Clade filtering:",Constants.ENDLINE,"Clade level for measuring=",args.iCladeFilterMeasure,Constants.ENDLINE,
+                                                "Clade level for filtering=",args.iCladeFilterLevel,Constants.ENDLINE,"Minimum features needed in the measured clade=",
+                                                args.iCladeFilterMinNumber,Constants.ENDLINE,Constants.ENDLINE])
 
     #Read in selection file
     fHndlInput = open(args.strSelectionFile,'r')
@@ -189,6 +215,9 @@ def _main( ):
     for strSelectionLine in filter(None,strSelection.split(Constants.ENDLINE)):
         astrSelectionMethod = strSelectionLine.split(Constants.COLON)
         dictSelection[astrSelectionMethod[0]] = filter(None,[lsSample.strip() for lsSample in astrSelectionMethod[1].split(Constants.COMMA)])
+    #Update detail: Sampling selection
+    sCladogramDetails = "".join([sCladogramDetails,"Sample Selection:",Constants.ENDLINE,
+                        Constants.ENDLINE.join(["".join([sKey,"=",str([dictSelection[sKey]])]) for sKey in dictSelection.keys()]),Constants.ENDLINE,Constants.ENDLINE])
 
     #Set Color Data
     dictColors = {MicroPITA.c_DIVERSITY_1:objColors.invSimpsonColorN,
@@ -228,10 +257,12 @@ def _main( ):
     #Add clade highlighting
     #Force the highlighting of taxa defined inputs (with highlight)
     lsUserDefinedTaxa = list()
-    if(not args.iTargetedTaxaFile == "None"):
-      fhndlTaxaInput = open(args.iTargetedTaxaFile,'r')
+    if(not args.strTargetedTaxaFile == "None"):
+      fhndlTaxaInput = open(args.strTargetedTaxaFile,'r')
       lsUserDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
       fhndlTaxaInput.close()
+    #Update detail: Targeted taxa
+    sCladogramDetails = "".join([sCladogramDetails,"Targeted Taxa:",Constants.ENDLINE,"".join([sTaxa for sTaxa in lsUserDefinedTaxa]),Constants.ENDLINE,Constants.ENDLINE])
 
     lsUserDefinedHighlighted = list()
     if(not args.iHighlightCladeFile == "None"):
@@ -259,6 +290,10 @@ def _main( ):
     lsSelectedSampleMethod = dictSelection.keys()
     if not args.iRingOrder == None:
       lsSelectedSampleMethod = [filter(None,strMethod) for strMethod in (args.iRingOrder.split(Constants.COMMA))]
+
+    #Update detail: Enrichment details
+    sCladogramDetails = "".join([sCladogramDetails,"Enrichment threshold method:",str(args.strEnrichmentIndicatorMethod),Constants.ENDLINE,
+                                              "Enrichment threshold:",str(args.dAlpha),Constants.ENDLINE,Constants.ENDLINE])
 
     #Measure enrichment
     if((args.strEnrichmentIndicatorMethod=="PVALUE") or (args.strEnrichmentIndicatorMethod=="FDR")):#P-value or qvalue
@@ -325,22 +360,42 @@ def _main( ):
             if(dValue <= float(args.dAlpha)):
               if dCurScore > 0.0:
                 lsAlpha.append(str(1-dValue))
-                lsShapes.append("^")
+                lsShapes.append(c_IncreasedEnrichment)
               elif(dCurScore < 0.0):
                 lsAlpha.append(str(1-dValue))
-                lsShapes.append("v")
+                lsShapes.append(c_DecreasedEnrichment)
               elif(dCurScore == 0.0):
                 lsAlpha.append("0.0")
-                lsShapes.append("R")
+                lsShapes.append(c_NoChangeEnrichment)
             else:
               lsAlpha.append("0.0")
-              lsShapes.append("R")
+              lsShapes.append(c_NoChangeEnrichment)
 
           #Add circle for this data
           cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
+          #Update detail: Enrichment details
+          #Build method enrichment detail
+          iIncreasedEnrichmentCounts = sum([1 if cEnrichment == c_IncreasedEnrichment else 0 for cEnrichment in lsShapes])
+          iDecreasedEnrichmentCounts = sum([1 if cEnrichment == c_DecreasedEnrichment else 0 for cEnrichment in lsShapes])
+          iNoChangeEnrichmentCounts = sum([1 if cEnrichment == c_NoChangeEnrichment else 0 for cEnrichment in lsShapes])
+          sMethodEnrichment = ""
+          if iIncreasedEnrichmentCounts:
+            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Increased Enrichment= ",str(iIncreasedEnrichmentCounts),Constants.ENDLINE])
+          if iDecreasedEnrichmentCounts:
+            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Decreased Enrichment= ",str(iDecreasedEnrichmentCounts),Constants.ENDLINE])
+          if iNoChangeEnrichmentCounts:
+            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa significant but with no change= ",str(iNoChangeEnrichmentCounts),Constants.ENDLINE])
+          #Add method enrichment to total enrichment details
+          if sMethodEnrichment:
+            sCladogramDetails = "".join([sCladogramDetails, selectedSampleMethod,": ",Constants.ENDLINE,sMethodEnrichment,Constants.ENDLINE,Constants.ENDLINE])
 
-    #Generate cladogram
+    #Generate cladogram PDF
     cladogram.generate(strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
+
+    #Write detail file out
+    with open( args.strDetailOutputFile, 'w') as f:
+      f.write(sCladogramDetails)
+    f.close()
 
 if __name__ == "__main__":
     _main( )

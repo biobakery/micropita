@@ -94,10 +94,10 @@ def _main( ):
             iArrayLengthTraveled = iArrayLengthTraveled + iLabelLength
         liOverlap[iPredictedPosition] = len(setPredicted - setPotentialSharedSamples)
 
-    #Plot confusion matrix
+    #Plot matrix
     liOverlap = np.array(liOverlap)
     liOverlap.shape=iLabelLength,iLabelLength
-    PlotMatrix.funcPlotMatrix(npMatrix=liOverlap, lsLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
+    PlotMatrix.funcPlotMatrix(npMatrix=liOverlap, lsXLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperOverlapMatrix")
 

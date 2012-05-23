@@ -7,7 +7,6 @@
 #
 #######################################################
 
-
 class Constants_Arguments():
     #afc Abundance filter cut off
     c_strAbundanceFilterCutoff = "-afc"
@@ -51,6 +50,7 @@ class Constants_Arguments():
     c_strEnrichmentMethodHelp = """The type of result the TAXA/OTU circles are commenting on. 
                         PVALUE shows differentially enriched elements between selected or not selected populations given a Rank sum nonparameteric t-test and a threshold of 0.05,
                         FDR shows the PVALUE option but with a Benjamini and Hochberg FDR correction and a threshold of 0.1"""
+    c_strEnrichmentChoices = ["PVALUE","FDR"]
 
     #i Flag to record if the colors are inverted
     c_strInvertArgument = "-i"
@@ -68,6 +68,7 @@ class Constants_Arguments():
     c_strLoggingArgument = "-l"
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
+    c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
 
     #m The name of the last metadata
     c_strLastMetadataName = "-m"
@@ -130,6 +131,14 @@ class Constants_Arguments():
     c_strTaxaFilePath = "-t"
     c_strTaxaFileHelp= "The file containing the clades or taxa/OTUs to highlight in the circlader."
 
+    #tm Taxa selection method
+    c_strTargetedFeatureMethodArgument = "-tm"
+    c_strTargetedFeatureMethodArgumentHelp = "The method used to select targeted features."
+    #Order is important, the first is the default
+    c_TARGETED_METHOD_RANKED = "Targeted_Rank"
+    c_TARGETED_METHOD_ABUNDANCE = "Targeted_Abundance"
+    lsTargetedFeatureMethodValues = [c_TARGETED_METHOD_RANKED, c_TARGETED_METHOD_ABUNDANCE]
+
     #u Unsupervised stratify metadata
     c_strUnsupervisedStratifyMetadata = "-u"
     c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
@@ -161,6 +170,7 @@ class Constants_Arguments():
     c_strCircladerColorFile = "The name of the input file specifying color that is generated and then used by the cladogram program."
     c_strCircladerHighlightFile = "The name of the input file specifying selection highlighting that is generated and then used by the cladogram program."
     c_strCircladerOutputFigure = "The output cladogram figure."
+    c_strCircladerOutputDetails = "The output file listing the detail of generating the cladogram."
     c_strCircladerSizeFile = "The name of the input file specifying node size that is generated and then used by the cladogram program."
     c_strCircladerStyleFile = "An input file used to specify cladogram syle features."
     c_strCircladerTaxaFile = "The name of the input file specifying taxa that is generated and then used by the cladogram program."
@@ -178,13 +188,10 @@ class Constants_Arguments():
     c_genericTMPDirLocationHelp = "Directory to place temporary and intermediate files."
     c_strMicropitaActualFileHelp = "A file containing indications of how in silico samples were actually intended on being sampled by sampling methods."
     c_strMicropitaSelectFileHelp = "A file containing the samples selected which will be visualized."
-    c_strSelectionMethodsHelp = "Select techniques listed one after another."
+    c_strMicropitaProjectsHelp = "A list of projects whose output will be combined into the meta matrix."
+    c_strSelectionMethodsHelp = "Select techniques listed one after another (seperated by whitespace)."
+    c_strSelectionMethodsCommaHelp = "Select techniques listed one after another (seperated by commas)."
     c_strOutputFileHelp = "A file to write the output."
     c_strValidationAbundanceFileHelp = "Abundance table wit which to validate the selection"
     c_strSelectionAbundanceFileHelp = "Abundance table where the selection, which is being validated, occured."
-
-    ####################################
-    #Arg choices
-    c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
-    c_strEnrichmentChoices = ["PVALUE","FDR"]
 

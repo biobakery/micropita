@@ -227,7 +227,7 @@ def _main( ):
     #Plot confusion matrix
     liConfusion = np.array(liConfusion)
     liConfusion.shape=iLabelLength,iLabelLength
-    PlotMatrix.funcPlotMatrix(npMatrix=np.array(liConfusion), lsLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
+    PlotMatrix.funcPlotMatrix(npMatrix=np.array(liConfusion), lsXLabels=lsLabels, strOutputFigurePath=args.strOutputFigure, strXTitle="Predicted", strYTitle="Actual", fFlipYLabels=c_fFlipYLabels, fInvert=c_fInvert)
 
     logging.info("Stop MicropitaPaperConfusionMatrix")
 

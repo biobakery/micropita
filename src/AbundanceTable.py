@@ -568,63 +568,63 @@ class AbundanceTable:
     #Stratifies the AbundanceTable by the given metadata.
     #Will write each stratified abundance table to file
     #if fWriteToFile is True the object will used it's internally stored name as a file to write to
-    #if fWriteToFile is a string then it should be a dirctory and end with /. This will rebase the file
+    #if fWriteToFile is a string then it should be a directory and end with /. This will rebase the file
     #and store it in a different directory but with an otherwise unchanged name
     #Returns a list of AbundanceTables which are deep copies of the original
-#    def funcStratifyByMetadata(self,strMetadata,xWriteToFile=False):
-#        retlAbundanceTables = []
-#
-#        if (not self._npaFeatureAbundance == None) and self._dictTableMetadata :
-#            dictAbundanceBlocks = dict()
-#            #Get unique metadata values to stratify by
-#            lsMetadata = self._dictTableMetadata.get(strMetadata,[])
-#            setValues = set(lsMetadata)
-#
-#            #If there is only one metadata value then no need to stratify so return the original in the list (and write if needed)
-#            if len(setValues) == 0:
-#              return retlAbundanceTables
-#            elif len(setValues) == 1:
-#              retlAbundanceTables.append(self)
-#              #Write to file if need be before returning data
-#              if xWriteToFile:
-#                  if isinstance(xWriteToFile, basestring):
-#                      self.funcWriteToFile("".join([xWriteToFile,os.path.split(self.getName())[1]]))
-#                  else:
-#                      self.funcWriteToFile(self.getName())
-#              return retlAbundanceTables
-#
-#            #Given here there are multiple metadata values, continue to stratify
-#            lsNames = self.funcGetSampleNames()
-#            #Get index of values to break up
-#            for value in setValues:
-#                ffuncGetIDMetadataNameDataIndex = [sData==value for sData in lsMetadata]
-#                #Get abundance data for the metadata value
-#                #The true is added to keep the first column which should be the feature id
-#                npaStratfiedAbundance = self._npaFeatureAbundance[[self.funcGetIDMetadataName()]+list(np.compress(fDataIndex,lsNames))]
-#
-#                #Get metadata for the metadata value
-#                dictStratifiedMetadata = dict()
-#                for metadataType in self._dictTableMetadata:
-#                    dictValues = self.funcGetMetadata(metadataType)
-#                    dictStratifiedMetadata[metadataType] = np.compress(fDataIndex,dictValues).tolist()
-#
-#                #Make abundance table
-#                #Add abundance table to the list
-#                strStratifiedName = "".join([os.path.splitext(self._strOriginalName)[0],"-StratBy-",value,".txt"])
-#                objStratifiedAbundanceTable = AbundanceTable(npaAbundance=npaStratfiedAbundance, dictMetadata=dictStratifiedMetadata, strName=strStratifiedName,
-#                                              fIsNormalized=self._fIsNormalized, fIsSummed=self._fIsSummed, cFeatureNameDelimiter=self._cFeatureDelimiter)
-#
-#                #Write to file if needed
-#                if xWriteToFile:
-#                    if isinstance(xWriteToFile, basestring):
-#                        objStratifiedAbundanceTable.funcWriteToFile("".join([xWriteToFile,os.path.split(objStratifiedAbundanceTable.funcGetName())[1]]))
-#                    else:
-#                        objStratifiedAbundanceTable.funcWriteToFile(objStratifiedAbundanceTable.funcGetName())
-#
-#                #Append abundance table to returning list
-#                retlAbundanceTables.append(objStratifiedAbundanceTable)
-#
-#        return retlAbundanceTables
+    def funcStratifyByMetadata(self,strMetadata,xWriteToFile=False):
+        retlAbundanceTables = []
+
+        if (not self._npaFeatureAbundance == None) and self._dictTableMetadata :
+            dictAbundanceBlocks = dict()
+            #Get unique metadata values to stratify by
+            lsMetadata = self._dictTableMetadata.get(strMetadata,[])
+            setValues = set(lsMetadata)
+
+            #If there is only one metadata value then no need to stratify so return the original in the list (and write if needed)
+            if len(setValues) == 0:
+              return retlAbundanceTables
+            elif len(setValues) == 1:
+              retlAbundanceTables.append(self)
+              #Write to file if need be before returning data
+              if xWriteToFile:
+                  if isinstance(xWriteToFile, basestring):
+                      self.funcWriteToFile("".join([xWriteToFile,os.path.split(self.getName())[1]]))
+                  else:
+                      self.funcWriteToFile(self.getName())
+              return retlAbundanceTables
+
+            #Given here there are multiple metadata values, continue to stratify
+            lsNames = self.funcGetSampleNames()
+            #Get index of values to break up
+            for value in setValues:
+                fDataIndex = [sData==value for sData in lsMetadata]
+                #Get abundance data for the metadata value
+                #The true is added to keep the first column which should be the feature id
+                npaStratfiedAbundance = self._npaFeatureAbundance[[self.funcGetIDMetadataName()]+list(np.compress(fDataIndex,lsNames))]
+
+                #Get metadata for the metadata value
+                dictStratifiedMetadata = dict()
+                for metadataType in self._dictTableMetadata:
+                    dictValues = self.funcGetMetadata(metadataType)
+                    dictStratifiedMetadata[metadataType] = np.compress(fDataIndex,dictValues).tolist()
+
+                #Make abundance table
+                #Add abundance table to the list
+                strStratifiedName = "".join([os.path.splitext(self._strOriginalName)[0],"-StratBy-",value,".txt"])
+                objStratifiedAbundanceTable = AbundanceTable(npaAbundance=npaStratfiedAbundance, dictMetadata=dictStratifiedMetadata, strName=strStratifiedName,
+                                              fIsNormalized=self._fIsNormalized, fIsSummed=self._fIsSummed, cFeatureNameDelimiter=self._cFeatureDelimiter)
+
+                #Write to file if needed
+                if xWriteToFile:
+                    if isinstance(xWriteToFile, basestring):
+                        objStratifiedAbundanceTable.funcWriteToFile("".join([xWriteToFile,os.path.split(objStratifiedAbundanceTable.funcGetName())[1]]))
+                    else:
+                        objStratifiedAbundanceTable.funcWriteToFile(objStratifiedAbundanceTable.funcGetName())
+
+                #Append abundance table to returning list
+                retlAbundanceTables.append(objStratifiedAbundanceTable)
+
+        return retlAbundanceTables
 
     #Takes the given data values in one metadata and translates it to values in another
     #metadata of the sample samples holding the values of the first metadata

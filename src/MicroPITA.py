@@ -80,6 +80,10 @@ class MicroPITA:
     c_SVM_CLOSE = c_strDiscriminant
     c_SVM_FAR = c_strDistinct
 
+    #Targeted feature settings
+    c_TARGETED_METHOD_RANKED = Constants_Arguments.c_TARGETED_METHOD_RANKED
+    c_TARGETED_METHOD_ABUNDANCE = Constants_Arguments.c_TARGETED_METHOD_ABUNDANCE
+
     #Technique groupings
     c_lsDiversityMethods = [c_DIVERSITY_1,c_DIVERSITY_2]
 
@@ -426,15 +430,62 @@ class MicroPITA:
         #return
         return sampleRankAverages
 
-    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount, sSampleIDName):
+    def getAverageAbundanceSamples(self, tempMatrix, tempTargetedTaxa, sSampleIDName):
+
+        #Sample rank averages [[sample,average abundance of selected taxa]]
+        #Returned
+        sampleAbundanceAverages = []
+        
+        #Get sample names
+        sampleNames = tempMatrix.dtype.names[1:]
+        #Get taxa names
+        allTaxaNames = tempMatrix[tempMatrix.dtype.names[0]]
+
+        #If the taxa to be selected are not in the list
+        #Return nothing and log
+        lsMissing = []
+        for tempTaxa in tempTargetedTaxa:
+            if not tempTaxa in allTaxaNames:
+                lsMissing.append(tempTaxa)
+            else:
+                #Check to make sure the taxa of interest is not average abundance of 0
+                if sum(list(tempMatrix[np.where(allTaxaNames==tempTaxa)[0],:][0])[1:]) == 0:
+                    lsMissing.append(tempTaxa)
+
+        if len(lsMissing) > 0:
+            logging.error("".join(["MicroPITA.getAverageAbundanceSamples. The following feature/s is not in the data set or has the abundance of 0. ",",".join(lsMissing)]))
+            return False        
+
+        #For each sample name get averagae abundance
+        for name in sampleNames:
+            #Lists of taxa with the following information [[taxa name,abudance]]
+            lAbundances = [tempMatrix[name][iIndex] if allTaxaNames[iIndex] in tempTargetedTaxa else 0.0 for iIndex in xrange(0,len(allTaxaNames))]
+            sampleAbundanceAverages.append([name,float(sum(lAbundances))/float(len(tempTargetedTaxa))])
+
+        #Sort based on average
+        sampleAbundanceAverages = sorted(sampleAbundanceAverages, key = lambda sampleData: sampleData[1], reverse = True)
+
+        #return
+        return sampleAbundanceAverages
+
+    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount, sSampleIDName, sMethod):
       if(len(tempTargetedTaxa) < 1):
-        logging.error("MicroPITA.getAverageRanksSamples. Taxa defined selection was requested but no taxa were given.")
+        logging.error("MicroPITA.selectTargetedTaxaSamples. Taxa defined selection was requested but no features were given.")
+        return []
+      if not sMethod:
+        logging.error("MicroPITA.selectTargetedTaxaSamples. Taxa defined selection was requested but no Method were given.")
+        return []
+
+      lsTargetedSamples = None
       #Rank the samples
-      userRankedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
+      if sMethod == self.c_TARGETED_METHOD_RANKED:
+          lsTargetedSamples = self.getAverageRanksSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
+      elif sMethod == self.c_TARGETED_METHOD_ABUNDANCE:
+          lsTargetedSamples = self.getAverageAbundanceSamples(tempMatrix=tempMatrix, tempTargetedTaxa=tempTargetedTaxa, sSampleIDName=sSampleIDName)
       
       #Select the top samples
-      if userRankedSamples:
-          topRankedSamples = userRankedSamples[(sampleSelectionCount*-1):]
+      if lsTargetedSamples:
+          topRankedSamples = lsTargetedSamples[(sampleSelectionCount*-1):]
           topRankedSamplesNames = np.compress([True,False],topRankedSamples,axis=1)
           return [item for sublist in topRankedSamplesNames for item in sublist]
       else:
@@ -675,7 +726,7 @@ class MicroPITA:
     #Start micropita selection
     def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
             strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1,
-            strSelectionTechnique=None, strLabel=None, strStratify=None, sMetadataID=None, sLastMetadataName=None, fSumData=True):
+            strSelectionTechnique=None, strLabel=None, strStratify=None, sMetadataID=None, sLastMetadataName=None, fSumData=True, sFeatureSelectionMethod=None):
         #microPITA object0
         microPITA = MicroPITA()
 
@@ -945,7 +996,7 @@ class MicroPITA:
             if(c_RUN_RANK_AVERAGE_USER_4):
               if not microPITA.c_USER_RANKED in selectedSamples:
                   selectedSamples[microPITA.c_USER_RANKED]=list()
-              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=stratAbundanceTable.funcGetAbundanceCopy(), tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sSampleIDName=stratAbundanceTable.funcGetIDMetadataName()))
+              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=stratAbundanceTable.funcGetAbundanceCopy(), tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sSampleIDName=stratAbundanceTable.funcGetIDMetadataName(),sMethod=sFeatureSelectionMethod))
             logging.info("Selected Samples 4")
             logging.info(selectedSamples)
 
@@ -1022,6 +1073,8 @@ argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormal
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
 argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
+argp.add_argument(Constants_Arguments.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar= "FeatureSelectionMethod", default=Constants_Arguments.lsTargetedFeatureMethodValues[0], 
+                  choices=Constants_Arguments.lsTargetedFeatureMethodValues, help= Constants_Arguments.c_strTargetedFeatureMethodArgumentHelp)
 
 #SVM label
 #Label parameter to be used with SVM
@@ -1077,7 +1130,7 @@ def _main( ):
                                         strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount),
                                         iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel,
                                         strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection,
-                                        sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=fSumData)
+                                        sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=fSumData, sFeatureSelectionMethod=args.strFeatureSelection)
     logging.info("End microPITA")
 
     #Log output for debugging
