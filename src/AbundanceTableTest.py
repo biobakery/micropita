@@ -1109,6 +1109,34 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
+    #TestFuncRankAbundance
+    def testFuncRankAbundanceForGoodCase(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-ForRanked.txt"])
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        data = data.funcRankAbundance()
+        data._strOriginalName = ""
+        resultStr = str(data)+str(data.funcGetAbundanceCopy())
+        
+
+        #Correct Answer
+        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        answer._strOriginalName = ""
+        answerStr = str(answer)+str(answer.funcGetAbundanceCopy())
+
+        #Check result against answer
+        self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
+
     #Test funcSumClades
     def testFuncSumCladesForGoodCase(self):
         

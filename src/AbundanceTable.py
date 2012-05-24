@@ -504,6 +504,54 @@ class AbundanceTable:
 
         return True
 
+    def funcRankAbundance(self):
+        if not self._npaFeatureAbundance == None:
+
+            #Sample rank averages [[sample,average rank of selected taxa]]
+            #Returned
+            sampleRankAverages = []
+        
+            #Get sample names
+            lsSampleNames = self.funcGetSampleNames()
+            #Get taxa names
+            allTaxaNames = self.funcGetFeatureNames()
+            #Get abundance copy
+            npRankAbundance = self.funcGetAbundanceCopy()
+            #If there are no features then return self.
+            if len(allTaxaNames)==0:
+               return self 
+
+            liRanks = []
+            #For each sample name get the ranks
+            for sName in lsSampleNames:
+            
+                #Enumerate for order and sort abundances
+                lfSample = list(enumerate(npRankAbundance[sName]))
+                lfSample = sorted(lfSample, key = lambda sampleData: sampleData[1], reverse = True)
+
+                #Replace abundance with rank
+                fPreviousAbundance = None
+                iRank = 0
+                iRankedList = []
+                for iOrder, fAbundance in lfSample:
+                    if not fPreviousAbundance == fAbundance:
+                        iRank = iRank + 1
+                    iRankedList.append((iOrder,iRank))
+                    fPreviousAbundance = fAbundance
+
+                #Sort back to original order
+                iRankedList = sorted(iRankedList, key = lambda sampleData: sampleData[0], reverse = False)
+                npRankAbundance[sName] = np.array([tuplData[1] for tuplData in iRankedList])
+
+            lsPathPieces = os.path.splitext(self.funcGetName())
+            return AbundanceTable(npaAbundance=npRankAbundance, dictMetadata=self.funcGetMetadataCopy(),
+                  strName="".join([lsPathPieces[0],"-Ranked",lsPathPieces[1]]), fIsNormalized=self.funcIsNormalized(),
+                  fIsSummed=self.funcIsSummed(), cFileDelimiter=self.funcGetFileDelimiter(),
+                  cFeatureNameDelimiter=self.funcGetFeatureDelimiter())
+
+        return None
+    
+
     #Happy path testing
     #Sums abundance data by clades indicated in the feature name (as consensus lineages)
     def funcSumClades(self):
@@ -635,13 +683,11 @@ class AbundanceTable:
 
         #Get metadata
         lFromMetadata = self.funcGetMetadata(sMetadataFrom)
-        print "lFromMetadata", lFromMetadata
         if not lFromMetadata:
                 print "Abundancetable::funcTranlateIntoMetadata. Did not receive lFromMetadata."
                 return False
 
         lToMetadata = self.funcGetMetadata(sMetadataTo)
-        print "lToMetadata", lToMetadata
         if not lToMetadata:
                 print "Abundancetable::funcTranlateIntoMetadata. Did not receive lToMetadata."
                 return False
@@ -654,8 +700,6 @@ class AbundanceTable:
 
         #Translate over
         if lFromMetadata and lToMetadata:
-            for value in lsValues:
-                print "index", lFromMetadata.index(value)
             return [lToMetadata[iIndex] for iIndex in [lFromMetadata.index(value) for value in lsValues]]
 
         return False
