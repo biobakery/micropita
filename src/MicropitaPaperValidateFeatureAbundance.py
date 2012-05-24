@@ -69,6 +69,9 @@ def _main( ):
     logging.info("MicropitaPaperValidateFeatureAbundance. The following arguments were passed.")
     logging.info(str(args))
 
+    #False indicates Ranking
+    c_PlotAbundance = False
+
     #Invert figure
     fInvert = (args.fInvert.lower() == "true")
 
@@ -155,7 +158,10 @@ def _main( ):
                     imgFigure.set_facecolor(objFigureControl.c_strBackgroundColorWord)
                     imgSubplot = imgFigure.add_subplot(111,axisbg=objFigureControl.c_strBackgroundColorLetter)
                     imgSubplot.set_xlabel("Sample Population")
-                    imgSubplot.set_ylabel("Relative Abundance")
+                    if not c_PlotAbundance:
+                        imgSubplot.set_ylabel("Ranked Abundance")
+                    else:
+                        imgSubplot.set_ylabel("Relative Abundance")
                     imgSubplot.spines['top'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['bottom'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['left'].set_color(objFigureControl.c_strDetailsColorLetter)
@@ -171,6 +177,10 @@ def _main( ):
 
                     #Create selected and not selected groupings
                     #Measure feature abundance of selected and not selected populations
+                    #Reduce the table to just the features
+                    #Rank the data if need be
+                    if not c_PlotAbundance:
+                        abndValidationData = abndValidationData.funcRankAbundance()
                     abndFeatureTable = abndValidationData.funcGetFeatureAbundanceTable(lsFeatures)
                     if not abndFeatureTable:
                         logging.error("MicropitaPaperValidateFeatureAbundance:: did not receive a reduced feature abundance table.")
@@ -182,17 +192,14 @@ def _main( ):
                         logging.error("MicropitaPaperValidateFeatureAbundance:: did not receive a abundance table with all but the feature.")
                         return False
 
-                    if c_PlotAbundance:
-                        #Get average abundance per sample selection group and plot
-                        setsNotSelected = setsSampleNames-set(lsSelectedInValidation)
-                        dFeatureSampleLength = float(abndFeatureTable.funcGetFeatureCount())
-                        ldAverageSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSelectedInValidation]
-                        ldAverageNotSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in setsNotSelected]
+                    #Get average abundance per sample selection group and plot
+                    setsNotSelected = setsSampleNames-set(lsSelectedInValidation)
+                    dFeatureSampleLength = float(abndFeatureTable.funcGetFeatureCount())
+                    ldAverageSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSelectedInValidation]
+                    ldAverageNotSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in setsNotSelected]
 
-                        #Make box plot
-                        bp = plt.boxplot(x=[ldAverageSelectedAbundance,ldAverageNotSelectedAbundance], notch=1, patch_artist=True)
-                    else:
-                        
+                    #Make box plot
+                    bp = plt.boxplot(x=[ldAverageSelectedAbundance,ldAverageNotSelectedAbundance], notch=1, patch_artist=True)                       
 
                     #Color boxes
                     plt.setp(bp['boxes'], color=objFigureControl.c_strDetailsColorLetter, facecolor=objFigureControl.dictConvertMethodToHEXColor[sMethod], alpha=objFigureControl.c_dAlpha)
