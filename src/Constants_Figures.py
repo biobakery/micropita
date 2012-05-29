@@ -31,12 +31,12 @@ class Constants_Figures():
     #Standardized coloring
     invSimpsonColor = "#FF6600"#Dark orange
     invSimpsonColorN = "255,102,0"#Dark orange
-    chao1Color = "#009900"#Green
-    chao1ColorN = "0,153,0"#Green
+    chao1Color = "#66FF00"#Lawn green
+    chao1ColorN = "102,255,0"#Lawn green
     unifracColor = "#FFCC33"#Gold
     unifracColorN = "255,204,51"#Gold
-    inUnifracColor = "#66FF00"#Lawn green
-    inUnifracColorN = "102,255,0"#Lawn green
+    inUnifracColor = "#FA8072"#Salmon
+    inUnifracColorN = "250,128,114"#Salmon
     weightedUnifracColor = "#0000FF"#Blue
     weightedUnifracColorN = "0,0,255"#Blue
     inWeightedUnifracColor = "#0099FF"#Doger blue
@@ -54,8 +54,8 @@ class Constants_Figures():
 #Grey just was not working for the figure 2 got to have a more vibriant color    userRankedN = "204,204,204"#Grey
     svmClose = "#FF0000"#Red
     svmCloseN = "255,0,0"#Red
-    svmFar = "#FA8072"#Salmon
-    svmFarN = "250,128,114"#Salmon
+    svmFar = "#009900"#Green
+    svmFarN = "0,153,0"#Green
 
     c_SELECTED_SAMPLE = "#FF0000" #Indicates a sample that is selected
 

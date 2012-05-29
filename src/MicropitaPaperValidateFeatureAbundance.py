@@ -199,6 +199,7 @@ def _main( ):
                     ldAverageNotSelectedAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in setsNotSelected]
 
                     #Make box plot
+                    print "ValidateFeature::","Selected",ldAverageSelectedAbundance,"\nNot Selected",ldAverageNotSelectedAbundance,"\nSamples",setsSelection
                     bp = plt.boxplot(x=[ldAverageSelectedAbundance,ldAverageNotSelectedAbundance], notch=1, patch_artist=True)                       
 
                     #Color boxes
@@ -207,8 +208,15 @@ def _main( ):
 
                     #Set ticks and title
                     #xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected", "Diff Selected", "Diff Not Selected","x1","x2","x3","x4"])
-                    xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected"])
+                    xtickNames = plt.setp(imgSubplot, xticklabels=["".join(["Selected (",str(len(ldAverageSelectedAbundance)),")"]),
+                                                                   "".join(["Not Selected (",str(len(ldAverageNotSelectedAbundance)),")"])])
+                    plt.scatter(x=[1]*len(ldAverageSelectedAbundance),y=ldAverageSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+                    plt.scatter(x=[2]*len(ldAverageNotSelectedAbundance),y=ldAverageNotSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
                     imgSubplot.set_title("Targeted feature selection shown in validation data.")
+
+                    if not c_PlotAbundance:
+                        ax = plt.gca()
+                        ax.set_ylim(ax.get_ylim()[::-1])
 
                     #End plot
                     #Save to a file

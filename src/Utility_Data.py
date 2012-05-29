@@ -29,17 +29,17 @@ class Utility_Data():
     #Generate matrix for microPITA
     #@param tempOutPutFile
     @staticmethod
-    def generateAbundanceTable(strOutputFile, strSampleClassification):
+    def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount = 1):
         #Matrix descriptors
         #Samples
         #Number of diversity samples
-        diversitySampleCount = 16#8
+        diversitySampleCount = 16 * iScalingFactorForSampleAmount
         #Number of representative dissimilarity samples
-        representativeDissimilarityCount = 14#7
+        representativeDissimilarityCount = 14 *iScalingFactorForSampleAmount
         #Number of extreme dissimilarity samples
-        extremeDissimilarityCount = 14#7
+        extremeDissimilarityCount = 14 * iScalingFactorForSampleAmount
         #Number of taxa-driven samples
-        taxaDrivenCount = 4#2
+        taxaDrivenCount = 4 * iScalingFactorForSampleAmount
         #Total sample count
         sampleCount = diversitySampleCount + representativeDissimilarityCount + extremeDissimilarityCount + taxaDrivenCount
 
@@ -47,11 +47,11 @@ class Utility_Data():
         #Number of blocks of dissimlarity
         representiveDiversityBlocks = representativeDissimilarityCount
         #Number of taxa in each block of dissimilarity
-        representiveDiversityTaxa = 16
+        representiveDiversityTaxa = 16 * iScalingFactorForSampleAmount
         #Number of blocks of extreme dissimilarity
         extremeDissimilarityBlocks = representiveDiversityBlocks
         #Number of taxa in each block of extreme dissimilarity
-        extremeDissimilarityTaxa = 8#int(representiveDiversityBlocks*.5)
+        extremeDissimilarityTaxa = 8 * iScalingFactorForSampleAmount
         #Number of low abundance taxa in extreme dissimilarity
         extremeDissimilarityLowTaxa = representiveDiversityTaxa
         #Number of taxa
@@ -70,6 +70,9 @@ class Utility_Data():
         iRepresentativeAbundanceMin = 0
         iExtremeAbundanceMax = 200
         iExtremeAbundanceMin = 0
+
+        #Random Max
+        iRandomMax = 5
 
         #Taxa selected for taxa driven
         taxaDriverPositions = set([3,43,19])
@@ -129,7 +132,7 @@ class Utility_Data():
                 diversityMaximalTaxaPositions = random.sample(population,diversityMaximalTaxa)
                 #Set abundance
                 for taxonPosition in diversityMaximalTaxaPositions:
-                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMax+random.randint(0,5)
+                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMax+random.randint(0,iRandomMax)
                 #Remove already selected position from the potential indices population
                 population = population.difference(set(diversityMaximalTaxaPositions))
                 #Taxa indices with minimal abundance in diversity samples
@@ -142,7 +145,7 @@ class Utility_Data():
 
                 #Set abundance
                 for taxonPosition in diversityMinimalTaxaPositions:
-                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMin+random.randint(1,5)
+                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMin+random.randint(1,iRandomMax)
 
                 #Update block
                 iTaxaBlockStart = iTaxaBlockStart + representiveDiversityTaxa
@@ -164,7 +167,7 @@ class Utility_Data():
             dictActualData[MicroPITA.c_SVM_FAR].append(strSampleName)
 
             for blockTaxonPosition in xrange(taxonBlockStart,taxonBlockStart+representiveDiversityTaxa):
-                dataMatrix[blockTaxonPosition,dissimilaritySampleIndex] = iRepresentativeAbundanceMax+random.randint(0,5)
+                dataMatrix[blockTaxonPosition,dissimilaritySampleIndex] = iRepresentativeAbundanceMax+random.randint(0,iRandomMax)
             taxonBlockStart = taxonBlockStart+representiveDiversityTaxa
 
         #Update sample bounds
@@ -185,7 +188,7 @@ class Utility_Data():
 
             #Set block abundance
             for extremeBlockTaxonPosition in xrange(taxonBlockStart,taxonBlockStop):
-                dataMatrix[extremeBlockTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMax+random.randint(0,5)
+                dataMatrix[extremeBlockTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMax+random.randint(0,iRandomMax)
             #Define index populations and set abundance per sample (for noise)
             population = set(range(taxaCount))
             #Remove taxa drivers
@@ -196,7 +199,7 @@ class Utility_Data():
             extremeNoisePopulation = random.sample(population,extremeDissimilarityLowTaxa)
             #Set extreme noise
             for extremeNoiseTaxonPosition in extremeNoisePopulation:
-                dataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+random.randint(1,5)
+                dataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+random.randint(1,iRandomMax)
             #Increment start and stop
             taxonBlockStart = taxonBlockStop+extremeTaxaBlockIncrement
             taxonBlockStop = taxonBlockStart + extremeDissimilarityTaxa
@@ -221,11 +224,11 @@ class Utility_Data():
             population = population.difference(taxaDriverPositions)
             #Set sample abundance
             for drivingTaxonPosition in taxaDriverPositions:
-                dataMatrix[drivingTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMax+random.randint(0,5)
+                dataMatrix[drivingTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMax+random.randint(0,iRandomMax)
             #Generate low noise
             noisePositions = random.sample(population,extremeDissimilarityLowTaxa)
             for noiseTaxonPosition in noisePositions:
-                dataMatrix[noiseTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMin+random.randint(1,5)
+                dataMatrix[noiseTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMin+random.randint(1,iRandomMax)
 
         #Write to file
         #Delete current file before writing
@@ -245,7 +248,7 @@ class Utility_Data():
                 taxaData.append(str(sampleAbundance))
             taxaData = Constants.TAB.join(taxaData)
             outputContents.append(Constants.TAB.join([taxaNames[row],taxaData]))
-        with open(strFileName,'a') as f:
+        with open(strOutputFile,'a') as f:
             f.write(Constants.ENDLINE.join(outputContents))
         f.close()
 
@@ -372,4 +375,44 @@ class Utility_Data():
         #Return file name
         return tempFilePath
 
+    @staticmethod
+    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dFeatureScale, dSampleScale):
+
+        #Make sure scales are ints
+        dFeatureScale = int(dFeatureScale)
+        dSampleScale = int(dSampleScale)
+
+        lsCorrelation = []
+
+        dSampleCount = 10*dSampleScale
+        dFeatureCount = 9*dFeatureScale
+
+        iFeatureIndex = 1
+
+        #Create correlated, anticorrelated, and flat but scaled features
+        for feature in xrange(dFeatureCount):
+            ldFeature = []
+            dCurrentFeatureScale = math.pow(2.0,feature)
+            for dSample in xrange(dSampleCount):
+                ldFeature.append(dSample*dCurrentFeatureScale)
+            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
+            iFeatureIndex = iFeatureIndex + 1
+            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+([str(feature)]*dSampleCount))
+            ldFeature.reverse()
+            iFeatureIndex = iFeatureIndex + 1
+            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
+            iFeatureIndex = iFeatureIndex + 1
+            dCurrentFeatureScale = math.pow(2.0,feature)
+
+        #Update contents to a line
+        sContents = "FeatureID"+Constants.TAB+Constants.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
+        sContents = Constants.ENDLINE.join([sContents]+[Constants.TAB.join(feature) for feature in lsCorrelation])
+
+        #Write line to a file
+        with open(sOutputFile,'w') as f:
+            f.write(sContents)
+        f.close()
+        return
+
+#Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96.pcl", strSampleClassification="Unbalanced96-Actual.txt", iScalingFactorForSampleAmount = 2)
 #Utility_Data.generateRandomMatrix(tempFilePath="Random.txt",iNumberRows=10,iNumberColumns=6, iMinValue=0, iMaxValue=2500)

@@ -53,6 +53,7 @@ class Constants():
     QUOTE = "\""
     TAB = '\t'
     WHITE_SPACE = " "
+    PIPE = "|"
 
     #Default values for missing data in the Abundance Table
     c_strEmptyAbundanceData = "0"

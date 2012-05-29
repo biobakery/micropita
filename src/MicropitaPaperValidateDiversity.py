@@ -169,13 +169,17 @@ def _main( ):
 
                     #Make box plot
                     bp = plt.boxplot(x=[ldSelectedDiversity[0],ldNotSelectedDiversity[0]], notch=1, patch_artist=True)
+                    plt.scatter(x=[1]*len(ldSelectedDiversity[0]),y=ldSelectedDiversity[0],c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+                    plt.scatter(x=[2]*len(ldNotSelectedDiversity[0]),y=ldNotSelectedDiversity[0],c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+
 
                     #Color boxes
                     plt.setp(bp['boxes'], color=objFigureControl.c_strDetailsColorLetter, facecolor=objFigureControl.dictConvertMethodToHEXColor[sMethod], alpha=objFigureControl.c_dAlpha)
                     plt.setp(bp['whiskers'], color=objFigureControl.c_strDetailsColorLetter)
 
                     #Set ticks and title
-                    xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected"])
+                    xtickNames = plt.setp(imgSubplot, xticklabels=["".join(["Selected (",str(len(ldSelectedDiversity[0])),")"]),
+                                                                   "".join(["Not Selected (",str(len(ldNotSelectedDiversity[0])),")"])])
                     imgSubplot.set_title("Maximum diversity shown in validation data set.")
 
                     #End plot

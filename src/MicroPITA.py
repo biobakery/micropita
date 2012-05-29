@@ -7,7 +7,7 @@ Description: Class to Run analysis for the microPITA paper
 __author__ = "Timothy Tickle"
 __copyright__ = "Copyright 2011"
 __credits__ = ["Timothy Tickle"]
-__license__ = "GPL"
+__license__ = ""
 __version__ = "1.0"
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
@@ -38,7 +38,7 @@ from ValidateData import ValidateData
 
 class MicroPITA:
     """
-    Micropita class
+    Performs analysis associated with sample selection.
     """
     #Constants
     #Diversity metrics Alpha
@@ -65,6 +65,8 @@ class MicroPITA:
     c_strRandom = "Random"
     c_strRepresentativeDissimilarity = "Representative"
     c_strTaxa = "Taxa_Defined"
+    c_lsAllSupervised = [c_strDiversity,c_strExtremeDissimilarity,c_strRandom,c_strRepresentativeDissimilarity,c_strTaxa]
+    c_lsAllUnsupervised = [c_strDiscriminant,c_strDistinct]
 
     #Technique Names
     c_DIVERSITY_1 = "".join([c_strDiversity,"_I"])
@@ -285,65 +287,6 @@ class MicroPITA:
         return returnSamples
 
 ####Group 4## Rank Average of user Defined Taxa
-
-    #Testing: Happy Path Testing
-    #Reduce by taxa
-    #@params tempMatrix Structured array [("taxa label",numeric,numeric,numeric),...]
-    #@params tempTaxa List of string which are the taxa labels
-    #@return Structured array of just the given taxa
-#    def reduceToTaxa(self, tempMatrix = None, tempTaxa = None):
-#        #Validate parameters
-#
-#        #To indicate how to reduce rows
-#        reduceIndex = []
-#        for row in tempMatrix:
-#            taxa = row[0]
-#            reduceIndex.append(taxa in tempTaxa)
-#
-#        #Reduce
-#        return np.compress(reduceIndex, tempMatrix, axis = 0)
-
-    #Returns Rank Average of samples given abundancy in input taxa
-    #Expects (Taxa (row) by Samples (column))
-    #Expects a column 0 of taxa id that is skipped
-    #Allows ties
-    #@param tempMatrix [taxa (row) x sample(column)] Matrix with first column as a taxa id column which is ignored
-    #@return [(sample name,average,rank)]
-#    def getRankAverageSamples(self, tempMatrix = None):
-#        #Validate Matrix
-#
-#        #List to return with [(sample name,average,rank)]
-#        rankAverageSamplesReturn = []
-#        
-#        #Get sample names
-#        sampleNames = tempMatrix.dtype.names[1:]
-#
-#        #For each sample name get average and add to return list
-#        for name in sampleNames:
-#            rankAverageSamplesReturn.append([name,np.average(tempMatrix[name]),-1])
-#
-#        #Sort based on average
-#        rankAverageSamplesReturn = sorted(rankAverageSamplesReturn, key = lambda sampleData: sampleData[1], reverse = True)
-#
-#        #Add ranks
-#        rank = 1
-#        currentValue = rankAverageSamplesReturn[0][1]
-#        for sampleData in rankAverageSamplesReturn:
-#            sampleAverage = sampleData[1]
-#            #Error samples are out of order
-#            if(sampleAverage > currentValue):
-#                return False
-#            #Allow ties
-#            if(sampleAverage == currentValue):
-#                sampleData[2] = rank
-#            else:
-#                #Update/set rank and value
-#                currentValue = sampleAverage
-#                rank = rank + 1
-#                sampleData[2] = rank
-#
-#        #return
-#        return rankAverageSamplesReturn
 
 #TODO TEST AND CHECK
     #Ranks the taxa by abundance and then averages thier ranks in the samples
@@ -1061,52 +1004,60 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 #Arguments
 #Optional parameters
 #Logging
-argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
+argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Log_level", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
+
 #Abundance associated
-argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "Name_of_Sample_ID", default=None, help= Constants_Arguments.c_strIDNameHelp)
-argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "Last_Row_of_Metadata", default=None, 
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "Sample_ID_Metadata_Name", help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "Last_Metadata_Name",
                   help= Constants_Arguments.c_strLastMetadataNameHelp)
-argp.add_argument(Constants_Arguments.c_strSupervisedLabelCount, dest="iSupervisedCount", metavar= "CountSupervisedSamplesSelected", default=1, 
-                  help= Constants_Arguments.c_strSupervisedLabelCountHelp)
-argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
+argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store_true", metavar= "Is_Normalized", default=False,
                   help= Constants_Arguments.c_strIsNormalizedHelp)
-argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
-argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
-argp.add_argument(Constants_Arguments.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar= "FeatureSelectionMethod", default=Constants_Arguments.lsTargetedFeatureMethodValues[0], 
-                  choices=Constants_Arguments.lsTargetedFeatureMethodValues, help= Constants_Arguments.c_strTargetedFeatureMethodArgumentHelp)
+argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store_true", metavar= "Clades_Are_Summed", default= False help= Constants_Arguments.c_strIsSummedHelp)
+argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store_true", metavar= "Data_Should_Be_Summed", default = True, help= Constants_Arguments.c_strSumDataHelp)
+argp.add_argument(Constants_Arguments.c_strTargetedFeatureMethodArgument, dest="sFeatureSelection", metavar= "Feature_Selection_Method", default=Constants_Arguments.lsTargetedFeatureMethodValues[0], 
+                  choices=Constants_Arguments.lsTargetedFeatureMethodValues, help= Constants_Arguments.c_strTargetedFeatureMethodHelp)
+argp.add_argument(Constants_Arguments.c_strFileDelimiterArgument, dest= "cFileDelimiter", action= "store", metavar="File_Delimiter", default=Constants.TAB, help=Constants_Arguments.c_strFileDelimiterHelp) 
+argp.add_argument(Constants_Arguments.c_strFeatureNameDelimiterArgument, dest= "cFeatureNameDelimiter", action= "store", metavar="Feature_Name_Delimiter", default=Constants.PIPE, help=Constants_Arguments.c_strFeatureNameDelimiterHelp) 
+
+#Select count
+argp.add_argument(Constants_Arguments.c_strUnsupervisedCountArgument, "iUnsupervisedSelectionCount", metavar = "Number_Samples_To_Select(Unsupervised)", type = int, help = Constants_Arguments.c_strUnsupevisedCountHelp)
+argp.add_argument(Constants_Arguments.c_strTargetedSelectionFileArgument, dest="strFileTaxa", metavar = "Targeted_Feature_File", default=None, help = Constants_Arguments.c_strTargetedSelectionFileHelp)
+argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument, dest="sUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
+                  help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
 
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument(Constants_Arguments.c_strSupervisedLabel, dest="strLabel", metavar= "Label", default="", help= Constants_Arguments.c_strSupervisedLabelCountHelp)
-argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadata, dest="strUnsupervisedStratify", metavar= "UnsupervisedStratify", default=None, 
-                  help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
-#Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", nargs = "?", help = Constants_Arguments.c_strOptionalOutputDataFile)
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised_Label_Metadata_Name", default=None, help= Constants_Arguments.c_strSupervisedLabelCountHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised_Sample_Selection_Count", default=1, type=int,
+                  help= Constants_Arguments.c_strSupervisedLabelCountHelp)
+
+#Output
+argp.add_argument(Constants_Arguments.c_strTemporaryDirectoryArgument, dest="strTMPDir", metavar = "Temporary_Directory", default=None, help = Constants_Arguments.c_genericTMPDirLocationHelp)
+
+#Required
+#Input
 #Abundance file
-argp.add_argument( "strFileAbund", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
-#Taxa file
-argp.add_argument( "strFileTaxa", metavar = "Taxa_file", help = Constants_Arguments.c_strTaxaSelectionFile)
-#Temporary folder
-argp.add_argument( "strTMPDir", metavar = "Temporary_Directory", help = Constants_Arguments.c_genericTMPDirLocationHelp)
-#Select count
-argp.add_argument( "icount", metavar = "number", type = int, help = Constants_Arguments.c_strCountHelp)
+argp.add_argument("strFileAbund", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
+#Outputfile
+argp.add_argument("strOutFile", metavar = "Selection_Output_File", help = Constants_Arguments.c_strOptionalOutputDataFileHelp)
 #Selection parameter
-argp.add_argument("strSelection", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionTechniques, nargs="*")
+argp.add_argument("strSelection", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionTechniquesHelp, nargs="*")
+
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
 
-    #Massage input
-    if args.strFileTaxa == "None":
-      args.strFileTaxa = None
+    #Message input
+#    if args.strFileTaxa == "None":
+#      args.strFileTaxa = None
 
     #Is summed and normalized
-    fIsSummed = (args.fIsSummed.lower() == "true")
-    fIsNormalized = (args.fIsNormalized.lower() == "true")
-    fSumData = (args.fSumData.lower() == "true")
+#    fIsSummed = (args.fIsSummed.lower() == "true")
+#    fIsNormalized = (args.fIsNormalized.lower() == "true")
+#    fSumData = (args.fSumData.lower() == "true")
 
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
@@ -1125,12 +1076,40 @@ def _main( ):
     #Run micropita
     logging.info("Start microPITA")
     microPITA = MicroPITA()
-    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, strOutputFile=args.strOutFile,
-                                        cDelimiter=Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=args.strFileAbund,
-                                        strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=int(args.icount),
-                                        iSupervisedSampleCount=int(args.iSupervisedCount), strLabel=args.strLabel,
-                                        strStratify=args.strUnsupervisedStratify, strSelectionTechnique=args.strSelection,
-                                        sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=fSumData, sFeatureSelectionMethod=args.strFeatureSelection)
+
+    #Check inputs
+    #If a target feature file is given make sure that targeted feature is in the selection methods, if not add
+    if c_strTaxaSelectionFile:
+        if microPITA.c_strTaxa not in args.strSelection:
+            args.selection.append(microPITA.c_strTaxa)
+
+    #If a supervised selection method is indicated make sure supervised selection count is indicated and above 0
+    #Otherwise stop
+    if len(set(microPITA.lsAllSupervisedMethods)&set(strSelection))>0:
+        if args.iSupervisedCount < 1:
+            logging.error("".join(["MicroPITA::Did not receive a selection count for supervised selection above 0, received=",
+                                   str(args.iSupervisedCount),". Did not continue analysis."]))
+            return -1
+
+    #If an unsupervised selection method is indicated make sure the unsupervised selection count is above 0
+    #Otherwise stop
+    if len(set(microPITA.lsAllUnsupervisedMethods)&set(strSelection))>0:
+        if args.iUnsupervisedSelectionCount < 1:
+            logging.error("".join(["MicroPITA::Did not receive a selection count for unsupervised selection above 0, received=",
+                                   str(args.iUnsupervisedSelectionCount),". Did not continue analysis."]))
+            return -2
+
+    #If the tmp directory is not made, make
+    if not args.strTMPDir:
+        args.strTMPDir = "".join([os.path.split(args.strOutFile)[0],Constants.PATH_SEP,"TMP",Constants.PATH_SEP])
+
+
+    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
+                                        cDelimiter=args.cFileDelimiter, cFeatureNameDelimiter = args.cFeatureNameDelimiter, strInputAbundanceFile=args.strFileAbund,
+                                        strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=args.iSupervisedSelectionCount,
+                                        iSupervisedSampleCount=args.iSupervisedCount, strLabel=args.sLabel,
+                                        strStratify=args.sUnsupervisedStratify, strSelectionTechnique=args.strSelection,
+                                        sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=fSumData, sFeatureSelectionMethod=args.sFeatureSelection)
     logging.info("End microPITA")
 
     #Log output for debugging
