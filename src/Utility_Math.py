@@ -23,6 +23,7 @@ class Utility_Math():
   def __init__(): pass
 
   ##
+  #Happy path test 2
   #Generate matrix for microPITA
   #@param tempOutPutFile
   @staticmethod
@@ -53,17 +54,7 @@ class Utility_Math():
    #return just 1 dimension (the qvalue)
    return [ldValues[2] for ldValues in lsConvertToQValues]
 
-  ##
-  #Bootstrap and perform the given method on a population of data
-  #Bootstrap, sample with replacement (each iteration of sampling may not have unique selection).
-#  @staticmethod
-#  def funcBootstrapRowsFromMatrix(aMatrix, iSelectRowCount, iIterationCount, funcFunction, funcSummaryFunction):
-#    iColumnCount = dim(aMatrix)
-#    iRowCount = 0
-#    if iColumnCount:
-#      iRowCount = len(aMatrix[0])
-#    return [funcSummaryFunction([funcFunction(funcSampleWithReplacement(row,iSelectRowCount)) for iIter in xrange(iIteractionCount)]) for row in aMatrix]
-
+  #Hpath path tested 5
   #Sample from a vector of data (aData) with replacement iSelect many objects
   @staticmethod
   def funcSampleWithReplacement(aData, iSelect):
@@ -76,6 +67,7 @@ class Utility_Math():
       return lsSampling
     return []
 
+  #Happy Path Tested 2
   #Takes the column indices of a npArray and sums the rows into one column
   #Returns a list which is the row sums of the column
   @staticmethod
@@ -87,7 +79,7 @@ class Utility_Math():
       npPooledSample = npPooledSample + npaAbundance[strSampleName]
     return list(npPooledSample)
 
-  #Testing Status: Light happy path testing
+  #Testing Status: Light happy path testing 2
   #Transposes a matrix.
   #Removes the first column before transposing if tempRemoveAdornments = True
   #@params tempMatrix Structured array to transpose

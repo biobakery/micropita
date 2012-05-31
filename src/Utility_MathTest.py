@@ -203,6 +203,45 @@ class Utility_MathTest(unittest.TestCase):
       #Check result against answer
       self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
+    def testFuncSumRowsOfColumnsByGoodCase(self):
+      #Inputs
+      inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+      delimiter = Constants.TAB
+      sMetadataID = "TID"
+      sLastMetadata = "STSite"
+      removeAdornment = True
+
+      #Correct Answer
+      answer = "[22.0, 83.0, 79.0, 83.0, 15.0]"
+
+      #Call method
+      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+                                           cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
+      result = Utility_Math.funcSumRowsOfColumns(npaAbundance=result.funcGetAbundanceCopy(), lsSampleNames=result.funcGetSampleNames())
+
+      #Check result against answer
+      self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSumRowsOfColumnsByGoodCase2(self):
+      #Inputs
+      inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+      delimiter = Constants.TAB
+      sMetadataID = "TID"
+      sLastMetadata = "STSite"
+      removeAdornment = True
+      lsSampleNames = ["700098986","700098980","700037472","700037478"]
+
+      #Correct Answer
+      answer = "[13.0, 66.0, 32.0, 34.0, 7.0]"
+
+      #Call method
+      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+                                           cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
+      result = Utility_Math.funcSumRowsOfColumns(npaAbundance=result.funcGetAbundanceCopy(), lsSampleNames=lsSampleNames)
+
+      #Check result against answer
+      self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
 ##
 #Create a suite to be called to test
 def suite():
