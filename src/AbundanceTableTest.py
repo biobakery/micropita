@@ -389,6 +389,98 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
+    #Test funcGetFeatureSumAcrossSamples
+    def testFuncGetFeatureSumAcrossSamplesGoodCase1(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-FeatureSum.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sFeature = "Bacteria|3417"
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
+
+        #Correct Answer
+        answer = 83.0
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    #Test funcGetFeatureSumAcrossSamples
+    def testFuncGetFeatureSumAcrossSamplesGoodCase2(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-FeatureSum.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sFeature = "Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
+
+        #Correct Answer
+        answer = 22.0
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    #Test funcGetFeatureSumAcrossSamples
+    def testFuncGetFeatureSumAcrossSamplesGoodCase3(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-FeatureSum.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sFeature = "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
+
+        #Correct Answer
+        answer = 15.0
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    #Test funcGetFeatureSumAcrossSamples
+    def testFuncGetFeatureSumAcrossSamplesGoodCase0(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-FeatureSum.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sFeature = "Bacteria|Lost"
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
+
+        #Correct Answer
+        answer = 0.0
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
     #Test funcGetFeatureNames
     def testFuncGetFeatureNames(self):
         #Inputs
@@ -1342,6 +1434,58 @@ class AbundanceTableTest(unittest.TestCase):
         #Answer files
         sAnswerFile1 = "".join([Constants_Testing.c_strTestingTruth,"PairedTables1with2-Correct.txt"])
         sAnswerFile2 = "".join([Constants_Testing.c_strTestingTruth,"PairedTables2with1-Correct.txt"])
+
+        #Collects all the errors to display
+        sError = ""
+
+        #Pair files
+        result = AbundanceTable.funcPairTables(strFileOne=sInputFileOne, strFileTwo=sInputFileTwo,
+                                      strIdentifier=sIdentifier, cDelimiter=cDelimiter,
+                                      strOutFileOne=sOutputFileOne, strOutFileTwo=sOutputFileTwo)
+        if not result:
+            sError = "AbundanceTableTest.testFuncPairTablesForGoodCase::Received false when calling the AbundanceTable.funcPairTables()"
+
+        #Check answers
+        if result:
+            sCorrect = None
+            sResult = None
+            with open(sOutputFileOne, 'r') as f:
+                sResult = f.read()
+            f.close()
+            with open(sAnswerFile1, 'r') as f:
+                sCorrect = f.read()
+            f.close()
+            if not sCorrect.strip() == sResult:
+                sError = " ".join([sError, "Did not receive the correct output for file 1. Expected:",sCorrect,". Received:",sResult,"."])
+
+            sCorrect = None
+            sResult = None
+            with open(sOutputFileTwo, 'r') as f:
+                sResult = f.read()
+            f.close()
+            with open(sAnswerFile2, 'r') as f:
+                sCorrect = f.read()
+            f.close()
+            if not sCorrect.strip() == sResult:
+                sError = " ".join([sError, "Did not receive the correct output for file 2. Expected:",sCorrect,". Received:",sResult,"."])
+
+        #Check result against answer
+        self.assertEqual("",sError,sError)
+
+    #Test funcPairTables
+    def testFuncPairTablesForBadCaseDuplicates(self):
+        
+        #Inputs
+        sInputFileOne = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/PairTablesDup1.txt"])
+        sInputFileTwo = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/PairTablesDup2.txt"])
+        cDelimiter = Constants.TAB
+        sIdentifier = "ID"
+        sOutputFileOne = "".join([Constants_Testing.c_strTestingTMP,"PairTablesDup1with2.txt"])
+        sOutputFileTwo = "".join([Constants_Testing.c_strTestingTMP,"PairTablesDup2with1.txt"])
+
+        #Answer files
+        sAnswerFile1 = "".join([Constants_Testing.c_strTestingTruth,"PairedTablesDup1with2-Correct.txt"])
+        sAnswerFile2 = "".join([Constants_Testing.c_strTestingTruth,"PairedTablesDup2with1-Correct.txt"])
 
         #Collects all the errors to display
         sError = ""

@@ -14,7 +14,7 @@ pE = DefaultEnvironment( )
 
 #Process flags
 c_fGenerateInSilicoDataSets = False
-c_fRunCollectionCurve = False
+c_fRunCollectionCurve = True
 fMakeMovies = False
 
 #Normalize
@@ -143,6 +143,7 @@ c_strConfigSelectionTechniquesCollectorCurve = "[Methods to plot in collection c
 c_strConfigSumData = "[Sum Clades for Analysis/Plotting]"
 c_strConfigSupervisedLabel = "[Supervised Label]"
 c_strConfigSupervisedCount = "[Supervised Selection Count]"
+c_strConfigTargetedSelection = "[Targeted Feature Selection Method]"
 c_strConfigUnsupervisedCount = "[Unsupervised Selection Count]"
 c_strConfigUnsupervisedStratify = "[Stratify by Metadata]"
 c_strConfigValidationFile = "[Validation Input File]"
@@ -248,8 +249,15 @@ def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed
   def funcMicroPitaRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData, sFeatureSelection=sFeatureSelection, iUnsupervisedCount=iUnsupervisedCount, strTaxaFile=strTaxaFile, strUnsupervisedStratify=strUnsupervisedStratify, strSupervisedLabel=strSupervisedLabel, iSupervisedCount=iSupervisedCount, strDirTmp=strDirTmp, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd = astrSs[0], astrSs[1]
-    return sfle.ex( [strProg]+[strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed, fSumData, sFeatureSelection,
-iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel, iSupervisedCount, strDirTmp]+[strAbnd, strT] + lsSelectionMethods)
+    lsCommandline = [strProg,strLoggingLevel, sIDName, sLastMetadata]
+    if fNormalized:
+        lsCommandline = lsCommandline + [Constants_Arguments.c_strIsNormalizedArgument]
+    if fSummed:
+        lsCommandline = lsCommandline + [Constants_Arguments.c_strIsSummedArgument]
+    if not fSumData:
+        lsCommandline = lsCommandline + [Constants_Arguments.c_strSumDataArgument]
+    return sfle.ex( lsCommandline + [sFeatureSelection, iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel,
+                    iSupervisedCount, strDirTmp]+[strAbnd, strT] + lsSelectionMethods)
   return funcMicroPitaRet
 
 ##Create figures
@@ -369,8 +377,7 @@ def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strLastMetada
       iFileCount = iFileCount + 1
     lsSelectionFiles = astrSs[2:iFileCount+1]
     return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, fNormalized,
-                    fSummed, strInvert, strAbundance, strFigureT,
-                    target[1].get_abspath()]+lsSelectionFiles+[lsSelectionMethods])
+                    fSummed, strInvert, strAbundance, strFigureT]+lsSelectionFiles+[lsSelectionMethods])
   return funcCollectionCurveRet
 
 #Validation steps
@@ -389,15 +396,15 @@ def funcMeasureDiversityByGroup( strLoggingLevel, strSampleNameRow, strLastMetad
 
 #ValidateFeature
 def funcMeasureFeatureByGroup( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
-                               strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair):
+                               strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair, sMeasureMethod):
   def funcMeasureFeatureByGroupRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
                                       strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
                                       strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
-                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair):
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair, sMeasureMethod=sMeasureMethod):
     strFigureT, astrSs = sfle.ts( target, source )
     strProg, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3], astrSs[4]
     return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
-                    fSummed, fValidateNormalized, fValidateSummed, sPair, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile, strFigureT])
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, sMeasureMethod, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile, strFigureT])
   return funcMeasureFeatureByGroupRet
 
 #Validate Extreme, Representative
@@ -562,6 +569,11 @@ for fileConfigMicropita in lMicropitaFiles:
       print("".join(["Unsupervised selection =",str(len(sFileConfiguration[c_strConfigUnsupervisedCount])),". Supervised selection =",str(len(sFileConfiguration[c_strConfigSupervisedCount]))]))
       pass
 
+  #Update flag variables to pass
+  fIsNormalized = sFileConfiguration[c_strConfigFileIsNormalized].lower() == "true"
+  fIsSummed = sFileConfiguration[c_strConfigFileIsSummed].lower() == "true"
+  fSumData = sFileConfiguration[c_strConfigSumData].lower() == "true"
+
   #Update the configurations that can be toggled on or off
   if sFileConfiguration[c_strConfigCladeFilter].lower() == "false":
     sFileConfiguration[c_strConfigCladeFilterLevel] = "none"
@@ -627,10 +639,6 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Make file names from the input micropita file in the temp directory
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufTable, c_strSufPredict )))
-    print "sMicropitaPredictFile", sMicropitaPredictFile
-    print "sCheckedAbundanceFile", sCheckedAbundanceFile
-    print "c_strSufTable", c_strSufTable
-    print "c_strSufPredict", c_strSufPredict
 
     #Make files names from the micropita output file
     sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
@@ -666,16 +674,14 @@ for fileConfigMicropita in lMicropitaFiles:
         funcMicroPita(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
         " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
         " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
-        " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
-        " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
-        " ".join([Constants_Arguments.c_strConfigSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
-        " ".join([Constants_Arguments.c_strTargetedSelectionFileArgument,sFileConfiguration[c_strTargetedSelectionFile]]),
-        sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex],
-        cCladogramSelectedTaxa,
+        fIsNormalized, fIsSummed, fSumData,
+        " ".join([Constants_Arguments.c_strTargetedFeatureMethodArgument,sFileConfiguration[c_strConfigTargetedSelection]]),
+        " ".join([Constants_Arguments.c_strUnsupervisedCountArgument,sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex]]),
+        " ".join([Constants_Arguments.c_strTargetedSelectionFileArgument,cCladogramSelectedTaxa.get_abspath()]),
         " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelCountArgument,sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
-        " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp]),
+        " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp.get_abspath()]),
         lsSelectionMethods))
 
     #Create figure 1A PCoA
@@ -842,7 +848,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                       " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                       " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
                                       " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
-                                      " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]])))
+                                      " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]]),
+                                      " ".join([Constants_Arguments.c_strTargetedFeatureMethodArgument,sFileConfiguration[c_strConfigTargetedSelection]])))
 
       if c_EXTREME in lsSelectionMethods:
         #Validate Extreme selection
@@ -966,12 +973,12 @@ if c_fRunCollectionCurve:
       lsPlotCollectorSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniquesCollectorCurve]))
 
       #Make more files, now for figure 5 Collection Curve
-      sOutputFigure5CC, sOutputFigureText5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
-      sfle.rebase( strInputSummaryKey, c_strSufMicropita, s ))) for s in (c_strSufCollectionCurveFigure, c_strSufCollectionCurveText)]
+      sOutputFigure5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
+      sfle.rebase( strInputSummaryKey, c_strSufTable, s ))) for s in (c_strSufCollectionCurveFigure)]
 
       #Create Figure 5
       #Collection Curve
-      Command([sOutputFigure5CC, sOutputFigureText5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
+      Command([sOutputFigure5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
           funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
                               " ".join([Constants_Arguments.c_strIDNameArgument, curSampleNameRow]),
                               " ".join([Constants_Arguments.c_strLastMetadataNameArgument, curLastMetadataRow]),

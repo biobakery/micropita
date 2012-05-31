@@ -285,7 +285,17 @@ class AbundanceTable:
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.shape[0]
         else:
-            return 0
+            return None
+
+    #Happy path tested
+    #Returns float sum of feature values across the samples
+    def funcGetFeatureSumAcrossSamples(self,sFeatureName):
+        if (not self._npaFeatureAbundance == None):
+            for sFeature in self._npaFeatureAbundance:
+                if sFeature[0] == sFeatureName:
+                    return sum(list(sFeature)[1:])
+        else:
+            return None
 
     #Happy path tested
     def funcGetFeatureNames(self):
@@ -739,6 +749,7 @@ class AbundanceTable:
     #Testing Status: 1 Happy path test
     #This method will read in two files and abridge both files (saved as new files)
     #to just the samples in common between the two files given a common identifier.
+    #***If the identifier is not unique in each data set, the first sample is taken
     #Expects the files to have the sample delimiters
     @staticmethod
     def funcPairTables(strFileOne, strFileTwo, strIdentifier, cDelimiter, strOutFileOne, strOutFileTwo, lsIgnoreValues=None):
@@ -784,8 +795,14 @@ class AbundanceTable:
         setsCommonIdentifiers = set(fileOneIdentifier) & set(fileTwoIdentifier)
         if lsIgnoreValues:
             setsCommonIdentifiers = setsCommonIdentifiers - set(lsIgnoreValues)
-        lfFileOneElements = [sIdentifier in setsCommonIdentifiers for sIdentifier in fileOneIdentifier]
-        lfFileTwoElements = [sIdentifier in setsCommonIdentifiers for sIdentifier in fileTwoIdentifier]
+
+        #Get positions of common identifiers in each data set, if the identifier is not unique in a date set just take the first index
+        lfFileOneIDIndexes = [fileOneIdentifier.index(sCommonID) for sCommonID in setsCommonIdentifiers]
+        lfFileTwoIDIndexes = [fileTwoIdentifier.index(sCommonID) for sCommonID in setsCommonIdentifiers]
+
+        #Convert index list to list of boolean
+        lfFileOneElements = [iIndex in lfFileOneIDIndexes for iIndex, sIdentifier in enumerate(fileOneIdentifier)]
+        lfFileTwoElements = [iIndex in lfFileTwoIDIndexes for iIndex, sIdentifier in enumerate(fileTwoIdentifier)]
 
         #Write out file one
         with open(strOutFileOne, 'w') as f:

@@ -33,10 +33,10 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperValidatePCoA.py",
 #Logging
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
-argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
-argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
-argp.add_argument(Constants_Arguments.c_strValidationIDName, dest="sValidationIDName", metavar= "SampleRowNameValidation", default=None, help= Constants_Arguments.c_strValidationIDName)
-argp.add_argument(Constants_Arguments.c_strValidationLastMetadataName, dest="sValidationLastMetadataName", metavar= "FirstDataRowValidation", default=None, help= Constants_Arguments.c_strValidationLastMetadataNameHelp)
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
+argp.add_argument(Constants_Arguments.c_strValidationIDNameArgument, dest="sValidationIDName", metavar= "SampleRowNameValidation", default=None, help= Constants_Arguments.c_strValidationIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strValidationLastMetadataNameArgument, dest="sValidationLastMetadataName", metavar= "FirstDataRowValidation", default=None, help= Constants_Arguments.c_strValidationLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
@@ -44,9 +44,9 @@ argp.add_argument(Constants_Arguments.c_strValidationIsSummedArgument, dest="fVa
 argp.add_argument(Constants_Arguments.c_strValidationIsNormalizedArgument, dest="fValidationIsNormalized", action = "store", metavar= "flagIndicatingNormalizationForValidationFile", 
                   help= Constants_Arguments.c_strValidationIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
-argp.add_argument(Constants_Arguments.c_strPairingMetadata, dest="sPairedMetadata", action = "store", metavar= "sMetadataUsedInPairing", help= Constants_Arguments.c_strPairingMetadataHelp)
-argp.add_argument(Constants_Arguments.c_strMetric, dest="sMetric", action = "store", metavar= "sMetric_For_Validation", help= Constants_Arguments.c_strMetricHelp)
-argp.add_argument(Constants_Arguments.c_strSupervisedLabel, dest="sStratifyMetadata", action = "store", metavar= "sMetadata_For_Stratification", help= Constants_Arguments.c_strSupervisedLabelHelp)
+argp.add_argument(Constants_Arguments.c_strPairingMetadataArgument, dest="sPairedMetadata", action = "store", metavar= "sMetadataUsedInPairing", help= Constants_Arguments.c_strPairingMetadataHelp)
+argp.add_argument(Constants_Arguments.c_strMetricArgument, dest="sMetric", action = "store", metavar= "sMetric_For_Validation", help= Constants_Arguments.c_strMetricHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sStratifyMetadata", action = "store", metavar= "sMetadata_For_Stratification", help= Constants_Arguments.c_strSupervisedLabelHelp)
 
 #Data file
 argp.add_argument( "strValidationAbundanceFile", metavar = "Validation_Abundance_file", help = Constants_Arguments.c_strValidationAbundanceFileHelp)

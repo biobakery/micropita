@@ -44,43 +44,43 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
                   help= Constants_Arguments.c_strLoggingHelp)
 argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp )
 argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = Constants_Arguments.c_strAbundanceFileHelp )
-argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFile )
-argp.add_argument(Constants_Arguments.c_strTaxaFilePath, dest="strTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
-argp.add_argument(Constants_Arguments.c_strHighlightCladeFile, dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, help= Constants_Arguments.c_strHighlightCladeHelp)
+argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFileHelp )
+argp.add_argument(Constants_Arguments.c_strTaxaFilePathArgument, dest="strTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
+argp.add_argument(Constants_Arguments.c_strHighlightCladeFileArgument, dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, help= Constants_Arguments.c_strHighlightCladeHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
-argp.add_argument(Constants_Arguments.c_strRoot, dest = "sRoot", metavar= "root", default="None", help = Constants_Arguments.c_strRootHelp )
-argp.add_argument(Constants_Arguments.c_strEnrichmentMethod, dest="strEnrichmentIndicatorMethod", metavar= "enrichmentIndicatorMethod", default="FDR", 
+argp.add_argument(Constants_Arguments.c_strRootArgument, dest = "sRoot", metavar= "root", default="None", help = Constants_Arguments.c_strRootHelp )
+argp.add_argument(Constants_Arguments.c_strEnrichmentMethodArgument, dest="strEnrichmentIndicatorMethod", metavar= "enrichmentIndicatorMethod", default="FDR", 
                   choices=Constants_Arguments.c_strEnrichmentChoices, help= Constants_Arguments.c_strEnrichmentMethodHelp)
-argp.add_argument(Constants_Arguments.c_strCladeFilterLevel, dest = "iCladeFilterLevel", metavar= "CladeFilterLevel", default="None",help = Constants_Arguments.c_strCladeFilterLevelHelp)
-argp.add_argument(Constants_Arguments.c_strCladeMeasureLevel, dest = "iCladeFilterMeasure", metavar= "CladeFilterLevelMeasure", default="None", help = Constants_Arguments.c_strCladeMeasureLevelHelp)
-argp.add_argument(Constants_Arguments.c_strCladeFilteringMinLevel, dest = "iCladeFilterMinNumber", metavar= "CladeFilterMinNumber", default="None",
+argp.add_argument(Constants_Arguments.c_strCladeFilterLevelArgument, dest = "iCladeFilterLevel", metavar= "CladeFilterLevel", default="None",help = Constants_Arguments.c_strCladeFilterLevelHelp)
+argp.add_argument(Constants_Arguments.c_strCladeMeasureLevelArgument, dest = "iCladeFilterMeasure", metavar= "CladeFilterLevelMeasure", default="None", help = Constants_Arguments.c_strCladeMeasureLevelHelp)
+argp.add_argument(Constants_Arguments.c_strCladeFilteringMinLevelArgument, dest = "iCladeFilterMinNumber", metavar= "CladeFilterMinNumber", default="None",
 	help = Constants_Arguments.c_strCladeFilteringMinLevelHelp)
-argp.add_argument(Constants_Arguments.c_strAbundanceFilterPercentile, dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default=0.0,
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterPercentileArgument, dest = "iAbundanceFilterPercentile", metavar= "AbundanceFilterPercentile", default=0.0,
 	help = Constants_Arguments.c_strAbundanceFilterPercentileHelp)
-argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoff, dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default=0.0,
+argp.add_argument(Constants_Arguments.c_strAbundanceFilterCutoffArgument, dest = "iAbundanceFilterPercentCuttoff", metavar= "AbundanceFilterPercentCuttoff", default=0.0,
 	help = Constants_Arguments.c_strAbundanceFilterCutoffHelp)
-argp.add_argument(Constants_Arguments.c_strRingOrder, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrder)
-argp.add_argument(Constants_Arguments.c_strCircladerTicks, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
-argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
-argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
+argp.add_argument(Constants_Arguments.c_strRingOrderArgument, dest = "iRingOrder", metavar= "Ring Order", default=None, help = Constants_Arguments.c_strRingOrderHelp)
+argp.add_argument(Constants_Arguments.c_strCircladerTicksArgument, dest = "iTicks", metavar= "Internal Dendrogram Ticks", default=None, help = Constants_Arguments.c_strCircladerTicksHelp)
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strNormalizeArgument, dest = "fNormalize", action = "store", default="False", help = Constants_Arguments.c_strNormalizeHelp)
-argp.add_argument(Constants_Arguments.c_strEnrichmentThreshold, dest = "dAlpha", action = "store", default = 0.05, help = Constants_Arguments.c_strEnrichmentThresholdHelp)
-argp.add_argument(Constants_Arguments.c_strOccurenceFilterSequenceCount, dest ="iMinSequenceCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSequenceHelp)
-argp.add_argument(Constants_Arguments.c_strOccurenceFilterSampleCount, dest ="iMinSampleCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSampleHelp)
+argp.add_argument(Constants_Arguments.c_strEnrichmentThresholdArgument, dest = "dAlpha", action = "store", default = 0.05, help = Constants_Arguments.c_strEnrichmentThresholdHelp)
+argp.add_argument(Constants_Arguments.c_strOccurenceFilterSequenceCountArgument, dest ="iMinSequenceCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSequenceHelp)
+argp.add_argument(Constants_Arguments.c_strOccurenceFilterSampleCountArgument, dest ="iMinSampleCount", action = "store", default=0.0, help = Constants_Arguments.c_strOccurenceFilterSampleHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
 argp.add_argument(Constants_Arguments.c_strSumDataArgument, dest="fSumData", action = "store", metavar= "WouldlikeDataSummed", help= Constants_Arguments.c_strSumDataHelp)
 
 #Outputfile
-argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFile )
-argp.add_argument( "sColorFileName", metavar = "ColorFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerColorFile )
-argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTickFile )
-argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerHighlightFile )
-argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerSizeFile )
-argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerCircleFile )
-argp.add_argument( "strOutFigure", metavar = "SelectionCladogram.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputFigure )
-argp.add_argument( "strDetailOutputFile", metavar = "SelectionDetail.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputDetails )
+argp.add_argument( "sTaxaFileName", metavar = "TaxaFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTaxaFileHelp )
+argp.add_argument( "sColorFileName", metavar = "ColorFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerColorFileHelp )
+argp.add_argument( "sTickFileName", metavar = "TickFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerTickFileHelp )
+argp.add_argument( "sHighlightFileName", metavar = "HighlightFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerHighlightFileHelp )
+argp.add_argument( "sSizeFileName", metavar = "SizeFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerSizeFileHelp )
+argp.add_argument( "sCircleFileName", metavar = "CircleFile.txt", nargs = "?", help = Constants_Arguments.c_strCircladerCircleFileHelp )
+argp.add_argument( "strOutFigure", metavar = "SelectionCladogram.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputFigureHelp )
+argp.add_argument( "strDetailOutputFile", metavar = "SelectionDetail.png", nargs = "?", help = Constants_Arguments.c_strCircladerOutputDetailsHelp )
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 

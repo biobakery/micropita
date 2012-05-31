@@ -133,11 +133,11 @@ argp.add_argument( Constants_Arguments.c_strInvertArgument, dest = "fInvert", ac
 	help = Constants_Arguments.c_strInvertHelp)
 #Select file
 argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
-argp.add_argument( "strHCLLoc", metavar = "HClust_location", help = Constants_Arguments.c_strHCLLocation)
+argp.add_argument( "strHCLLoc", metavar = "HClust_location", help = Constants_Arguments.c_strHCLLocationHelp)
 #Outputfile
-argp.add_argument( "strOutHCLDataFile", metavar = "HCLData.txt", nargs = "?", help = Constants_Arguments.c_strHCLDataFile)
-argp.add_argument( "strOutHCLColorFile", metavar = "HCLColor.txt", nargs = "?", help = Constants_Arguments.c_strHCLColorFile)
-argp.add_argument( "strOutHCLLabelFile", metavar = "HCLLabel.txt", nargs = "?", help = Constants_Arguments.c_strHCLLabelFile)
+argp.add_argument( "strOutHCLDataFile", metavar = "HCLData.txt", nargs = "?", help = Constants_Arguments.c_strHCLDataFileHelp)
+argp.add_argument( "strOutHCLColorFile", metavar = "HCLColor.txt", nargs = "?", help = Constants_Arguments.c_strHCLColorFileHelp)
+argp.add_argument( "strOutHCLLabelFile", metavar = "HCLLabel.txt", nargs = "?", help = Constants_Arguments.c_strHCLLabelFileHelp)
 argp.add_argument( "strOutFigure", metavar = "SelectionHCL.png", nargs = "?", help = Constants_Arguments.c_genericOutputFigureFileHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__

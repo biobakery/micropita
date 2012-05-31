@@ -35,28 +35,19 @@ from Utility_Math import Utility_Math
 class MicropitaPaperCollectionCurve:
 
     #Bootstrap interations
-    c_BootstrapItr = 100
+    c_BootstrapItr = 10
 
     #Metric
     c_strMetricCategory = "Observed Counts"
 
     #Plot the collection curve
-    def funcPlotCollectionCurve(self, strPlotName, dictMethods, dictdMaxYMetric, dictdMinYMetric, dictdDiversityBaseline, strMetric, fInvert):
+    def funcPlotCollectionCurve(self, abndData, strPlotName, dictMethods, setiSelectionCounts, strMetric, fInvert):
         logging.info("Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve")
         logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve strPlotName=",str(strPlotName)]))
         logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictMethods=",str(dictMethods)]))
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdMaxYMetric=",str(dictdMaxYMetric)]))
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdMinYMetric=",str(dictdMinYMetric)]))
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdDiversityBaseline=",str(dictdDiversityBaseline)]))
+        logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve setiSelectionCounts=",str(setiSelectionCounts)]))
         logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve strMetric=",str(strMetric)]))
         logging.debug("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve fInvert=",str(fInvert)]))
-
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve strPlotName=",str(strPlotName)]))
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictMethods=",str(dictMethods)]))
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdMaxYMetric=",str(dictdMaxYMetric)]))
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdMinYMetric=",str(dictdMinYMetric)]))
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve dictdDiversityBaseline=",str(dictdDiversityBaseline)]))
-        print("".join(["Start MicropitaPaperCollectionCurve.funcPlotCollectionCurve strMetric=",str(strMetric)]))
 
         font = {'family':'arial',
            'color':'k',
@@ -67,7 +58,7 @@ class MicropitaPaperCollectionCurve:
         objColors = Constants_Figures()
         objColors.invertColors(fInvert=fInvert)
 
-        #Get plot object
+        #Get plot object and set colors for inversion
         imgFigure = plt.figure()
         imgFigure.set_facecolor(objColors.c_strBackgroundColorWord)
         imgSubplot = imgFigure.add_subplot(111,axisbg=objColors.c_strBackgroundColorLetter)
@@ -83,52 +74,46 @@ class MicropitaPaperCollectionCurve:
         imgSubplot.tick_params(axis='y', colors=objColors.c_strDetailsColorLetter)
         charMarkerEdgeColor = objColors.c_strDetailsColorLetter
 
+        #Get sample names
+        lsSampleNames = abndData.funcGetSampleNames()
+        rawAbundance = abndData.funcGetAbundanceCopy()
+
+        #Used to size the domain and range of the plots
         iYMin = 0
         iYMax = 0
         iXMin = 0
         iXMax = 0
-
         liX = list()
         liY = list()
-        #Plot max y metric
-        for iCount in sorted(dictdMaxYMetric.keys()):
-            liX.append(iCount)
-            liY.append(dictdMaxYMetric[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Summed Max "+strMetric)
 
-        #Update range
-        iYMin = min(liY)
-        iYMax = max(liY)
-        iXMin = min(liX)
-        iXMax = max(liX)
-
-        #Plot min y metric
+        #Plot bootstrapped metric median values as a line
         liX = list()
         liY = list()
-        for iCount in sorted(dictdMinYMetric.keys()):
-            liX.append(iCount)
-            liY.append(dictdMinYMetric[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="-", linestyle='--', label = "Summed Min "+strMetric)
 
-        #Update range
-        iYMin = min(liY)
-        iYMax = max(liY)
-        iXMin = min(liX)
-        iXMax = max(liX)
+        #Booststrapped diversity level at N
+        dictdBootstrappedMetricAtN = dict()
 
-        #Plot bootstrapped diversity
-        liX = list()
-        liY = list()
-        for iCount in sorted(dictdDiversityBaseline.keys()):
-            liX.append(iCount)
-            liY.append(dictdDiversityBaseline[iCount])
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker=".", linestyle='--', label = "Bootstrapped "+strMetric)
+        #Per sample selection count get the bootstrapped metric
+        for iSelectionCount in setiSelectionCounts:
+            #Get bootstrapped metric
+            ldMeasurements = self.getMedianBootstrappedObservedCount(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = iSelectionCount, iBootStrappingItr = self.c_BootstrapItr)
 
-        #Update range
-        iYMin = min(liY+[iYMin])
-        iYMax = max(liY+[iYMax])
-        iXMin = min(liX+[iXMin])
-        iXMax = max(liX+[iXMax])
+            #Plot box plot
+            bp = imgSubplot.boxplot(x=[ldMeasurements], positions=[iSelectionCount], notch=1, patch_artist=True)
+            plt.setp(bp['boxes'], color=objColors.c_strDetailsColorLetter, facecolor=objColors.c_strGridLineColor, alpha=objColors.c_dAlpha)
+            plt.setp(bp['whiskers'], color=objColors.c_strDetailsColorLetter)
+
+            liX.append(iSelectionCount)
+            liY.append(np.median(ldMeasurements))
+
+            #Update range and domain
+            iYMin = min([iYMin]+ldMeasurements)
+            iYMax = max([iYMax]+ldMeasurements)
+            iXMin = min([iXMin]+[iSelectionCount])
+            iXMax = max([iXMax]+[iSelectionCount])
+
+        #Plot median values as a line
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Bootstrapped"+strMetric)
 
         #Plot methods
         for strMethod in dictMethods:
@@ -146,10 +131,12 @@ class MicropitaPaperCollectionCurve:
             iXMin = min(liX+[iXMin])
             iXMax = max(liX+[iXMax])
 
+        ###Aesthetics
+        #Make the plot a little bigger than needed
         xlim(iXMin*.9,iXMax*1.1)
         ylim(iYMin*.9,iYMax*1.1)
-        objLegend = imgSubplot.legend(loc="upper right", scatterpoints=1, prop={'size':10})
-
+        plt.xticks(setiSelectionCounts)
+        objLegend = imgSubplot.legend(loc="lower right", scatterpoints=1, prop={'size':10})
         #Invert legend
         if(fInvert):
             objLegend.legendPatch.set_fc(objColors.c_strBackgroundColorWord)
@@ -164,11 +151,11 @@ class MicropitaPaperCollectionCurve:
 
     #First a subselection occurs and pool. 
     # Pool by sum then normalize then measure diversity
-    def getMedianBootstrappedMetric(self, npaAbundance, lsSampleNames, iSelectSampleCount, iBootStrappingItr, microPITA):
-        logging.info("Start MicropitaPaperCollectionCurve.getMedianBootstrappedMetric")
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedMetric lsSampleNames=",str(lsSampleNames)]))
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedMetric iSelectSampleCount=",str(iSelectSampleCount)]))
-        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedMetric iBootStrappingItr=",str(iBootStrappingItr)]))
+    def getMedianBootstrappedObservedCount(self, npaAbundance, lsSampleNames, iSelectSampleCount, iBootStrappingItr):
+        logging.info("Start MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount")
+        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount lsSampleNames=",str(lsSampleNames)]))
+        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount iSelectSampleCount=",str(iSelectSampleCount)]))
+        logging.debug("".join(["Start MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount iBootStrappingItr=",str(iBootStrappingItr)]))
 
         ldMeasurePerIteration = list()
         for iItr in xrange(iBootStrappingItr):
@@ -180,26 +167,8 @@ class MicropitaPaperCollectionCurve:
                 ldMeasurePerIteration.append(0.0)
             else:
                 ldMeasurePerIteration.append(Diversity.getObservedCount(tempSampleAbundances=ldPooledSample))
-        logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedMetric")
-        return np.median(ldMeasurePerIteration)
-
-    def funcGetHighestPossibleCounts(self, iSampleSelectionCount, rawAbundance, lsSampleNames):
-#        iBestCount = 0
-#        for lsSelection in itertools.permutations(lsSampleNames,iSampleSelectionCount):
-#            iCurCount = Diversity.getObservedCount(tempSampleAbundances= np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, lsSelection)))
-#            if iCurCount > iBestCount:
-#                iBestCount = iCurCount
-#        return iBestCount
-        return 0
-
-    def funcGetLeastPossibleCounts(self, iSampleSelectionCount, rawAbundance, lsSampleNames):
-#        iLeastCount = 10000000
-#        for lsSelection in itertools.permutations(lsSampleNames,iSampleSelectionCount):
-#            iCurCount = Diversity.getObservedCount(tempSampleAbundances= np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance, lsSelection)))
-#            if iCurCount < iLeastCount:
-#                iLeastCount = iCurCount
-#        return iLeastCount
-        return 0
+        logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount")
+        return ldMeasurePerIteration
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py", 
@@ -209,18 +178,17 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperCollectionCurve.py",
 #Logging
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
-argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
-argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
-argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
+argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
 
 #Select file
 argp.add_argument( "strAbundanceFile", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Outputfile
 argp.add_argument( "strOutFigure", metavar = "CollectionCurveOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
-argp.add_argument( "strOutText", metavar = "CollectionCurveOutputTextFile", help = Constants_Arguments.c_genericOutputDataFileHelp)
 argp.add_argument( "strSelectionFiles", metavar = "InputSelectionFiles", nargs = "+", help = Constants_Arguments.c_strSelectionMethodsHelp)
 #Selection parameter
 argp.add_argument(Constants_Arguments.c_strPlotSelectedArgument, metavar = "Selection_Methods", nargs = "+", help = Constants_Arguments.c_strPlotSelectedHelp)
@@ -258,7 +226,7 @@ def _main( ):
 
     #Manage the cases where there are no or 1 selection file given
     if args.strSelectionFiles == None:
-      logging.warning("MicropitaPaperCollectionCurve. No files were provided indicating sample selection so the collection curve was not made.")
+      logging.error("MicropitaPaperCollectionCurve. No files were provided indicating sample selection so the collection curve was not made.")
       return False
     if isinstance(args.strSelectionFiles, basestring):
       args.strSelectionFiles = [args.strSelectionFiles]
@@ -270,18 +238,10 @@ def _main( ):
 
     #Do not produce a plot for summed or normalized data
     if totalData.funcIsSummed() or totalData.funcIsNormalized():
-        logging.error("MicropitaPaperCollectionCurve. Will not produce a Refraction curve on normalized or summed data.")
+        logging.error("MicropitaPaperCollectionCurve. Will not produce a refraction curve on normalized or summed data.")
         return False
 
     rawAbundance = totalData.funcGetAbundanceCopy()
-    lsSampleNames = totalData.funcGetSampleNames()
-
-    #Calculate individual counts per sample (row)
-    #Sort the sample names by their diversity and store the names (Lowest diversity first)
-    #the abundances will be used for pooling later and so will need to stay unnormalized.
-#    lStudyMetrics = zip([Diversity.getObservedCount(rawAbundance[sSample]) for sSample in lsSampleNames],lsSampleNames)
-#    lStudyMetrics.sort(key=operator.itemgetter(0))
-#    lStudyMetrics = [tplSample[1] for tplSample in lStudyMetrics]
 
     #Read through selection files and place contents in dictionary
     dictAllSelectionStudies = dict()
@@ -295,10 +255,11 @@ def _main( ):
     logging.debug(dictAllSelectionStudies)
 
     #Store the different sampling counts in all the studies
-    setSampleCounts = set()
+    setiSampleCounts = set()
 
     #For each selection/study evaluate the methods by diversity or top ranked
-    #Creating the following structure {"MethodName":{iSampleCount:metric}}
+    #Creating the following structure {"MethodName":{iSampleCount:metric measurement}}
+    # example {"Representative":{5:34}}
     dictMetricsBySampleN = dict()
     for dictStudy in dictAllSelectionStudies:
         dictCurStudy = dictAllSelectionStudies[dictStudy]
@@ -317,35 +278,18 @@ def _main( ):
                 lsCurSampleSelections = dictCurStudy[strCurrentMethod]
 
                 iSampleCount = len(lsCurSampleSelections)
-                setSampleCounts.add(iSampleCount)
+                setiSampleCounts.add(iSampleCount)
 
-                #Calculate diversity
+                #Calculate measurement
                 #This assumes that a method is not ran multiple times in the same study at the same count
                 #And if so that the same method at the same count will give the same results which is currently true
                 ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
-                #Get diversity (observed count)
+                #Get measurement (observed count)
                 dictCurStudyMethod[iSampleCount]=Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
     logging.debug(dictMetricsBySampleN)
-
-    #Most diverse set of samples at each N
-    dictdMostMetricSamplesAtN = dict()
-    #Least diverse set of samples at each N
-    dictdLeastMetricSamplesAtN = dict()
-    #Booststrapped diversity level at N
-    dictdBootstrappedMetricAtN = dict()
-
-    #Per sample selection count get the metric of the most, least, and bootstrapped samples given the metric
-    for strSelectionCount in setSampleCounts:
-        #Get Most and least diverse sample per N
-        iSampleSelectionCount = int(strSelectionCount)
-        dictdMostMetricSamplesAtN[strSelectionCount] = mCC.funcGetHighestPossibleCounts(iSampleSelectionCount, rawAbundance, lsSampleNames)
-        dictdLeastMetricSamplesAtN[strSelectionCount] = mCC.funcGetLeastPossibleCounts(iSampleSelectionCount, rawAbundance, lsSampleNames)
-
-        #Get bootstrapped metric
-        dictdBootstrappedMetricAtN[strSelectionCount] = mCC.getMedianBootstrappedMetric(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = int(strSelectionCount), iBootStrappingItr = mCC.c_BootstrapItr, microPITA = microPITA)
 
     #Update the plot name with the run metric
     strPlotNamePieces = filter(None,re.split(Constants.PATH_SEP,args.strOutFigure))
@@ -353,7 +297,9 @@ def _main( ):
     strPlotName = Constants.PATH_SEP.join([strPlotName,mCC.c_strMetricCategory+"-"+strPlotNamePieces[-1:][0]])
 
     #Plot line graph
-    mCC.funcPlotCollectionCurve(strPlotName=strPlotName, dictMethods=dictMetricsBySampleN, dictdMaxYMetric=dictdMostMetricSamplesAtN, dictdMinYMetric=dictdLeastMetricSamplesAtN, dictdDiversityBaseline=dictdBootstrappedMetricAtN, strMetric=mCC.c_strMetricCategory, fInvert = fInvert)
+    sortedCounts = list(setiSampleCounts)
+    sortedCounts.sort()
+    mCC.funcPlotCollectionCurve(abndData = totalData, strPlotName=strPlotName, dictMethods=dictMetricsBySampleN, setiSelectionCounts = sortedCounts, strMetric=mCC.c_strMetricCategory, fInvert = fInvert)
 
     logging.info("Stop MicropitaPaperCollectionCurve")
 

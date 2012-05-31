@@ -61,7 +61,7 @@ class Constants_Arguments():
     c_strFeatureNameDelimiterHelp = "The delimiter for a feaure name if it contains a consensus sequence."
 
     #i Flag to record if the colors are inverted
-    c_strInvertArgumentArgument = "-i"
+    c_strInvertArgument = "-i"
     c_strInvertHelp = "Invert the image to a black background (default=False)."
 
     #in flag indicating the original file is normalized as read in
@@ -69,11 +69,11 @@ class Constants_Arguments():
     c_strIsNormalizedHelp = "Indicates if the file is normalized when read in (True indicates normalized)."
 
     #is flag indicating the original file is summed as read in
-    c_strIsSummedArgumentArgument = "-is"
+    c_strIsSummedArgument = "-is"
     c_strIsSummedHelp = "Indicates if the file is summed when read in (True indicates summed)."
 
     #l String for logging level
-    c_strLoggingArgumentArgument = "-l"
+    c_strLoggingArgument = "-l"
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
     c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
@@ -96,7 +96,7 @@ class Constants_Arguments():
 
     #o Circlader ring order
     c_strRingOrderArgument = "-o"
-    c_StrRingOrderHelp = "The order to use for the cladogram rings from inner ring to outer ring." 
+    c_strRingOrderHelp = "The order to use for the cladogram rings from inner ring to outer ring." 
 
     #ofe Occurence filtering minimum sequence count
     c_strOccurenceFilterSequenceCountArgument = "-ofe"

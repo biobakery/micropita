@@ -32,10 +32,10 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperValidateFeatureAbundance.p
 #Logging
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
-argp.add_argument(Constants_Arguments.c_strIDName, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDName)
-argp.add_argument(Constants_Arguments.c_strLastMetadataName, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
-argp.add_argument(Constants_Arguments.c_strValidationIDName, dest="sValidationIDName", metavar= "SampleRowNameValidation", default=None, help= Constants_Arguments.c_strValidationIDName)
-argp.add_argument(Constants_Arguments.c_strValidationLastMetadataName, dest="sValidationLastMetadataName", metavar= "FirstDataRowValidation", default=None, help= Constants_Arguments.c_strValidationLastMetadataNameHelp)
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "SampleRowName", default=None, help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "FirstDataRow", default=None, help= Constants_Arguments.c_strLastMetadataNameHelp)
+argp.add_argument(Constants_Arguments.c_strValidationIDNameArgument, dest="sValidationIDName", metavar= "SampleRowNameValidation", default=None, help= Constants_Arguments.c_strValidationIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strValidationLastMetadataNameArgument, dest="sValidationLastMetadataName", metavar= "FirstDataRowValidation", default=None, help= Constants_Arguments.c_strValidationLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store", metavar= "flagIndicatingNormalization", 
                   help= Constants_Arguments.c_strIsNormalizedHelp)
@@ -43,13 +43,15 @@ argp.add_argument(Constants_Arguments.c_strValidationIsSummedArgument, dest="fVa
 argp.add_argument(Constants_Arguments.c_strValidationIsNormalizedArgument, dest="fValidationIsNormalized", action = "store", metavar= "flagIndicatingNormalizationForValidationFile", 
                   help= Constants_Arguments.c_strValidationIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
-argp.add_argument(Constants_Arguments.c_strPairingMetadata, dest="sPairedMetadata", action = "store", metavar= "sMetadataUsedInPairing", help= Constants_Arguments.c_strPairingMetadataHelp)
+argp.add_argument(Constants_Arguments.c_strPairingMetadataArgument, dest="sPairedMetadata", action = "store", metavar= "sMetadataUsedInPairing", help= Constants_Arguments.c_strPairingMetadataHelp)
+argp.add_argument(Constants_Arguments.c_strTargetedFeatureMethodArgument, dest="sFeatureSelection", metavar= "Feature Selection Method", default=Constants_Arguments.lsTargetedFeatureMethodValues[0], 
+                  choices=Constants_Arguments.lsTargetedFeatureMethodValues, help= Constants_Arguments.c_strTargetedFeatureMethodHelp)
 
 #Data file
 argp.add_argument( "strValidationAbundanceFile", metavar = "Validation_Abundance_file", help = Constants_Arguments.c_strValidationAbundanceFileHelp)
 argp.add_argument( "strSelectionAbundanceFile", metavar = "Selection_Abundance_file", help = Constants_Arguments.c_strSelectionAbundanceFileHelp)
 argp.add_argument( "strSelectionFile", metavar = "Selection_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
-argp.add_argument( "strValidateFeatureFile", metavar = "Feature_file", help = Constants_Arguments.c_strTaxaSelectionFile)
+argp.add_argument( "strValidateFeatureFile", metavar = "Feature_file", help = Constants_Arguments.c_strTargetedSelectionFileHelp)
 
 #Outputfile
 argp.add_argument( "strOutFigure", metavar = "BoxPlotOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
@@ -69,8 +71,19 @@ def _main( ):
     logging.info("MicropitaPaperValidateFeatureAbundance. The following arguments were passed.")
     logging.info(str(args))
 
-    #False indicates Ranking
-    c_PlotAbundance = False
+
+    if not args.sFeatureSelection:
+        logging.error("MicropitaPaperValidateFeatureAbundance::Did not receive a method to measure the feature so the plot was not generated.")
+        return False
+
+    c_PlotAbundance = None
+    if args.sFeatureSelection.lower() == Constants_Arguments.c_TARGETED_METHOD_RANKED.lower():
+        c_PlotAbundance = False
+    elif args.sFeatureSelection.lower() == Constants_Arguments.c_TARGETED_METHOD_ABUNDANCE.lower():
+        c_PlotAbundance = True
+    else:
+        logging.error("MicropitaPaperValidateFeatureAbundance::Did not receive a valid value for method to measure the feature so the plot was not generated. Received:"+str( args.sFeatureSelection))
+        return False
 
     #Invert figure
     fInvert = (args.fInvert.lower() == "true")
