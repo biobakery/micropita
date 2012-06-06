@@ -21,7 +21,6 @@ if(not Constants.COGENT_SRC in sys.path):
     sys.path.append(Constants.COGENT_SRC)
 if(not Constants.QIIME_SRC in sys.path):
     sys.path.append(Constants.QIIME_SRC)
-from ValidateData import ValidateData
 
 #External libraries
 from cogent.maths.stats.alpha_diversity import chao1_uncorrected, chao1_bias_corrected

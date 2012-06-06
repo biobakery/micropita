@@ -45,6 +45,10 @@ class Constants_Arguments():
     c_strFirstDataRowHelp = "".join(["The row in the abundance file that is the first row to contain abundance data. ",
          "This row and after are assumed to be abundance data. The area between the iSampleNameRow and this are assumed to be metadata."])
 
+    #delim File delimiter
+    c_strFileDelimiterArgument = "-delim"
+    c_strFileDelimiterHelp = "The delimiter for the abundance table."
+
     #e Enrichment method for circlader
     c_strEnrichmentMethodArgument = "-e"
     c_strEnrichmentMethodHelp = """The type of result the TAXA/OTU circles are commenting on. 
@@ -52,46 +56,58 @@ class Constants_Arguments():
                         FDR shows the PVALUE option but with a Benjamini and Hochberg FDR correction and a threshold of 0.1"""
     c_strEnrichmentChoices = ["PVALUE","FDR"]
 
-    #fd File delimiter
-    c_strFileDelimiterArgument = "-fd"
-    c_strFileDelimiterHelp = "The delimiter for the abundance table."
-
-    #ftd Feature delimiter
-    c_strFeatureNameDelimiterArgument = "-ftd"
+    #featdelim Feature delimiter
+    c_strFeatureNameDelimiterArgument = "-featdelim"
     c_strFeatureNameDelimiterHelp = "The delimiter for a feaure name if it contains a consensus sequence."
 
     #i Flag to record if the colors are inverted
     c_strInvertArgument = "-i"
     c_strInvertHelp = "Invert the image to a black background (default=False)."
 
-    #in flag indicating the original file is normalized as read in
-    c_strIsNormalizedArgument = "-in"
+    #id Name of the sample id row
+    c_strIDNameArgument = "-id"
+    c_strIDNameHelp = "The row in the abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
+
+    #isnorm flag indicating the original file is normalized as read in
+    c_strIsNormalizedArgument = "-isnorm"
     c_strIsNormalizedHelp = "Indicates if the file is normalized when read in (True indicates normalized)."
 
-    #is flag indicating the original file is summed as read in
-    c_strIsSummedArgument = "-is"
+    #issum flag indicating the original file is summed as read in
+    c_strIsSummedArgument = "-issum"
     c_strIsSummedHelp = "Indicates if the file is summed when read in (True indicates summed)."
 
+    #label Supervised Label
+    c_strSupervisedLabelArgument = "-label"
+    c_strSupervisedLabelHelp = "The name of the phenotype data row on which to perform supervised methods"
+
+    #lastmeta The name of the last metadata
+    c_strLastMetadataNameArgument = "-lastmeta"
+    c_strLastMetadataNameHelp = "The row in the abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
+
+    #Level Terminal clade level
+    c_strTerminalLevelArgument = "-level"
+    c_strTerminalLevelHelp = "The terminal clade for analysis defined in the tree made by the consensus lineage of the features."
+
     #l String for logging level
-    c_strLoggingArgument = "-l"
+    c_strLoggingArgument = "-logging"
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
     c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
-
-    #m The name of the last metadata
-    c_strLastMetadataNameArgument = "-m"
-    c_strLastMetadataNameHelp = "The row in the abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
 
     #metric The metric used for evaluation
     c_strMetricArgument = "-metric"
     c_strMetricHelp = "The metric used for measurement."
 
-    #n Name of the sample id row
-    c_strIDNameArgument = "-n"
-    c_strIDNameHelp = "The row in the abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
+    #-nosum Sum data
+    c_strSumDataArgument = "-nosum"
+    c_strSumDataHelp = "The analysis/plotting should be performed on data with clades which are summed. If data is not provided this way, summation will occur before analysis and plotting as needed. This turns off summing."
 
-    #nu The Number of unsupervised sample selection
-    c_strUnsupervisedCountArgument = "-nu"
+    #nsup Supervised label count
+    c_strSupervisedLabelCountArgument = "-nsup"
+    c_strSupervisedLabelCountHelp = "The count of labeled data to select per label. (An integer greater than 0)."
+
+    #nun The Number of unsupervised sample selection
+    c_strUnsupervisedCountArgument = "-nun"
     c_strUnsupevisedCountHelp = "The number of samples to select with unsupervised methodology. (An integer greater than 0.)."
 
     #o Circlader ring order
@@ -127,42 +143,29 @@ class Constants_Arguments():
     c_strRootArgument = "-rt"
     c_strRootHelp = "The Clade at which to root the cladogram. Default None indicates no rooting outside of the structure of the input file."
 
-    #s Supervised Label
-    c_strSupervisedLabelArgument = "-s"
-    c_strSupervisedLabelHelp = "The name of the phenotype data row on which to perform supervised methods"
-
-    #-sd Sum data
-    c_strSumDataArgument = "-sd"
-    c_strSumDataHelp = "The analysis/plotting should be performed on data with clades which are summed. If data is not provided this way, summation will occur before analysis and plotting as needed."
-
-    #sc Supervised label count
-    c_strSupervisedLabelCountArgument = "-sc"
-    c_strSupervisedLabelCountHelp = "The count of labeled data to select per label (default =1)"
+    #stratify Unsupervised stratify metadata
+    c_strUnsupervisedStratifyMetadataArgument = "-stratify"
+    c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
 
     #t Taxa file path
     c_strTaxaFilePathArgument = "-t"
     c_strTaxaFileHelp= "The file containing the clades or taxa/OTUs to highlight in the circlader."
 
-    #tm Taxa selection method
-    c_strTargetedFeatureMethodArgument = "-tm"
+    #targetmethod Taxa selection method
+    c_strTargetedFeatureMethodArgument = "-targetmethod"
     c_strTargetedFeatureMethodHelp = "The method used to select targeted features."
-
-    #tmp Temporary directory
-    c_strTemporaryDirectoryArgument = "-tmp"
-    c_genericTMPDirLocationHelp = "Directory to place temporary and intermediate files."
-
-    #target Targeted feature file
-    c_strTargetedSelectionFileArgument = "-target"
-    c_strTargetedSelectionFileHelp = "A file containing taxa/otu/clades to be used in targeted feature selection."
-
     #Order is important, the first is the default
     c_TARGETED_METHOD_RANKED = "Targeted_Rank"
     c_TARGETED_METHOD_ABUNDANCE = "Targeted_Abundance"
     lsTargetedFeatureMethodValues = [c_TARGETED_METHOD_RANKED, c_TARGETED_METHOD_ABUNDANCE]
 
-    #u Unsupervised stratify metadata
-    c_strUnsupervisedStratifyMetadataArgument = "-u"
-    c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
+    #tmp Temporary directory
+    c_strTemporaryDirectoryArgument = "-tmp"
+    c_genericTMPDirLocationHelp = "Directory to place temporary and intermediate output files."
+
+    #target Targeted feature file
+    c_strTargetedSelectionFileArgument = "-target"
+    c_strTargetedSelectionFileHelp = "A file containing taxa/otu/clades to be used in targeted feature selection."
 
     #vin flag indicating the original file is normalized as read in
     c_strValidationIsNormalizedArgument = "-vin"

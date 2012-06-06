@@ -22,6 +22,7 @@ from Diversity import Diversity
 import logging
 import matplotlib.pyplot as plt
 from MicroPITA import MicroPITA
+import random
 import os
 
 #Set up arguments reader
@@ -223,8 +224,10 @@ def _main( ):
                     #xtickNames = plt.setp(imgSubplot, xticklabels=["Selected", "Not Selected", "Diff Selected", "Diff Not Selected","x1","x2","x3","x4"])
                     xtickNames = plt.setp(imgSubplot, xticklabels=["".join(["Selected (",str(len(ldAverageSelectedAbundance)),")"]),
                                                                    "".join(["Not Selected (",str(len(ldAverageNotSelectedAbundance)),")"])])
-                    plt.scatter(x=[1]*len(ldAverageSelectedAbundance),y=ldAverageSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
-                    plt.scatter(x=[2]*len(ldAverageNotSelectedAbundance),y=ldAverageNotSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+                    ldJitteredX1 = [1.0+random.uniform(-.05,.05) for x in xrange(len(ldAverageSelectedAbundance))]
+                    ldJitteredX2 = [2.0+random.uniform(-.05,.05) for x in xrange(len(ldAverageNotSelectedAbundance))]
+                    plt.scatter(x=ldJitteredX1,y=ldAverageSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+                    plt.scatter(x=ldJitteredX2,y=ldAverageNotSelectedAbundance,c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
                     imgSubplot.set_title("Targeted feature selection shown in validation data.")
 
                     if not c_PlotAbundance:

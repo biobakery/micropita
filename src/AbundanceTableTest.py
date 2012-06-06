@@ -1094,6 +1094,30 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(abndDataAnswer),"".join([str(self),"::Expected=",str(abndDataAnswer),". Received=",str(result),"."]))
 
+    #Test filterFeatureBySTD
+    def testFilterFeatureBYSTDForGoodCase1(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestSTDFiltering-Answer.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Filter options
+        dMinSTD = 5
+
+        #Correct Answer
+        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+
+        #Call method
+        data.funcFilterFeatureBySTD(dMinSTDCuttOff=dMinSTD)
+        result = data.funcGetAbundanceCopy()
+        
+        #Check result against answer
+        self.assertEqual(str(result),str(abndDataAnswer[0]),"".join([str(self),"::Expected=",str(abndDataAnswer[0]),". Received=",str(result),"."]))
+
     #Test funcNormalize
     def testFuncNormalizeForGoodCaseSummed(self):
         

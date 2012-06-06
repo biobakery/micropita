@@ -38,10 +38,10 @@ c_strSufCircTick = ".CTick"
 c_strSufCheckedTable = "".join(["-checked",c_strSufTable])
 c_strSufCollectionCurveFigure = "-ColCurv.pdf"
 c_strSufCollectionCurveText = "-ColCurv.txt"
-c_strSufCombinedPCOA = "-Combined.pdf"
+c_strSufCombinedPCOA = "-Combined.png"
 c_strSufCombinedStratPCOA = "-Combined-StratPCoA.pdf"
 c_strSufConfig = ".config"
-c_strSufConfusionMatrix = "-Confusion.pdf"
+c_strSufConfusionMatrix = "-Confusion.png"
 c_strSufFig2 = "-Fig2.pdf"
 c_strSufHCLUSTColor = ".HCLColor"
 c_strSufHCLUSTData = ".HCLData"
@@ -49,7 +49,7 @@ c_strSufHCLUSTFig = "-SHCL.pdf"
 c_strSufHCLUSTLabel = ".HCLLabel"
 c_strSufInsilicoData = c_strSufTable
 c_strSufMetaMatrix = ".meta"
-c_sufMetaConfusionMatrix = "-metaConfusion.pdf"
+c_sufMetaConfusionMatrix = "-metaConfusion.png"
 c_sufMetaOverlapMatrix = "-metaOverlap.pdf"
 c_strSufMicropita = ".txt"
 c_strSufOverlapMatrix = "-overlap.pdf"
@@ -64,6 +64,7 @@ c_strSufStratPCOA = "-StratPCoA.pdf"
 c_strSufUncheckedTable = c_strSufTable
 c_strSufValidatedDiversity = "-ValidatedMaxDiv.pdf"
 c_strSufValidatedFeature = "-ValidatedFeature.pdf"
+c_strSufValidatedFeatureHistogram = "-ValidatedFeatureHist.pdf"
 c_strSufValidatedExtreme = "-ValidatedMaxDis.pdf"
 c_strSufValidatedRepresentative = "-ValidatedMaxRep.pdf"
 c_strSufValidatedDistinct = "-ValidatedDistinct.pdf"
@@ -144,6 +145,7 @@ c_strConfigSumData = "[Sum Clades for Analysis/Plotting]"
 c_strConfigSupervisedLabel = "[Supervised Label]"
 c_strConfigSupervisedCount = "[Supervised Selection Count]"
 c_strConfigTargetedSelection = "[Targeted Feature Selection Method]"
+c_strConfigTerminalLevel = "[Show Clade Level]"
 c_strConfigUnsupervisedCount = "[Unsupervised Selection Count]"
 c_strConfigUnsupervisedStratify = "[Stratify by Metadata]"
 c_strConfigValidationFile = "[Validation Input File]"
@@ -189,6 +191,7 @@ c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSe
 c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
 c_fileProgValidateDiversity = File( sfle.d( fileDirSrc, "MicropitaPaperValidateDiversity.py" ))
 c_fileProgValidateFeature = File( sfle.d( fileDirSrc, "MicropitaPaperValidateFeatureAbundance.py" ))
+c_fileProgValidateFeatureHistogram = File( sfle.d( fileDirSrc, "MicropitaPaperValidateFeatureAbundanceHistogram.py" ))
 c_fileProgValidatePCoA = File( sfle.d( fileDirSrc, "MicropitaPaperValidatePCoA.py" ))
 
 #Lists of sources needed for different python scripts that are ran so that they can be used as libraries
@@ -312,18 +315,18 @@ def funcOverlapMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
 #Visualize selected output with Cladogram (Figure 2)
 def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, sIDName, sLastMetadata, iNormalize, strInvert,
                                    fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha, strMinSequence, strMinSample, fSumData):
+                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha, strMinSequence, strMinSample, fSumData, iTerminalClade):
 
   def funcCladogramSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, 
                                  sIDName=sIDName, sLastMetadata=sLastMetadata, iNormalize=iNormalize, strInvert=strInvert,
                                  fNormalized=fNormalized, fSummed=fSummed, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
-                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample, fSumData=fSumData):
+                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample, fSumData=fSumData, iTerminalClade=iTerminalClade):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
     strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strDetailFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath(), target[7].get_abspath()
     return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, sIDName, sLastMetadata, iNormalize, strInvert, fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT, strDetailFile])
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, iTerminalClade, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT, strDetailFile])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -406,6 +409,18 @@ def funcMeasureFeatureByGroup( strLoggingLevel, strSampleNameRow, strLastMetadat
     return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
                     fSummed, fValidateNormalized, fValidateSummed, sPair, sMeasureMethod, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile, strFigureT])
   return funcMeasureFeatureByGroupRet
+
+def funcMeasureFeatureByGroupHistogram( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
+                               strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair):
+  def funcMeasureFeatureByGroupHistogramRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
+                                      strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
+                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair):
+    strFigureT, astrSs = sfle.ts( target, source )
+    strProg, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3], astrSs[4]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, strValidationAbundance, strAbundance, strSelectionFile, strFeatureFile, strFigureT])
+  return funcMeasureFeatureByGroupHistogramRet
 
 #Validate Extreme, Representative
 def funcValidateInPCoA( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
@@ -780,7 +795,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strEnrichmentThresholdArgument,sFileConfiguration[c_strConfigCladogramAlpha]]),
                                        " ".join([Constants_Arguments.c_strOccurenceFilterSequenceCountArgument,sFileConfiguration[c_strOccurenceFilterMinSequence]]),
                                        " ".join([Constants_Arguments.c_strOccurenceFilterSampleCountArgument,sFileConfiguration[c_strOccurenceFilterMinSample]]),
-                                       " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]])))
+                                       " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
+                                       " ".join([Constants_Arguments.c_strTerminalLevelArgument,sFileConfiguration[c_strConfigTerminalLevel]])))
 
     #Create figure 3 HCL version
 #    #Selection in Stratification
@@ -798,7 +814,7 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                    " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
-                                                                                                                                                   " ".join([Constants_Arguments.c_strNormalizeArgumentArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
+                                                                                                                                                   " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
                                                                                                                                                    " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
@@ -850,6 +866,20 @@ for fileConfigMicropita in lMicropitaFiles:
                                       " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
                                       " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]]),
                                       " ".join([Constants_Arguments.c_strTargetedFeatureMethodArgument,sFileConfiguration[c_strConfigTargetedSelection]])))
+
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedFeatureHistogram)]) )),
+              [c_fileProgValidateFeatureHistogram, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput, cCladogramSelectedTaxa],
+              funcMeasureFeatureByGroupHistogram(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
+                                      " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
+                                      " ".join([Constants_Arguments.c_strValidationIDNameArgument,sFileConfiguration[c_strConfigValidationIDName]]),
+                                      " ".join([Constants_Arguments.c_strValidationLastMetadataNameArgument,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+                                      " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]])))
 
       if c_EXTREME in lsSelectionMethods:
         #Validate Extreme selection
@@ -973,8 +1003,7 @@ if c_fRunCollectionCurve:
       lsPlotCollectorSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniquesCollectorCurve]))
 
       #Make more files, now for figure 5 Collection Curve
-      sOutputFigure5CC =  [File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder,
-      sfle.rebase( strInputSummaryKey, c_strSufTable, s ))) for s in (c_strSufCollectionCurveFigure)]
+      sOutputFigure5CC =  File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder, sfle.rebase( strInputSummaryKey, c_strSufTable, c_strSufCollectionCurveFigure)))
 
       #Create Figure 5
       #Collection Curve

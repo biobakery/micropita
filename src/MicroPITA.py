@@ -1192,7 +1192,7 @@ argp.add_argument(Constants_Arguments.c_strFileDelimiterArgument, dest= "cFileDe
 argp.add_argument(Constants_Arguments.c_strFeatureNameDelimiterArgument, dest= "cFeatureNameDelimiter", action= "store", metavar="Feature Name Delimiter", default=Constants.PIPE, help=Constants_Arguments.c_strFeatureNameDelimiterHelp) 
 
 #Select count
-argp.add_argument(Constants_Arguments.c_strUnsupervisedCountArgument, dest="iUnsupervisedSelectionCount", metavar = "Number Samples To Select (Unsupervised)", type = int, help = Constants_Arguments.c_strUnsupevisedCountHelp)
+argp.add_argument(Constants_Arguments.c_strUnsupervisedCountArgument, dest="iUnsupervisedSelectionCount", metavar = "Number Samples To Select (Unsupervised)", default=0, type = int, help = Constants_Arguments.c_strUnsupevisedCountHelp)
 argp.add_argument(Constants_Arguments.c_strTargetedSelectionFileArgument, dest="strFileTaxa", metavar = "Targeted Feature File", default=None, help = Constants_Arguments.c_strTargetedSelectionFileHelp)
 argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument, dest="sUnsupervisedStratify", metavar= "Metadata to Stratify Unsupervised Selection", default=None, 
                   help= Constants_Arguments.c_strUnsupervisedStratifyMetadataHelp)
@@ -1200,7 +1200,7 @@ argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument,
 #SVM label
 #Label parameter to be used with SVM
 argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default=None, help= Constants_Arguments.c_strSupervisedLabelCountHelp)
-argp.add_argument(Constants_Arguments.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=1, type=int,
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
                   help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 
 #Output
@@ -1211,7 +1211,7 @@ argp.add_argument(Constants_Arguments.c_strTemporaryDirectoryArgument, dest="str
 #Abundance file
 argp.add_argument("strFileAbund", metavar = "Abundance file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Outputfile
-argp.add_argument("strOutFile", metavar = "Selection Output File", help = Constants_Arguments.c_strOptionalOutputDataFileHelp)
+argp.add_argument("strOutFile", metavar = "Selection Output File", help = Constants_Arguments.c_genericOutputDataFileHelp)
 #Selection parameter
 argp.add_argument("strSelection", metavar = "Selection Methods", help = Constants_Arguments.c_strSelectionTechniquesHelp, nargs="*")
 
@@ -1263,7 +1263,7 @@ def _main( ):
 
     #If the tmp directory is not made, make
     if not args.strTMPDir:
-        args.strTMPDir = "".join([os.path.split(args.strOutFile)[0],Constants.PATH_SEP,"TMP",Constants.PATH_SEP])
+        args.strTMPDir = "."
 
 
     dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,

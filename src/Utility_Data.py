@@ -29,7 +29,7 @@ class Utility_Data():
     #Generate matrix for microPITA
     #@param tempOutPutFile
     @staticmethod
-    def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount = 1):
+    def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount = 1, iRandomMax=5):
         #Matrix descriptors
         #Samples
         #Number of diversity samples
@@ -59,7 +59,7 @@ class Utility_Data():
         #Number of taxa with abundance in diversity samples
         diversityMaximalTaxa = int(representiveDiversityTaxa*.3)
         #Number of taxa with minimal abundance in diversity samples
-        diversityMinimalTaxa = int(representiveDiversityTaxa*.1)
+#        diversityMinimalTaxa = int(representiveDiversityTaxa*.1)
         #Buffer of taxa to skip before starting the first extreme dissimilarity block
         iExtremeDissimilarityStart = representiveDiversityTaxa-extremeDissimilarityTaxa
 
@@ -68,18 +68,20 @@ class Utility_Data():
         iDiversityAbundanceMin = 0
         iRepresentativeAbundanceMax = 50
         iRepresentativeAbundanceMin = 0
-        iExtremeAbundanceMax = 200
+        iExtremeAbundanceMax = 100
         iExtremeAbundanceMin = 0
-
-        #Random Max
-        iRandomMax = 5
+        iTargetedAbundanceMax = 50
+        iTargetedAbundanceMin = 0
 
         #Taxa selected for taxa driven
         taxaDriverPositions = set([3,43,19])
         
-        ####Create matrix
+        ####Create matrix with noise
         #Create the matrix of n taxa (row) by n samples (column)
-        dataMatrix = np.zeros((taxaCount,sampleCount))
+#        dataMatrix = np.array([random.randint(0,iRandomMax) for i in xrange(taxaCount*sampleCount)])
+        iRandomMax = float(iRandomMax)
+        dataMatrix = np.array([random.random()*iRandomMax for i in xrange(taxaCount*sampleCount)])
+        dataMatrix.shape = (taxaCount, sampleCount)
 
         #Create taxa names
         taxaNames = []
@@ -89,7 +91,25 @@ class Utility_Data():
         sampleNames = ["ID"]
 
         #Create labels
-        lsLabels = ["Label"]
+        lsLabels = ["Label","Class-One","Class-One","Class-One","Class-Two","Class-One","Class-Two","Class-Two","Class-One",
+                           "Class-One","Class-Two","Class-One","Class-Two","Class-Two","Class-Two","Class-Two","Class-One",
+                           "Class-One","Class-One","Class-One","Class-One","Class-Two","Class-Two","Class-One","Class-Two",
+                           "Class-Two","Class-One","Class-Two","Class-Two","Class-Two","Class-Two","Class-One","Class-One",
+                           "Class-One","Class-One","Class-Two","Class-Two","Class-One","Class-Two","Class-Two","Class-One",
+                           "Class-Two","Class-Two","Class-Two","Class-Two","Class-One","Class-One","Class-One","Class-One"]
+
+        if iScalingFactorForSampleAmount == 2:
+          lsLabels = ["Label","Class-Two","Class-Two","Class-Two","Class-One","Class-Two","Class-One","Class-Two","Class-Two",
+                    "Class-Two","Class-Two","Class-One","Class-One","Class-One","Class-Two","Class-One","Class-One","Class-One",
+                    "Class-Two","Class-One","Class-One","Class-One","Class-One","Class-Two","Class-One","Class-Two","Class-One",
+                    "Class-Two","Class-One","Class-Two","Class-Two","Class-One","Class-Two","Class-Two","Class-Two","Class-One",
+                    "Class-One","Class-Two","Class-One","Class-Two","Class-One","Class-One","Class-One","Class-Two","Class-One",
+                    "Class-Two","Class-Two","Class-Two","Class-One","Class-One","Class-Two","Class-One","Class-Two","Class-Two",
+                    "Class-Two","Class-Two","Class-Two","Class-One","Class-Two","Class-One","Class-One","Class-Two","Class-Two",
+                    "Class-Two","Class-One","Class-Two","Class-One","Class-Two","Class-One","Class-One","Class-One","Class-Two",
+                    "Class-One","Class-Two","Class-Two","Class-Two","Class-Two","Class-One","Class-One","Class-One","Class-Two",
+                    "Class-Two","Class-Two","Class-Two","Class-Two","Class-Two","Class-One","Class-Two","Class-One","Class-Two",
+                    "Class-Two","Class-Two","Class-Two","Class-Two","Class-Two","Class-Two","Class-Two"]																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														
         
         #Keep tract of which samples are being produced in the matrix
         sampleStart = 0
@@ -105,9 +125,6 @@ class Utility_Data():
         dictActualData[MicroPITA.c_SVM_CLOSE] = []
         dictActualData[MicroPITA.c_SVM_FAR] = []
 
-        #Enables the label to be a word
-        sLabelSelection = ["Class-One","Class-Two"]
-
         ####Create diversity samples
         for diversitySampleIndex in xrange(sampleStart,sampleStop):
 
@@ -115,7 +132,7 @@ class Utility_Data():
             iTaxaBlockStart = 0
 
             #Append Label and name and add to actual classification dictionary
-            lsLabels.append(sLabelSelection[diversitySampleIndex%2])
+#            lsLabels.append(sLabelSelection[diversitySampleIndex%2])
             strSampleName = "_".join(["Sample",str(diversitySampleIndex),"D"])
             sampleNames.append(strSampleName)
             dictActualData[MicroPITA.c_DIVERSITY_1].append(strSampleName)
@@ -136,16 +153,16 @@ class Utility_Data():
                 #Remove already selected position from the potential indices population
                 population = population.difference(set(diversityMaximalTaxaPositions))
                 #Taxa indices with minimal abundance in diversity samples
-                diversityMinimalTaxaPositions = set()
-                if(len(population)>0):
-                    if(len(population)>diversityMinimalTaxa):
-                        diversityMinimalTaxaPositions = random.sample(population,diversityMinimalTaxa)
-                    else:
-                        diversityMinimalTaxaPositions = population
+#                diversityMinimalTaxaPositions = set()
+#                if(len(population)>0):
+#                    if(len(population)>diversityMinimalTaxa):
+#                        diversityMinimalTaxaPositions = random.sample(population,diversityMinimalTaxa)
+#                    else:
+#                        diversityMinimalTaxaPositions = population
 
                 #Set abundance
-                for taxonPosition in diversityMinimalTaxaPositions:
-                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMin+random.randint(1,iRandomMax)
+#                for taxonPosition in diversityMinimalTaxaPositions:
+#                    dataMatrix[taxonPosition,diversitySampleIndex] = iDiversityAbundanceMin+random.randint(1,iRandomMax)
 
                 #Update block
                 iTaxaBlockStart = iTaxaBlockStart + representiveDiversityTaxa
@@ -160,7 +177,7 @@ class Utility_Data():
         taxonBlockStart = 0
         for dissimilaritySampleIndex in xrange(sampleStart,sampleStop):
             #Append Label and name
-            lsLabels.append(sLabelSelection[dissimilaritySampleIndex%2])
+#            lsLabels.append(sLabelSelection[dissimilaritySampleIndex%2])
             strSampleName = "_".join(["Sample",str(dissimilaritySampleIndex),"R"])
             sampleNames.append(strSampleName)
             dictActualData[MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1].append(strSampleName)
@@ -180,7 +197,7 @@ class Utility_Data():
         taxonBlockStop = taxonBlockStart + extremeTaxaBlockIncrement
         for extremeSampleIndex in xrange(sampleStart,sampleStop):
             #Append Label and name
-            lsLabels.append(sLabelSelection[extremeSampleIndex%2])
+#            lsLabels.append(sLabelSelection[extremeSampleIndex%2])
             strSampleName = "_".join(["Sample",str(extremeSampleIndex),"E"])
             sampleNames.append(strSampleName)
             dictActualData[MicroPITA.c_EXTREME_DISSIMILARITY_1].append(strSampleName)
@@ -196,10 +213,10 @@ class Utility_Data():
             #Remove current block
             population = population.difference(set(range(taxonBlockStart,taxonBlockStop)))
             #Generate noise population for extreme dissimilarity
-            extremeNoisePopulation = random.sample(population,extremeDissimilarityLowTaxa)
+#            extremeNoisePopulation = random.sample(population,extremeDissimilarityLowTaxa)
             #Set extreme noise
-            for extremeNoiseTaxonPosition in extremeNoisePopulation:
-                dataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+random.randint(1,iRandomMax)
+#            for extremeNoiseTaxonPosition in extremeNoisePopulation:
+#                dataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+random.randint(1,iRandomMax)
             #Increment start and stop
             taxonBlockStart = taxonBlockStop+extremeTaxaBlockIncrement
             taxonBlockStop = taxonBlockStart + extremeDissimilarityTaxa
@@ -212,7 +229,7 @@ class Utility_Data():
         #Update sample bounds
         for drivenSampleIndex in xrange(sampleStart,sampleStop):
             #Append Label and name
-            lsLabels.append(sLabelSelection[drivenSampleIndex%2])
+#            lsLabels.append(sLabelSelection[drivenSampleIndex%2])
             strSampleName = "_".join(["Sample",str(drivenSampleIndex),"T"])
             sampleNames.append(strSampleName)
             dictActualData[MicroPITA.c_USER_RANKED].append(strSampleName)
@@ -224,11 +241,11 @@ class Utility_Data():
             population = population.difference(taxaDriverPositions)
             #Set sample abundance
             for drivingTaxonPosition in taxaDriverPositions:
-                dataMatrix[drivingTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMax+random.randint(0,iRandomMax)
+                dataMatrix[drivingTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMax+random.randint(0,iRandomMax)
             #Generate low noise
-            noisePositions = random.sample(population,extremeDissimilarityLowTaxa)
-            for noiseTaxonPosition in noisePositions:
-                dataMatrix[noiseTaxonPosition,drivenSampleIndex] = iRepresentativeAbundanceMin+random.randint(1,iRandomMax)
+#            noisePositions = random.sample(population,extremeDissimilarityLowTaxa)
+#            for noiseTaxonPosition in noisePositions:
+#                dataMatrix[noiseTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMin+random.randint(1,iRandomMax)
 
         #Write to file
         #Delete current file before writing
@@ -311,7 +328,7 @@ class Utility_Data():
         strFirstDataCol = "2"
         
         ####Create matrix
-        #Create the matrix of n taxa (row) by n samples (column)
+        #Create the matrix of n taxa /(row) by n samples (column)
         dataMatrix = np.zeros((iTaxaCount,iSampleCount+1))
         #Create taxa names
         lsTaxaNames = []
@@ -414,5 +431,8 @@ class Utility_Data():
         f.close()
         return
 
-#Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96.pcl", strSampleClassification="Unbalanced96-Actual.txt", iScalingFactorForSampleAmount = 2)
+for iRandom in [5]:#(10,15,20,25):
+  for i in xrange(1,11):
+    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-random"+str(iRandom)+"-"+str(i)+".pcl", strSampleClassification="Unbalanced96-random-"+str(iRandom)+"-"+str(i)+"Actual.txt", iScalingFactorForSampleAmount = 2, iRandomMax = iRandom)
+#    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced-random"+str(iRandom)+"-"+str(i)+".pcl", strSampleClassification="Unbalanced-random-"+str(iRandom)+"-"+str(i)+"Actual.txt", iScalingFactorForSampleAmount = 1, iRandomMax = iRandom)
 #Utility_Data.generateRandomMatrix(tempFilePath="Random.txt",iNumberRows=10,iNumberColumns=6, iMinValue=0, iMaxValue=2500)

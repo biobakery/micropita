@@ -19,6 +19,7 @@ from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
 from Diversity import Diversity
+import itertools
 import logging
 import matplotlib.pyplot as plt
 from MicroPITA import MicroPITA
@@ -79,6 +80,9 @@ def _main( ):
     fIsNormalized = (args.fIsNormalized.lower() == "true")
     fValidationIsSummed = (args.fValidationIsSummed.lower() == "true")
     fValidationIsNormalized = (args.fValidationIsNormalized.lower() == "true")
+
+    #Number of dimensions to explore
+    iDimensionCount = 2
 
     #Analysis object
     analysis = PCoA()
@@ -153,7 +157,7 @@ def _main( ):
                     #LoadData
                     analysis.loadData(xData=abndValidationData, fIsRawData=True)
                     #Make distance matrix
-                    pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS)
+                    pcoaResults = analysis.run(tempDistanceMetric=analysis.c_BRAY_CURTIS, iDims = iDimensionCount)
 
                     #Colors
                     acharColors = []
@@ -176,21 +180,24 @@ def _main( ):
                             acharSelection.append(objColors.c_strPCOANotSelected)
 
                     #If given a valid label, stratify otherwise normal PCoA
-                    if args.sStratifyMetadata:
-                        lsStratify = abndValidationData.funcGetMetadata(args.sStratifyMetadata)
-                        if lsStratify:
-                            #Stratified PCoA
-                            analysis.plotList(lsLabelList=lsStratify,
-                                strOutputFileName=args.strOutFigure, iSize=iShapeSize, dAlpha=dAlpha,
-                                charForceColor=[acharColors,acharSelection], fInvert=fInvert)
+                    for iDim1, iDim2 in itertools.combinations(range(1,iDimensionCount+1),2):
+                        lsFilePieces = os.path.splitext(args.strOutFigure)
+                        strOutputFigure = "".join([lsFilePieces[0],str(iDim1+1),"-",str(iDim2+1),lsFilePieces[1]])
+                        if args.sStratifyMetadata:
+                            lsStratify = abndValidationData.funcGetMetadata(args.sStratifyMetadata)
+                            if lsStratify:
+                                #Stratified PCoA
+                                analysis.plotList(lsLabelList=lsStratify,
+                                    strOutputFileName=strOutputFigure, iSize=iShapeSize, dAlpha=dAlpha,
+                                    charForceColor=[acharColors,acharSelection], fInvert=fInvert, iDim1=iDim1, iDim2=iDim2)
+                            else:
+                                #Normal PCoA
+                                analysis.plot(tempPlotName=strOutputFigure, tempColorGrouping=acharColors, tempShape=acharShape,
+                                  tempLabels=acharSelection, tempShapeSize=iShapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = fInvert, iDim1=iDim1, iDim2=iDim2)
                         else:
                             #Normal PCoA
-                            analysis.plot(tempPlotName=args.strOutFigure, tempColorGrouping=acharColors, tempShape=acharShape,
-                              tempLabels=acharSelection, tempShapeSize=iShapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = fInvert)
-                    else:
-                        #Normal PCoA
-                        analysis.plot(tempPlotName=args.strOutFigure, tempColorGrouping=acharColors, tempShape=acharShape,
-                          tempLabels=acharSelection, tempShapeSize=iShapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = fInvert)
+                            analysis.plot(tempPlotName=strOutputFigure, tempColorGrouping=acharColors, tempShape=acharShape,
+                              tempLabels=acharSelection, tempShapeSize=iShapeSize, tempAlpha=dAlpha, tempLegendLocation="lower left", tempInvert = fInvert, iDim1=iDim1, iDim2=iDim2)
 
                 else:
                     logging.error("MicropitaPaperValidatePCoA::Not all samples selected for diversity are in the given sample.")

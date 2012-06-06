@@ -48,7 +48,7 @@ argp.add_argument( "strFileAbund", action="store", metavar = "Abundance_file", h
 #Select file
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 #Outputfile
-argp.add_argument( "strOutFile", metavar = "output.txt", help = Constants_Arguments.c_strOptionalOutputDataFile)
+argp.add_argument( "strOutFile", metavar = "output.txt", help = Constants_Arguments.c_strOptionalOutputDataFileHelp)
 #Selection parameter
 argp.add_argument("strSelectionMethods", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionMethodsHelp, nargs="*")
 

@@ -434,6 +434,31 @@ class AbundanceTable:
 
         return True
 
+    #A feature is removed if it's abundance is not found in the top X percetile a certain percentage of the samples
+    def funcFilterFeatureBySTD(self, dMinSTDCuttOff = 0.0):
+        """
+        A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSTDCutoff.
+        """
+        #No need to do anything
+        if(dMinSTDCuttOff==0.0):
+            return True
+
+        #Holds which indexes are kept
+        liKeepFeatures = []
+
+        #Evaluate each sample
+        for iRowIndex, dataRow in enumerate(self._npaFeatureAbundance):
+            if(np.std(list(dataRow)[1:])>=dMinSTDCuttOff):
+                liKeepFeatures.append(iRowIndex)
+        
+        #Compress array
+        self._npaFeatureAbundance = self._npaFeatureAbundance[liKeepFeatures,:]
+
+        #Update filter state
+        self._iCurrentFilterState = "".join([self._iCurrentFilterState, ":", "dMinSTDCuttOff", "=", str(dMinSTDCuttOff)])
+
+        return True
+
     #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
         print "AbundanceTable:funcNormalize called"
@@ -997,7 +1022,7 @@ class AbundanceTable:
         #Stratify data
         stratifiedAbundanceTables = dict()
         for tableRow in sFileContents:
-            row = tableRow.split(cDelimiter)
+            row = tableRow.split(cDelimiter) 
             if(len(row)> 1):
                 for metadata in metadataInformation:
                     #[0] includes the taxa line

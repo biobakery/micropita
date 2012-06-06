@@ -35,7 +35,7 @@ from Utility_Math import Utility_Math
 class MicropitaPaperCollectionCurve:
 
     #Bootstrap interations
-    c_BootstrapItr = 10
+    c_BootstrapItr = 1000
 
     #Metric
     c_strMetricCategory = "Observed Counts"
@@ -93,13 +93,16 @@ class MicropitaPaperCollectionCurve:
         #Booststrapped diversity level at N
         dictdBootstrappedMetricAtN = dict()
 
+        #Size of boxplots
+        dBoxPlotwidth = max([.5*((max(setiSelectionCounts)-min(setiSelectionCounts))/20.0),.5])
+
         #Per sample selection count get the bootstrapped metric
         for iSelectionCount in setiSelectionCounts:
             #Get bootstrapped metric
             ldMeasurements = self.getMedianBootstrappedObservedCount(npaAbundance=rawAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount = iSelectionCount, iBootStrappingItr = self.c_BootstrapItr)
 
             #Plot box plot
-            bp = imgSubplot.boxplot(x=[ldMeasurements], positions=[iSelectionCount], notch=1, patch_artist=True)
+            bp = imgSubplot.boxplot(x=[ldMeasurements], positions=[iSelectionCount], notch=1, sym="", widths=dBoxPlotwidth, patch_artist=True)
             plt.setp(bp['boxes'], color=objColors.c_strDetailsColorLetter, facecolor=objColors.c_strGridLineColor, alpha=objColors.c_dAlpha)
             plt.setp(bp['whiskers'], color=objColors.c_strDetailsColorLetter)
 
@@ -160,7 +163,8 @@ class MicropitaPaperCollectionCurve:
         ldMeasurePerIteration = list()
         for iItr in xrange(iBootStrappingItr):
             #Select population
-            lsSelectedSampleNames = Utility_Math.funcSampleWithReplacement(lsSampleNames,iSelectSampleCount)
+            lsSelectedSampleNames = random.sample(lsSampleNames,iSelectSampleCount)
+#            lsSelectedSampleNames = Utility_Math.funcSampleWithReplacement(lsSampleNames,iSelectSampleCount)
             #When combining combine counts by summing
             ldPooledSample = np.array(Utility_Math.funcSumRowsOfColumns(npaAbundance,lsSelectedSampleNames))
             if float(sum(ldPooledSample))==0.0:

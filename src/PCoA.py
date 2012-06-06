@@ -45,72 +45,11 @@ class PCoA:
     #Current pcoa object
     pcoa = None
 
+    #Current dimensions
+    _iDimensions = 1
+
     #Get plot colors
     objFigureControl = Constants_Figures()
-
-    #Loads data into PCoA (given the matrix or a valid file path)
-    #Data can be passed or read in
-    #Data can be the original data to be converted to a distance matrix or a distance matrix
-    #If it is the orignal data, indicate that it is rawData (tempIsRawData=True)
-     #If it is the distance matrix already generated indicate (tempIsRawData=False)
-    #  and no conversion will occur in subsequent methods
-    #Raw data file is assumed to have a column at index 0 that is the id for the rows, this is ignored.
-    #Otherwise assumed to have samples as columns and features as rows.
-    #If there are metadata rows at the top of the file, use tempNameRow to identify 
-    #  the id row and tempFirstDataRow to skip the rest of the metadata rows.
-    #Indices are 0 based.
-    #Distance matrices are expected to be ######TODO 
-    #@params tempReadData Either a Structured matrix of data or a valid file path to read from
-    #@params tempDelimiter Delimiter for reading in the file
-    #@params tempNameRow The index of the row that identifies the columns
-    #@params tempFirstDataRow The index of teh first row to contain actual data
-    #@params tempNormalize True normalizes each column by the sum of the column (columnElement=columnElement/sum(column))
-    #@params tempCheckFile True indicates the files should be check. 
-    #@return Return boolean indicator of success (True=Was able to load data)
-#    def loadData(self,tempReadData, tempIsRawData, tempDelimiter=Constants.TAB, tempNameRow=0, tempFirstDataRow=1, tempNormalize=True, tempCheckFile=True):
-#
-#        #Indicates if data needs to be read or if a structured matrix is given
-#        readData=None
-#
-#        #Validate parameters
-#        if(ValidateData.isValidFileName(tempReadData)):
-#            readData=True
-#        elif(ValidateData.isValidStructuredArray(tempReadData)):
-#            readData=False
-#        else:
-#            print("".join(["PCoA:loadData::Error tempReadData was not an existing file or an np array."]))
-#            return False
-#
-#        #If a file path is given, read data.
-#        if(ValidateData.isTrue(readData)):
-#            #Object to read in and manipulate raw data
-#            rawData = AbundanceTable()
-#            #If indicated, check the input file
-#            if(ValidateData.isTrue(tempCheckFile)):
-#                tempReadData = rawData.checkRawDataFile(tempReadData)
-#                if(ValidateData.isFalse(tempReadData)):
-#                    print("".join(["PCoA:loadData::Error when checking raw data file, did not perform PCoA. File name:",str(tempReadData)]))
-#                    return False
-#            #Read in the file data to a numpy array.
-#            #Samples (column) by Taxa (rows)(lists) without the column
-#            data = rawData.textToArray(tempInputFile=tempReadData, tempDelimiter=tempDelimiter, tempNameRow=tempNameRow, tempFirstDataRow=tempFirstDataRow, tempNormalize=tempNormalize)
-#            if(ValidateData.isFalse(data)):
-#                print("PCoA:loadData::Error when reading checked raw data file, did not perform PCoA.")
-#                return False
-#
-#            #Transpose data to be Taxa (columns) by samples (rows)(lists)
-#            data = rawData.transposeDataMatrix(tempMatrix=data[0], tempRemoveAdornments=False)
-#            if(ValidateData.isFalse(data)):
-#                print("PCoA:loadData::Error when transposing read raw data file, did not perform PCoA.")
-#                return False
-#            else:
-#                self.dataMatrix=data
-#                self.isRawData=tempIsRawData
-#        #Otherwise load the data directly as passed.
-#        else:
-#            self.dataMatrix=tempReadData
-#            self.isRawData=tempIsRawData
-#        return True
 
     #Loads data into PCoA (given the matrix or a valid file path)
     #Data can be the Abundance Table to be converted to a distance matrix or a distance matrix
@@ -148,8 +87,11 @@ class PCoA:
 
     #Runs analysis on loaded data
     #@params tempReadData Either a Structured matrix of data from an abundance table or a valid file path
+    #iDims start with 1
     #@return Return string file path
-    def run(self,tempDistanceMetric=None):
+    def run(self,tempDistanceMetric=None, iDims=2):
+
+        self._iDimensions = iDims
 
         #If distance metric is none, check to see if the matrix is a distance matrix
         #If so, run NMDS on the distance matrix
@@ -173,7 +115,7 @@ class PCoA:
             if(ValidateData.isFalse(distanceMatrix)):
                 print "ERROR"
                 return False
-            self.pcoa = NMDS(squareform(distanceMatrix), verbosity=0)
+            self.pcoa = NMDS(squareform(distanceMatrix), dimension=max(self._iDimensions,2), verbosity=0)
             return self.pcoa
         else:
             print("PCoA:run::Error, not a supported distance metric. Please generate the distance matrix and load.")
@@ -182,13 +124,16 @@ class PCoA:
         return False
 
     #@params tempPlotName A valid file path to save the image of the plot
-    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempAlpha = 1.0, tempLegendLocation="upper right", tempInvert=False):
+    #iDim1 and iDim2 start with 1
+    def plot(self,tempPlotName="PCOA.png", tempColorGrouping='g', tempShape='o', tempLabels=["Green"], tempShapeLabels=["Circle"], tempShapeSize = 20, tempAlpha = 1.0, tempLegendLocation="upper right", tempInvert=False, iDim1 = 1, iDim2 = 2):
 
         if(not self.pcoa == None):
             #Get point count
+            iDimensionOne = max(0,min(self._iDimensions-2, iDim1-1))
+            iDimensionTwo = max(1,min(self._iDimensions-1, iDim2-1))
             adPoints = self.pcoa.getPoints()
-            ldXPoints = list(adPoints[:,0])
-            ldYPoints = list(adPoints[:,1])
+            ldXPoints = list(adPoints[:,iDimensionOne])
+            ldYPoints = list(adPoints[:,iDimensionTwo])
             iPointCount = len(ldXPoints)
 
             #Check shapes
@@ -235,8 +180,8 @@ class PCoA:
             #Color/Invert figure
             imgFigure.set_facecolor(self.objFigureControl.c_strBackgroundColorWord)
             imgSubplot = imgFigure.add_subplot(111,axisbg=self.objFigureControl.c_strBackgroundColorLetter)
-            imgSubplot.set_xlabel("Dimension 1")
-            imgSubplot.set_ylabel("Dimension 2")
+            imgSubplot.set_xlabel("Dimension "+str(iDimensionOne+1))
+            imgSubplot.set_ylabel("Dimension "+str(iDimensionTwo+1))
             imgSubplot.spines['top'].set_color(self.objFigureControl.c_strDetailsColorLetter)
             imgSubplot.spines['bottom'].set_color(self.objFigureControl.c_strDetailsColorLetter)
             imgSubplot.spines['left'].set_color(self.objFigureControl.c_strDetailsColorLetter)
@@ -553,7 +498,7 @@ class PCoA:
     #Currently can be a list (1 color per marker in the order of the data), or 1 char to force all markers to
     #charForceShapes if set, automatic shapes will not occur
     #Currently can only be a char (forcing effects all markers equally)
-    def plotList(self,lsLabelList, strOutputFileName, iSize, dAlpha = 1.0, charForceColor=None, charForceShape=None, fInvert=False):
+    def plotList(self,lsLabelList, strOutputFileName, iSize, dAlpha = 1.0, charForceColor=None, charForceShape=None, fInvert=False, iDim1 = 1, iDim2 = 2):
 
         #Get uniqueValues for labels
         acharUniqueValues = list(set(lsLabelList))
@@ -615,7 +560,7 @@ class PCoA:
 
         logging.debug("lsLabelList")
         logging.debug(lsLabelList)
-        self.plot(tempPlotName=strOutputFileName, tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempAlpha=dAlpha, tempInvert = fInvert)
+        self.plot(tempPlotName=strOutputFileName, tempColorGrouping=atupldLabelColors, tempShape=alLabelShapes, tempLabels=lsLabelList, tempShapeSize = iSize, tempAlpha=dAlpha, tempInvert = fInvert, iDim1=iDim1, iDim2=iDim2)
 
 
     #TODO put in utilities

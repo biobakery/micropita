@@ -82,7 +82,9 @@ def funcReadActualClassFile(strInputFile):
                 if len(sSampleGrouping) > iClassPrefixLength:
                     if sSampleGrouping[0:iClassPrefixLength] == Constants.c_strClassPrefix:
                         dictActualClassSamples[sSelectionMethodology].extend(dictClasses[sSampleGrouping[iClassPrefixLength:]])
-                        dictOverlap[sSelectionMethodology] = dictOverlap.get(sSelectionMethodology,0)+1
+                        lcurSelection = dictOverlap.get(sSelectionMethodology,[])
+                        lcurSelection.append(sSampleGrouping[iClassPrefixLength:])
+                        dictOverlap[sSelectionMethodology] = lcurSelection
                     else:
                         dictActualClassSamples[sSelectionMethodology].append(sSampleGrouping)
                 else:
@@ -181,6 +183,9 @@ def _main( ):
             if c_fFlipYLabels:
                 lsYLabels.reverse()
 
+        dictMisclassifiedClasses = {}
+        dictMisclassfiedSamples = {}
+
         #Setup data for confusion matrix
         liConfusion = []
         #Go through each label
@@ -194,7 +199,7 @@ def _main( ):
                 setXPredicted = set(dictPredicted[xLabel])
                 setXPredictedPossible = set(dictActual[xLabel])
                 iCountPredictedSamples = len(setXPredicted)
-                iMaxSamplesPerClass = int(round(iCountPredictedSamples/float(iClassCount)))
+                iMaxSamplesPerCategory = int(round(iCountPredictedSamples/float(iClassCount)))
 
                 #Representative techniques are different because they do not have specific samples to
                 #to select in a priori classes. Correct selection is defined by the shape of the data and how many data are sampled.
@@ -208,8 +213,8 @@ def _main( ):
                         iMisclassificationCount = 0
                         for sClass in dictClasses:
                             iClassSelectionCount = len(dictClasses[sClass]&setXPredicted)
-                            if iClassSelectionCount > iMaxSamplesPerClass:
-                                iMisclassificationCount = iClassSelectionCount - iMaxSamplesPerClass
+                            if iClassSelectionCount > iMaxSamplesPerCategory:
+                                iMisclassificationCount = iClassSelectionCount - iMaxSamplesPerCategory
                         liConfusion.append(iCountPredictedSamples - iMisclassificationCount)
                     #Treat as a normal sample with a defined a prior classification
                     #If comparing the amount correct just look at actual and predicted classes
@@ -226,19 +231,34 @@ def _main( ):
                     #This means there could be a column or row total of more than the total samples
                     #sampled if the actual groups overlapp.
                     elif Constants.c_strEvenSelection in setXPredictedPossible:
-                        iCountSamplesInCommon = len(setXPredicted & setYActual)
-                        iTotalAllowed = dictOverlapMeasure.get(yLabel, 1)*iMaxSamplesPerClass
-                        if iCountSamplesInCommon > iTotalAllowed:
-                            liConfusion.append(iCountSamplesInCommon-iTotalAllowed)
-                        else:
-                            liConfusion.append(0)
+                        lsAssociatedClasses = dictOverlapMeasure.get(yLabel, [])
+                        iMissclassifiedCount = 0
+                        for strClass in lsAssociatedClasses:
+                            lAreadyCountedMistakes = dictMisclassifiedClasses.get(xLabel, [])
+                            if strClass not in lAreadyCountedMistakes:
+                                iCommonWithClass = len(dictClasses[strClass]&setXPredicted)
+                                if iCommonWithClass > iMaxSamplesPerCategory:
+                                    iMissclassifiedCount += (iCommonWithClass-iMaxSamplesPerCategory)
+                                    lAreadyCountedMistakes.append(strClass)
+                                    dictMisclassifiedClasses[xLabel] = lAreadyCountedMistakes 
+                        liConfusion.append(iMissclassifiedCount)
+
                     #Treat as a normal sample with a defined a prior classification
                     #If looking at missclassification remember that the classes here are overlapping.
                     #It is expected that A diversity sample is selected by representative methodology for example
                     #So make sure to first remove samples that may be in other classes but are ok to be selected
                     #Before determining error.
                     else:
-                        liConfusion.append(len(setXPredicted & (setYActual - setXPredictedPossible)))
+                        setMisclassified = setXPredicted & (setYActual - setXPredictedPossible)
+                        iMisclassified = len(setMisclassified)
+                        if iMisclassified > 0:
+                            lsAlreadyMistaken = dictMisclassfiedSamples.get(xLabel, [])
+                            setNewMisclassified = setMisclassified - set(lsAlreadyMistaken)
+                            iMisclassified = len(setNewMisclassified)
+                            lsAlreadyMistaken.extend(list(setNewMisclassified))
+                            dictMisclassfiedSamples[xLabel] = lsAlreadyMistaken
+
+                        liConfusion.append(iMisclassified)
 
         #Cumulate results
         npUniversalConfusion = npUniversalConfusion + np.array(liConfusion)

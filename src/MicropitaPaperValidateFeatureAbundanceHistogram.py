@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Author: Timothy Tickle
-Description: Class to Validate diversity selection in a sanmple set
+Description: Class to Validate feature selection in a sample set (Using a histogram)
 """
 
 __author__ = "Timothy Tickle"
@@ -22,12 +22,12 @@ from Diversity import Diversity
 import logging
 import matplotlib.pyplot as plt
 from MicroPITA import MicroPITA
-import random
+from operator import itemgetter
 import os
 
 #Set up arguments reader
-argp = argparse.ArgumentParser( prog = "MicropitaPaperValidateDiversity.py", 
-    description = """Generates boxplots showing the distribution of diversity of samples in different selected groupings.""" )
+argp = argparse.ArgumentParser( prog = "MicropitaPaperValidateFeatureAbundanceHistogram.py", 
+    description = """Generates boxplots showing the distribution of feature abundance in samples in different selected groupings.""" )
 
 #Arguments
 #Logging
@@ -50,6 +50,7 @@ argp.add_argument(Constants_Arguments.c_strPairingMetadataArgument, dest="sPaire
 argp.add_argument( "strValidationAbundanceFile", metavar = "Validation_Abundance_file", help = Constants_Arguments.c_strValidationAbundanceFileHelp)
 argp.add_argument( "strSelectionAbundanceFile", metavar = "Selection_Abundance_file", help = Constants_Arguments.c_strSelectionAbundanceFileHelp)
 argp.add_argument( "strSelectionFile", metavar = "Selection_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
+argp.add_argument( "strValidateFeatureFile", metavar = "Feature_file", help = Constants_Arguments.c_strTargetedSelectionFileHelp)
 
 #Outputfile
 argp.add_argument( "strOutFigure", metavar = "BoxPlotOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
@@ -65,8 +66,8 @@ def _main( ):
         raise ValueError("".join(["Invalid log level: ",strLogLevel," Try one of the following: "]+Constants_Arguments.c_lsLoggingChoices))
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFigure)[0],".log"]), filemode = 'w', level=iLogLevel)
 
-    logging.info("Start MicropitaPaperValidateDiversity")
-    logging.info("MicropitaPaperValidateDiversity. The following arguments were passed.")
+    logging.info("Start MicropitaPaperValidateFeatureAbundanceHistogram")
+    logging.info("MicropitaPaperValidateFeatureAbundanceHistogram. The following arguments were passed.")
     logging.info(str(args))
 
     #Invert figure
@@ -97,45 +98,51 @@ def _main( ):
         abndSelectionTable.funcNormalize()
 
     #Get sample names as a set
-    setsValidationMetadata = set(abndValidationData.funcGetMetadata(abndValidationData.funcGetIDMetadataName()))
+    setsSampleNames = set(abndValidationData.funcGetSampleNames())
 
     #Read in selection file
     dictAllSelectionStudies = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
 
+    #Get features from file
+    sContents = ""
+    with open(args.strValidateFeatureFile, 'r') as f:
+        sContents = f.read()
+    f.close()
+    lsFeatures =  filter(None, sContents.split(Constants.ENDLINE))
+    if not lsFeatures:
+        logging.error("".join(["MicropitaPaperValidateFeatureAbundanceHistogram:: Could not read features form the file:",args.strValidateFeatureFile]))
+        return False
+
     #For each diversity methodology in the selection
     for sMethod in dictAllSelectionStudies.keys():
-        if sMethod == MicroPITA.c_DIVERSITY_1:
+        if sMethod == MicroPITA.c_strTaxa:
 
-            #Get the alpha metric being used and normalize
-            sMetric = MicroPITA.convertMicroPITAToAMetric[sMethod]
-            
             #Get the selection
-            setsDiversitySelection = set(dictAllSelectionStudies[sMethod])
+            setsSelection = set(dictAllSelectionStudies[sMethod])
 
             #Make sure the selection is in this data and there is other data to compare to
-            if len(setsDiversitySelection) < len(setsValidationMetadata):
+            if len(setsSelection) < len(setsSampleNames):
 
                 #Check to make sure the paired key is primary in both tables
                 if (not abndSelectionTable.funcIsPrimaryIdMetadata(args.sPairedMetadata)) or (not abndValidationData.funcIsPrimaryIdMetadata(args.sPairedMetadata)):
-                    logging.error("".join(["MicropitaPaperValidateDiversity:: tried to validate on a none unique key:",args.sPairedMetadata]))
+                    logging.error("".join(["MicropitaPaperValidateFeatureAbundanceHistogram:: tried to validate on a none unique key:",args.sPairedMetadata]))
                     return False
 
                 #In the selection file go from the sampleID to the paired value
-                lsPairedSelected = abndSelectionTable.funcTranslateIntoMetadata(lsValues=setsDiversitySelection, sMetadataFrom=abndSelectionTable.funcGetIDMetadataName(),
+                lsPairedSelected = abndSelectionTable.funcTranslateIntoMetadata(lsValues=setsSelection, sMetadataFrom=abndSelectionTable.funcGetIDMetadataName(),
                                                              sMetadataTo=args.sPairedMetadata, fFromPrimaryIds=True)
                 if not lsPairedSelected:
-                    logging.error("MicropitaPaperValidateDiversity:: Did not recieve lsPairedSelected.")
+                    logging.error("MicropitaPaperValidateFeatureAbundanceHistogram:: Did not recieve lsPairedSelected.")
                     return False
 
                 #In the validation file go from the paired value to the sampleID
                 lsSelectedInValidation = abndValidationData.funcTranslateIntoMetadata(lsValues=lsPairedSelected, sMetadataFrom=args.sPairedMetadata,
                                                              sMetadataTo=abndValidationData.funcGetIDMetadataName(), fFromPrimaryIds=True)
-
                 if not lsSelectedInValidation:
-                    logging.error("MicropitaPaperValidateDiversity:: Did not recieve lsSelectedInValidation.")
+                    logging.error("MicropitaPaperValidateFeatureAbundanceHistogram:: Did not recieve lsSelectedInValidation.")
                     return False
 
-                if len(lsSelectedInValidation) == len(setsDiversitySelection):
+                if len(lsSelectedInValidation) == len(setsSelection):
 
                     #Start plot
                     #Get plot object
@@ -148,52 +155,65 @@ def _main( ):
                     #Color/Invert figure
                     imgFigure.set_facecolor(objFigureControl.c_strBackgroundColorWord)
                     imgSubplot = imgFigure.add_subplot(111,axisbg=objFigureControl.c_strBackgroundColorLetter)
-                    imgSubplot.set_xlabel("Sample Population")
-                    imgSubplot.set_ylabel("Diversity (Inverse Simpson)")
+                    imgSubplot.set_xlabel("Ranked Abundance")
+                    imgSubplot.set_ylabel("Relative Abundance")
                     imgSubplot.spines['top'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['bottom'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['left'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.spines['right'].set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.xaxis.label.set_color(objFigureControl.c_strDetailsColorLetter)
-                    imgSubplot.yaxis.label.set_color(objFigureControl.c_strDetailsColorLetter)
                     #Adds light grid for numbers and puts them in the background
                     imgSubplot.yaxis.grid(True, linestyle='-', which='major', color=objFigureControl.c_strGridLineColor, alpha=objFigureControl.c_dAlpha)
                     imgSubplot.set_axisbelow(True)
+                    imgSubplot.yaxis.label.set_color(objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.tick_params(axis='x', colors=objFigureControl.c_strDetailsColorLetter)
                     imgSubplot.tick_params(axis='y', colors=objFigureControl.c_strDetailsColorLetter)
                     charMarkerEdgeColor = objFigureControl.c_strDetailsColorLetter
 
                     #Create selected and not selected groupings
-                    #Measure diversity of selected and not selected groupings
-                    ldSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = lsSelectedInValidation, tempDiversityMetricAlpha = sMetric)
-                    ldNotSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = (setsValidationMetadata-set(lsSelectedInValidation)), tempDiversityMetricAlpha = sMetric)
+                    #Measure feature abundance of selected and not selected populations
+                    #Reduce the table to just the features
+                    #Rank the data if need be
+                    abndFeatureTable = abndValidationData.funcGetFeatureAbundanceTable(lsFeatures)
+                    abndValidationData = abndValidationData.funcRankAbundance()
+                    abndRankFeatureTable = abndValidationData.funcGetFeatureAbundanceTable(lsFeatures)
+                    if not abndFeatureTable or not abndRankFeatureTable:
+                        logging.error("MicropitaPaperValidateFeatureAbundanceHistogram:: did not receive a reduced feature abundance table.")
+                        return False
 
-                    #Make box plot
-                    bp = plt.boxplot(x=[ldSelectedDiversity[0],ldNotSelectedDiversity[0]], notch=1, patch_artist=True)
-                    ldJitteredX1 = [1.0+random.uniform(-.05,.05) for x in xrange(len(ldSelectedDiversity[0]))]
-                    ldJitteredX2 = [2.0+random.uniform(-.05,.05) for x in xrange(len(ldNotSelectedDiversity[0]))]
-                    plt.scatter(x=ldJitteredX1,y=ldSelectedDiversity[0],c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
-                    plt.scatter(x=ldJitteredX2,y=ldNotSelectedDiversity[0],c=objFigureControl.dictConvertMethodToHEXColor[sMethod],marker="o",alpha=objFigureControl.c_dAlpha)
+                    #Get selection in 16S
+                    #Get Rank abundance and abundance in WGS
+                    #Order relative abundance by rank abundance
+                    lsSamples = abndFeatureTable.funcGetSampleNames()
+                    lsColors = ['r' if sSample in lsSelectedInValidation else 'y' for sSample in lsSamples]
+                    dFeatureSampleLength = len(lsFeatures)
+                    ldAverageFeatureAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSamples]
+                    ldAverageRankedAbundance = [sum(abndRankFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSamples]
+                    ltpleHistogram = zip(ldAverageFeatureAbundance,ldAverageRankedAbundance,lsColors)
+                    #Sort by abundance
+                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(0))
+                    #Sort by rank
+                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(1))
 
-                    #Color boxes
-                    plt.setp(bp['boxes'], color=objFigureControl.c_strDetailsColorLetter, facecolor=objFigureControl.dictConvertMethodToHEXColor[sMethod], alpha=objFigureControl.c_dAlpha)
-                    plt.setp(bp['whiskers'], color=objFigureControl.c_strDetailsColorLetter)
-
-                    #Set ticks and title
-                    xtickNames = plt.setp(imgSubplot, xticklabels=["".join(["Selected (",str(len(ldSelectedDiversity[0])),")"]),
-                                                                   "".join(["Not Selected (",str(len(ldNotSelectedDiversity[0])),")"])])
-                    imgSubplot.set_title("Maximum diversity shown in validation data set.")
+                    #Plot as histograms
+                    #Add color or astrices to selected samples
+                    ldOrderedRelativeAbundance, ldOrderedRank, lsOrderedColors = zip(*ltpleHistogram)
+                    print "ldOrderedRelativeAbundance", ldOrderedRelativeAbundance
+                    print "ldOrderedRank", ldOrderedRank
+                    print "lsOrderedColors", lsOrderedColors
+                    print "ltpleHistogram", ltpleHistogram
+                    plt.bar(left=range(len(ldOrderedRank)), height=ldOrderedRelativeAbundance)#, facecolor=lsOrderedColors)
 
                     #End plot
                     #Save to a file
                     imgFigure.savefig(args.strOutFigure, facecolor=imgFigure.get_facecolor())
 
                 else:
-                    logging.error("MicropitaPaperValidateDiversity::Not all samples selected for diversity are in the given sample.")
+                    logging.error("MicropitaPaperValidateFeatureAbundanceHistogram::Not all samples selected for diversity are in the given sample.")
             else:
-                logging.error("MicropitaPaperValidateDiversity::Not all samples selected for diversity are in the given sample.")
+                logging.error("MicropitaPaperValidateFeatureAbundanceHistogram::Not all samples selected for diversity are in the given sample.")
 
-    logging.info("Stop MicropitaPaperValidateDiversity")
+    logging.info("Stop MicropitaPaperValidateFeatureAbundanceHistogram")
 
 if __name__ == "__main__":
     _main( )

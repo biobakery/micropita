@@ -153,7 +153,7 @@ class Cladogram:
     """
     self.strRoot = strRoot
 
-  def generate(self, strImageName, strStyleFile, sTaxaFileName, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
+  def generate(self, strImageName, strStyleFile, sTaxaFileName, iTerminalCladeLevel = 10, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This is the method to call to generate a cladogram using circlader.
     The default data file is an abundance table unless the getDa function is overwritten.
@@ -164,6 +164,8 @@ class Cladogram:
     :type strStyleFile File path (string)
     :param sTaxaFileName File path indicating the taxa file to use
     :type sTaxaFileName File path (string)
+    :param iTerminalCladeLevel Clade level to use as terminal in plotting
+    :type iTerminalCladeLevel integer starting with 1
     :param strColorFile File path indicating the color file to use
     :type strColorFile File path (string)
     :param strTickFile File path indicating the tick file to use
@@ -173,6 +175,8 @@ class Cladogram:
     :param strSizeFile File path indicating the size file to use
     :type strSizeFile File path (string)
     """
+
+    print "**********************************self.ldictCircleData", len(self.ldictCircleData)
 
     if self.npaAbundance == None:
       print "Cladogram::generate. The data was not set so an image could not be generated"
@@ -191,6 +195,13 @@ class Cladogram:
     #Fix unclassified names
     #Make numeric labels as indicated
     self.dictConvertIDs = self.generateLabels(lsIDs)
+
+    #Remove taxa lower than the display clade level
+    lsCladeAndAboveFeatures = []
+    for sFeature in lsIDs:
+        if len(sFeature.split(self.cFeatureDelimiter)) <= iTerminalCladeLevel:
+            lsCladeAndAboveFeatures.append(sFeature)
+    lsIDs = lsCladeAndAboveFeatures
 
     #Filter by abundance
     if(self.fAbundanceFilter):
@@ -316,6 +327,11 @@ class Cladogram:
     :type iScale integer
     """
     self.c_dCircleScale = iScale
+
+  #Not tested
+  def setFeatureDelimiter(self, cDelimiter):
+    if cDelimiter:
+      self.cFeatureDelimiter = cDelimiter
 
   #Not tested
   def setFilterByCladeSize(self, fCladeSizeFilter, iCladeLevelToMeasure = 3, iCladeLevelToReduce = 1, iMinimumCladeSize = 5, cFeatureDelimiter = "|", strUnclassified="unclassified"):

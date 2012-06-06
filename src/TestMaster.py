@@ -18,8 +18,8 @@ import unittest
 #Import test libraries
 import AbundanceTableTest
 #import CladogramTest
-#import DiversityTest
-#import MLPYDistanceAdaptorTest
+import DiversityTest
+import MLPYDistanceAdaptorTest
 #import PCoATest
 #import MicroPITATest
 #import SVMTest
@@ -27,10 +27,10 @@ import AbundanceTableTest
 import Utility_MathTest
 
 suite = unittest.TestSuite()
-#suite.addTest(AbundanceTableTest.suite())
+suite.addTest(AbundanceTableTest.suite())
 #suite.addTest(CladogramTest.suite())
-#suite.addTest(DiversityTest.suite())
-#suite.addTest(MLPYDistanceAdaptorTest.suite())
+suite.addTest(DiversityTest.suite())
+suite.addTest(MLPYDistanceAdaptorTest.suite())
 #suite.addTest(PCoATest.suite())
 #suite.addTest(MicroPITATest.suite())
 #suite.addTest(SVMTest.suite())
