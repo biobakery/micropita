@@ -21,18 +21,24 @@ class Constants_Figures():
     #General colors
     c_strBackgroundColorName = "Invisible"
     c_strBackgroundColor = "255,255,255"
+    c_strBackgroundColorTuple = (255,255,255)
     c_strBackgroundColorWord = "white"
     c_strBackgroundColorLetter = "w"
 
     c_strDetailsColor = "0,0,0"
+    c_strDetailsColorTuple = (0,0,0)
     c_strDetailsColorWord = "black"
     c_strDetailsColorLetter = "k"
 
     #Standardized coloring
     invSimpsonColor = "#FF6600"#Dark orange
     invSimpsonColorN = "255,102,0"#Dark orange
+    invSimpsonColorLetter = 'o'#Dark orange
+    invSimpsonColorTuple = (255,102,0)
     chao1Color = "#66FF00"#Lawn green
     chao1ColorN = "102,255,0"#Lawn green
+    chao1ColorLetter = 'g'
+    chao1ColorTuple = (102,255,0)
     unifracColor = "#FFCC33"#Gold
     unifracColorN = "255,204,51"#Gold
     inUnifracColor = "#FA8072"#Salmon
@@ -43,19 +49,31 @@ class Constants_Figures():
     inWeightedUnifracColorN = "0,153,255"#Doger blue
     brayCurtisColor = "#6600FF"#Purple
     brayCurtisColorN = "102,0,255"#Purple
+    brayCurtisColorLetter = ''
+    brayCurtisColorTuple = (102,0,255)
     inBrayCurtisColor = "#FF33FF"#Fushia
     inBrayCurtisColorN = "255,51,255"#Fushia
+    inBrayCurtisColorLetter = 'm'
+    inBrayCurtisColorTuple = (255,51,255)
     randomColor = "#000000"#Black
     randomColorN = "0,0,0"#Black
+    randomColorLetter = 'k'
+    randomColorTuple = (0,0,0)
     userRanked = "#83C8F9"#Blue
     userRankedN = "131,200,249"#Blue
+    userRankedLetter = 'c'
+    userRankedTuple = (131,200,249)
 #    userRanked = "#CCCCCC"#Grey
 #    userRankedN = "204,204,204"#Grey
 #Grey just was not working for the figure 2 got to have a more vibriant color    userRankedN = "204,204,204"#Grey
     svmClose = "#FF0000"#Red
     svmCloseN = "255,0,0"#Red
+    svmCloseLetter = 'r'
+    svmCloseTuple = (255,0,0)
     svmFar = "#009900"#Green
+    svmFarLetter = 'g'
     svmFarN = "0,153,0"#Green
+    svmFarTuple = (0,153,0)
 
     c_SELECTED_SAMPLE = "#FF0000" #Indicates a sample that is selected
 
@@ -78,10 +96,12 @@ class Constants_Figures():
         if fInvert==True:
             #General colors
             self.c_strBackgroundColor = "0,0,0"
+            self.c_strBackgroundColorTuple = (0,0,0)
             self.c_strBackgroundColorWord = "black"
             self.c_strBackgroundColorLetter = "k"
 
             self.c_strDetailsColor = "255,255,255"
+            self.c_strDetailsColorTuple = (255,255,255)
             self.c_strDetailsColorWord = "white"
             self.c_strDetailsColorLetter = "w"
 
@@ -98,10 +118,12 @@ class Constants_Figures():
         else:
             #General colors
             self.c_strBackgroundColor = "255,255,255"
+            self.c_strBackgroundColorTuple = (255,255,255)
             self.c_strBackgroundColorWord = "white"
             self.c_strBackgroundColorLetter = "w"
 
             self.c_strDetailsColor = "0,0,0"
+            self.c_strDetailsColorTuple = (0,0,0)
             self.c_strDetailsColorWord = "black"
             self.c_strDetailsColorLetter = "k"
 
@@ -124,3 +146,23 @@ class Constants_Figures():
                               MicroPITA.c_RANDOM:randomColor,
                               MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColor,
                               MicroPITA.c_USER_RANKED:userRanked}
+
+    #Can be used to convert method names to rgb tuples
+    dictConvertMethodToRGBLetter={MicroPITA.c_DIVERSITY_1:invSimpsonColorLetter,
+                              MicroPITA.c_DIVERSITY_2:chao1ColorLetter,
+                              MicroPITA.c_EXTREME_DISSIMILARITY_1:inBrayCurtisColorLetter,
+                              MicroPITA.c_SVM_CLOSE:svmCloseLetter,
+                              MicroPITA.c_SVM_FAR:svmFarLetter,
+                              MicroPITA.c_RANDOM:randomColorLetter,
+                              MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColorLetter,
+                              MicroPITA.c_USER_RANKED:userRankedLetter}
+
+    #Can be used to convert method names to rgb strings
+    dictConvertMethodToRGBString={MicroPITA.c_DIVERSITY_1:invSimpsonColorN,
+                              MicroPITA.c_DIVERSITY_2:chao1ColorN,
+                              MicroPITA.c_EXTREME_DISSIMILARITY_1:inBrayCurtisColorN,
+                              MicroPITA.c_SVM_CLOSE:svmCloseN,
+                              MicroPITA.c_SVM_FAR:svmFarN,
+                              MicroPITA.c_RANDOM:randomColorN,
+                              MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColorN,
+                              MicroPITA.c_USER_RANKED:userRankedN}

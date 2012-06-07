@@ -185,15 +185,19 @@ def _main( ):
                     #Get Rank abundance and abundance in WGS
                     #Order relative abundance by rank abundance
                     lsSamples = abndFeatureTable.funcGetSampleNames()
-                    lsColors = ['r' if sSample in lsSelectedInValidation else 'y' for sSample in lsSamples]
+                    lsColors = [objFigureControl.dictConvertMethodToRGBLetter[sMethod] if sSample in lsSelectedInValidation else objFigureControl.c_strBackgroundColorLetter for sSample in lsSamples]
+
                     dFeatureSampleLength = len(lsFeatures)
                     ldAverageFeatureAbundance = [sum(abndFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSamples]
                     ldAverageRankedAbundance = [sum(abndRankFeatureTable.funcGetSample(sSample))/dFeatureSampleLength for sSample in lsSamples]
                     ltpleHistogram = zip(ldAverageFeatureAbundance,ldAverageRankedAbundance,lsColors)
                     #Sort by abundance
-                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(0))
+                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(0), reverse=True)
                     #Sort by rank
                     ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(1))
+                    #Sort by color
+                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(2))
+
 
                     #Plot as histograms
                     #Add color or astrices to selected samples
@@ -202,7 +206,7 @@ def _main( ):
                     print "ldOrderedRank", ldOrderedRank
                     print "lsOrderedColors", lsOrderedColors
                     print "ltpleHistogram", ltpleHistogram
-                    plt.bar(left=range(len(ldOrderedRank)), height=ldOrderedRelativeAbundance)#, facecolor=lsOrderedColors)
+                    plt.bar(left=range(len(ldOrderedRank)), height=ldOrderedRelativeAbundance, color=list(lsOrderedColors))
 
                     #End plot
                     #Save to a file
