@@ -23,10 +23,10 @@ from Diversity import Diversity
 import logging
 import math
 import mlpy
-from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
 import operator
 import os
+from Pycluster import *
 import random
 import re
 import scipy.cluster.hierarchy as hcluster
@@ -172,15 +172,7 @@ class MicroPITA:
             return False
 
     #Testing: Needs Testing
-    #Samples are rows, taxa are columns
-    #@params tempMatrix Data matrix taxa (rows) by samples (columns).
-    #Note: Not a structured array, a matrix stripped of adornment.
-    #@params tempSampleNames The names of the samples
-    #@params tempNumberClusters The K number of clusters to divide the space
-    #@params tempNumberSamplesReturned The number of samples needing to be returned (Almost completely ignored currently
-    #TODO stop ignoring tempNumberSamplesReturned
-    #otherwise a distance object is expected and will be used.
-    def getCentralSamplesByKMedoids(self, tempMatrix=None, tempMetric=None, tempSampleNames=None, tempNumberClusters=0, tempNumberSamplesReturned=0):
+    def getCentralSamplesByKMedoids(self, tempMatrix=None, tempMetric=None, tempSampleNames=None, tempNumberSamplesReturned=0):
 	"""
 	Gets centroid samples by k-medoids clustering of a given matrix.
 	
@@ -190,28 +182,26 @@ class MicroPITA:
 	:type	String:	String name of beta metric. Possibilities are listed in microPITA.
 	:param	tempSampleNames:	The names of the sample
 	:type	List:	List of strings
-	:param	tempNumberClusters:	Number of clusters to make from the data.
-	:type	Integer:	Integer number of clusters
-	:param	tempNumberSamplesReturned:	Number of samples from the center returned from each cluster.
-	:type	Integer:	Number of samples to return from each cluster
+	:param	tempNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
+	:type	Integer:	Number of samples to return
 	"""
 
         #Validate parameters
-        if(tempNumberClusters > tempNumberSamplesReturned):
-            logging.error("MicroPITA.getCentralSamplesByKMedoids. Number of clusters should be equal to or less than the number samples returned. We will not represent a cluster otherwise.")
+        if(tempNumberSamplesReturned < 0):
+            logging.error("MicroPITA.getCentralSamplesByKMedoids. Number of samples to return must be atleast 1.")
             return False
 
         #Count of how many rows
         sampleCount = tempMatrix.shape[0]
-        if(tempNumberClusters > sampleCount):
-            logging.error("".join(["MicroPITA.getCentralSamplesByKMedoids. There are not enough samples to make that many clusters. Cluster number = ",str(tempNumberClusters),". Sample number = ",str(sampleCount),"."]))
+        if(tempNumberSamplesReturned > sampleCount):
+            logging.error("".join(["MicroPITA.getCentralSamplesByKMedoids. There are not enough samples to return the amount of samples specified. Return sample count = ",str(tempNumberSamplesReturned),". Sample number = ",str(sampleCount),"."]))
             return False
 
         #Samples to return
         returningSamples = list()
 
         #If the cluster count is equal to the sample count return all samples
-        if(sampleCount == tempNumberClusters):
+        if(sampleCount == tempNumberSamplesReturned):
             return list(tempSampleNames)
 
         #Get distance matrix
@@ -225,34 +215,21 @@ class MicroPITA:
 
         if(( tempMetric==Diversity.c_UNIFRAC_B_DIVERSITY ) or ( tempMetric==Diversity.c_WEIGHTED_UNIFRAC_B_DIVERSITY )):
           distanceMatrix = distanceMatrix['distance_matrix'][0]
+
+        #Perform Kmedoid clustering in pycluster
+        lclusterid, error, nfound = kmedoids (distance=distanceMatrix, nclusters=tempNumberSamplesReturned, npass=1000, initialid=None)
         #TODO make sure you are getting condensed for unifrac and braycurtis
-        #Make the adaptor for the MLPY Kmediods method to use custom distanc matrices
-        distance = MLPYDistanceAdaptor(tempDistanceMatrix=distanceMatrix, tempIsCondensedMatrix=True)
-
-        #Create object to determine clusters/medoids
-        medoidsMaker = mlpy.Kmedoids(k=tempNumberClusters, dist=distance)
-
-        #medoidsData includes(1d numpy array, medoids indexes; 
-        #              1d numpy array, non-medoids indexes;
-        #              1d numpy array, cluster membership for non-medoids;
-        #              double, cost of configuration)
-        #tempMatrix is samples x rows
-        #Build a matrix of lists of indicies to pass to the distance matrix
-        indicesMatrix = []
-        for indexPosition in xrange(0,len(tempMatrix)):
-            indicesMatrix.append([indexPosition])
-        medoidsData = medoidsMaker.compute(np.array(indicesMatrix))
+        print "********"
+        print lclusterid, error, nfound
+        print "********"
         logging.debug("Results from the kmedoid method in representative selection:")
-        logging.debug(str(medoidsData))
+        logging.debug("clusterid:"+str(list(lclusterid)))
+        logging.debug("error:"+str(error))
+        logging.debug("nfound:"+str(nfound))
 
-        #If returning the same amount of clusters and samples
+        #Convert centroid indexes to names and return
         #Return centroids
-        if(tempNumberClusters == tempNumberSamplesReturned):
-            selectedIndexes = medoidsData[0]
-            for index in xrange(0,tempNumberClusters):
-                returningSamples.append(tempSampleNames[selectedIndexes[index]])
-            return returningSamples
-        return False
+        return [tempSampleNames[iindex] for iindex in set(lclusterid)]
 
 ####Group 3## Highest Dissimilarity
     #Testing: Needs testing
@@ -317,100 +294,6 @@ class MicroPITA:
         return returnSamples
 
 ####Group 4## Rank Average of user Defined Taxa
-
-#TODO TEST AND CHECK
-    #Ranks the taxa by abundance and then averages thier ranks in the samples
-    #Expects (Taxa (row) by Samples (column))
-    #Expects a column 0 of taxa id that is skipped
-    #Allows ties
-    #@param tempMatrix [taxa (row) x sample(column)] Matrix with first column as a taxa id column which is ignored
-    #@param tempTargetedTaxa list of string names of taxa which are measured after ranking against the full sample.
-    #@return [(sample name,average rank)]
-#    def getAverageRanksSamples(self, tempMatrix, tempTargetedTaxa, sSampleIDName):
-#	"""
-#	Ranks the features by abundance and then averages thier ranks in the samples. Allows ties. Expects a column 0 of taxa id that is skipped.
-#	
-#	:param	tempMatrix:	Matrix with first column as a taxa id column which is ignored [taxa (row) x sample(column)] 
-#	:type	matrix:	Matrix of abundance data
-#	:param	tempTargetedTaxa:	String names
-#	:type	list:	list of string names of taxa which are measured after ranking against the full sample
-#	:param	sSampleIDName:	ID for the feature name
-#	:type	string:	String of the metadata indicating the feature name
-#	"""
- #       #Sample rank averages [[sample,average rank of selected taxa]]
-#        #Returned
-#        sampleRankAverages = []
-#        
-#        #Get sample names
-#        sampleNames = tempMatrix.dtype.names[1:]
-#        #Get taxa names
-#        allTaxaNames = tempMatrix[tempMatrix.dtype.names[0]]
-#
-#        #If the taxa to be selected are not in the list
-#        #Return nothing and log
-#        lsMissing = []
-#        for tempTaxa in tempTargetedTaxa:
-#            if not tempTaxa in allTaxaNames:
-#                lsMissing.append(tempTaxa)
-#            else:
-#                #Check to make sure the taxa of interest is not average abundance of 0
-#                if sum(list(tempMatrix[np.where(allTaxaNames==tempTaxa)[0],:][0])[1:]) == 0:
-#                    lsMissing.append(tempTaxa)
-#
-#        if len(lsMissing) > 0:
-#            logging.error("".join(["MicroPITA.getAverageRanksSamples. The following feature/s is not in the data set or has the abundance of 0. ",",".join(lsMissing)]))
-#            return False        
-#
-#        #For each sample name get the ranks
-#        for name in sampleNames:
-#            #Lists of taxa with the following information [[taxa name,value,rank]]
-#            ranks = []
-#
-#            #For each taxa
-#            for taxaIDIndex in xrange(0,len(allTaxaNames)):
-#                currentAbundance = tempMatrix[name][taxaIDIndex]
-#                ranks.append([tempMatrix[sSampleIDName][taxaIDIndex],currentAbundance,-1])
-#
-#            #Sort based on abundance
-#            ranks = sorted(ranks, key = lambda sampleData: sampleData[1], reverse = True)
-#
-#            #Add ranks
-#            rank = 1
-#            currentValue = ranks[0][1]
-#            for sampleData in ranks:
-#                sampleAbundance = sampleData[1]
-#                #Error samples are out of order
-#                if(sampleAbundance > currentValue):
-#                    return False
-#                #Allow ties
-#                if(sampleAbundance == currentValue):
-#                    sampleData[2] = rank
-#                else:
-#                    #Update/set rank and value
-#                    currentValue = sampleAbundance
-#                    rank = rank + 1
-#                    sampleData[2] = rank
-#
-#            #Get average ranks
-#            sumRank = 0
-#            countRank = 0.0
-#            for rankData in ranks:
-#               if(rankData[0] in tempTargetedTaxa):
-#                   sumRank = sumRank + rankData[2] 
-#                   countRank = countRank + 1.0
-#
-#            #Save average rank by sample name
-#            if(not countRank == 0):
-#                sampleRankAverages.append([name,sumRank/countRank])
-##                print([name,sumRank/countRank])
-#            else:
-#                logging.error("".join(["MicroPITA.getAverageRanksSamples. Found no taxa for sample=",str(name)]))
-#
-#        #Sort based on average
-#        sampleRankAverages = sorted(sampleRankAverages, key = lambda sampleData: sampleData[1], reverse = True)
-#
-#        #return
-#        return sampleRankAverages
 
     def getAverageAbundanceSamples(self, tempMatrix, tempTargetedTaxa, fRank=False):
 	"""
@@ -548,14 +431,10 @@ class MicroPITA:
 ####Group 6## Supervised
         
     #@return Dictionary of file paths which were generated by the model and prediction steps
-    def runSVM(self, tempInputFile=None, tempDelimiter=Constants.TAB, tempOutputSVMFile=None, tempMatrixLabels=None, sLastMetadataName=None, tempSkipFirstColumn=True, tempNormalize=True, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
+    def runSVM(self, abndTable, tempOutputSVMFile, sLabelID, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
 	"""
-	Runs a linear SVM (Adapted from the easy.py script included in the standard libsvm intall.
-	
-	:param	tempInputFile:	String File path to Qiime-like output of abundance data to be converted to SVM format
-	:type	string:	String path
-	:param	tempDelimiter:	Delimiter to use to parse the input file
-	:type	char:	char
+	Runs a linear SVM (Adapted from the easy.py script included in the standard libsvm intall).
+
 	:param	tempOutputSVMFile:	String File path and name to output in SVM format based on the input file
 	:type	string:	String file path
 	:param	tempMatrixLabels:	List of labels (does not have to be strings, just have to be appropriate for labels when casted to string type
@@ -574,11 +453,6 @@ class MicroPITA:
 	:type	boolean:	boolean
 	"""
 
-        #Validate data
-        if not sLastMetadataName:
-            logging.error("MicroPITA::runSVM Did not received a value for sLastMetadataName and so did not run.")
-            return False
-
         #Create SVM object
         svm = SVM()
 
@@ -588,20 +462,8 @@ class MicroPITA:
         #Files generated by prediction
         predictionFiles = None
 
-        #Convert metadata to labels
-        #Create a dictionary converting labels to indexes
-        metadataLabelToIndex = dict()
-        indexCount = 0
-
-        for metadataLabel in tempMatrixLabels:
-            if(not metadataLabel in metadataLabelToIndex):
-                metadataLabelToIndex[metadataLabel] = indexCount
-                indexCount += 1
-        #Create a new label list but coded as integers
-        metadataLabelsAsIntegerCodes = [metadataLabelToIndex[data] for data in tempMatrixLabels]
-
         #Convert abundancies file to SVM file
-        noError = svm.convertAbundanceFileToSVMFile(tempInputFile=tempInputFile, tempOutputSVMFile=tempOutputSVMFile, tempDelimiter=tempDelimiter, tempLabels=metadataLabelsAsIntegerCodes, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=tempSkipFirstColumn, tempNormalize=tempNormalize)
+        noError = svm.convertAbundanceTableToSVMFile(abndAbundanceTable=abndTable, tempOutputSVMFile=tempOutputSVMFile, sMetadataLabel=sLabelID)
 
         modelFiles = False
         predictionFiles = False
@@ -620,6 +482,136 @@ class MicroPITA:
             logging.error("MicroPITA.runSVM: Prediction files were false.")
         return modelFiles
 
+    #@return Dictionary of file paths which were generated by the model and prediction steps
+#    def runSVM(self, tempInputFile=None, tempDelimiter=Constants.TAB, tempOutputSVMFile=None, tempMatrixLabels=None, sLastMetadataName=None, tempSkipFirstColumn=True, tempNormalize=True, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
+#	"""
+#	Runs a linear SVM (Adapted from the easy.py script included in the standard libsvm intall).
+#	
+#	:param	tempInputFile:	String File path to Qiime-like output of abundance data to be converted to SVM format
+#	:type	string:	String path
+#	:param	tempDelimiter:	Delimiter to use to parse the input file
+#	:type	char:	char
+#	:param	tempOutputSVMFile:	String File path and name to output in SVM format based on the input file
+#	:type	string:	String file path
+#	:param	tempMatrixLabels:	List of labels (does not have to be strings, just have to be appropriate for labels when casted to string type
+#	:type	List:	List of strings
+#	:param	sLastMetadataName:	String Found immediately before the first row to read (skips header rows)
+#	:type	string:	string
+#	:param	tempSkipFirstColumn:	Boolean True indicates the first column will be skipped (due to it containing row identifying information like OTU names).
+#	:type	boolean:	boolean
+#	:param	tempNormalize:	Boolean True indicates normalizes to relative abundancy per sample (column)
+#	:type	boolean:	boolean
+#	:param	tempSVMScaleLowestBound:	Lowest value (0 or -1) the values were scaled to (max = 1)
+#	:type	integer:	integer
+#	:param	tempSVMLogC:	Comma delimited string giving values for C cross validation
+#	:type	string:	Comma delimited string
+#	:param	tempSVMProbabilistic:	Get probablistic outcome for SVM
+#	:type	boolean:	boolean
+#	"""
+#
+#        #Validate data
+#        if not sLastMetadataName:
+#            logging.error("MicroPITA::runSVM Did not received a value for sLastMetadataName and so did not run.")
+#            return False
+#
+#        #Create SVM object
+#        svm = SVM()
+#
+#        #Holds files generated by SVM code
+#        #Files generated by modeling
+#        modelFiles = None
+#        #Files generated by prediction
+#        predictionFiles = None
+#
+#        #Convert metadata to labels
+#        #Create a dictionary converting labels to indexes
+#        metadataLabelToIndex = dict()
+#        indexCount = 0
+#
+#        for metadataLabel in tempMatrixLabels:
+#            if(not metadataLabel in metadataLabelToIndex):
+#                metadataLabelToIndex[metadataLabel] = indexCount
+#                indexCount += 1
+#        #Create a new label list but coded as integers
+#        metadataLabelsAsIntegerCodes = [metadataLabelToIndex[data] for data in tempMatrixLabels]
+#
+#        #Convert abundancies file to SVM file
+#        noError = svm.convertAbundanceFileToSVMFile(tempInputFile=tempInputFile, tempOutputSVMFile=tempOutputSVMFile, tempDelimiter=tempDelimiter, tempLabels=metadataLabelsAsIntegerCodes, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=tempSkipFirstColumn, tempNormalize=tempNormalize)
+#
+#        modelFiles = False
+#        predictionFiles = False
+#        #Run SVM
+#        if(noError==True):
+#            modelFiles = svm.createLinearModel(tempInputFileName=tempOutputSVMFile, tempScaling=tempSVMScaleLowestBound, tempLogC=tempSVMLogC, tempProbabilistic=tempSVMProbabilistic)
+#            if(not modelFiles == False):
+#                predictionFiles = svm.predictFromLinearModel(tempDataFileName=tempOutputSVMFile, tempModelFileName=modelFiles[svm.c_KEYWORD_MODEL_FILE], tempRangeFileName=modelFiles[svm.c_KEYWORD_RANGE_FILE], tempProbabilistic=tempSVMProbabilistic)
+#            else:
+#                logging.error("".join(["MicroPITA.runSVM: Could not run prediction, model file was false."]))
+#        #Combine output dictionarys and return
+#        if(not predictionFiles == False):
+#            for pKey in predictionFiles:
+#                modelFiles[pKey]=(predictionFiles[pKey])
+#        else:
+#            logging.error("MicroPITA.runSVM: Prediction files were false.")
+#        return modelFiles
+
+    #@return Dictionary of file paths which were generated by the model and prediction steps
+#    def runMLPYSVM(self, abndAbundanceTable, sMetadataForLabel, strOutputModelFile)#tempInputFile=None, tempDelimiter=Constants.TAB, tempOutputSVMFile=None, tempMatrixLabels=None, sLastMetadataName=None, tempSkipFirstColumn=True, tempNormalize=True, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):#
+#	"""
+#	Runs a linear SVM using MLPY.
+#	
+#	:param	tempInputFile:	String File path to Qiime-like output of abundance data to be converted to SVM format
+#	:type	string:	String path
+#	:param	tempDelimiter:	Delimiter to use to parse the input file
+#	:type	char:	char
+#	:param	tempOutputSVMFile:	String File path and name to output in SVM format based on the input file
+#	:type	string:	String file path
+#	:param	tempMatrixLabels:	List of labels (does not have to be strings, just have to be appropriate for labels when casted to string type
+#	:type	List:	List of strings
+#	:param	sLastMetadataName:	String Found immediately before the first row to read (skips header rows)
+#	:type	string:	string
+#	:param	tempSkipFirstColumn:	Boolean True indicates the first column will be skipped (due to it containing row identifying information like OTU names).
+#	:type	boolean:	boolean
+#	:param	tempNormalize:	Boolean True indicates normalizes to relative abundancy per sample (column)
+#	:type	boolean:	boolean
+#	:param	tempSVMScaleLowestBound:	Lowest value (0 or -1) the values were scaled to (max = 1)
+#	:type	integer:	integer
+#	:param	tempSVMLogC:	Comma delimited string giving values for C cross validation
+#	:type	string:	Comma delimited string
+#	:param	tempSVMProbabilistic:	Get probablistic outcome for SVM
+#	:type	boolean:	boolean
+#	"""
+#
+#        #Create SVM object
+#        svm = mlpy.LibSvm()
+#
+#        #Get 2D array of data
+#        npData = abndAbundanceTable.funcGetAbundanceCopy()
+#        #Get labels
+#        lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataForLabel)
+#        #Create a new label list but coded as integers
+#        setsLabels = set(lslabels)
+#        dictLabels = dict(zip(setsLabels, range(len(setsLabels)))
+#        ldLabels = [dictLabels[sLabel] for sLabel in lsLabels]
+#
+#        #Create classifier
+#        svm.learn(x=npData,y=ldLabel)
+#
+#
+#        #Save model to file
+#        svm.save_model(strOutputModelFile)
+#
+#
+#        #Convert abundancies file to SVM file
+#        svm.convertAbundanceFileToSVMFile(tempInputFile=tempInputFile, tempOutputSVMFile=tempOutputSVMFile, tempDelimiter=tempDelimiter, tempLabels=metadataLabelsAsIntegerCodes, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=tempSkipFirstColumn, tempNormalize=tempNormalize)
+#
+#        #Run SVM
+#        if(noError==True):
+#            mlpySVM = mlpy.LibSvm()
+#            mlpy.leanr(x=data,y=lsLabels)
+#            svm.createLinearModel(tempInputFileName=tempOutputSVMFile, tempScaling=tempSVMScaleLowestBound, tempLogC=tempSVMLogC, tempProbabilistic=tempSVMProbabilistic)
+#            svm.predictFromLinearModel(tempDataFileName=tempOutputSVMFile, tempModelFileName=modelFiles[svm.c_KEYWORD_MODEL_FILE], tempRangeFileName=modelFiles[svm.c_KEYWORD_RANGE_FILE], tempProbabilistic=tempSVMProbabilistic)
+#
     #Run the supervised methods
     def runSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
                                    strOuputSVMFile, strSupervisedMetadata, sampleSVMSelectionCount,
@@ -662,11 +654,7 @@ class MicroPITA:
         #Will contain the samples selected to return
         dictSelectedSamples = dict()
         #Run linear SVM
-        svmRelatedData = self.runSVM(tempInputFile=abundanceTable.funcGetName(), tempDelimiter=abundanceTable.funcGetFileDelimiter(),
-                                     tempOutputSVMFile=strOuputSVMFile,
-                                     tempMatrixLabels=abundanceTable.funcGetMetadata(strSupervisedMetadata), sLastMetadataName=sLastMetadataName,
-                                     tempSkipFirstColumn=fSkipFirstColumn,
-                                     tempNormalize=fNormalize, tempSVMScaleLowestBound=iScaleLowestBound,
+        svmRelatedData = self.runSVM(abndTable=abundanceTable, tempOutputSVMFile=strOuputSVMFile, sLabelID=strSupervisedMetadata, tempSVMScaleLowestBound=iScaleLowestBound,
                                      tempSVMLogC=strCostRange, tempSVMProbabilistic=fProbabilitic)
 
         #Read in prediction file and select samples
@@ -891,8 +879,6 @@ class MicroPITA:
 
         sampleSelectionCount = iSampleSelectionCount
         sampleSVMSelectionCount = iSupervisedSampleCount
-        #TODO
-        clusterCount = iSampleSelectionCount
 
         #Holds the alpha diversity metrics for samples
         internalAlphaMatrix = []
@@ -936,22 +922,11 @@ class MicroPITA:
 
         logging.debug(" ".join(["Micropita:run.","Received metadata=",str(dictTotalMetadata)]))
 
-        #Run supervised methods#
-        if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-            selectedSamples.update(self.runSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
-                                   strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
-                                   strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, sLastMetadataName=sLastMetadataName,
-                                   fSkipFirstColumn=c_SKIP_FIRST_COLUMN, fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
-                                   iScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, strCostRange=c_SVM_COST_RANGE, fProbabilitic=c_SVM_PROBABILISTIC))
-            logging.info("Selected Samples Unsupervised")
-            logging.info(selectedSamples)
-        
         #Run unsupervised methods###
         #Stratify the data if need be and drop the old data
         lStratifiedAbundanceTables = None
         if (not strStratify == None) and (not strStratify == "None"):
             lStratifiedAbundanceTables = totalAbundanceTable.funcStratifyByMetadata(strStratify,xWriteToFile="".join([os.path.split(strOutputFile)[0],"/"]))
-            totalAbundanceTable = None
         else:
             lStratifiedAbundanceTables = [totalAbundanceTable]
 
@@ -992,7 +967,7 @@ class MicroPITA:
                         for bMetric in diversityMetricsBetaNoNormalize:
 
                             #Get representative dissimilarity samples
-                            medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
+                            medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberSamplesReturned=sampleSelectionCount)
 
                             if(not medoidSamples == False):
                                 astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1061,7 +1036,7 @@ class MicroPITA:
                     for bMetric in diversityMetricsBeta:
 
                         #Get representative dissimilarity samples
-                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberClusters=clusterCount, tempNumberSamplesReturned=sampleSelectionCount)
+                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberSamplesReturned=sampleSelectionCount)
 
                         if(not medoidSamples == False):
                             astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1113,6 +1088,18 @@ class MicroPITA:
                 selectedSamples[microPITA.c_RANDOM].extend(list(randomlySelectedSamples))
 
             logging.info("Selected Samples 5")
+            logging.info(selectedSamples)
+
+        #Run supervised methods#
+        lStratifiedAbundanceTables = None
+        totalAbundanceTable.funcNormalize()
+        if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
+            selectedSamples.update(self.runSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
+                                   strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
+                                   strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, sLastMetadataName=sLastMetadataName,
+                                   fSkipFirstColumn=c_SKIP_FIRST_COLUMN, fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
+                                   iScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, strCostRange=c_SVM_COST_RANGE, fProbabilitic=c_SVM_PROBABILISTIC))
+            logging.info("Selected Samples Unsupervised")
             logging.info(selectedSamples)
 
         return selectedSamples

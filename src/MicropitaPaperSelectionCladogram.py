@@ -172,21 +172,19 @@ def _main( ):
           Constants.ENDLINE,"Percent Samples Above Percentile=",args.iAbundanceFilterPercentCuttoff,Constants.ENDLINE,
           "Filtered Feature Count (After Abundance Filtering)=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
-    #Filter by variance
-#    if rawData.funcIsNormalized():
-#      logging.error("MicropitaPaperSelectionCladogram::Can not filter on variance on a normalized file.")
-#      return False 
-#    rawData.funcFilterFeatureBySTD(dMinSTDCuttOff = 4.0)
-
     if c_Normalize:
       rawData.funcNormalize()
 
+    #####
+    ## Note all manipualtions to the abundance table including feature filitering should occur before this point
+    #####
     abundance = rawData.funcGetAbundanceCopy()
     strSampleID = rawData.funcGetIDMetadataName()
     lsAllSampleNames = rawData.funcGetSampleNames()
 
     #All taxa in the study
     lsAllTaxa = [strTaxaId for strTaxaId in list(abundance[strSampleID])]
+    sCladogramDetails = "".join([sCladogramDetails," Feature count before reducing to a clade level:",str(len(lsAllTaxa)),Constants.ENDLINE])
 
     #Reduce the clades down to a certain clade level
     lsCladeAndAboveFeatures = []
@@ -194,6 +192,11 @@ def _main( ):
         if len(sFeature.split(c_strLineageDelim)) <= args.iTerminalCladeLevel:
             lsCladeAndAboveFeatures.append(sFeature)
     lsAllTaxa = lsCladeAndAboveFeatures
+    sCladogramDetails = "".join([sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
+    sCladogramDetails = "".join([sCladogramDetails," Feature count AFTER reducing to a clade level:",str(len(lsAllTaxa)),Constants.ENDLINE])
+
+    sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE.join(lsAllTaxa)])+Constants.ENDLINE
+
 
     #Create a cladogram object
     cladogram = Cladogram()
@@ -276,7 +279,7 @@ def _main( ):
       lsUserDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
       fhndlTaxaInput.close()
     #Update detail: Targeted taxa
-    sCladogramDetails = "".join([sCladogramDetails,"Targeted Taxa:",Constants.ENDLINE,"".join([sTaxa for sTaxa in lsUserDefinedTaxa]),Constants.ENDLINE,Constants.ENDLINE])
+    sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE,"Targeted Taxa:",Constants.ENDLINE,"".join([sTaxa for sTaxa in lsUserDefinedTaxa]),Constants.ENDLINE,Constants.ENDLINE])
 
     lsUserDefinedHighlighted = list()
     if(not args.iHighlightCladeFile == "None"):
@@ -317,6 +320,7 @@ def _main( ):
       #This is performing t-test with p-values
       for selectedSampleMethod in lsSelectedSampleMethod:
         if selectedSampleMethod in dictSelection:
+          sCladogramDetails = "".join([sCladogramDetails,"Selection Method:",selectedSampleMethod])
           #All samples that were selected by the method
           lsSelectedSamples = dictSelection[selectedSampleMethod]
           #Samples selected
@@ -333,6 +337,7 @@ def _main( ):
 
           #Compress arrays to one or the other distribution
           #Conduct wilcoxon tests on all taxa
+          
           for iTaxonIndex in xrange(0,len(lsAllTaxa)):
             npaTaxaData = list(abundance[iTaxonIndex,])
             strTaxaId = npaTaxaData[0]
@@ -345,13 +350,21 @@ def _main( ):
               npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
               dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
               sTaxaData = " ".join([sTaxaData,"Score",str(dScore),"P-value",str(dPvalue),Constants.ENDLINE])
-              sTaxadata = "".join(["Selected Average: ",str(sum(npaSelectedDistribution)/float(len(npaSelectedDistribution)))," Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
-              sTaxadata = "".join(["Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
+              if(sum(npaSelectedDistribution)==0):
+                  sTaxaData = "".join([sTaxaData,"Selected Average: 0 Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
+              else:
+                  sTaxadata = "".join([sTaxaData,"Selected Average: ",str(sum(npaSelectedDistribution)/float(len(npaSelectedDistribution)))," Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
+              if(sum(npaNotSelectedDistribution)==0):
+                  sTaxaData = "".join([sTaxaData,"Not Selected Average: 0 Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
+              else:
+                  sTaxaData = "".join([sTaxaData,"Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
+
               #[ID,TScore,PValue,QValue,SortOrder]
               lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
             else:
               sTaxaData = " ".join([sTaxaData,"Not terminal, not measured"])
-            sCladogramDetails = Constants.ENDLINE.join([sCladogramDetails,sTaxaData])
+            sCladogramDetails = "".join([sCladogramDetails,sTaxaData])
+
           #Get a list of pvalues preserving order
           ldOrderedPValues = list()
           for iScoreDataIndex in lsTaxaTScores:
@@ -369,6 +382,7 @@ def _main( ):
           lsAlpha = list()
           lsShapes = list()
           lsTaxa = list()
+          print(lsTaxaTScores)
           for iTaxa in xrange(0,len(lsTaxaTScores)):
             lsCur = lsTaxaTScores[iTaxa]
             lsTaxa.append(lsCur[c_IDINDEX])

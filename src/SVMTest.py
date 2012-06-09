@@ -13,7 +13,9 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libraries
+from AbundanceTable import AbundanceTable
 from Constants import Constants
+from Constants_Testing import Constants_Testing
 import numpy as np
 import os
 from SVM import SVM
@@ -23,11 +25,11 @@ import unittest
 #Tests the Blog object
 class SVMTest(unittest.TestCase):
 
-    def testConvertAbundanceFileToSVMFileForGoodCase(self):
+    def ntestConvertAbundanceFileToSVMFileForGoodCase(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        outputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVM.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVM.txt"])
         delimiter = Constants.TAB
         labels = [-1,+1,-1,+1,-1,+1,-1,+1,-1,+1]
         firstDataRow = 2
@@ -46,11 +48,11 @@ class SVMTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testConvertAbundanceFileToSVMFileForGoodCaseNormalize(self):
+    def ntestConvertAbundanceFileToSVMFileForGoodCaseNormalize(self):
 
         #Inputs
-        inputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"
-        outputFile = "./testData/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVM.txt"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVM.txt"])
         delimiter = Constants.TAB
         labels = [-1,+1,-1,+1,-1,+1,-1,+1,-1,+1]
         firstDataRow = 2
@@ -69,10 +71,39 @@ class SVMTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testCreateLinearModelForTestDataTrain1(self):
+    def testConvertAbundanceTableToSVMFileForGoodCase(self):
 
         #Inputs
-        inputFile = "./testData/SVM/train.1"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = False
+#"L_Antecubital_fossa"	"R_Retroauricular_crease"	"L_Retroauricular_crease"	"Subgingival_plaque"	"R_Antecubital_fossa"	"L_Retroauricular_crease"	"R_Retroauricular_crease"	"L_Antecubital_fossa"	"R_Antecubital_fossa"	"Anterior_nares"
+        #Correct Answer
+        answer = "-1 1:0.111111111111 2:0.0 3:0.333333333333 4:0.0 5:0.555555555556\n1 1:0.0 2:0.181818181818 3:0.0 4:0.818181818182 5:0.0\n-1 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0\n1 1:0.1 2:0.358333333333 3:0.241666666667 4:0.283333333333 5:0.0166666666667\n-1 1:0.0 2:0.666666666667 3:0.0 4:0.333333333333 5:0.0\n1 1:0.105263157895 2:0.0 3:0.789473684211 4:0.0 5:0.105263157895\n-1 1:0.0 2:1.0 3:0.0 4:0.0 5:0.0\n1 1:0.5 2:0.0 3:0.25 4:0.0 5:0.25\n-1 1:0.2 2:0.2 3:0.2 4:0.2 5:0.2\n1 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0\n"
+
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVMFile.txt"])
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        abndData.funcNormalize()
+        SVM.convertAbundanceTableToSVMFile(abndAbundanceTable=abndData, tempOutputSVMFile=strOutputFile, sMetadataLabel=sLastMetadata)
+
+        with open(strOutputFile,'r') as f:
+            result = f.read()
+        f.close()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestCreateLinearModelForTestDataTrain1(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"SVM/train.1"])
         dataPredictionFile = inputFile
         scaling = -1
         costRange = "-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10"
@@ -97,10 +128,10 @@ class SVMTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(resultCost)+" "+str(resultAccuracy),str(answerCost)+" "+str(answerAccuracy),"".join([str(self),"::Expected=",str(answerCost)+" "+str(answerAccuracy),". Received=",str(resultCost)+" "+str(resultAccuracy),"."]))
 
-    def testCreateLinearModelForTestDataSVMGuide1(self):
+    def ntestCreateLinearModelForTestDataSVMGuide1(self):
 
         #Inputs
-        inputFile = "./testData/SVM/svmguide1.t"
+        inputFile = "".join([Constants_Testing.c_strTestingData,"SVM/svmguide1.t"])
         dataPredictionFile = inputFile
         scaling = -1
         costRange = "-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10"

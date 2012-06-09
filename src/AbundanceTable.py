@@ -435,12 +435,12 @@ class AbundanceTable:
         return True
 
     #A feature is removed if it's abundance is not found in the top X percetile a certain percentage of the samples
-    def funcFilterFeatureBySTD(self, dMinSTDCuttOff = 0.0):
+    def funcFilterFeatureBySD(self, dMinSDCuttOff = 0.0):
         """
-        A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSTDCutoff.
+        A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSDCutoff.
         """
         #No need to do anything
-        if(dMinSTDCuttOff==0.0):
+        if(dMinSDCuttOff==0.0):
             return True
 
         #Holds which indexes are kept
@@ -448,14 +448,14 @@ class AbundanceTable:
 
         #Evaluate each sample
         for iRowIndex, dataRow in enumerate(self._npaFeatureAbundance):
-            if(np.std(list(dataRow)[1:])>=dMinSTDCuttOff):
+            if(np.std(list(dataRow)[1:])>=dMinSDCuttOff):
                 liKeepFeatures.append(iRowIndex)
         
         #Compress array
         self._npaFeatureAbundance = self._npaFeatureAbundance[liKeepFeatures,:]
 
         #Update filter state
-        self._iCurrentFilterState = "".join([self._iCurrentFilterState, ":", "dMinSTDCuttOff", "=", str(dMinSTDCuttOff)])
+        self._iCurrentFilterState = "".join([self._iCurrentFilterState, ":", "dMinSDCuttOff", "=", str(dMinSDCuttOff)])
 
         return True
 

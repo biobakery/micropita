@@ -14,6 +14,7 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Libraries
+from AbundanceTable import AbundanceTable
 from Constants import Constants
 from CommandLine import CommandLine
 import math
@@ -352,3 +353,46 @@ class SVM:
                 (f.write(" ".join(dataColumn)+Constants.ENDLINE) for dataColumn in dataMatrix)
             f.close()
             return True
+
+    #Converts abundance files to input SVM files.
+    #@tempInputFile Abundance file to read (should be a standard Qiime output abundance table)
+    #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
+    #@tempDelimiter Delimiter of the Abundance table
+    #@tempLabels Ordered labels to use to classify the samples in the abundance table
+    #@sLastMetadataName The name of the last row in the abundance table representing metadata
+    #@tempSkipFirstColumn Boolean Indicates to skip the first column (true) (for instance if it contains taxonomy identifiers)
+    #@tempNormalize Boolean to indicate if the abundance data should be normalized (true) before creating the file (normalized by total sample abundance)
+    @staticmethod
+    def convertAbundanceTableToSVMFile(abndAbundanceTable, tempOutputSVMFile, sMetadataLabel):
+        #Validate parameters
+        if abndAbundanceTable == None:
+            print "Error, invalid Abundance table."
+            return False
+        if(not ValidateData.isValidString(tempOutputSVMFile)):
+            print "Error, file not valid. File:"+str(tempOutputSVMFile)
+            return False
+
+        #If output file exists, delete
+        if(os.path.exists(tempOutputSVMFile)):
+            os.remove(tempOutputSVMFile)
+
+        #Create data matrix
+        dataMatrix = zip(*abndAbundanceTable.funcGetAbundanceCopy())
+
+        #Add labels
+        llData = []
+        lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataLabel)
+        dictLabels = dict([[str(lenuLabels[1]),str(lenuLabels[0])] for lenuLabels in enumerate(set(lsLabels))])
+        lsLabels = [dictLabels[sLabel] for sLabel in lsLabels]
+
+        iRowIndex = 0
+        for dataRow in dataMatrix[1:]:
+            llData.append(" ".join([lsLabels[iRowIndex]]+[Constants.COLON.join([str(enuSamples[0]+1),str(enuSamples[1])])
+                            for enuSamples in enumerate(dataRow)])+Constants.ENDLINE)
+            iRowIndex = iRowIndex + 1
+
+        #Output file
+        with open(tempOutputSVMFile,'a') as f:
+            (f.write("".join(llData)))
+        f.close()
+        return True

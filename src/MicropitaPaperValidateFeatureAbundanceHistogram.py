@@ -193,11 +193,10 @@ def _main( ):
                     ltpleHistogram = zip(ldAverageFeatureAbundance,ldAverageRankedAbundance,lsColors)
                     #Sort by abundance
                     ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(0), reverse=True)
-                    #Sort by rank
-                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(1))
                     #Sort by color
                     ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(2))
-
+                    #Sort by rank
+                    ltpleHistogram = sorted(ltpleHistogram, key=itemgetter(1))
 
                     #Plot as histograms
                     #Add color or astrices to selected samples
