@@ -113,7 +113,10 @@ class Constants_Figures():
             self.c_charNoSelect = "#000000" # black
 
             #Record that it is inverted
-            c_fInverted = True
+            self.c_fInverted = True
+
+            #Alpha looks best at full in inversion
+            self.c_dAlpha = 1.0
 
         else:
             #General colors
@@ -135,7 +138,10 @@ class Constants_Figures():
             self.c_charNoSelect = "#FFFFFF" # White
 
             #Record that it is not inverted
-            c_fInverted = False
+            self.c_fInverted = False
+
+            #Alpha looks best at full in inversion
+            self.c_dAlpha = 0.5
 
     #Can be used to convert method names to colors
     dictConvertMethodToHEXColor={MicroPITA.c_DIVERSITY_1:invSimpsonColor,

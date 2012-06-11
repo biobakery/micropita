@@ -172,11 +172,19 @@ def _main( ):
           Constants.ENDLINE,"Percent Samples Above Percentile=",args.iAbundanceFilterPercentCuttoff,Constants.ENDLINE,
           "Filtered Feature Count (After Abundance Filtering)=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
+    #Reduce the clades down to a certain clade level
+    sCladogramDetails = "".join([sCladogramDetails," Feature count before reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
+    rawData.funcReduceFeaturesToCladeLevel(args.iTerminalCladeLevel)
+    sCladogramDetails = "".join([sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
+    sCladogramDetails = "".join([sCladogramDetails," Feature count AFTER reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
+
+    sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE.join(rawData.funcGetFeatureNames())])+Constants.ENDLINE
+
     if c_Normalize:
       rawData.funcNormalize()
 
     #####
-    ## Note all manipualtions to the abundance table including feature filitering should occur before this point
+    ## Note all manipulations to the abundance table including feature filtering should occur before this point
     #####
     abundance = rawData.funcGetAbundanceCopy()
     strSampleID = rawData.funcGetIDMetadataName()
@@ -184,19 +192,7 @@ def _main( ):
 
     #All taxa in the study
     lsAllTaxa = [strTaxaId for strTaxaId in list(abundance[strSampleID])]
-    sCladogramDetails = "".join([sCladogramDetails," Feature count before reducing to a clade level:",str(len(lsAllTaxa)),Constants.ENDLINE])
-
-    #Reduce the clades down to a certain clade level
-    lsCladeAndAboveFeatures = []
-    for sFeature in lsAllTaxa:
-        if len(sFeature.split(c_strLineageDelim)) <= args.iTerminalCladeLevel:
-            lsCladeAndAboveFeatures.append(sFeature)
-    lsAllTaxa = lsCladeAndAboveFeatures
-    sCladogramDetails = "".join([sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
-    sCladogramDetails = "".join([sCladogramDetails," Feature count AFTER reducing to a clade level:",str(len(lsAllTaxa)),Constants.ENDLINE])
-
-    sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE.join(lsAllTaxa)])+Constants.ENDLINE
-
+    sCladogramDetails = "".join([sCladogramDetails," Total Taxa:",str(len(lsAllTaxa)),Constants.ENDLINE,Constants.ENDLINE.join(lsAllTaxa),Constants.ENDLINE])
 
     #Create a cladogram object
     cladogram = Cladogram()
@@ -357,7 +353,7 @@ def _main( ):
               if(sum(npaNotSelectedDistribution)==0):
                   sTaxaData = "".join([sTaxaData,"Not Selected Average: 0 Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
               else:
-                  sTaxaData = "".join([sTaxaData,"Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
+                  sTaxaData = "".join([sTaxaData,"Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)])
 
               #[ID,TScore,PValue,QValue,SortOrder]
               lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
@@ -382,7 +378,7 @@ def _main( ):
           lsAlpha = list()
           lsShapes = list()
           lsTaxa = list()
-          print(lsTaxaTScores)
+
           for iTaxa in xrange(0,len(lsTaxaTScores)):
             lsCur = lsTaxaTScores[iTaxa]
             lsTaxa.append(lsCur[c_IDINDEX])
@@ -409,7 +405,7 @@ def _main( ):
 
           #Add circle for this data
           cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
-          sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]),str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
+          sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE,Constants.ENDLINE,"Circle Data:",Constants.ENDLINE,Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]),str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
 
           #Update detail: Enrichment details
           #Build method enrichment detail

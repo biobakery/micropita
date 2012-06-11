@@ -1253,6 +1253,118 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
 
+    #Test funcReduceFeaturesToCladeLevelForLevel1
+    def testFuncReduceFeaturesToCladeLevelForLevel1(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeClades.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        iCladeLevel = 1
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade1.txt"])
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Reduce Clades
+        fError = data.funcReduceFeaturesToCladeLevel(iCladeLevel)
+        resultStr = str(data.funcGetAbundanceCopy())
+
+        #Correct Answer
+        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        answerStr = str(answer.funcGetAbundanceCopy())
+
+        #Check result against answer
+        self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
+
+    #Test funcReduceFeaturesToCladeLevelForLevel3
+    def testFuncReduceFeaturesToCladeLevelForLevel3(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeClades.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        iCladeLevel = 3
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade3.txt"])
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Reduce Clades
+        fError = data.funcReduceFeaturesToCladeLevel(iCladeLevel)
+        resultStr = str(data.funcGetAbundanceCopy())
+
+        #Correct Answer
+        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        answerStr = str(answer.funcGetAbundanceCopy())
+
+        #Check result against answer
+        self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
+
+    #Test funcReduceFeaturesToCladeLevelForLevel5
+    def testFuncReduceFeaturesToCladeLevelForLevel5(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeClades.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        iCladeLevel = 5
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade5.txt"])
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Reduce Clades
+        fError = data.funcReduceFeaturesToCladeLevel(iCladeLevel)
+        resultStr = str(data.funcGetAbundanceCopy())
+
+        #Correct Answer
+        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        answerStr = str(answer.funcGetAbundanceCopy())
+
+        #Check result against answer
+        self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
+
+    #Test funcReduceFeaturesToCladeLevelForLevel10
+    def testFuncReduceFeaturesToCladeLevelForLevel10(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeClades.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        iCladeLevel = 10
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade10.txt"])
+
+        #Make array
+        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Reduce Clades
+        fError = data.funcReduceFeaturesToCladeLevel(iCladeLevel)
+        resultStr = str(data.funcGetAbundanceCopy())
+
+        #Correct Answer
+        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        answerStr = str(answer.funcGetAbundanceCopy())
+
+        #Check result against answer
+        self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
+
     #Test funcSumClades
     def testFuncSumCladesForGoodCase(self):
         

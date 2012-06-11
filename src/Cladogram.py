@@ -176,8 +176,6 @@ class Cladogram:
     :type strSizeFile File path (string)
     """
 
-    print "**********************************self.ldictCircleData", len(self.ldictCircleData)
-
     if self.npaAbundance == None:
       print "Cladogram::generate. The data was not set so an image could not be generated"
       return False
@@ -235,6 +233,16 @@ class Cladogram:
 
     #Add in forced highlighting
     lsIDs.extend(self.dictForcedHighLights.keys())
+    lsIDs = list(set(lsIDs))
+
+    #Add in forced circle data
+    for dictCircleData in self.ldictCircleData:
+      if(dictCircleData[self.c_sForced]):
+        lsTaxa = dictCircleData[self.c_sTaxa]
+        lsAlpha = dictCircleData[self.c_sAlpha]
+        lsAddTaxa = []
+        [lsAddTaxa.append(lsTaxa[tpleAlpha[0]]) if not tpleAlpha[1] == '0.0' else 0 for tpleAlpha in enumerate(lsAlpha)]
+        lsIDs.extend(lsAddTaxa)
     lsIDs = list(set(lsIDs))
 
     #Create circle files (needs to be after any filtering because it has a forcing option).

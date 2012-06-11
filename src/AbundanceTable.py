@@ -585,7 +585,23 @@ class AbundanceTable:
                   cFeatureNameDelimiter=self.funcGetFeatureDelimiter())
 
         return None
-    
+
+    #Happy Path Tested
+    #Reduce the current table to a certain clade level
+    def funcReduceFeaturesToCladeLevel(self, iCladeLevel):
+        if iCladeLevel < 1: return False
+        if not self._npaFeatureAbundance == None:
+            liFeatureKeep = []
+            [liFeatureKeep.append(tplFeature[0]) if (len(tplFeature[1][0].split(self.funcGetFeatureDelimiter())) <= iCladeLevel) else 0
+             for tplFeature in enumerate(self._npaFeatureAbundance)]
+            #Compress array
+            self._npaFeatureAbundance = self._npaFeatureAbundance[liFeatureKeep,:]
+
+            #Update filter state
+            self._iCurrentFilterState = "".join([self._iCurrentFilterState, ":", "iCladeLevel", "=", str(iCladeLevel)])
+            return True
+        else:
+            return False
 
     #Happy path testing
     #Sums abundance data by clades indicated in the feature name (as consensus lineages)
@@ -897,6 +913,9 @@ class AbundanceTable:
         if iFirstDataIndex < 0:
             iFirstDataIndex = iMetadataRow + 1
 
+        #Used to substitute . to -
+        reSubPeriod = re.compile('\.')
+
         #File writer
         with open(strOutputFileName,'a') as f:
 
@@ -919,6 +938,9 @@ class AbundanceTable:
                 #Break line into delimited elements
                 lineElements = line.split(cDelimiter)
 
+                #Clean feature name
+                sCleanFeatureName = reSubPeriod.sub("-",lineElements[0])
+
                 #For each element but the first (taxa name)
                 #Element check to see if not == zero
                 #If so add to output
@@ -934,7 +956,7 @@ class AbundanceTable:
                         writeToFile = True
                 #Write to file
                 if(writeToFile):    
-                    f.write(lineElements[0]+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
+                    f.write(sCleanFeatureName+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
         f.close()
         return outputFile
 
