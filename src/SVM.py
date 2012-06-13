@@ -40,15 +40,6 @@ class SVM:
     c_C_SVC = "0"
     c_SVC_PROBABILITY_ESTIMATES = "1"
 
-    #File extensions
-    c_SCALED_FILE_EXT = ".scaled"
-    c_SCALING_PARAMETERS = ".range"
-    c_CV_FILE_EXT = ".cv.out"
-    c_CV_IMAGE_EXT = ".cv.png"
-    c_MODEL_FILE_EXT = ".model"
-    c_PREDICT_FILE_EXT = ".predict"
-    c_SCALED_FOR_PREDICTION_FILE_EXT = ".scaledForpredict"
-
     #Dictionary keywords for files
     c_KEYWORD_INPUT_FILE = "INPUT"
     c_KEYWORD_SCALED_FILE = "SCALED"
@@ -88,19 +79,18 @@ class SVM:
         #Create output file names
         inputFile = Constants.QUOTE+tempInputFileName+Constants.QUOTE
         fileNamePrefix = os.path.splitext(tempInputFileName)[0]
-        fileNameBase = fileNamePrefix.split(Constants.PATH_SEP)[-1]
 
         #Creat file names and delete of they exist
         if(tempTMPDirectory == None):
-            scaledFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALED_FILE_EXT,Constants.QUOTE])
-            rangeFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_SCALING_PARAMETERS,Constants.QUOTE])
-            cvOutFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_CV_FILE_EXT,Constants.QUOTE])
-            modelFile = "".join([Constants.QUOTE,fileNamePrefix,self.c_MODEL_FILE_EXT,Constants.QUOTE])
+            scaledFile = "".join([Constants.QUOTE,fileNamePrefix,Constants.c_SCALED_FILE_EXT,Constants.QUOTE])
+            rangeFile = "".join([Constants.QUOTE,fileNamePrefix,Constants.c_SCALING_PARAMETERS,Constants.QUOTE])
+            cvOutFile = "".join([Constants.QUOTE,fileNamePrefix,Constants.c_CV_FILE_EXT,Constants.QUOTE])
+            modelFile = "".join([Constants.QUOTE,fileNamePrefix,Constants.c_MODEL_FILE_EXT,Constants.QUOTE])
         else:
-            scaledFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALED_FILE_EXT,Constants.QUOTE])
-            rangeFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_SCALING_PARAMETERS,Constants.QUOTE])
-            cvOutFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_CV_FILE_EXT,Constants.QUOTE])
-            modelFile = "".join([Constants.QUOTE,tempTMPDirectory,self.c_MODEL_FILE_EXT,Constants.QUOTE])
+            scaledFile = "".join([Constants.QUOTE,tempTMPDirectory,Constants.c_SCALED_FILE_EXT,Constants.QUOTE])
+            rangeFile = "".join([Constants.QUOTE,tempTMPDirectory,Constants.c_SCALING_PARAMETERS,Constants.QUOTE])
+            cvOutFile = "".join([Constants.QUOTE,tempTMPDirectory,Constants.c_CV_FILE_EXT,Constants.QUOTE])
+            modelFile = "".join([Constants.QUOTE,tempTMPDirectory,Constants.c_MODEL_FILE_EXT,Constants.QUOTE])
         if os.path.exists(scaledFile):
             os.remove(scaledFile)
         if os.path.exists(rangeFile):
@@ -223,9 +213,9 @@ class SVM:
         #Create output file names
         modelFile = Constants.QUOTE+tempModelFileName+Constants.QUOTE
         dataFile = Constants.QUOTE+tempDataFileName+Constants.QUOTE
-        scaledFile = Constants.QUOTE+dataFileNamePrefix+self.c_SCALED_FOR_PREDICTION_FILE_EXT+Constants.QUOTE
+        scaledFile = Constants.QUOTE+dataFileNamePrefix+Constants.c_SCALED_FOR_PREDICTION_FILE_EXT+Constants.QUOTE
         rangeFile = Constants.QUOTE+tempRangeFileName+Constants.QUOTE
-        predictFile = Constants.QUOTE+dataFileNamePrefix+self.c_PREDICT_FILE_EXT+Constants.QUOTE
+        predictFile = Constants.QUOTE+dataFileNamePrefix+Constants.c_PREDICT_FILE_EXT+Constants.QUOTE
 
         #Create Commandline interface
         shell = CommandLine()

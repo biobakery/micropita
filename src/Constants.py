@@ -69,3 +69,12 @@ class Constants():
     #Actual file details for the confusion matrix
     c_strClassPrefix = "[Class]"
     c_strEvenSelection = "[EVEN]"
+
+    #SVM related
+    c_SCALED_FILE_EXT = ".scaled"
+    c_SCALING_PARAMETERS = ".range"
+    c_CV_FILE_EXT = ".cv.out"
+    c_CV_IMAGE_EXT = ".cv.png"
+    c_MODEL_FILE_EXT = ".model"
+    c_PREDICT_FILE_EXT = ".predict"
+    c_SCALED_FOR_PREDICTION_FILE_EXT = ".scaledForpredict"

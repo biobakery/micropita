@@ -36,6 +36,10 @@ class Constants_Arguments():
     c_strCladeFilteringMinLevelArgument = "-cfn"
     c_strCladeFilteringMinLevelHelp = "The minimum clades at CladeFilterLevelMeasure the CladeFilterLevel clade can have without being removed."
 
+    #-cost Cost for the supervised method (used as actual cost = 2^cost given)
+    c_strCostArgument = "-cost"
+    c_strCostHelp = "Used to derive the cost n the supervised method classification. used cost = 2^cost given."
+
     #ct Optional Circlader ticks for the internal dendrogram
     c_strCircladerTicksArgument = "-ct"
     c_strCircladerTicksHelp = "When indicated by the Circlader style file, are the ticks used for the internal dendrogram. First to last = internal to external."

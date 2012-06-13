@@ -118,6 +118,7 @@ c_strConfigCladeFilterMinSize = "[Minimum Clade Size]"
 c_strConfigCladogramAlpha = "[Enrichment Threshold]"
 c_strConfigCladogramRingOrder = "[Cladogram Ring Order]"
 c_strConfigCladogramTicks = "[Cladogram Dendrogram Ticks]"
+c_strConfigCost = "[COST]"
 c_strConfigLastMetadataRow = "[Last Metadata Name]"
 c_strConfigEnrichmentMeasurement = "[Taxa or OTU Enrichment Measurement]"
 c_strConfigFileIsNormalized = "[File is Already Normalized]"
@@ -224,7 +225,7 @@ def funcGenerateUnbalancedData(strDataSetKey):
     return sfle.ex( [strProg,strT,strDataSetKey, target[1].get_abspath()] )
   return funcGenerateUnbalancedDataRet
 
-def funcGenerateDiversityData(strDataSetKey):
+def funcGenerateDiversityDatac_strConfigCost(strDataSetKey):
   def funcGenerateDiversityDataRet( target, source, env, strDataSetKey=strDataSetKey ):
     strT, astrSs = sfle.ts( target, source )
     strProg = astrSs[0]
@@ -248,8 +249,8 @@ def funcCheckAbundanceData( sLogging, sMetadataName ):
   return funcCheckAbundanceDataRet
 
 ##Call micropita to run
-def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed, fSumData, sFeatureSelection, iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel, iSupervisedCount, strDirTmp, lsSelectionMethods):
-  def funcMicroPitaRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData, sFeatureSelection=sFeatureSelection, iUnsupervisedCount=iUnsupervisedCount, strTaxaFile=strTaxaFile, strUnsupervisedStratify=strUnsupervisedStratify, strSupervisedLabel=strSupervisedLabel, iSupervisedCount=iSupervisedCount, strDirTmp=strDirTmp, lsSelectionMethods=lsSelectionMethods):
+def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed, fSumData, sFeatureSelection, iUnsupervisedCount, strCost, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel, iSupervisedCount, strDirTmp, lsSelectionMethods):
+  def funcMicroPitaRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData, sFeatureSelection=sFeatureSelection, iUnsupervisedCount=iUnsupervisedCount, strCost=strCost, strTaxaFile=strTaxaFile, strUnsupervisedStratify=strUnsupervisedStratify, strSupervisedLabel=strSupervisedLabel, iSupervisedCount=iSupervisedCount, strDirTmp=strDirTmp, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd = astrSs[0], astrSs[1]
     lsCommandline = [strProg,strLoggingLevel, sIDName, sLastMetadata]
@@ -259,7 +260,7 @@ def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed
         lsCommandline = lsCommandline + [Constants_Arguments.c_strIsSummedArgument]
     if not fSumData:
         lsCommandline = lsCommandline + [Constants_Arguments.c_strSumDataArgument]
-    return sfle.ex( lsCommandline + [sFeatureSelection, iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel,
+    return sfle.ex( lsCommandline + [sFeatureSelection, iUnsupervisedCount, strCost, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel,
                     iSupervisedCount, strDirTmp]+[strAbnd, strT] + lsSelectionMethods)
   return funcMicroPitaRet
 
@@ -697,6 +698,7 @@ for fileConfigMicropita in lMicropitaFiles:
         " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelCountArgument,sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
         " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp.get_abspath()]),
+        " ".join([Constants_Arguments.c_strCostArgument,sFileConfiguration[c_strConfigCost]]),
         lsSelectionMethods))
 
     #Create figure 1A PCoA
