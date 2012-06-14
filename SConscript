@@ -683,10 +683,12 @@ for fileConfigMicropita in lMicropitaFiles:
     #The lsInsilicoDataFiles is added to this command to order the actions correctly.
     #The insilico file creation must go before micropita
     sAbundanceFileName = File(c_strPathDelim.join(["input",sAbundanceFileName]))
+    #The file that is created after checking
+    #Passed in for the dependency tree not actually coupled with the code
     lFileMicropitaConditionalDependencies = []+lsInsilicoDataFiles
-    if os.path.exists(sCheckedAbundanceFile.get_abspath()):
-      lFileMicropitaConditionalDependencies.append(sCheckedAbundanceFile.get_abspath())
-    Command(sMicropitaOutput, [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita]+lFileMicropitaConditionalDependencies,
+#    if os.path.exists(sCheckedAbundanceFile.get_abspath()):
+#     lFileMicropitaConditionalDependencies.append(sCheckedAbundanceFile.get_abspath())
+    Command([sMicropitaOutput,sCheckedAbundanceFile], [c_fileProgMicroPITA, sAbundanceFileName] + c_filesSecondarySrc + [fileConfigMicropita]+lFileMicropitaConditionalDependencies,
         funcMicroPita(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
         " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
         " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
@@ -700,6 +702,7 @@ for fileConfigMicropita in lMicropitaFiles:
         " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp.get_abspath()]),
         " ".join([Constants_Arguments.c_strCostArgument,sFileConfiguration[c_strConfigCost]]),
         lsSelectionMethods))
+
 
     #Create figure 1A PCoA
     #Unstratified PCoA of selection

@@ -13,6 +13,7 @@ from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
 import csv
 from Diversity import Diversity
+import math
 from MicroPITA import MicroPITA
 import numpy as np
 import os
@@ -29,7 +30,15 @@ class Utility_Data():
     #Generate matrix for microPITA
     #@param tempOutPutFile
     @staticmethod
-    def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount=1, fMaxGeneralNoise = 0.0, fMaxSignalNoise=5.0):
+    def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount=1, dMaxGeneralNoise = 0.0, dMaxSignalNoise=5.0, dSimpleNoise=0.0):
+
+        #If dSimpleNoise is greater than 0 then the simple noise model will be used over the sparse noise model
+        #The simple noise model will uniformly add up to the dSimpleNoise value to all data in the data set
+        #The simple noise model will ignore the dMaxGeneralNoise and dMaxSignalNoise variables /  noise structures
+        if dSimpleNoise > 0.0:
+            dMaxGeneralNoise = 0.0
+            dMaxSignalNoise = 0.0
+
         #Matrix descriptors
         #Samples
         #Number of diversity samples
@@ -181,7 +190,7 @@ class Utility_Data():
                 liDiversityMaximalTaxaPositions = random.sample(setPopulation,iDiversityMaximalTaxa)
                 #Set abundance
                 for taxonPosition in liDiversityMaximalTaxaPositions:
-                    npDataMatrix[taxonPosition,iDiversitySampleIndex] = iDiversityAbundanceMax+(random.random()*fMaxSignalNoise)
+                    npDataMatrix[taxonPosition,iDiversitySampleIndex] = iDiversityAbundanceMax+(random.random()*dMaxSignalNoise)
                 #Remove all diversityMaximalTaxa already selected position from the potential indices setPopulation
                 setDiversityNoiseFeatures = setDiversityNoiseFeatures | setPopulation.difference(set(liDiversityMaximalTaxaPositions))
 
@@ -198,7 +207,7 @@ class Utility_Data():
 
             #Set abundance
             for iTaxonPosition in setDiversityMinimalTaxaPositions:
-                npDataMatrix[iTaxonPosition,iDiversitySampleIndex] = iDiversityAbundanceMin+(random.random()*fMaxGeneralNoise)
+                npDataMatrix[iTaxonPosition,iDiversitySampleIndex] = iDiversityAbundanceMin+(random.random()*dMaxGeneralNoise)
 
         #Update sample bounds to generate the representative samples
         iSampleStart = iSampleStop
@@ -216,12 +225,12 @@ class Utility_Data():
             #Create max representative features in sample
             setBlockFeatures = set()
             for iBlockTaxonPosition in xrange(taxonBlockStart,taxonBlockStart+iRepresentiveDissimilarityTaxa):
-                npDataMatrix[iBlockTaxonPosition,dissimilaritySampleIndex] = iRepresentativeAbundanceMax+(random.random()*fMaxSignalNoise)
+                npDataMatrix[iBlockTaxonPosition,dissimilaritySampleIndex] = iRepresentativeAbundanceMax+(random.random()*dMaxSignalNoise)
                 setBlockFeatures = setBlockFeatures | set([iBlockTaxonPosition])
 
             #Create min representative features in sample (noisey samples)
             for iRepresentativeNoiseIndex in random.sample(set(range(iTaxaCount))-setBlockFeatures,iRepresentativeDissimilarityLowTaxa):
-                npDataMatrix[iRepresentativeNoiseIndex,dissimilaritySampleIndex] = iRepresentativeAbundanceMin+(random.random()*fMaxGeneralNoise)
+                npDataMatrix[iRepresentativeNoiseIndex,dissimilaritySampleIndex] = iRepresentativeAbundanceMin+(random.random()*dMaxGeneralNoise)
 
             #Update the block range for the next sample
             taxonBlockStart = taxonBlockStart+iRepresentiveDissimilarityTaxa
@@ -241,7 +250,7 @@ class Utility_Data():
 
             #Set block abundance
             for extremeBlockTaxonPosition in xrange(taxonBlockStart,taxonBlockStop):
-                npDataMatrix[extremeBlockTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMax+(random.random()*fMaxSignalNoise)
+                npDataMatrix[extremeBlockTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMax+(random.random()*dMaxSignalNoise)
             #Define index populations and set abundance per sample (for noise)
             population = set(range(iTaxaCount))
             #Remove taxa drivers
@@ -252,7 +261,7 @@ class Utility_Data():
             extremeNoisePopulation = random.sample(population,iExtremeDissimilarityLowTaxa)
             #Set extreme noise
             for extremeNoiseTaxonPosition in extremeNoisePopulation:
-                npDataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+(random.random()*fMaxGeneralNoise)
+                npDataMatrix[extremeNoiseTaxonPosition,extremeSampleIndex] = iExtremeAbundanceMin+(random.random()*dMaxGeneralNoise)
             #Increment start and stop
             taxonBlockStart = taxonBlockStop+extremeTaxaBlockIncrement
             taxonBlockStop = taxonBlockStart + iExtremeDissimilarityTaxa
@@ -274,11 +283,17 @@ class Utility_Data():
             population = population.difference(liTaxaDriverPositions)
             #Set sample abundance
             for drivingTaxonPosition in liTaxaDriverPositions:
-                npDataMatrix[drivingTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMax+(random.random()*fMaxSignalNoise)
+                npDataMatrix[drivingTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMax+(random.random()*dMaxSignalNoise)
             #Generate low noise
             noisePositions = random.sample(population,iExtremeDissimilarityLowTaxa)
             for noiseTaxonPosition in noisePositions:
-                npDataMatrix[noiseTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMin+(random.random()*fMaxGeneralNoise)
+                npDataMatrix[noiseTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMin+(random.random()*dMaxGeneralNoise)
+
+        #Apply simple noise structure if indicated to do so
+        if dSimpleNoise > 0.0:
+            for iSample in xrange(iSampleCount):
+                for iFeature in xrange(iTaxaCount):
+                    npDataMatrix[iFeature,iSample] = npDataMatrix[iFeature,iSample] + random.random()*dSimpleNoise
 
         #Write to file
         #Delete current file before writing
@@ -420,38 +435,80 @@ class Utility_Data():
         #Return file name
         return tempFilePath
 
+#    @staticmethod
+#    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dFeatureScale, dSampleScale):
+#
+#        #Make sure scales are ints
+#        dFeatureScale = int(dFeatureScale)
+#        dSampleScale = int(dSampleScale)
+#
+#        lsCorrelation = []
+#
+#        dSampleCount = 10*dSampleScale
+#        dFeatureCount = 9*dFeatureScale
+#
+#        iFeatureIndex = 1
+#
+#        #Create correlated, anticorrelated, and flat but scaled features
+#        for feature in xrange(dFeatureCount):
+#            ldFeature = []
+#            dCurrentFeatureScale = math.pow(2.0,feature)
+#            for dSample in xrange(dSampleCount):
+#                ldFeature.append(dSample*dCurrentFeatureScale)
+#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
+#            iFeatureIndex = iFeatureIndex + 1
+#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+([str(feature)]*dSampleCount))
+#            ldFeature.reverse()
+#            iFeatureIndex = iFeatureIndex + 1
+#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
+#            iFeatureIndex = iFeatureIndex + 1
+#            dCurrentFeatureScale = math.pow(2.0,feature)
+#
+#        #Update contents to a line
+#        sContents = "FeatureID"+Constants.TAB+Constants.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
+#        sContents = Constants.ENDLINE.join([sContents]+[Constants.TAB.join(feature) for feature in lsCorrelation])
+#
+#        #Write line to a file
+#        with open(sOutputFile,'w') as f:
+#            f.write(sContents)
+#        f.close()
+#        return
+
     @staticmethod
-    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dFeatureScale, dSampleScale):
+    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dScale=1):
 
         #Make sure scales are ints
-        dFeatureScale = int(dFeatureScale)
-        dSampleScale = int(dSampleScale)
+        dScale = int(dScale)
 
         lsCorrelation = []
+        dMaxSampleCount = 10*dScale
+        dFeatureCount = dMaxSampleCount
+        iIndexFeatureName = 0
 
-        dSampleCount = 10*dSampleScale
-        dFeatureCount = 9*dFeatureScale
-
-        iFeatureIndex = 1
+        #The mean value the data will center around
+        cCenter = math.pow(2.0,dFeatureCount)*dMaxSampleCount/2
 
         #Create correlated, anticorrelated, and flat but scaled features
-        for feature in xrange(dFeatureCount):
-            ldFeature = []
-            dCurrentFeatureScale = math.pow(2.0,feature)
-            for dSample in xrange(dSampleCount):
-                ldFeature.append(dSample*dCurrentFeatureScale)
-            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
-            iFeatureIndex = iFeatureIndex + 1
-            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+([str(feature)]*dSampleCount))
-            ldFeature.reverse()
-            iFeatureIndex = iFeatureIndex + 1
-            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
-            iFeatureIndex = iFeatureIndex + 1
-            dCurrentFeatureScale = math.pow(2.0,feature)
+        #Need to make sure the sum of the features through the samples are = 1 or you
+        #Impose unintented structure
+        #Here both the samples and the features sum to same number
+        for iFeature in xrange(dFeatureCount):
+            ldFeature1 = []
+            ldFeature2 = []
+            for dSample in xrange(dMaxSampleCount):
+                dCurrentFeatureScale = math.pow(2.0,iFeature)*dSample
+                ldFeature1.append(cCenter+dCurrentFeatureScale)
+                ldFeature2.append(cCenter-dCurrentFeatureScale)
+            ldFeature1.reverse()
+            ldFeature1 = ldFeature1+ldFeature2
+            lsCorrelation.append(["Feature_"+str(iIndexFeatureName)]+[str(dFeature) for dFeature in ldFeature1])
+            ldFeature1.reverse()
+            lsCorrelation.append(["Feature_"+str(iIndexFeatureName+1)]+[str(dFeature) for dFeature in ldFeature1])
+            iIndexFeatureName =iIndexFeatureName + 2
 
         #Update contents to a line
-        sContents = "FeatureID"+Constants.TAB+Constants.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
-        sContents = Constants.ENDLINE.join([sContents]+[Constants.TAB.join(feature) for feature in lsCorrelation])
+        sContents = "FeatureID"+Constants.TAB+Constants.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dMaxSampleCount*2)])
+        sContents = Constants.ENDLINE.join([sContents]+[Constants.TAB.join(dFeature) for dFeature in lsCorrelation])
 
         #Write line to a file
         with open(sOutputFile,'w') as f:
@@ -459,9 +516,18 @@ class Utility_Data():
         f.close()
         return
 
-for iGeneralRandom in [5.0]:#(0,5,10,20,25)
-  for iSignalRandom in [5.0,10.0,15.0,20.0,25.0]:
-    for i in xrange(1,11):
-      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 2, fMaxGeneralNoise = iGeneralRandom, fMaxSignalNoise=iSignalRandom)
-      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 1, fMaxGeneralNoise = iGeneralRandom, fMaxSignalNoise=iSignalRandom)
+#for iGeneralRandom in [5.0]:
+#  for iSignalRandom in [5.0,10.0,15.0,20.0,25.0]:
+#    for i in xrange(1,11):
+#      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
+#      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
 
+iGeneralRandom = 0
+iSignalRandom = 0
+for iSimpleNoise in [5,10,15,20,25]:
+  for i in xrange(1,11):
+    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
+    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
+
+
+#Utility_Data.funcGenerateCorrelatedFeaturesDataSet("TestCor.pcl", 1)

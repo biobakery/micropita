@@ -917,7 +917,7 @@ class AbundanceTable:
         reSubPeriod = re.compile('\.')
 
         #File writer
-        with open(strOutputFileName,'a') as f:
+        with open(outputFile,'a') as f:
 
             #Write metadata
             #Empty data is changed to a default

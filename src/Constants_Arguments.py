@@ -24,6 +24,10 @@ class Constants_Arguments():
     c_strHighlightCladeFileArgument = "-c"
     c_strHighlightCladeHelp = "The file containing the clades or taxa/OTUs to highlight in the circlader."
 
+    #checked Checked abundance file
+    c_strCheckedAbundanceFileArgument = "-checked"
+    c_strCheckedAbundanceFileHelp = "Optional name for the file analysis will be ran on which is created by checking the raw abundance file and save a new fiel with the result. Default will append a -Checked to the end of the file name."
+
     #cfl Circlader clade filter level (when filtering by clades this is the level in the clade which is filtered; the ancestor clade)
     c_strCladeFilterLevelArgument = "-cfl"
     c_strCladeFilterLevelHelp = "The level in the clade lineage to filter (based on your input Taxa/OTU IDs). 1 is the highest clade level (for instance Kingdom)."
@@ -74,7 +78,7 @@ class Constants_Arguments():
 
     #isnorm flag indicating the original file is normalized as read in
     c_strIsNormalizedArgument = "-isnorm"
-    c_strIsNormalizedHelp = "Indicates if the file is normalized when read in (True indicates normalized)."
+    c_strIsNormalizedHelp = "Indicates ic_CheckedAbundanceFileHelpf the file is normalized when read in (True indicates normalized)."
 
     #issum flag indicating the original file is summed as read in
     c_strIsSummedArgument = "-issum"
@@ -186,7 +190,6 @@ class Constants_Arguments():
     #vn Name of the sample id row in the validation data set (when you need both)
     c_strValidationIDNameArgument = "-vn"
     c_strValidationIDNameHelp = "The row in the validation abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
-
 
     #Data key to indicate which insilico data set to generate
     c_dataSetKeyHelp = "Key to indicate which data set to generate. Valid values are Diversity, Unbalanced."

@@ -64,7 +64,7 @@ class Constants():
 
     #AbundanceTable
     #Suffix given to a file that is check with the checkRawDataFile method
-    OUTPUT_SUFFIX = "-checked.txt"
+    OUTPUT_SUFFIX = "-checked.pcl"
 
     #Actual file details for the confusion matrix
     c_strClassPrefix = "[Class]"

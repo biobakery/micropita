@@ -799,7 +799,7 @@ class MicroPITA:
 
     #Start micropita selection
     def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
-            strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=1,
+            strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", strCheckedAbndFile = "", iSampleSelectionCount=0, iSupervisedSampleCount=1,
             strSelectionTechnique=None, strLabel=None, strStratify=None, sMetadataID=None, sLastMetadataName=None, fSumData=True, sFeatureSelectionMethod=None, sCostRange="0"):
 	"""
 	Writes the selection of samples by method to an output file.
@@ -820,6 +820,8 @@ class MicroPITA:
 	:type	string:	String path to existing file
 	:param	strTemporaryDirectory:	Directory that will be used to store secondary files important to analysis but not the direct deliverable
 	:type	string:	String directory path
+        :param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
+        :type	string: String file path
 	:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods
 	:type	integer:	integer
 	:param	iSupervisedSampleCount:	Number of samples to select with supervised methods
@@ -882,8 +884,8 @@ class MicroPITA:
                 c_RUN_RANK_AVERAGE_USER_4 = False
                 logging.error("MicroPITA.run. No taxa file was given for taxa selection.")
             #Read in taxa list, break down to lines and filter out empty strings
-            fhndlTaxaInput = open(strUserDefinedTaxaFile,'r')
-            userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
+            with open(strUserDefinedTaxaFile,'r') as fhndlTaxaInput:
+                userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
             fhndlTaxaInput.close()
 
         c_RUN_RANDOM_5 = False
@@ -915,10 +917,12 @@ class MicroPITA:
         selectedSamples = dict()
 
         #Check/reduce raw abundance data
-        if(not os.path.exists("".join([inputFilePrefix,"-checked",inputFileComponents[1]]))):
-            strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, strOutputFileName="".join([inputFilePrefix,"-checked",inputFileComponents[1]]))
-        else:
-            strInputAbundanceFile = "".join([inputFilePrefix,"-checked",inputFileComponents[1]])
+#        if(not os.path.exists("".join([inputFilePrefix,"-checked",inputFileComponents[1]]))):
+#            strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, strOutputFileName="".join([inputFilePrefix,"-checked",inputFileComponents[1]]))
+#        else:
+#            strInputAbundanceFile = "".join([inputFilePrefix,"-checked",inputFileComponents[1]])
+
+        strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, strOutputFileName=strCheckedAbndFile)
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
@@ -1217,6 +1221,7 @@ argp.add_argument(Constants_Arguments.c_strCostArgument, dest="sCostRange", meta
 
 #Output
 argp.add_argument(Constants_Arguments.c_strTemporaryDirectoryArgument, dest="strTMPDir", metavar = "Temporary Directory", default=None, help = Constants_Arguments.c_genericTMPDirLocationHelp)
+argp.add_argument(Constants_Arguments.c_strCheckedAbundanceFileArgument, dest="strCheckedFile", metavar = "Checked Abundance File Name", default="", help = Constants_Arguments.c_strCheckedAbundanceFileHelp)
 
 #Required
 #Input
@@ -1280,7 +1285,8 @@ def _main( ):
 
     dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
                                         cDelimiter=args.cFileDelimiter, cFeatureNameDelimiter = args.cFeatureNameDelimiter, strInputAbundanceFile=args.strFileAbund,
-                                        strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, iSampleSelectionCount=args.iUnsupervisedSelectionCount,
+                                        strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, strCheckedAbndFile = args.strCheckedFile,
+                                        iSampleSelectionCount=args.iUnsupervisedSelectionCount,
                                         iSupervisedSampleCount=args.iSupervisedCount, strLabel=args.sLabel,
                                         strStratify=args.sUnsupervisedStratify, strSelectionTechnique=args.strSelection,
                                         sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName, fSumData=args.fSumData,
