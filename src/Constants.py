@@ -71,6 +71,8 @@ class Constants():
     c_strEvenSelection = "[EVEN]"
 
     #SVM related
+    c_COST_RANGE_KEY = "range"
+    c_COST_RANGE_STRING = "-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10"
     c_SCALED_FILE_EXT = ".scaled"
     c_SCALING_PARAMETERS = ".range"
     c_CV_FILE_EXT = ".cv.out"

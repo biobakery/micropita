@@ -17,8 +17,8 @@ c_fGenerateInSilicoDataSets = False
 c_fRunCollectionCurve = True
 fMakeMovies = False
 
-#Normalize
-c_NormalizePCOA = "False"
+#General Settings file
+c_strGeneralSettings = sfle.d(fileDirInput,"micropita-general.settings")
 
 #Extentions
 c_strSufTable = ".pcl"
@@ -225,7 +225,7 @@ def funcGenerateUnbalancedData(strDataSetKey):
     return sfle.ex( [strProg,strT,strDataSetKey, target[1].get_abspath()] )
   return funcGenerateUnbalancedDataRet
 
-def funcGenerateDiversityDatac_strConfigCost(strDataSetKey):
+def funcGenerateDiversityData(strDataSetKey):
   def funcGenerateDiversityDataRet( target, source, env, strDataSetKey=strDataSetKey ):
     strT, astrSs = sfle.ts( target, source )
     strProg = astrSs[0]
@@ -540,6 +540,9 @@ lMicropitaFiles = Glob( sfle.d( fileDirInput, "".join(["*",c_strSufConfig]) ) )
 #{"InputFile:[SelectionFile1],[SelectionFile2],[SelectionFile3]...]}
 dictSelectionFiles = dict()
 
+#Read in general settings file
+dictGeneralSettings = funcReadConfigFile(c_strGeneralSettings)
+
 #Read in each config file
 #An use their contents to perform analysis
 for fileConfigMicropita in lMicropitaFiles:
@@ -700,7 +703,7 @@ for fileConfigMicropita in lMicropitaFiles:
         " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelCountArgument,sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
         " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp.get_abspath()]),
-        " ".join([Constants_Arguments.c_strCostArgument,sFileConfiguration[c_strConfigCost]]),
+        " ".join([Constants_Arguments.c_strCostArgument,dictGeneralSettings[c_strConfigCost]]),
         lsSelectionMethods))
 
 

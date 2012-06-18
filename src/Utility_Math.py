@@ -54,7 +54,7 @@ class Utility_Math():
    #return just 1 dimension (the qvalue)
    return [ldValues[2] for ldValues in lsConvertToQValues]
 
-  #Hpath path tested 5
+  #Happy path tested 5
   #Sample from a vector of data (aData) with replacement iSelect many objects
   @staticmethod
   def funcSampleWithReplacement(aData, iSelect):

@@ -173,6 +173,7 @@ class SVM:
             if lldCostAccuracy[0][1] == lldCostAccuracy[len(lldCostAccuracy)-1][1]:
                 bestCost,highestAccuracy = lldCostAccuracy[int(len(lldCostAccuracy)/2)]
 
+        print "LIBSVM::Using cost=", bestCost, " log cost=", math.log(bestCost,2)
         generatedFiles[self.c_COST_VALUE] = str(math.log(bestCost,2))
         generatedFiles[self.c_ACCURACY] = str(highestAccuracy)
         generatedFiles[self.c_KEYWORD_CV_OUT_FILE] = cvOutFile.strip(Constants.QUOTE)
@@ -386,3 +387,8 @@ class SVM:
             (f.write("".join(llData)))
         f.close()
         return True
+
+    @staticmethod
+    def funcScaleFeature(npadData):
+        dMin = min(npadData)
+        return (npadData-dMin)/float(max(npadData-dMin))

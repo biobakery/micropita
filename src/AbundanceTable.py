@@ -255,6 +255,58 @@ class AbundanceTable:
             return self._npaFeatureAbundance.copy()
         return None
 
+    #Happy path tested
+    #Get average feature abundance
+    def funcGetAverageAbundancePerSample(self, lsTargetedFeatures):
+	"""
+	Averages feature abundance.
+
+	:param	lsTargetedFeatures:	String names of features to average
+	:type	list:	list of string names of features which are measured
+        :return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample and the feature's average abudance
+        :type	list:	[[sample,average abundance of selected taxa]] or False on error
+	"""
+
+        #Sample rank averages [[sample,average abundance of selected taxa]]
+        #Returned
+        sampleAbundanceAverages = []
+        
+        #Get sample names
+        sampleNames = self.funcGetSampleNames()
+        #Get taxa names
+        allTaxaNames = self.funcGetFeatureNames()
+
+        #Get an abundance table compressed to features of interest
+        abndReducedTable = self.funcGetFeatureAbundanceTable(lsTargetedFeatures)
+        if abndReducedTable == None:
+            return False  
+
+        #If the taxa to be selected are not in the list
+        #Return nothing and log
+        lsMissing = []
+        for sFeature in lsTargetedFeatures:
+            if not sFeature in allTaxaNames:
+                lsMissing.append(sFeature)
+            else:
+                #Check to make sure the taxa of interest is not average abundance of 0
+                iFeatureSum = abndReducedTable.funcGetFeatureSumAcrossSamples(sFeature)
+                if (iFeatureSum == None) or (iFeatureSum == 0):
+                    lsMissing.append(sFeature)
+
+        if len(lsMissing) > 0:
+            return False        
+
+        #For each sample name get average abundance
+        for sName in sampleNames:
+            npaFeaturesSample = abndReducedTable.funcGetSample(sName)
+            sampleAbundanceAverages.append([sName,sum(npaFeaturesSample)/float(len(npaFeaturesSample))])
+
+        #Sort based on average
+        sampleAbundanceAverages = sorted(sampleAbundanceAverages, key = lambda sampleData: sampleData[1], reverse = True)
+
+        #return
+        return sampleAbundanceAverages
+
     #Happy Path Tested
     #Returns a copy of the current abundance table with the abundance of just the given features
     def funcGetFeatureAbundanceTable(self, lsFeatures):
@@ -433,8 +485,9 @@ class AbundanceTable:
                                              ",", "iMinSamples", "=", str(iMinSamples)])
 
         return True
-
-    #A feature is removed if it's abundance is not found in the top X percetile a certain percentage of the samples
+   
+    #1 Happy path test
+    #A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSDCutoff
     def funcFilterFeatureBySD(self, dMinSDCuttOff = 0.0):
         """
         A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSDCutoff.
@@ -459,6 +512,7 @@ class AbundanceTable:
 
         return True
 
+#TODO Test
     #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
         print "AbundanceTable:funcNormalize called"
@@ -539,6 +593,7 @@ class AbundanceTable:
 
         return True
 
+    #1 Happy path test
     def funcRankAbundance(self):
         if not self._npaFeatureAbundance == None:
 
@@ -664,6 +719,7 @@ class AbundanceTable:
 
         return True
 
+#TODO Test
     #Stratifies the AbundanceTable by the given metadata.
     #Will write each stratified abundance table to file
     #if fWriteToFile is True the object will used it's internally stored name as a file to write to
@@ -725,6 +781,7 @@ class AbundanceTable:
 
         return retlAbundanceTables
 
+    #Happy Path Tested
     #Takes the given data values in one metadata and translates it to values in another
     #metadata of the sample samples holding the values of the first metadata
     #FPrimaryIds, if true the sMetadataFrom are checked for unique values,

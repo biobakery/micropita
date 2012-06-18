@@ -185,7 +185,7 @@ class Constants_Arguments():
 
     #vm The name of the last metadata in the validation data set (when you need both)
     c_strValidationLastMetadataNameArgument = "-vm"
-    c_strValidationLastMetadataNameHelp = "The row in the validation abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
+    c_strValidationLastMetadataNameHelp = "The row in the validation abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadacta row."
 
     #vn Name of the sample id row in the validation data set (when you need both)
     c_strValidationIDNameArgument = "-vn"

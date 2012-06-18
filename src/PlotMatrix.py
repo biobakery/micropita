@@ -26,6 +26,7 @@ class PlotMatrix:
   @staticmethod
   def funcPlotMatrix(npMatrix, lsXLabels, strOutputFigurePath, strXTitle="X Axis", strYTitle="Y Axis", fFlipYLabels=False, fInvert=False):
 
+    #Get canvas/figure
     plt.clf()
     figConfusionMatrix = plt.figure()
     objAxis = figConfusionMatrix.add_subplot(111)
@@ -55,7 +56,8 @@ class PlotMatrix:
             plt.text(xIndex, yIndex, dValue, fontdict = {'size':18,'weight':'bold'} )
 
     #Add color bar
-    figConfusionMatrix.colorbar(objPlot)
+    print "npMatrix", npMatrix
+    figConfusionMatrix.colorbar(objPlot, ticks=range(min(np.array(npMatrix).ravel()),max(np.array(npMatrix).ravel())))
 
     #Save to a file
     savefig(strOutputFigurePath)

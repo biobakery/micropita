@@ -25,13 +25,13 @@ import SVMTest
 import Utility_MathTest
 
 suite = unittest.TestSuite()
-suite.addTest(AbundanceTableTest.suite())
+#suite.addTest(AbundanceTableTest.suite())
 #suite.addTest(CladogramTest.suite())
-#suite.addTest(DiversityTest.suite())
-#suite.addTest(MicroPITATest.suite())
+suite.addTest(DiversityTest.suite())
+suite.addTest(MicroPITATest.suite())
 #suite.addTest(PCoATest.suite())
 #suite.addTest(SVMTest.suite())
-#suite.addTest(Utility_MathTest.suite())
+suite.addTest(Utility_MathTest.suite())
 
 runner = unittest.TextTestRunner()
 runner.run(suite)

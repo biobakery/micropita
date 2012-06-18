@@ -522,12 +522,12 @@ class Utility_Data():
 #      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
 #      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
 
-iGeneralRandom = 0
-iSignalRandom = 0
-for iSimpleNoise in [5,10,15,20,25]:
-  for i in xrange(1,11):
-    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
-    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
+#iGeneralRandom = 0
+#iSignalRandom = 0
+#for iSimpleNoise in [5,10,15,20,25]:
+#  for i in xrange(1,11):
+#    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
+#    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
 
 
 #Utility_Data.funcGenerateCorrelatedFeaturesDataSet("TestCor.pcl", 1)

@@ -153,6 +153,7 @@ class Cladogram:
     """
     self.strRoot = strRoot
 
+#TODO Test
   def generate(self, strImageName, strStyleFile, sTaxaFileName, iTerminalCladeLevel = 10, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This is the method to call to generate a cladogram using circlader.
@@ -326,6 +327,7 @@ class Cladogram:
     self.c_dPercentileCutOff = dPercentileCutOff
     self.c_dPercentageAbovePercentile = dPercentageAbovePercentile
 
+  #Not Tested
   def setCircleScale(self, iScale):
     """
     Is a scale used to increase or decrease node sizes in the the cladogram to make more visible
@@ -382,6 +384,7 @@ class Cladogram:
     """
     self.llsTicks = llsTicks
 
+#TODO Test
   def addCircle(self, lsTaxa, strCircle, dBorder=0.0, strShape="R", dAlpha=1.0, fForced=False):
     """
     This methods allows one to add a circle to the outside of the cladogram.
@@ -418,6 +421,7 @@ class Cladogram:
     self.ldictCircleData.append(dictCircleData)
     return True
 
+#TODO Test
   def createCircleFile(self, lsIDs):
     """
     Write circle data to file.
@@ -579,6 +583,7 @@ class Cladogram:
 
 ############################################################
 
+#TODO Test
   def createHighlightFile(self, lsIDs):
     """
     Write highlight data to file
@@ -646,6 +651,7 @@ class Cladogram:
         self.fSizeFileMade=True
     return True
 
+#TODO Test
   def createTreeFile(self, lsIDs):
     """
     Write tree data to file. The tree file defines the internal cladogram and all it's points.
@@ -671,6 +677,7 @@ class Cladogram:
       self.writeToFile(self.strTreeFilePath, Constants.ENDLINE.join(lsFullTree), False)
     return True
 
+#TODO Test
   ##Returns only terminal nodes given the list's structure
   @staticmethod
   def funcGetTerminalNodes(lsTaxa,cDelim):
@@ -751,6 +758,7 @@ class Cladogram:
             retls.append(sCurTaxaName)
     return retls
 
+  #Happy Path Tested
   def filterByCladeSize(self, lsIDs):
     """
     Filter by the count of individuals in the clade.
@@ -813,6 +821,7 @@ class Cladogram:
         sCircladerColor = "".join(["_c_[",str(iR),",",str(iG),",",str(iB),"]"])
     return sCircladerColor
 
+#TODO Test
   def generateLabels(self, lsIDs):
     """
     Labels for visualization. 
@@ -835,6 +844,7 @@ class Cladogram:
         dictRet[sID] = sLabel
     return dictRet
 
+#TODO Test
   def manageFilePaths(self, sTaxaFileName, strStyleFile, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This method sets the naming to the files generated that Circlader acts on.
@@ -895,6 +905,7 @@ class Cladogram:
       if(os.path.exists(self.strCircleFilePath)):
         os.remove(self.strCircleFilePath)
 
+  #Not tested
   def relabelIDs(self, dictLabels):
     """
     Allows the relabeling of ids. Can be used to make numeric labeling of ids or renaming
@@ -929,6 +940,7 @@ class Cladogram:
           lsRootedIDs.append(sIDElements[iRootIndex+1])
     return(lsRootedIDs)
 
+  #Testing: Used extensively in other tests
   def writeToFile(self, strFileName, strDataToWrite, fAppend):
     """
     Helper function that writes a string to a file
