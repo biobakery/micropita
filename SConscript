@@ -710,10 +710,11 @@ for fileConfigMicropita in lMicropitaFiles:
     #Create figure 1A PCoA
     #Unstratified PCoA of selection
     #Manage optional files
-    if fSupervisedRun:
-      strPredictFileArgument = " ".join(["-p",sMicropitaPredictFile.get_abspath()])
-    else:
-      strPredictFileArgument = " ".join(["-p","None"])
+#    if fSupervisedRun:
+#      strPredictFileArgument = " ".join(["-p",sMicropitaPredictFile.get_abspath()])
+#    else:
+#      strPredictFileArgument = " ".join(["-p","None"])
+    strPredictFileArgument = " ".join(["-p","None"]) 
     if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
       lsPCOAFigures.append(sOutputFigure1APCoA)
       Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),

@@ -20,6 +20,7 @@ from CommandLine import CommandLine
 import math
 import operator
 import os
+from random import shuffle
 from ValidateData import ValidateData
 
 class SVM:
@@ -52,6 +53,8 @@ class SVM:
     c_COST_VALUE = "C"
     c_ACCURACY = "ACCURACY"
 
+#TODO Unfreeze two tests
+    #Tested 2/4 test cases
     #Creates a model using a linear SVM
     #1. Scales data if indicated
     #2. Uses cross validation to define the gamma, cost, and range
@@ -193,6 +196,7 @@ class SVM:
         #Return generated files
         return generatedFiles
 
+#TODO Test
     def predictFromLinearModel(self, tempDataFileName=None, tempModelFileName=None, tempRangeFileName=None, tempProbabilistic=False):
         #ValidateData
         if(not ValidateData.isValidFileName(tempDataFileName)):
@@ -243,108 +247,7 @@ class SVM:
         generatedFiles[self.c_KEYWORD_PREDICTION_FILE] = predictFile.strip(Constants.QUOTE)
         return generatedFiles
 
-    #Converts abundance files to input SVM files.
-    #@tempInputFile Abundance file to read (should be a standard Qiime output abundance table)
-    #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
-    #@tempDelimiter Delimiter of the Abundance table
-    #@tempLabels Ordered labels to use to classify the samples in the abundance table
-    #@sLastMetadataName The name of the last row in the abundance table representing metadata
-    #@tempSkipFirstColumn Boolean Indicates to skip the first column (true) (for instance if it contains taxonomy identifiers)
-    #@tempNormalize Boolean to indicate if the abundance data should be normalized (true) before creating the file (normalized by total sample abundance)
-    @staticmethod
-    def convertAbundanceFileToSVMFile(tempInputFile=None, tempOutputSVMFile=None, tempDelimiter=None, tempLabels=None, sLastMetadataName=None, tempSkipFirstColumn = True, tempNormalize=None):
-        #Validate parameters
-        if(not ValidateData.isValidFileName(tempInputFile)):
-            print "Error, file not valid. File:"+str(tempInputFile)
-            return False
-        if(not ValidateData.isValidString(tempOutputSVMFile)):
-            print "Error, file not valid. File:"+str(tempOutputSVMFile)
-            return False
-        if(not ValidateData.isValidStringType(tempDelimiter)):
-            print "Error, tempDelimiter was invalid. Value ="+str(tempDelimiter)
-            return False
-        if(not ValidateData.isValidList(tempLabels)):
-            print "Error, tempNameRow was invalid. Value ="+str(tempLabels)
-            return False
-        if(not ValidateData.isValidString(sLastMetadataName)):
-            print "Error, sLastMetadataName was invalid. Value ="+str(sLastMetadataName)
-            return False
-        if(not ValidateData.isValidBoolean(tempNormalize)):
-            print "Error, tempNormalize was invalid. Value ="+str(tempNormalize)
-            return False
-        if(not ValidateData.isValidBoolean(tempSkipFirstColumn)):
-            print "Error, tempSkipFirstColumn was invalid. Value ="+str(tempSkipFirstColumn)
-            return False
-
-        #Read in file
-        contents = None
-        with open(tempInputFile,'r') as f:
-            contents = f.read()
-        f.close()
-
-        #If output file exists, delete
-        if(os.path.exists(tempOutputSVMFile)):
-            os.remove(tempOutputSVMFile)
-
-        #Turn to lines of the file
-        contents = contents.replace(Constants.QUOTE,"")
-        contents = contents.split(Constants.ENDLINE)
-
-        tempFirstDataRow = -1
-        for iIndex, sLine in enumerate(contents):
-            if sLine.split(tempDelimiter)[0].strip() == sLastMetadataName:
-                tempFirstDataRow = iIndex + 1
-                break
-
-        #Run through data and create a list of column lists
-        columnCount = len(contents[tempFirstDataRow].split(tempDelimiter))
-        startingColumn = 0
-        if(tempSkipFirstColumn == True):
-            columnCount = columnCount - 1
-            startingColumn = 1
-
-        #Create data matrix
-        dataMatrix = list()
-
-        #Add labels
-        for labelIndex in xrange(0,len(tempLabels)):
-            dataMatrix.append([str(tempLabels[labelIndex])])
-
-        if(tempNormalize==True):
-            #Add data as numeric and normalize
-            for lineIndex in xrange(tempFirstDataRow,len(contents)):
-                columns = contents[lineIndex].split(tempDelimiter)
-                for columnIndex in xrange(startingColumn,len(columns)):
-                    dataMatrix[columnIndex-startingColumn].append(float(columns[columnIndex]))
-            
-            #Output file
-            with open(tempOutputSVMFile,'a') as f:
-                for numericData in dataMatrix:
-                    outputString = str(numericData[0])
-                    dataNoLabel=numericData[1:]
-
-                    columnSum = sum(dataNoLabel)
-                    for normalizedDataIndex in xrange(0,len(dataNoLabel)):
-                        if(columnSum > 0):
-                            outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex]/columnSum)])
-                        else:
-                            outputString = "".join([outputString," ",str(normalizedDataIndex+1),Constants.COLON,str(dataNoLabel[normalizedDataIndex])])
-                    f.write(outputString+Constants.ENDLINE)
-            f.close()
-            return True
-        else:
-            #Add data
-            for lineIndex in xrange(tempFirstDataRow,len(contents)):
-                columns = contents[lineIndex].split(tempDelimiter)
-                for columnIndex in xrange(startingColumn,len(columns)):
-                    dataMatrix[columnIndex-startingColumn].append("".join([str(lineIndex+1-tempFirstDataRow),Constants.COLON,str(columns[columnIndex])]))
-
-            #Output file
-            with open(tempOutputSVMFile,'a') as f:
-                (f.write(" ".join(dataColumn)+Constants.ENDLINE) for dataColumn in dataMatrix)
-            f.close()
-            return True
-
+    #1 Happy Path tested
     #Converts abundance files to input SVM files.
     #@tempInputFile Abundance file to read (should be a standard Qiime output abundance table)
     #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
@@ -373,7 +276,8 @@ class SVM:
         #Add labels
         llData = []
         lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataLabel)
-        dictLabels = dict([[str(lenuLabels[1]),str(lenuLabels[0])] for lenuLabels in enumerate(set(lsLabels))])
+        lsUniqueLabels = list(set(lsLabels))
+        dictLabels = dict([[str(lenuLabels[1]),str(lenuLabels[0])] for lenuLabels in enumerate(lsUniqueLabels)])
         lsLabels = [dictLabels[sLabel] for sLabel in lsLabels]
 
         iRowIndex = 0
@@ -386,9 +290,60 @@ class SVM:
         with open(tempOutputSVMFile,'a') as f:
             (f.write("".join(llData)))
         f.close()
-        return True
+        return lsUniqueLabels
 
+    #Tested
     @staticmethod
-    def funcScaleFeature(npadData):
-        dMin = min(npadData)
-        return (npadData-dMin)/float(max(npadData-dMin))
+    def funcScaleFeature(npdData):
+        if sum(npdData) == 0 or len(set(npdData))==1:
+            return npdData
+        dMin = min(npdData)
+        return (npdData-dMin)/float(max(npdData-dMin))
+
+    #Tested
+    @staticmethod
+    def funcWeightLabels(lLabels):
+        #Convert to dict
+        lUniqueLabels = list(set(lLabels))
+        dictLabels = dict(zip(lUniqueLabels, range(len(lUniqueLabels))))
+
+        #Build a dict of weights per label {label:weight, label:weight}
+        #Get the occurence of each label
+        dictWeights = dict()
+        for sLabelKey in dictLabels:
+            sCurLabel = dictLabels[sLabelKey]
+            dictWeights[sCurLabel] = lLabels.count(sLabelKey)
+
+        #Divide the highest occurence each occurence
+        iMaxOccurence = max(dictWeights.values())
+        for sWeightKey in dictWeights:
+            dictWeights[sWeightKey]=iMaxOccurence/float(dictWeights[sWeightKey])
+
+        return [dictWeights,lUniqueLabels]
+
+    #Tested 3/4 cases TODO could add in test 12 with randomize True
+    def func10FoldCrossvalidation(self, iTotalSampleCount, fRandomise = False):
+        """
+        Generates the indexes for a 10 fold crossvalidation given a sample count.
+        If there are less than 10 samples, it uses the sample count as the K-fold crossvalidation
+        as a leave one out method.
+
+	:param	iTotalSampleCount:	Total Sample Count
+	:type	int:	Sample Count
+	:param	fRandomise:	Random sample indices
+	:type	boolean:	True indicates randomise (Default False)
+        """
+
+        #Make indices and shuffle if needed
+        liindices = range(iTotalSampleCount)
+        if fRandomise:
+            shuffle(liindices)
+
+        #For 10 times
+        iKFold = 10
+        if iTotalSampleCount < iKFold:
+            iKFold = iTotalSampleCount
+        for iiteration in xrange(iKFold):
+            lfTraining = [iindex % iKFold != iiteration for iindex in liindices]
+            lfValidation = [not iindex for iindex in lfTraining]
+            yield lfTraining, lfValidation

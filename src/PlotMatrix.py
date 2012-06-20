@@ -57,7 +57,7 @@ class PlotMatrix:
 
     #Add color bar
     print "npMatrix", npMatrix
-    figConfusionMatrix.colorbar(objPlot, ticks=range(min(np.array(npMatrix).ravel()),max(np.array(npMatrix).ravel())))
+    figConfusionMatrix.colorbar(objPlot, ticks=range(int(min(np.array(npMatrix).ravel())),int(max(np.array(npMatrix).ravel()))))
 
     #Save to a file
     savefig(strOutputFigurePath)
