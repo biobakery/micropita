@@ -583,6 +583,7 @@ class MicroPITA:
             dictiPrediction = dict()
             dictdProbability = dict()
             dictAllProbabilities = dict()
+            dictAllPredictions = dict()
 
             #For each cross validation fold for the cost
             for lfTraining, lfValidation in svm.func10FoldCrossvalidation(iTotalSampleCount = len(lsSampleNames), fRandomise = True):
@@ -614,6 +615,7 @@ class MicroPITA:
                 #svm functions require [samples,features]
                 retDistance = svmMLPY.pred_probability(llValidationData)
 
+                print "lsValidationSamples", lsValidationSamples
                 print "retDistance", retDistance
 
                 #Store fold results
@@ -623,11 +625,13 @@ class MicroPITA:
                         dMaxProbability = max(retDistance[indexSamples])
                         iLabel = lSVMLabels[list(retDistance[indexSamples]).index(dMaxProbability)]
                         dictiPrediction[sSampleName] = ldValidationLabels[indexSamples] == iLabel
-                        dictAllProbabilities[sSampleName] = [iLabel]+retDistance[indexSamples]
+                        dictAllProbabilities[sSampleName] = [int(iLabel)]+list(retDistance[indexSamples])
+                        dictAllPredictions[sSampleName] = str(int(iLabel))
                     #Determine label by pred method
                     else:
                         dictiPrediction[sSampleName] = ldValidationLabels[indexSamples] == retPred[indexSamples]
-                        dictAllProbabilities[sSampleName] = [retPred[indexSamples]]+retDistance[indexSamples]
+                        dictAllProbabilities[sSampleName] = [int(retPred[indexSamples])]+list(retDistance[indexSamples])
+                        dictAllPredictions[sSampleName] = str(int(retPred[indexSamples]))
                     dictdProbability[sSampleName] = retDistance[indexSamples][lSVMLabels.index(retPred[indexSamples])]
 
             #Get Accuracy and if is the best accuracy store
@@ -672,17 +676,21 @@ class MicroPITA:
             retDistance = svmMLPY.pred_probability(llFullData)
 
             #Store fold results
+            print "dictAllProbabilities", dictAllProbabilities
+            print "dictAllPredictions", dictAllPredictions
             for indexSamples, sSampleName in enumerate(lsSampleNames):
                 #Determine label by highest probability
                 if fClassifyByProbability:
                     dMaxProbability = max(retDistance[indexSamples])
                     iLabel = lSVMLabels[list(retDistance[indexSamples]).index(dMaxProbability)]
                     dictiPrediction[sSampleName] = ldLabels[indexSamples] == iLabel
-                    dictAllProbabilities[sSampleName] = [iLabel]+retDistance[indexSamples]
+                    dictAllProbabilities[sSampleName] = [int(iLabel)]+list(retDistance[indexSamples])
+                    dictAllPredictions[sSampleName] = str(int(iLabel))
                 #Determine label by pred method
                 else:
                     dictiPrediction[sSampleName] = ldLabels[indexSamples] == retPred[indexSamples]
-                    dictAllProbabilities[sSampleName] = [retPred[indexSamples]]+retDistance[indexSamples]
+                    dictAllProbabilities[sSampleName] = [int(retPred[indexSamples])]+list(retDistance[indexSamples])
+                    dictAllPredictions[sSampleName] = str(int(retPred[indexSamples]))
                 dictdProbability[sSampleName] = retDistance[indexSamples][lSVMLabels.index(retPred[indexSamples])]
 
         #Log best
@@ -691,7 +699,7 @@ class MicroPITA:
 
         #Create output prediction file
         strPredictionOutput = " ".join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+Constants.ENDLINE
-        strPredictionOutput = strPredictionOutput + Constants.ENDLINE.join([" ".join([str(dictiPrediction[sSampleName])]+[str(dProb) for dProb in dictAllProbabilities[sSampleName]])
+        strPredictionOutput = strPredictionOutput + Constants.ENDLINE.join([" ".join([str(dProb) for dProb in dictAllProbabilities[sSampleName]])
             for sSampleName in lsSampleNames])
 
 #        strPredictionOutput = strPredictionOutput + Constants.ENDLINE.join([" ".join([str(retPred[iIndexPredictions])]+[str(dPred) for dPred in list(retDistance[iIndexPredictions])])

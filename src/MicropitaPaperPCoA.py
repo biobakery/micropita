@@ -118,8 +118,8 @@ def _main( ):
 
     #Draw known truths
     #Draw labeling from metadata
-    for asMetadata in metadata:
-      analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
+#    for asMetadata in metadata:
+#      analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
 
     #Read in prediction file is supplied
     lsPredictions = list()

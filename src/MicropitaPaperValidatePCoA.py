@@ -82,7 +82,7 @@ def _main( ):
     fValidationIsNormalized = (args.fValidationIsNormalized.lower() == "true")
 
     #Number of dimensions to explore
-    iDimensionCount = 2
+    iDimensionCount = 4
 
     #Analysis object
     analysis = PCoA()

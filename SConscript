@@ -54,6 +54,7 @@ c_sufMetaOverlapMatrix = "-metaOverlap.pdf"
 c_strSufMicropita = ".txt"
 c_strSufOverlapMatrix = "-overlap.pdf"
 c_strSufPCOA = "-PCoA.pdf"
+c_strProbPCOA = "-ProbalisticPCOA.pdf"
 c_strSufPng = ".pdf"
 c_strSufPredict = "-SVM.predict"
 c_strSufSelectedTaxa = ".taxa"
@@ -187,13 +188,15 @@ c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSe
 c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
 c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
 c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratSelectionHCL.py" ) )
+c_fileProgSupervisedPCoA = File( sfle.d( fileDirSrc, "MicropitaPaperSupervisedPCoA.py" ))
 c_fileProgSVM = File( sfle.d( fileDirSrc, "SVM.py" ) )
 c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSets.py" ) )
-c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
+c_fileProgValidateSupervisedPCoA = File( sfle.d( fileDirSrc, "MicropitaPaperSupervisedValidationPCoA.py" ))
 c_fileProgValidateDiversity = File( sfle.d( fileDirSrc, "MicropitaPaperValidateDiversity.py" ))
 c_fileProgValidateFeature = File( sfle.d( fileDirSrc, "MicropitaPaperValidateFeatureAbundance.py" ))
 c_fileProgValidateFeatureHistogram = File( sfle.d( fileDirSrc, "MicropitaPaperValidateFeatureAbundanceHistogram.py" ))
 c_fileProgValidatePCoA = File( sfle.d( fileDirSrc, "MicropitaPaperValidatePCoA.py" ))
+c_fileProgValidateData = File( sfle.d( fileDirSrc, "ValidateData.py" ) )
 
 #Lists of sources needed for different python scripts that are ran so that they can be used as libraries
 c_filesSecondarySrc = [c_fileProgAbundanceTable, c_fileProgCommandLine, c_fileProgConstants, c_fileProgDiversity,
@@ -436,6 +439,19 @@ def funcValidateInPCoA( strLoggingLevel, strSampleNameRow, strLastMetadataName, 
                     fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel, strValidationAbundance, strAbundance, strSelectionFile, strFigureT])
   return funcValidateInPCoARet
 
+def funcValidateInSupPCoA( strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName,
+                        strInvert, fNormalized, fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel, sPredFile):
+  def funcValidateInSupPCoARet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
+                                      strValidateSampleNameRow=strValidateSampleNameRow, strValidateLastMetadataName=strValidateLastMetadataName,
+                                      strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed,
+                                      fValidateNormalized=fValidateNormalized, fValidateSummed=fValidateSummed, sPair=sPair, sMetric=sMetric,
+                                      sStratLabel=sStratLabel, sPredFile = sPredFile):
+    strFigureT, astrSs = sfle.ts( target, source )
+    strProg, strValidationAbundance, strAbundance, strSelectionFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
+    return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, strValidateSampleNameRow, strValidateLastMetadataName, strInvert, fNormalized,
+                    fSummed, fValidateNormalized, fValidateSummed, sPair, sMetric, sStratLabel, strValidationAbundance, strAbundance, strSelectionFile, strFigureT, sPredFile])
+  return funcValidateInSupPCoARet
+
 #Meta matrix creation
 def funcOverlapMetaMatrix( strLoggingLevel, strInvert, sSelectionMethods ):
   def funcOverlapMetaMatrixRet( target, source, env, strLoggingLevel=strLoggingLevel, strInvert=strInvert, sSelectionMethods=sSelectionMethods ):
@@ -630,7 +646,7 @@ for fileConfigMicropita in lMicropitaFiles:
   fileCheckedValidationFile = None
 
   #Check the validation file
-  if(not sFileConfiguration[c_strConfigValidationFile].lower() == "none"):
+  if((not sFileConfiguration[c_strConfigValidationFile].lower() == "none") and (not sFileConfiguration[c_strConfigValidationFile] == sFileConfiguration[c_strConfigInputFile])):
     fileValidationFile = File(sfle.d(fileDirInput.get_abspath(),sFileConfiguration[c_strConfigValidationFile]))
     fileCheckedValidationFile = File(sfle.d(fileDirDataName,sfle.rebase(sFileConfiguration[c_strConfigValidationFile], c_strSufUncheckedTable, c_strSufCheckedTable)))
     Command(fileCheckedValidationFile,[c_fileProgCheckFile, fileValidationFile], 
@@ -660,9 +676,9 @@ for fileConfigMicropita in lMicropitaFiles:
     sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufTable, c_strSufPredict )))
 
     #Make files names from the micropita output file
-    sOutputFigure1APCoA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
+    sOutputFigure1APCoA,sOutputProbabalisticPCOA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
     sCladogramColorFile,sCladogramSizeFile,sCladogramTickFile,sCladogramHighlightFile,sCladogramCircleFile, sCladogramDetailFile =  [File(sfle.d( sOutputDir,
-    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufConfusionMatrix,c_strSufOverlapMatrix,c_strSufHCLUSTData,c_strSufHCLUSTColor,
+    sfle.rebase( sMicropitaOutput, c_strSufMicropita, s ))) for s in (c_strSufPCOA,c_strProbPCOA,c_strSufCombinedPCOA,c_strSufStratPCOA,c_strSufCombinedStratPCOA,c_strSufHCLUSTFig,c_strSufConfusionMatrix,c_strSufOverlapMatrix,c_strSufHCLUSTData,c_strSufHCLUSTColor,
     c_strSufHCLUSTLabel,c_strSufFig2,c_strSufCircTaxa,c_strSufCircColor,c_strSufCircSize,c_strSufCircTick,c_strSufCircHighlight, c_strSufCircCircle, c_strSufCircDetail)]
 
     #Make more file names, these for cladogram options
@@ -710,11 +726,11 @@ for fileConfigMicropita in lMicropitaFiles:
     #Create figure 1A PCoA
     #Unstratified PCoA of selection
     #Manage optional files
-#    if fSupervisedRun:
-#      strPredictFileArgument = " ".join(["-p",sMicropitaPredictFile.get_abspath()])
-#    else:
-#      strPredictFileArgument = " ".join(["-p","None"])
-    strPredictFileArgument = " ".join(["-p","None"]) 
+    if fSupervisedRun:
+      strPredictFileArgument = " ".join(["-p",sMicropitaPredictFile.get_abspath()])
+    else:
+      strPredictFileArgument = " ".join(["-p","None"])
+ 
     if sFileConfiguration[c_strConfigUnsupervisedStratify].lower() == "none":
       lsPCOAFigures.append(sOutputFigure1APCoA)
       Command(sOutputFigure1APCoA, [c_fileProgPCoAFigure, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
@@ -726,6 +742,16 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
                                                                                                                                                                 strPredictFileArgument))
+      #Make probabalistic pcoa
+#      Command(sOutputProbabalisticPCOA, [c_fileProgSupervisedPCoA, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+#                                                                                                                                                                " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
+#                                                                                                                                                                strPredictFileArgument))
     #Create figure 1A PCoA combined
     #Unstratified PCoA of selection
     #Manage optional files
@@ -944,6 +970,25 @@ for fileConfigMicropita in lMicropitaFiles:
                                       " ".join([Constants_Arguments.c_strMetricArgument,c_DISTINCT]),
                                       " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]])))
 
+#      if c_DISTINCT in lsSelectionMethods:
+#        #Validate Distinct selection
+#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDistinct)]) )),
+#              [c_fileProgValidateSupervisedPCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+#              funcValidateInSupPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+#                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
+#                                      " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIDNameArgument,sFileConfiguration[c_strConfigValidationIDName]]),
+#                                      " ".join([Constants_Arguments.c_strValidationLastMetadataNameArgument,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+#                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+#                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+#                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+#                                      " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]]),
+#                                      " ".join([Constants_Arguments.c_strMetricArgument,c_DISTINCT]),
+#                                      " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
+#                                      strPredictFileArgument))
+
       if c_DISCRIMINANT in lsSelectionMethods:
         #Validate Discriminant selection
         Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiscriminant)]) )),
@@ -961,6 +1006,25 @@ for fileConfigMicropita in lMicropitaFiles:
                                       " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]]),
                                       " ".join([Constants_Arguments.c_strMetricArgument,c_DISCRIMINANT]),
                                       " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]])))
+
+#      if c_DISCRIMINANT in lsSelectionMethods:
+#        #Validate Discriminant selection
+#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiscriminant)]) )),
+#              [c_fileProgValidateSupervisedPCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
+#              funcValidateInSupPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+#                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
+#                                      " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIDNameArgument,sFileConfiguration[c_strConfigValidationIDName]]),
+#                                      " ".join([Constants_Arguments.c_strValidationLastMetadataNameArgument,sFileConfiguration[c_strConfigValidationLastMetadataName]]),
+#                                      " ".join([Constants_Arguments.c_strInvertArgument,strInvertImage]),
+#                                      " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+#                                      " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIsNormalizedArgument,sFileConfiguration[c_strConfigValidationIsNormalized]]),
+#                                      " ".join([Constants_Arguments.c_strValidationIsSummedArgument,sFileConfiguration[c_strConfigValidationIsSummed]]),
+#                                      " ".join([Constants_Arguments.c_strPairingMetadataArgument,sFileConfiguration[c_strConfigPairingMetadata]]),
+#                                      " ".join([Constants_Arguments.c_strMetricArgument,c_DISCRIMINANT]),
+#                                      " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
+#                                      strPredictFileArgument))
 
     #Add input files to be later summarized in the metaplots
     #Create key combining abundance file and stratification status

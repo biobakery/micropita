@@ -43,6 +43,25 @@ class AbundanceTable:
     #cFileDelimiter The delimiter for the abundace table
     #cFeatureDelimiter The delimiter for feature names
     def __init__(self, npaAbundance, dictMetadata, strName, fIsNormalized, fIsSummed, cFileDelimiter = Constants.TAB, cFeatureNameDelimiter="|"):
+      """
+      Averages feature abundance.
+
+      :param	npaAbundance:	Structured Array of abundance data (Row=Features, Columns=Samples)
+      :type	Numpy Structured Array:	Structured Array of abundance data (Row=Features, Columns=Samples)
+      :param	dictMetadata:	Structured Array of abundance data (Row=Features, Columns=Samples)
+      :type	Dictionary:	Dictionary of metadata {"String ID":["strValue","strValue","strValue","strValue","strValue"]}
+      :param	strName:	The name of the metadata that serves as the ID for the columns (For example a sample ID)
+      :type	String:	Structured Array of abundance data (Row=Features, Columns=Samples)
+      :param	fIsNormalized:	Indicates if the data is already normalized upon reading
+      :type	Boolean:	Boolean indicator of normalization (True=Already Normalized)
+      :param	fIsSummed:	Indicates if the data is already summed upon reading
+      :type	Boolean:	Boolean indicator of already being summed (True=Summed)
+      :param	cFileDelimiter:	Character used as the delimiter of the file that is read in to create the abundance table.
+                                Will also be used to write the abudance table file to a file to keep file consistency.
+      :type	Character:	Character delimiter for reading the data in (default = TAB)
+      :param	cFeatureNameDelimiter:	Character used as the delimiter of the feature names (column 1). This is useful if the name are complex, for instance consensus lineages in metagenomics.
+      :type	Character:	Character delimiter for feature names (default = |)
+      """
 
       #The abundance data
       self._npaFeatureAbundance = None
@@ -512,10 +531,9 @@ class AbundanceTable:
 
         return True
 
-#TODO Test
+    #Happy path tested
     #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
-        print "AbundanceTable:funcNormalize called"
         if self._fIsSummed:
             return self.funcNormalizeColumnsWithSummedClades()
         else:
@@ -527,8 +545,6 @@ class AbundanceTable:
     #@returns Normalized structured array or False on error. 
     #All columns are returned, this could be no normalization, all normalization or mixed normalized columns.
     def funcNormalizeColumnsBySum(self):
-        print "AbundanceTable:funcNormalizeColumnsBySum called"
-
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
             return False
@@ -719,7 +735,7 @@ class AbundanceTable:
 
         return True
 
-#TODO Test
+    #Happy path tested
     #Stratifies the AbundanceTable by the given metadata.
     #Will write each stratified abundance table to file
     #if fWriteToFile is True the object will used it's internally stored name as a file to write to

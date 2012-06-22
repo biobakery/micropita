@@ -51,6 +51,9 @@ class PCoA:
     #Get plot colors
     objFigureControl = Constants_Figures()
 
+    #Forced X Axis
+    ldForcedXAxis = None
+
     #Loads data into PCoA (given the matrix or a valid file path)
     #Data can be the Abundance Table to be converted to a distance matrix or a distance matrix
     #If it is the AbundanceTable, indicate that it is rawData (tempIsRawData=True)
@@ -133,6 +136,8 @@ class PCoA:
             iDimensionTwo = max(1,min(self._iDimensions-1, iDim2-1))
             adPoints = self.pcoa.getPoints()
             ldXPoints = list(adPoints[:,iDimensionOne])
+            if not (self.ldForcedXAxis == None):
+                ldXPoints = self.ldForcedXAxis
             ldYPoints = list(adPoints[:,iDimensionTwo])
             iPointCount = len(ldXPoints)
 
@@ -578,6 +583,12 @@ class PCoA:
         for dataIndex in xrange(0,len(dataIndicies)):
             aretList.append(aList[dataIndicies[dataIndex]])
         return aretList
+
+    def funcForceXAxis(self, dList):
+        self.ldForcedXAxis = dList
+
+    def funcUnforceXAxis(self):
+        self.ldForcedXAxis = None
 
     #TODO put in utilities
     #The adColor should be in the range between 0 and 1

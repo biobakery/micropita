@@ -1165,7 +1165,7 @@ class AbundanceTableTest(unittest.TestCase):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering.txt"])
-        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering-Answer.txt"])
+        strAnswerFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-TestOccurenceFiltering.txt"])
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
@@ -1222,7 +1222,15 @@ class AbundanceTableTest(unittest.TestCase):
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
-        answer = ""
+        answer = Constants.ENDLINE.join(["[('Bacteria', 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)",
+                   " ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes', 1.0, 0.0, 0.0, 0.35833333333333334, 0.0, 1.0, 0.0, 1.0, 0.6, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli', 0.8888888888888888, 0.0, 0.0, 0.25833333333333336, 0.0, 0.8947368421052632, 0.0, 0.5, 0.4, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)",
+                   " ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)]"])
+
 
         #Call method
         data.funcSumClades()
@@ -1243,7 +1251,11 @@ class AbundanceTableTest(unittest.TestCase):
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
-        answer = ""
+        answer = Constants.ENDLINE.join(["[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)",
+                 " ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)",
+                 " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)",
+                 " ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)",
+                 " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)]"])
 
         #Call method
         data.funcNormalize()
@@ -1285,7 +1297,15 @@ class AbundanceTableTest(unittest.TestCase):
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
-        answer = "[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)\n ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)\n ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)\n ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)]"
+        answer = Constants.ENDLINE.join(["[('Bacteria', 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)",
+                   " ('Bacteria|3417', 0.0, 0.8181818181818182, 0.0, 0.2833333333333333, 0.3333333333333333, 0.0, 0.0, 0.0, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes', 1.0, 0.0, 0.0, 0.35833333333333334, 0.0, 1.0, 0.0, 1.0, 0.6, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli', 0.8888888888888888, 0.0, 0.0, 0.25833333333333336, 0.0, 0.8947368421052632, 0.0, 0.5, 0.4, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 0.5555555555555556, 0.0, 0.0, 0.016666666666666666, 0.0, 0.10526315789473684, 0.0, 0.25, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 0.3333333333333333, 0.0, 0.0, 0.24166666666666667, 0.0, 0.7894736842105263, 0.0, 0.25, 0.2, 0.0)",
+                   " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 0.1111111111111111, 0.0, 0.0, 0.1, 0.0, 0.10526315789473684, 0.0, 0.5, 0.2, 0.0)",
+                   " ('Bacteria|unclassified|4904', 0.0, 0.18181818181818182, 0.0, 0.35833333333333334, 0.6666666666666666, 0.0, 1.0, 0.0, 0.2, 0.0)]"])
+
 
         #Call method
         data.funcSumClades()
@@ -1312,7 +1332,23 @@ class AbundanceTableTest(unittest.TestCase):
         result = data._npaFeatureAbundance
 
         #Correct Answer
-        answer = ""
+        answer = Constants.ENDLINE.join(["[('Bacteria', 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)",
+                  " ('Bacteria|Bacteroidetes|Bacteroidia|Bacteroidales', 0.8958333333333334, 1.0, 1.0, 0.0, 1.0, 0.3333333333333333, 0.0, 0.9210526315789473, 0.6, 0.0)",
+                  " ('Bacteria|Bacteroidetes|Bacteroidia|Bacteroidales|Bacteroidaceae|Bacteroides|1008', 0.8958333333333334, 0.9850746268656716, 0.9375, 0.0, 0.0, 0.0, 0.0, 0.9210526315789473, 0.6, 0.0)",
+                  " ('Bacteria|Bacteroidetes|Bacteroidia|Bacteroidales|Prevotellaceae|Prevotella', 0.0, 0.014925373134328358, 0.0625, 0.0, 1.0, 0.3333333333333333, 0.0, 0.0, 0.0, 0.0)",
+                  " ('Bacteria|Bacteroidetes|Bacteroidia|Bacteroidales|Prevotellaceae|Prevotella|1010', 0.0, 0.014925373134328358, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0)",
+                  " ('Bacteria|Bacteroidetes|Bacteroidia|Bacteroidales|Prevotellaceae|Prevotella|1013', 0.0, 0.0, 0.0625, 0.0, 0.0, 0.3333333333333333, 0.0, 0.0, 0.0, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia', 0.10416666666666667, 0.0, 0.0, 0.0, 0.0, 0.6666666666666666, 0.3333333333333333, 0.013157894736842105, 0.3, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Lachnospiraceae', 0.09375, 0.0, 0.0, 0.0, 0.0, 0.6666666666666666, 0.3333333333333333, 0.013157894736842105, 0.2, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Lachnospiraceae|1000', 0.052083333333333336, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Lachnospiraceae|1029', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Lachnospiraceae|Ruminococcus|1023', 0.041666666666666664, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3333333333333333, 0.013157894736842105, 0.0, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|Clostridiales|Lachnospiraceae|unclassified|101', 0.0, 0.0, 0.0, 0.0, 0.0, 0.6666666666666666, 0.0, 0.0, 0.0, 0.0)",
+                  " ('Bacteria|Firmicutes|Clostridia|unclassified|Lachnospiraceae|1034', 0.010416666666666666, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0)",
+                  " ('Bacteria|Tenericutes', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.6666666666666666, 0.06578947368421052, 0.1, 1.0)",
+                  " ('Bacteria|Tenericutes|Erysipelotrichi|Erysipelotrichales|Erysipelotrichaceae|Clostridium|1026', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.6666666666666666, 0.06578947368421052, 0.0, 1.0)",
+                  " ('Bacteria|Tenericutes|Mollicutes|RF39|unclassified|1', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0)",
+                  " ('unclassified|1035', 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0)]"])
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -1474,7 +1510,35 @@ class AbundanceTableTest(unittest.TestCase):
         result = data._npaFeatureAbundance
 
         #Correct Answer
+        answerFile = "".join([Constants_Testing.c_strTestingTruth,"test1otu-summed.txt"])
+        answer = AbundanceTable.makeFromFile(strInputFile=answerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")._npaFeatureAbundance
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    #funcStratifyByMetadata(self,strMetadata,xWriteToFile=False)
+    def testFuncStratifyByMetadataForGoodCaseNoFile(self):
+
+        #Input
+
         answer = ""
+
+        #Get result
+        result = "."
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    #funcStratifyByMetadata(self,strMetadata,xWriteToFile=False)
+    def testFuncStratifyByMetadataForGoodCaseCreateFile(self):
+
+        #Input
+
+        answer = ""
+
+        #Get result
+        result = "."
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))

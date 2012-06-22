@@ -32,11 +32,17 @@ class Utility_Data():
     @staticmethod
     def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount=1, dMaxGeneralNoise = 0.0, dMaxSignalNoise=5.0, dSimpleNoise=0.0):
 
-        #If dSimpleNoise is greater than 0 then the simple noise model will be used over the sparse noise model
-        #The simple noise model will uniformly add up to the dSimpleNoise value to all data in the data set
+        """
+        dMaxGeneralNoise is an absolute number of reads for noise a number starting with 1
+        dMaxSignalNoise is an absolute number of reads for noise a number starting with 1
+        dSimpleNoise should be between 0 and 1 (percentage noise)
+        """
+
+        #If iSimpleNoise is greater than 0 then the simple noise model will be used over the sparse noise model
+        #The simple noise model will uniformly add up to the iSimpleNoise value to all data in the data set
         #The simple noise model will ignore the dMaxGeneralNoise and dMaxSignalNoise variables /  noise structures
         if dSimpleNoise > 0.0:
-            dMaxGeneralNoise = 0.0
+#            dMaxGeneralNoise = 0.0
             dMaxSignalNoise = 0.0
 
         #Matrix descriptors
@@ -290,10 +296,43 @@ class Utility_Data():
                 npDataMatrix[noiseTaxonPosition,drivenSampleIndex] = iTargetedAbundanceMin+(random.random()*dMaxGeneralNoise)
 
         #Apply simple noise structure if indicated to do so
-        if dSimpleNoise > 0.0:
+#        if dSimpleNoise > 0.0:
+#            for iSample in xrange(iSampleCount):
+#                for iFeature in xrange(iTaxaCount):
+#                    npDataMatrix[iFeature,iSample] = npDataMatrix[iFeature,iSample] + random.random()*dSimpleNoise
+
+        #Add in noise by shuffling a percentage of the reads to other features
+        if dSimpleNoise > 0:
+            #For each sample get a percentage of the abundance and add to a random group
+            print "iSampleCount", iSampleCount
             for iSample in xrange(iSampleCount):
+                print "iSample", iSample
+                #Holds the noise adjustment and then after all the features in the sample are looked at
+                #The noise adjustment is added to the sample.
+                #If I added on the noise to features as I went through the sample if the feature with added
+                #noise are further down the list the percentage noise of that feature will be changed with the additional
+                #Added noise and so skews the noise model
+                #Noise is calculated seperately and then added at once.
+                npaNoise = np.array([0]*iTaxaCount)
+                print "npaNoise ", npaNoise
+                #Calculate noise and shuffle to other features
+                print "iTaxaCount", iTaxaCount
                 for iFeature in xrange(iTaxaCount):
-                    npDataMatrix[iFeature,iSample] = npDataMatrix[iFeature,iSample] + random.random()*dSimpleNoise
+                    dCurrentAbundance = npDataMatrix[iFeature,iSample]
+                    iShuffle = int(dCurrentAbundance*dSimpleNoise)
+                    print "dCurrentAbundance, iShuffle ",dCurrentAbundance," ",iShuffle 
+                    #Some of the features will have a measurement of 0 and so this can be skipped
+                    if(iShuffle>0):
+                        npaNoise[iFeature] = npaNoise[iFeature]-iShuffle
+                        
+                        for iShuffleInstance in xrange(iShuffle):
+                            iLocation = random.randint(0,iTaxaCount-1)
+                            npaNoise[iLocation] = npaNoise[iLocation] + 1
+                print "npaNoise After ", npaNoise
+
+                #Add noise to sample
+                for iindexNoise, iNoise in enumerate(npaNoise):
+                    npDataMatrix[iindexNoise,iSample] = npDataMatrix[iindexNoise,iSample] + iNoise
 
         #Write to file
         #Delete current file before writing
@@ -522,12 +561,12 @@ class Utility_Data():
 #      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
 #      Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-GenNoise-"+str(iGeneralRandom)+"-SignalNoise-"+str(iSignalRandom)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom)
 
-#iGeneralRandom = 0
-#iSignalRandom = 0
-#for iSimpleNoise in [5,10,15,20,25]:
-#  for i in xrange(1,11):
-#    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
-#    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(iSimpleNoise)+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=iSimpleNoise)
+iGeneralRandom = 0
+iSignalRandom = 0
+for dSimpleNoise in [.1]:#[.05,.10,.15,.20,.25]:
+  for i in xrange(1,11):
+    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)
+    Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)
 
 
 #Utility_Data.funcGenerateCorrelatedFeaturesDataSet("TestCor.pcl", 1)
