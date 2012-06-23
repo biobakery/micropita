@@ -802,6 +802,7 @@ class AbundanceTable:
     #metadata of the sample samples holding the values of the first metadata
     #FPrimaryIds, if true the sMetadataFrom are checked for unique values,
     #If FPrimaryIds is not true, duplicate values can stop the preservation of order
+    #Or may cause duplication in the "to" group. This is not advised.
     #if the sMetadataFrom has any duplicates the function fails and return false
     def funcTranslateIntoMetadata(self, lsValues, sMetadataFrom, sMetadataTo, fFromPrimaryIds=True):
 
@@ -849,7 +850,8 @@ class AbundanceTable:
             #Write Ids
             f.write(cDelimiter.join([self.funcGetIDMetadataName()]+list(self.funcGetSampleNames()))+Constants.ENDLINE)
             #Write metadata
-            f.write(Constants.ENDLINE.join([cDelimiter.join([sMetaKey]+self.funcGetMetadata(sMetaKey)) for sMetaKey in self._dictTableMetadata])+Constants.ENDLINE)
+            lsKeys = list(set(self._dictTableMetadata.keys())-set([self.funcGetIDMetadataName()]))
+            f.write(Constants.ENDLINE.join([cDelimiter.join([sMetaKey]+self.funcGetMetadata(sMetaKey)) for sMetaKey in lsKeys])+Constants.ENDLINE)
             #Write abundance
             lsOutput = list()
             curAbundance = self._npaFeatureAbundance.tolist()

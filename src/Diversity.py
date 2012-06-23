@@ -167,8 +167,6 @@ class Diversity:
     def getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = None):
         bcValue = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = tempSampleTaxaAbundancies)
         if(not ValidateData.isFalse(bcValue)):
-            #TODO Since brays curtis can get larger than 1, need to normalize this with a different value
-            #TODO Need all inverses to be inverse in a specific way ... maybe multiplicative inverse is better
             return 1.0-bcValue
         return False
 

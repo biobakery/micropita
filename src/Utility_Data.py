@@ -563,7 +563,7 @@ class Utility_Data():
 
 iGeneralRandom = 0
 iSignalRandom = 0
-for dSimpleNoise in [.1]:#[.05,.10,.15,.20,.25]:
+for dSimpleNoise in [.05,.1]:#[.05,.10,.15,.20,.25]:
   for i in xrange(1,11):
     Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)
     Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)

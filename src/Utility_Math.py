@@ -88,7 +88,7 @@ class Utility_Math():
   @staticmethod
   def transposeDataMatrix(tempMatrix, tempRemoveAdornments=False):
     #Validate parameters
-    if(not ValidateData.isValidStructuredArray(tempMatrix)):
+    if(not ValidateData.isValidNPArray(tempMatrix)):
       print "".join(["Utility_Math:transposeDataMatrix::Error, transposeDataMatrix was an invalid structured array. Value =",str(tempMatrix)])
       return False
     if(not ValidateData.isValidBoolean(tempRemoveAdornments)):

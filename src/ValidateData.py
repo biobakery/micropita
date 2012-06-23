@@ -41,7 +41,7 @@ class ValidateData:
             return False
         return True
 
-#TODO Test
+    #Happy path tested
     ##
     #Validates a boolean parameter as true
     #@param ParameterValue value to be evaluated as a True
@@ -53,7 +53,7 @@ class ValidateData:
                 return True
         return False
 
-#TODO Test
+    #Happy path tested
     ##
     #Validates a boolean parameter as false
     #@param ParameterValue value to be evaluated as a False
@@ -354,12 +354,11 @@ class ValidateData:
                 return False
         return True
 
-#TODO Test
     ##
     #Makes sure the object is not none and has a type of ndarray
     #Created 2/25/2011
     @staticmethod
-    def isValidStructuredArray(parameterValue):
+    def isValidNPArray(parameterValue):
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -483,55 +482,3 @@ class ValidateData:
             else:
                 return False
         return False
-
-#TODO Test
-    ##
-    #Validates a parameter as a function
-    #@param ParameterValue value to be evaluated as a function
-    #@return bool Indicator of boolean parameter validity
-    @staticmethod
-    def isValidFunctionType(parameterValue):
-        if parameterValue == None:
-            return False
-        if (not (type(parameterValue) is FunctionType)):
-            return False
-        return True
-
-#TODO Test
-    ##
-    #Validates a parameter as an instance
-    #@param ParameterValue value to be evaluated as an instance
-    #@return bool Indicator of boolean parameter validity
-    @staticmethod
-    def isValidInstance(parameterValue):
-        if parameterValue == None:
-            return False
-        if (not (type(parameterValue) is InstanceType)):
-            return False
-        return True
-
-#TODO Test
-    ##
-    #Validates a parameter as a method
-    #@param ParameterValue value to be evaluated as a method
-    #@return bool Indicator of boolean parameter validity
-    @staticmethod
-    def isValidMethod(parameterValue):
-        if parameterValue == None:
-            return False
-        if (not (type(parameterValue) is MethodType)):
-            return False
-        return True
-
-#TODO Test
-    ##
-    #Validates a parameter as an instance of a method
-    #@param ParameterValue value to be evaluated as an instance of a method
-    #@return bool Indicator of boolean parameter validity
-    @staticmethod
-    def isValidInstanceMethod(parameterValue):
-        if parameterValue == None:
-            return False
-        if (not (str(type(parameterValue)) == "<type 'instancemethod'>")):
-            return False
-        return True

@@ -1520,12 +1520,62 @@ class AbundanceTableTest(unittest.TestCase):
     #funcStratifyByMetadata(self,strMetadata,xWriteToFile=False)
     def testFuncStratifyByMetadataForGoodCaseNoFile(self):
 
-        #Input
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        fWriteToFile = False
 
-        answer = ""
+        #Remove any test files and check to see if this generates files
+        testFile1= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Retroauricular_crease.txt"])
+        testFile2= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Retroauricular_crease.txt"])
+        testFile3= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Antecubital_fossa.txt"])
+        testFile4= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Antecubital_fossa.txt"])
+        testFile5= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Anterior_nares.txt"])
+        testFile6= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Subgingival_plaque.txt"])
+
+        for sFile in [testFile1,testFile2,testFile3,testFile4,testFile5,testFile6]:
+            if os.path.exists(sFile):
+                os.remove(sFile)
 
         #Get result
-        result = "."
+        table = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,xWriteToFile=fWriteToFile)
+        result = Constants.ENDLINE.join([str(abndTable) for abndTable in result])
+
+        answer = ""
+        #Check to see if files were generated
+        for sFile in [testFile1,testFile2,testFile3,testFile4,testFile5]:
+            if os.path.exists(sFile):
+                answer = "".join(["The following file was created and should not have been :",sFile,"."])
+
+        #Answer
+        answer = "".join([answer,"Sample count:2\nFeature count:5\nId Metadata:TID\nMetadata ids:['TID', 'STSite']\n"
+                          "Metadata count:2\nOriginating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Retroauricular_crease.txt\n",
+                          "Original feature count:5\nOriginal sample count:2\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n"
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB,"\nSample count:2\nFeature count:5\nId Metadata:TID\n",
+                          "Metadata ids:['TID', 'STSite']\nMetadata count:2\n",
+                          "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Retroauricular_crease.txt\n",
+                          "Original feature count:5\nOriginal sample count:2\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n"
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB,"\nSample count:2\nFeature count:5\nId Metadata:TID\n"
+                          "Metadata ids:['TID', 'STSite']\nMetadata count:2\n",
+                          "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Antecubital_fossa.txt\n",
+                          "Original feature count:5\nOriginal sample count:2\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n",
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB,"\nSample count:2\nFeature count:5\nId Metadata:TID\n",
+                          "Metadata ids:['TID', 'STSite']\nMetadata count:2\n",
+                          "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Antecubital_fossa.txt\n",
+                          "Original feature count:5\nOriginal sample count:2\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n",
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB,"\nSample count:1\nFeature count:5\nId Metadata:TID\n",
+                          "Metadata ids:['TID', 'STSite']\nMetadata count:2\n",
+                          "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Anterior_nares.txt\n",
+                          "Original feature count:5\nOriginal sample count:1\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n",
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB,"\nSample count:1\nFeature count:5\nId Metadata:TID\nMetadata ids:['TID', 'STSite']\n",
+                          "Metadata count:2\nOriginating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Subgingival_plaque.txt\n",
+                          "Original feature count:5\nOriginal sample count:1\nIs normalized:False\nIs summed:False\nCurrent filtering state:\n",
+                          "Feature delimiter:|\nFile delimiter:",Constants.TAB])
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -1533,12 +1583,62 @@ class AbundanceTableTest(unittest.TestCase):
     #funcStratifyByMetadata(self,strMetadata,xWriteToFile=False)
     def testFuncStratifyByMetadataForGoodCaseCreateFile(self):
 
-        #Input
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        normalize = False
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        fWriteToFile = True
 
-        answer = ""
+        #Remove any test files and check to see if this generates files
+        testFile1= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Retroauricular_crease.txt"])
+        testFile2= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Retroauricular_crease.txt"])
+        testFile3= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Antecubital_fossa.txt"])
+        testFile4= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Antecubital_fossa.txt"])
+        testFile5= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Anterior_nares.txt"])
+        testFile6= "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Subgingival_plaque.txt"])
+
+        answerFile1= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Retroauricular_crease.txt"])
+        answerFile2= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Retroauricular_crease.txt"])
+        answerFile3= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-R_Antecubital_fossa.txt"])
+        answerFile4= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-L_Antecubital_fossa.txt"])
+        answerFile5= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Anterior_nares.txt"])
+        answerFile6= "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-StratBy-Subgingival_plaque.txt"])
+
+        #Delete any previous files if exist
+        for sFile in [testFile1,testFile2,testFile3,testFile4,testFile5,testFile6]:
+            if os.path.exists(sFile):
+                os.remove(sFile)
 
         #Get result
-        result = "."
+        table = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,xWriteToFile=fWriteToFile)
+        result = Constants.ENDLINE.join([str(abndTable) for abndTable in result])
+
+        result = ""
+        answer = ""
+        #Check to see if files were generated
+        for sFile, answerFile in [(testFile1,answerFile1),(testFile2,answerFile2),(testFile3,answerFile3),(testFile4,answerFile4),(testFile5,answerFile5),(testFile6,answerFile6)]:
+            if not os.path.exists(sFile):
+                result = result+"".join(["Did not generate the following file:",sFile,". "])
+
+            sResultString = ""
+            sAnswerString = ""
+
+            with open(sFile, 'r') as f:
+                sResultString = f.read()+Constants.ENDLINE
+            with open(answerFile, 'r') as f:
+                sAnswerString = f.read()
+
+            if not sResultString == sAnswerString:
+                result = "".join([result,"Expected=",sAnswerString," Received=",sResultString," "])
+
+        #Clean up Delete any previous files if exist
+        for sFile in [testFile1,testFile2,testFile3,testFile4,testFile5]:
+            if os.path.exists(sFile):
+                os.remove(sFile)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -1584,9 +1684,8 @@ class AbundanceTableTest(unittest.TestCase):
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcTranslateIntoMetadata(lsValues=data.funcGetMetadata(sFrom),
                                                 sMetadataFrom=sFrom, sMetadataTo=sTo, fFromPrimaryIds=fPrimary)
-
         #Correct Answer
-        answer = data.funcGetMetadata(sTo)
+        answer = "['700098986', '700098984', '700098982', '700098980', '700098988', '700098982', '700098984', '700098986', '700098988', '700037478']"
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -1696,6 +1795,7 @@ class AbundanceTableTest(unittest.TestCase):
         nameRow = "TID"
         firstDataRow = "STSite"
         sWriteToTempFile = "".join([Constants_Testing.c_strTestingTMP,"testFuncWriteToForGoodCase.txt"])
+        sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-ForWrite.txt"])
         data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcWriteToFile(strOutputFile=sWriteToTempFile, cDelimiter=data.funcGetFileDelimiter())
@@ -1703,14 +1803,14 @@ class AbundanceTableTest(unittest.TestCase):
         #Correct Answer
         sContents = None
         with open(sWriteToTempFile, 'r') as f:
-            sContents = f.read()
+            sContents = f.read()+Constants.ENDLINE
 
-        sOriginalContents = None
-        with open(sWriteToTempFile, 'r') as f:
-            sOriginalContents = f.read()
+        sAnswer = None
+        with open(sAnswerFile, 'r') as f:
+            sAnswer = f.read()
         
         #Check result against answer
-        self.assertEqual(str(sContents),str(sOriginalContents),"".join([str(self),"::Expected=",str(sOriginalContents),". Received=",str(sContents),"."]))
+        self.assertEqual(str(sContents),str(sAnswer),"".join([str(self),"::Expected=",str(sAnswer),". Received=",str(sContents),"."]))
 
     #Test funcPairTables
     def testFuncPairTablesForGoodCase(self):

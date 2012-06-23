@@ -691,13 +691,14 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = rawData.funcGetSampleNames()
         abundance = Utility_Math.transposeDataMatrix(abundance)
         abundance = abundance[1:5]
+        print "abundance", abundance
 
         #Get results
         #tempAbundancies Abundancies to be measured. Matrix should be where row = samples and columns = organisms
         result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
 
         #Correct Answer
-        answer = "[ 1.          1.          0.64166667  1.          0.53484848  1.        ]"
+        answer = "[ 1.          1.          0.90697674  1.          0.49714286  1.        ]"
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -763,13 +764,13 @@ class MicroPITATest(unittest.TestCase):
         result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
 
         #Correct Answer
-        answer = "[ 0.          0.          0.35833333  0.          0.46515152  0.        ]"
+        answer = "[ 0.          0.          0.09302326  0.          0.50285714  0.        ]"
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 #####Test GetCentralSamplesByKMedoids
-    def nottestGetCentralSamplesByKMedoidsForGoodCaseBC(self):
+    def testGetCentralSamplesByKMedoidsForGoodCaseBC(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -796,12 +797,19 @@ class MicroPITATest(unittest.TestCase):
         answer = "['Six', 'One', 'Four']"
 
         #Call method
-        result = microPITA.getCentralSamplesByKMedoids(tempMatrix=data, tempMetric=Diversity.c_BRAY_CURTIS_B_DIVERSITY, tempSampleNames = sampleNames, tempNumberClusters = numberClusters, tempNumberSamplesReturned = numberSamplesReturned)
+        result = microPITA.getCentralSamplesByKMedoids(tempMatrix=data, tempMetric=Diversity.c_BRAY_CURTIS_B_DIVERSITY, tempSampleNames = sampleNames, tempNumberSamplesReturned = numberSamplesReturned)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 ###Test selectExtremeSamplesFromHClust
+    def testFuncSelectExtremeSamplesForGoodCase(self):
+
+        answer = "."
+        result = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 ###Test GetAverageAbundanceSamples
     def testGetAverageAbundanceSamplesForGoodCase1Feature(self):
@@ -1419,10 +1427,194 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-### Test runLIBSVM
+    def testFuncRunSVMForGoodCase(self):
+
+        answer = "."
+        result = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+### Test runLIBSVM Will be removed
 ### Test runMLPYSVM
+    def testFuncRunMLPYSVMForGoodCase(self):
+
+        answer = "."
+        result = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncStoreSVMProbabilityForGoodCaseNoPriorStateProbabilistic(self):
+
+        #Input
+        lsValidationSamples = ["Sample1","Sample2","Sample3","Sample4","Sample5"]
+        lSVMLabels = [0,1,2]
+        ldValidationLabels = [2,1,0,1,2]
+        lPredictions = [0,1,2,1,1]
+        npaDistances = [[0.0,.7,.3],[.0,.5,.5],[0.0,0.0,1.0],[.4,.1,.5],[.9,.05,.05]]
+        dictdProbability = dict()
+        dictAllProbabilities = dict()
+        dictiPrediction = dict()
+        dictAllPredictions = dict()
+        fClassifyByProbability = True
+
+        #Make results
+        lreturn = MicroPITA()._funcStoreSVMProbability(lsValidationSamples,ldValidationLabels,lSVMLabels,npaDistances,lPredictions,
+                                                       dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions,fClassifyByProbability)
+        dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions = lreturn
+
+        result = " ".join([str([key,dictdProbability[key]]) for key in sorted(dictdProbability.keys())])
+        result = result+", "+" ".join([str([key,dictAllProbabilities[key]]) for key in sorted(dictAllProbabilities.keys())])
+        result = result+", "+" ".join([str([key,dictiPrediction[key]]) for key in sorted(dictiPrediction.keys())])
+        result = result+", "+" ".join([str([key,dictAllPredictions[key]]) for key in sorted(dictAllPredictions.keys())])
+
+        #Correct answers
+        dictdProbabilityAnswer = {"Sample1":.7,"Sample2":.5,"Sample3":1.0,"Sample4":.5,"Sample5":.9}
+        dictAllProbabilitiesAnswer = {"Sample1":[1,0.0,.7,.3],"Sample2":[1,.0,.5,.5],"Sample3":[2,0.0,0.0,1.0],"Sample4":[2,.4,.1,.5],"Sample5":[0,.9,.05,.05]}
+        dictiPredictionAnswer = {"Sample1":False,"Sample2":True,"Sample3":False,"Sample4":False,"Sample5":False}
+        dictAllPredictionsAnswer = {"Sample1":"1","Sample2":"1","Sample3":"2","Sample4":"2","Sample5":"0"}
+
+        answer = " ".join([str([key,dictdProbabilityAnswer[key]]) for key in sorted(dictdProbabilityAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllProbabilitiesAnswer[key]]) for key in sorted(dictAllProbabilitiesAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictiPredictionAnswer[key]]) for key in sorted(dictiPredictionAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllPredictionsAnswer[key]]) for key in sorted(dictAllPredictionsAnswer.keys())])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncStoreSVMProbabilityForGoodCaseNoPriorState(self):
+
+        #Input
+        lsValidationSamples = ["Sample1","Sample2","Sample3","Sample4","Sample5"]
+        lSVMLabels = [0,1,2]
+        ldValidationLabels = [2,1,0,1,2]
+        lPredictions = [0,1,2,1,1]
+        npaDistances = [[0.0,.7,.3],[.0,.5,.5],[0.0,0.0,1.0],[.4,.1,.5],[.9,.05,.05]]
+        dictdProbability = dict()
+        dictAllProbabilities = dict()
+        dictiPrediction = dict()
+        dictAllPredictions = dict()
+        fClassifyByProbability = False
+
+        #Make results
+        lreturn = MicroPITA()._funcStoreSVMProbability(lsValidationSamples,ldValidationLabels,lSVMLabels,npaDistances,lPredictions,
+                                                       dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions,fClassifyByProbability)
+        dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions = lreturn
+
+        result = " ".join([str([key,dictdProbability[key]]) for key in sorted(dictdProbability.keys())])
+        result = result+", "+" ".join([str([key,dictAllProbabilities[key]]) for key in sorted(dictAllProbabilities.keys())])
+        result = result+", "+" ".join([str([key,dictiPrediction[key]]) for key in sorted(dictiPrediction.keys())])
+        result = result+", "+" ".join([str([key,dictAllPredictions[key]]) for key in sorted(dictAllPredictions.keys())])
+
+        #Correct answers
+        dictdProbabilityAnswer = {"Sample1":.0,"Sample2":.5,"Sample3":1.0,"Sample4":.1,"Sample5":.05}
+        dictAllProbabilitiesAnswer = {"Sample1":[0,0.0,.7,.3],"Sample2":[1,.0,.5,.5],"Sample3":[2,0.0,0.0,1.0],"Sample4":[1,.4,.1,.5],"Sample5":[1,.9,.05,.05]}
+        dictiPredictionAnswer = {"Sample1":False,"Sample2":True,"Sample3":False,"Sample4":True,"Sample5":False}
+        dictAllPredictionsAnswer = {"Sample1":"0","Sample2":"1","Sample3":"2","Sample4":"1","Sample5":"1"}
+
+        answer = " ".join([str([key,dictdProbabilityAnswer[key]]) for key in sorted(dictdProbabilityAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllProbabilitiesAnswer[key]]) for key in sorted(dictAllProbabilitiesAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictiPredictionAnswer[key]]) for key in sorted(dictiPredictionAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllPredictionsAnswer[key]]) for key in sorted(dictAllPredictionsAnswer.keys())])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncStoreSVMProbabilityForGoodCaseWithPriorStateProbabilistic(self):
+
+        #Input
+        lsValidationSamples = ["Sample1","Sample2","Sample3","Sample4","Sample5"]
+        lSVMLabels = [0,1,2]
+        ldValidationLabels = [2,1,0,1,2]
+        lPredictions = [0,1,2,1,1]
+        npaDistances = [[0.0,.7,.3],[.0,.5,.5],[0.0,0.0,1.0],[.4,.1,.5],[.9,.05,.05]]
+        dictdProbability = {"Sample0":.99,"Sample10":.4}
+        dictAllProbabilities = {"Sample0":[.99,.1,.0],"Sample10":[.1,.4,.5]}
+        dictiPrediction = {"Sample0":True,"Sample10":False}
+        dictAllPredictions = {"Sample0":0,"Sample10":1}
+        fClassifyByProbability = True
+
+        #Make results
+        lreturn = MicroPITA()._funcStoreSVMProbability(lsValidationSamples,ldValidationLabels,lSVMLabels,npaDistances,lPredictions,
+                                                       dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions,fClassifyByProbability)
+        dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions = lreturn
+
+        result = " ".join([str([key,dictdProbability[key]]) for key in sorted(dictdProbability.keys())])
+        result = result+", "+" ".join([str([key,dictAllProbabilities[key]]) for key in sorted(dictAllProbabilities.keys())])
+        result = result+", "+" ".join([str([key,dictiPrediction[key]]) for key in sorted(dictiPrediction.keys())])
+        result = result+", "+" ".join([str([key,dictAllPredictions[key]]) for key in sorted(dictAllPredictions.keys())])
+
+        #Correct answers
+        dictdProbabilityAnswer = {"Sample0":.99,"Sample10":.4,"Sample1":.7,"Sample2":.5,"Sample3":1.0,"Sample4":.5,"Sample5":.9}
+        dictAllProbabilitiesAnswer = {"Sample0":[.99,.1,.0],"Sample10":[.1,.4,.5],"Sample1":[1,0.0,.7,.3],"Sample2":[1,.0,.5,.5],"Sample3":[2,0.0,0.0,1.0],"Sample4":[2,.4,.1,.5],"Sample5":[0,.9,.05,.05]}
+        dictiPredictionAnswer = {"Sample0":True,"Sample10":False,"Sample1":False,"Sample2":True,"Sample3":False,"Sample4":False,"Sample5":False}
+        dictAllPredictionsAnswer = {"Sample0":0,"Sample10":1,"Sample1":"1","Sample2":"1","Sample3":"2","Sample4":"2","Sample5":"0"}
+
+        answer = " ".join([str([key,dictdProbabilityAnswer[key]]) for key in sorted(dictdProbabilityAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllProbabilitiesAnswer[key]]) for key in sorted(dictAllProbabilitiesAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictiPredictionAnswer[key]]) for key in sorted(dictiPredictionAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllPredictionsAnswer[key]]) for key in sorted(dictAllPredictionsAnswer.keys())])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncStoreSVMProbabilityForGoodCaseWithPriorState(self):
+
+        #Input
+        lsValidationSamples = ["Sample1","Sample2","Sample3","Sample4","Sample5"]
+        lSVMLabels = [0,1,2]
+        ldValidationLabels = [2,1,0,1,2]
+        lPredictions = [0,1,2,1,1]
+        npaDistances = [[0.0,.7,.3],[.0,.5,.5],[0.0,0.0,1.0],[.4,.1,.5],[.9,.05,.05]]
+        dictdProbability = {"Sample0":.99,"Sample10":.4}
+        dictAllProbabilities = {"Sample0":[.99,.1,.0],"Sample10":[.1,.4,.5]}
+        dictiPrediction = {"Sample0":True,"Sample10":False}
+        dictAllPredictions = {"Sample0":0,"Sample10":1}
+        fClassifyByProbability = False
+
+        #Make results
+        lreturn = MicroPITA()._funcStoreSVMProbability(lsValidationSamples,ldValidationLabels,lSVMLabels,npaDistances,lPredictions,
+                                                       dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions,fClassifyByProbability)
+        dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions = lreturn
+
+        result = " ".join([str([key,dictdProbability[key]]) for key in sorted(dictdProbability.keys())])
+        result = result+", "+" ".join([str([key,dictAllProbabilities[key]]) for key in sorted(dictAllProbabilities.keys())])
+        result = result+", "+" ".join([str([key,dictiPrediction[key]]) for key in sorted(dictiPrediction.keys())])
+        result = result+", "+" ".join([str([key,dictAllPredictions[key]]) for key in sorted(dictAllPredictions.keys())])
+
+        #Correct answers
+        dictdProbabilityAnswer = {"Sample0":.99,"Sample10":.4,"Sample1":.0,"Sample2":.5,"Sample3":1.0,"Sample4":.1,"Sample5":.05}
+        dictAllProbabilitiesAnswer = {"Sample0":[.99,.1,.0],"Sample10":[.1,.4,.5],"Sample1":[0,0.0,.7,.3],"Sample2":[1,.0,.5,.5],"Sample3":[2,0.0,0.0,1.0],"Sample4":[1,.4,.1,.5],"Sample5":[1,.9,.05,.05]}
+        dictiPredictionAnswer = {"Sample0":True,"Sample10":False,"Sample1":False,"Sample2":True,"Sample3":False,"Sample4":True,"Sample5":False}
+        dictAllPredictionsAnswer = {"Sample0":0,"Sample10":1,"Sample1":"0","Sample2":"1","Sample3":"2","Sample4":"1","Sample5":"1"}
+
+        answer = " ".join([str([key,dictdProbabilityAnswer[key]]) for key in sorted(dictdProbabilityAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllProbabilitiesAnswer[key]]) for key in sorted(dictAllProbabilitiesAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictiPredictionAnswer[key]]) for key in sorted(dictiPredictionAnswer.keys())])
+        answer = answer+", "+" ".join([str([key,dictAllPredictionsAnswer[key]]) for key in sorted(dictAllPredictionsAnswer.keys())])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
 ### test runSupervisedMethods
+    def testFuncRunSupervisedMethodsForGoodCase(self):
+
+        answer = "."
+        result = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
 ### Test run
+    def testFuncRunForGoodCase(self):
+
+        answer = "."
+        result = ""
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
 ### Test funcWriteSelectionToFile
     def testFuncWriteSelectionToFileForGoodCase(self):
 
@@ -1448,13 +1640,9 @@ class MicroPITATest(unittest.TestCase):
 
         #Read in generated file and answer
         result = ""
-        with open(sTestFile) as f:
+        with open(sTestFile) as f, open(sAnswerFile) as g:
             result = f.read()
-        f.close()
-
-        with open(sAnswerFile) as f:
-            answer = f.read()
-        f.close()
+            answer = g.read()
 
         if os.path.exists(sTestFile):
             os.remove(sTestFile)

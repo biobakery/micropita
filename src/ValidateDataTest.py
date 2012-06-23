@@ -9,8 +9,8 @@
 
 #Import local code
 import unittest
+import numpy as np
 from Constants import Constants
-from Log import Log
 from ValidateData import ValidateData
 
 class ValidateDataTest(unittest.TestCase):
@@ -57,6 +57,42 @@ class ValidateDataTest(unittest.TestCase):
     def testIsValidBooleanForOne(self):
         self.assertEqual(ValidateData.isValidBoolean(1),False,"Should have received false for a invalid boolean input.")
 
+    def testIsTrueForGoodCase(self):
+        self.assertEqual(ValidateData.isTrue(True),True,"Should have received true for a valid boolean input.")
+
+    def testIsTrueForFalseCase(self):
+        self.assertEqual(ValidateData.isTrue(False),False,"Should have received false for false boolean input.")
+
+    def testIsTrueForString(self):
+        self.assertEqual(ValidateData.isTrue("False"),False,"Should have received false for a invalid string input.")
+
+    def testIsTrueForNone(self):
+        self.assertEqual(ValidateData.isTrue(None),False,"Should have received false for a invalid none input.")
+
+    def testIsTrueForZero(self):
+        self.assertEqual(ValidateData.isTrue(0),False,"Should have received false for a invalid boolean input.")
+
+    def testIsTrueForOne(self):
+        self.assertEqual(ValidateData.isTrue(1),False,"Should have received false for a invalid boolean input.")
+
+    def testIsFalseForGoodCase(self):
+        self.assertEqual(ValidateData.isFalse(False),True,"Should have received true for a valid boolean input.")
+
+    def testIsFalseForTrueCase(self):
+        self.assertEqual(ValidateData.isFalse(True),False,"Should have received false for true boolean input.")
+
+    def testIsFalseForString(self):
+        self.assertEqual(ValidateData.isFalse("False"),False,"Should have received false for a invalid string input.")
+
+    def testIsFalseForNone(self):
+        self.assertEqual(ValidateData.isFalse(None),False,"Should have received false for a invalid none input.")
+
+    def testIsFalseForZero(self):
+        self.assertEqual(ValidateData.isFalse(0),False,"Should have received false for a invalid boolean input.")
+
+    def testIsFalseForOne(self):
+        self.assertEqual(ValidateData.isFalse(1),False,"Should have received false for a invalid boolean input.")
+
     def testIsValidStringForGoodCase(self):
         self.assertEqual(ValidateData.isValidString("Valid"),True,"Should have received true for a valid string input.")
 
@@ -71,24 +107,6 @@ class ValidateDataTest(unittest.TestCase):
 
     def testIsValidStringForWrongCase(self):
         self.assertEqual(ValidateData.isValidString(1),False,"Should have received false for a numeric input.")
-
-    def testIsValidArrayNameForGoodCase(self):
-        self.assertEqual(ValidateData.isValidArrayName(Constants.WT_EXON_CHIP_NAME),True,"Should have received true for a valid string input.")
-
-    def testIsValidArrayNameForInvalidString(self):
-        self.assertEqual(ValidateData.isValidArrayName("inValid"),False,"Should have received true for a valid string input.")
-
-    def testIsValidArrayNameForNoneCase(self):
-        self.assertEqual(ValidateData.isValidArrayName(None),False,"Should have received false for a none string input.")
-
-    def testIsValidArrayNameForBlankCase(self):
-        self.assertEqual(ValidateData.isValidArrayName("    "),False,"Should have received false for a blank string input.")
-
-    def testIsValidArrayNameForEmptyCase(self):
-        self.assertEqual(ValidateData.isValidArrayName(""),False,"Should have received false for a empty string input.")
-
-    def testIsValidArrayNameForWrongCase(self):
-        self.assertEqual(ValidateData.isValidArrayName(True),False,"Should have received false for a numeric input.")
 
     def testIsValidStringTypeForGoodCase(self):
         self.assertEqual(ValidateData.isValidStringType("Valid"),True,"Should have received true for a valid string input.")
@@ -217,6 +235,22 @@ class ValidateDataTest(unittest.TestCase):
     def testIsValidNumericListForListWithWrongTypeCase(self):
         testingList = ["1","2","3","4",5,6,7]
         self.assertEqual(ValidateData.isValidNumericList(testingList),False,"Should have received false for a invalid list with none input.")
+
+    def testIsValidNPArrayForGoodCaseEmpty(self):
+        testingArray = np.array([1,2,3,4,5,6])
+        self.assertEquals(ValidateData.isValidNPArray(testingArray),True,"Should have received True for a np array")
+
+    def testIsValidNPArrayForBadCaseList(self):
+        testingArray = [1,2,3,4,5,6]
+        self.assertEquals(ValidateData.isValidNPArray(testingArray),False,"Should have received True for a list")
+
+    def testIsValidNPArrayForBadCaseNone(self):
+        testingArray = None
+        self.assertEquals(ValidateData.isValidNPArray(testingArray),False,"Should have received True for a None")
+
+    def testIsValidNPArrayForGoodCaseWrongType(self):
+        testingArray = True
+        self.assertEquals(ValidateData.isValidNPArray(testingArray),False,"Should have received True for a boolean")
 
     def testIsValidDictionaryForGoodCaseEmpty(self):
         testingDictionary = dict()
@@ -645,19 +679,19 @@ class ValidateDataTest(unittest.TestCase):
         self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = "None"),False,"Should have received False for a "+str(testingClass)+".")
 
     def testIsValidClassForGoodCase(self):
-        testingClass = Log()
-        self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = "Log"),True,"Should have received False for a "+str(testingClass)+".")
+        testingClass = ValidateData()
+        self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = "ValidateData"),True,"Should have received False for a "+str(testingClass)+".")
 
     def testIsValidClassForBadCaseWrongName(self):
-        testingClass = Log()
-        self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = "ValidateData"),False,"Should have received False for a "+str(testingClass)+".")
+        testingClass = []
+        self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = "List"),False,"Should have received False for a "+str(testingClass)+".")
 
     def testIsValidClassForBadCaseNoneName(self):
-        testingClass = Log()
+        testingClass = []
         self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = None),False,"Should have received False for a "+str(testingClass)+".")
 
     def testIsValidClassForBadCaseWrongTypeName(self):
-        testingClass = Log()
+        testingClass = []
         self.assertEquals(ValidateData.isValidClass(tempClassInstance = testingClass, tempCorrectName = 1),False,"Should have received False for a "+str(testingClass)+".")
 
 ##
