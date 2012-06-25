@@ -74,8 +74,8 @@ class PCoA:
                 return False
 
             #Transpose data to be Taxa (columns) by samples (rows)(lists)
-            data = Utility_Math.transposeDataMatrix(data,tempRemoveAdornments=False)
-            if(ValidateData.isFalse(data)):
+            data = Utility_Math.funcTransposeDataMatrix(data,fRemoveAdornments=False)
+            if(ValidateData.funcIsFalse(data)):
                 print("PCoA:loadData::Error when transposing data file, did not perform PCoA.")
                 return False
             else:
@@ -100,22 +100,22 @@ class PCoA:
         #If so, run NMDS on the distance matrix
         #Otherwise return a false and do not run
         if(tempDistanceMetric==None):
-            if(ValidateData.isTrue(self.isRawData)):
+            if(ValidateData.funcIsTrue(self.isRawData)):
                 print("PCoA:run::Error, no distance metric was specified but the previous load was not of a distance matrix.")
                 return False
-            elif(ValidateData.isFalse(self.isRawData)):
+            elif(ValidateData.funcIsFalse(self.isRawData)):
                 self.pcoa = NMDS(dataMatrix, verbosity=0)
                 return self.pcoa
         
         #Make sure the distance metric was a valid string type
-        if(not ValidateData.isValidString(tempDistanceMetric)):
+        if(not ValidateData.funcIsValidString(tempDistanceMetric)):
             print("PCoA:run::Error, distance metric was not a valid string type.")
             return False
 
         #Supported distances
         if(tempDistanceMetric==self.c_BRAY_CURTIS):
-            distanceMatrix=Diversity().getBrayCurtisDissimilarity(tempSampleTaxaAbundancies=self.dataMatrix)
-            if(ValidateData.isFalse(distanceMatrix)):
+            distanceMatrix=Diversity().funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies=self.dataMatrix)
+            if(ValidateData.funcIsFalse(distanceMatrix)):
                 print "ERROR"
                 return False
             self.pcoa = NMDS(squareform(distanceMatrix), dimension=max(self._iDimensions,2), verbosity=0)
@@ -142,7 +142,7 @@ class PCoA:
             iPointCount = len(ldXPoints)
 
             #Check shapes
-            if(ValidateData.isValidList(tempShape)):
+            if(ValidateData.funcIsValidList(tempShape)):
               if not len(tempShape) == iPointCount:
                 print("Error, the list of shapes was given but was not the same size as the points so nothing was plotted.")
                 print("tempShape")
@@ -154,7 +154,7 @@ class PCoA:
                 return
 
             #Check colors
-            if(ValidateData.isValidList(tempColorGrouping)):
+            if(ValidateData.funcIsValidList(tempColorGrouping)):
               if not len(tempColorGrouping) == iPointCount:
                 print("Error, the list of colors was given but was not the same size as the points so nothing was plotted.")
                 print("tempColorGrouping")
@@ -166,7 +166,7 @@ class PCoA:
                 return
 
             #Check sizes
-            if(ValidateData.isValidList(tempShapeSize)):
+            if(ValidateData.funcIsValidList(tempShapeSize)):
               if not len(tempShapeSize) == iPointCount:
                 print("Error, the list of sizes was given but was not the same size as the points so nothing was plotted.")
                 print("tempShapeSize")
@@ -199,10 +199,10 @@ class PCoA:
 
             #If given a list of colors, each color will be plotted individually stratified by shape
             #Plot colors seperately so the legend will pick up on the labels and make a legend
-            if(ValidateData.isValidList(tempColorGrouping)):
+            if(ValidateData.funcIsValidList(tempColorGrouping)):
                 if len(tempColorGrouping) == iPointCount:
                     #Check for lists in the list which indicate the need to plot pie charts
-                    lfAreLists = [ValidateData.isValidList(objColor) for objIndex, objColor in enumerate(tempColorGrouping)]
+                    lfAreLists = [ValidateData.funcIsValidList(objColor) for objIndex, objColor in enumerate(tempColorGrouping)]
 
                     #Pie chart data seperated out
                     lsColorsPieCharts = None
@@ -225,31 +225,31 @@ class PCoA:
                         lsColorsPieCharts = self.reduceList(tempColorGrouping, liAreLists)
                         tempColorGrouping = self.reduceList(tempColorGrouping, liAreNotLists)
                         #Split out shapes
-                        if ValidateData.isValidList(tempShape):
+                        if ValidateData.funcIsValidList(tempShape):
                             lcShapesPieCharts = self.reduceList(tempShape, liAreLists)
                             tempShape = self.reduceList(tempShape, liAreNotLists)
                         else:
                             lcShapesPieCharts = tempShape
                         #Split out labels
-                        if ValidateData.isValidList(tempLabels):
+                        if ValidateData.funcIsValidList(tempLabels):
                             lsLabelsPieCharts = self.reduceList(tempLabels, liAreLists)
                             tempLabels = self.reduceList(tempLabels, liAreNotLists)
                         else:
                             lsLabelsPieCharts = tempLabels
                         #Split out sizes
-                        if ValidateData.isValidList(tempShapeSize):
+                        if ValidateData.funcIsValidList(tempShapeSize):
                             lsSizesPieCharts = self.reduceList(tempShapeSize, liAreLists)
                             tempShapeSize = self.reduceList(tempShapeSize, liAreNotLists)
                         else:
                             lsSizesPieCharts = tempShapeSize
                         #Split out xpoints
-                        if ValidateData.isValidList(ldXPoints):
+                        if ValidateData.funcIsValidList(ldXPoints):
                             ldXPointsPieCharts = self.reduceList(ldXPoints, liAreLists)
                             ldXPoints = self.reduceList(ldXPoints, liAreNotLists)
                         else:
                             ldXPointsPieCharts = ldXPoints
                         #Split out ypoints
-                        if ValidateData.isValidList(ldYPoints):
+                        if ValidateData.funcIsValidList(ldYPoints):
                             ldYPointsPieCharts = self.reduceList(ldYPoints, liAreLists)
                             ldYPoints = self.reduceList(ldYPoints, liAreNotLists)
                         else:
@@ -269,7 +269,7 @@ class PCoA:
                         #Reduces sizes to indices if a list
                         reducedSizes = tempShapeSize
                         #Reduce sizes if a list
-                        if(ValidateData.isValidList(reducedSizes)):
+                        if(ValidateData.funcIsValidList(reducedSizes)):
                           reducedSizes = self.reduceList(reducedSizes,aiColorPointPositions)
 
                         #Reduce to the current color grouping
@@ -284,7 +284,7 @@ class PCoA:
                         #If the shapes are not a list plot
                         #Otherwise plot per shape per color (can not plot list of shapes in matplotlib)
                         reducedShapes = tempShape
-                        if(not ValidateData.isValidList(reducedShapes)):
+                        if(not ValidateData.funcIsValidList(reducedShapes)):
                           reducedShapes = reducedShapes[0]
                           imgSubplot.scatter(aiXPoints,aiYPoints, c=[charColor], marker=reducedShapes, alpha=tempAlpha, label=tempLabels[tempColorGrouping.index(charColor)], s=reducedSizes, edgecolor=charMarkerEdgeColor)
                         #Shapes are supplied as a list so plot each shape
@@ -300,7 +300,7 @@ class PCoA:
                             strShapeLabel = self.reduceList(acharLabelsByColor,aiShapeIndices)
                             #Reduce sizes by shapes
                             strShapeSizes = reducedSizes
-                            if ValidateData.isValidList(reducedSizes):
+                            if ValidateData.funcIsValidList(reducedSizes):
                               strShapeSizes = self.reduceList(reducedSizes,aiShapeIndices)
                             #Get points per shape
                             aiXPointsPerShape = self.reduceList(aiXPoints,aiShapeIndices)
@@ -308,7 +308,7 @@ class PCoA:
                             #Get sizes per shape
                             #Reduce sizes if a list
                             reducedSizesPerShape = reducedSizes
-                            if(ValidateData.isValidList(reducedSizes)):
+                            if(ValidateData.funcIsValidList(reducedSizes)):
                               reducedSizesPerShape = self.reduceList(reducedSizes,aiShapeIndices)
                             #Plot
                             imgSubplot.scatter(aiXPointsPerShape,aiYPointsPerShape, c=[charColor], marker=aCharShapeElement, alpha=tempAlpha, label=strShapeLabel[0], s=strShapeSizes, edgecolor=charMarkerEdgeColor)
@@ -318,7 +318,7 @@ class PCoA:
                         self.plotWithPieMarkers(imgSubplot=imgSubplot, aiXPoints=ldXPointsPieCharts, aiYPoints=ldYPointsPieCharts, dSize=lsSizesPieCharts, llColors=lsColorsPieCharts, lsLabels=lsLabelsPieCharts, lcShapes=lcShapesPieCharts, edgeColor=charMarkerEdgeColor, dAlpha=tempAlpha)
 
             #If the Color is not a list but shapes are a list then plot by each unique shape
-            elif((not ValidateData.isValidList(tempColorGrouping)) and (ValidateData.isValidList(tempShape))):
+            elif((not ValidateData.funcIsValidList(tempColorGrouping)) and (ValidateData.funcIsValidList(tempShape))):
                 if len(tempShape) == iPointCount:
                     #Get unique shapes and plot each individually
                     acharUniqueShapes = list(set(tempShape))
@@ -326,7 +326,7 @@ class PCoA:
                         aiShapePointPositions = self.getIndices(tempShape,acharUniqueShapes[iShapeIndex])
                         #Reduce sizes if needed
                         reducedSizes = tempShapeSize
-                        if(ValidateData.isValidList(reducedSizes)):
+                        if(ValidateData.funcIsValidList(reducedSizes)):
                           reducedSizes = self.reduceList(reducedSizes,aiShapePointPositions)
                         imgSubplot.scatter(self.reduceList(ldXPoints,aiShapePointPositions),self.reduceList(ldYPoints,aiShapePointPositions), s=reducedSizes, c=[tempColorGrouping], marker=acharUniqueShapes[iShapeIndex], alpha=dAlpha, label=tempLabels[tempShape.index(acharUniqueShapes[iShapeIndex])], edgecolor=charMarkerEdgeColor)
 
@@ -547,7 +547,7 @@ class PCoA:
             #Make label coloring
             atupldLabelColors = [ atupldColors[acharUniqueValues.index(sMetadata)] for sMetadata in lsLabelList ]
         #If the coloring is forced, color so it is based on the charForcedColor list
-        elif(ValidateData.isValidList(charForceColor)):
+        elif(ValidateData.funcIsValidList(charForceColor)):
             atupldLabelColors = charForceColor[0]
             if not len(lsLabelList) == len(atupldLabelColors):
                 logging.error("PCoA.plotList. Label and forced color lengths were not the same.")

@@ -170,7 +170,7 @@ class MicropitaPaperCollectionCurve:
             if float(sum(ldPooledSample))==0.0:
                 ldMeasurePerIteration.append(0.0)
             else:
-                ldMeasurePerIteration.append(Diversity.getObservedCount(tempSampleAbundances=ldPooledSample))
+                ldMeasurePerIteration.append(Diversity.funcGetObservedCount(ldSampleAbundances=ldPooledSample))
         logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount")
         return ldMeasurePerIteration
 
@@ -237,7 +237,7 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    totalData = AbundanceTable.makeFromFile(strInputFile=args.strAbundanceFile, fIsNormalized=fIsNormalized,
+    totalData = AbundanceTable.funcMakeFromFile(strInputFile=args.strAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Do not produce a plot for summed or normalized data
@@ -290,7 +290,7 @@ def _main( ):
                 ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
                 #Get measurement (observed count)
-                dictCurStudyMethod[iSampleCount]=Diversity.getObservedCount(tempSampleAbundances=ldSummedSubSet)
+                dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
     logging.debug(dictMetricsBySampleN)

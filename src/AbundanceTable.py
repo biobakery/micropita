@@ -103,7 +103,7 @@ class AbundanceTable:
         print "Abundance or metadata was None, should be atleast an empty object"
 
     @staticmethod
-    def makeFromFile(strInputFile, fIsNormalized, fIsSummed, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None, cFeatureNameDelimiter="|"):
+    def funcMakeFromFile(strInputFile, fIsNormalized, fIsSummed, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None, cFeatureNameDelimiter="|"):
         """
         Creates an abundance table from a table file.
 
@@ -128,7 +128,7 @@ class AbundanceTable:
 
 
         #Read in from text file to create the abundance and metadata structures
-        lContents = AbundanceTable._textToStructuredArray(strInputFile=strInputFile, cDelimiter=cDelimiter,
+        lContents = AbundanceTable._funcTextToStructuredArray(strInputFile=strInputFile, cDelimiter=cDelimiter,
                                                         sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
 
         #If contents is not a false then set contents to appropriate objects
@@ -166,7 +166,7 @@ class AbundanceTable:
 
     #Testing Status: Light happy path testing
     @staticmethod
-    def _textToStructuredArray(strInputFile = None, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None):
+    def _funcTextToStructuredArray(strInputFile = None, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None):
         """
         Private method
         Used to read in a file that is samples (column) and taxa (rows) into a structured array.
@@ -187,16 +187,16 @@ class AbundanceTable:
         """
 
         #Validate parameters
-        if(not ValidateData.isValidFileName(strInputFile)):
+        if(not ValidateData.funcIsValidFileName(strInputFile)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, input file not valid. File:",str(strInputFile)])
             return False
-        if(not ValidateData.isValidStringType(cDelimiter)):
+        if(not ValidateData.funcIsValidStringType(cDelimiter)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, cDelimiter was invalid. Value =",str(cDelimiter)])
             return False
-        if(not ValidateData.isValidString(sMetadataID)):
+        if(not ValidateData.funcIsValidString(sMetadataID)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, sMetadataID was invalid. Value =",str(sMetadataID)])
             return False
-        if(not ValidateData.isValidString(sLastMetadata)):
+        if(not ValidateData.funcIsValidString(sLastMetadata)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, sLastMetadata was invalid. Value =",str(sLastMetadata)])
             return False
 
@@ -262,8 +262,8 @@ class AbundanceTable:
                 tempSampleReads.append(float(reads))
             sampleReads = tempSampleReads
             #Validate data before adding to matrix
-            if(ValidateData.isValidString(taxId)):
-                if(ValidateData.isValidList(sampleReads)):
+            if(ValidateData.funcIsValidString(taxId)):
+                if(ValidateData.funcIsValidList(sampleReads)):
                     if(len(sampleReads)>0):
                         dataMatrix.append(tuple(sampleReads))
 
@@ -1108,11 +1108,11 @@ class AbundanceTable:
         """
 
         #Validate parameters
-        if(not ValidateData.isValidFileName(strFileOne)):
+        if(not ValidateData.funcIsValidFileName(strFileOne)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strFileOne)
             return False
         #Validate parameters
-        if(not ValidateData.isValidFileName(strFileTwo)):
+        if(not ValidateData.funcIsValidFileName(strFileTwo)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strFileTwo)
             return False
 
@@ -1191,10 +1191,10 @@ class AbundanceTable:
         """
 
         #Validate parameters
-        if(not ValidateData.isValidFileName(strReadDataFileName)):
+        if(not ValidateData.funcIsValidFileName(strReadDataFileName)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strReadDataFileName)
             return False
-        if(not ValidateData.isValidStringType(cDelimiter)):
+        if(not ValidateData.funcIsValidStringType(cDelimiter)):
             print "AbundanceTable:checkRawDataFile::Error, Delimiter is not a valid string/char type. Delimiter ="+str(cDelimiter)+"."
             return False
         if (iFirstDataIndex == -1) and (sLastMetadataName == None):
@@ -1301,13 +1301,13 @@ class AbundanceTable:
         """
 
         #Validate parameters
-        if(not ValidateData.isValidFileName(strInputFile)):
+        if(not ValidateData.funcIsValidFileName(strInputFile)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, file not valid. File:"+str(strInputFile)
             return False
-        if(not ValidateData.isValidStringType(cDelimiter)):
+        if(not ValidateData.funcIsValidStringType(cDelimiter)):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Delimiter is not a valid string/char type. Delimiter ="+str(cDelimiter)+"."
             return False
-        if(not ValidateData.isValidPositiveInteger(iStratifyByRow, tempZero = True) and (not ValidateData.isValidString(iStratifyByRow))):
+        if(not ValidateData.funcIsValidPositiveInteger(iStratifyByRow, tempZero = True) and (not ValidateData.funcIsValidString(iStratifyByRow))):
             print "AbundanceTable:stratifyAbundanceTableByMetadata::Error, Stratify by row is not a positive integer or string keyword. Row ="+str(iStratifyByRow)+"."
             return False
 
@@ -1331,7 +1331,7 @@ class AbundanceTable:
         metadataInformation = dict()
 
         #If the tempStratifyRow is by key word than find the index
-        if ValidateData.isValidString(iStratifyByRow):
+        if ValidateData.funcIsValidString(iStratifyByRow):
             for iLineIndex, strLine in enumerate(sFileContents):
                 if strLine.split(cDelimiter)[0].strip("\"") == iStratifyByRow:
                     iStratifyByRow = iLineIndex

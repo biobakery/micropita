@@ -28,7 +28,7 @@ from cogent.maths.unifrac.fast_unifrac import fast_unifrac
 from cogent.maths.unifrac.fast_tree import UniFracTreeNode, count_envs
 from cogent.parse.tree import DndParser
 #from qiime.format import format_unifrac_sample_mapping
-from qiime.parse import parse_otu_table
+#from qiime.parse import parse_otu_table
 from scipy.spatial.distance import pdist
 
 class Diversity:
@@ -90,7 +90,7 @@ class Diversity:
         if(simpsons == 0):
             return False
         #If simpsons is false return false, else return inverse
-        if(not ValidateData.isFalse(simpsons)):
+        if(not ValidateData.funcIsFalse(simpsons)):
             simpsons = 1.0/simpsons
         return simpsons
 
@@ -194,7 +194,7 @@ class Diversity:
     #@params ldSampleTaxaAbundancies an np.array of samples (rows) x measurements (columns) in which diversity is measured between rows
     #@return ndarray A condensed distance matrix
     @staticmethod
-    def funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies = None):
+    def funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies=None):
         """
         Calculates 1 - the BrayCurtis Beta diversity index.
         d(u,v)=1-(sum(abs(row1-row2))/sum(row1+row2)).

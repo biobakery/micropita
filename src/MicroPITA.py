@@ -159,9 +159,9 @@ class MicroPITA:
 	"""
 
         if(sMetric == self.c_BRAY_CURTIS_B_DIVERSITY):
-            return Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies=npadAbundancies)
+            return Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
         elif(sMetric == self.c_INVERSE_BRAY_CURTIS_B_DIVERSITY):
-            return Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies=npadAbundancies)
+            return Diversity.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
         #Needs NOT normalized abundances
 #        elif(sMetric == self.c_WEIGHTED_UNIFRAC_B_DIVERSITY):
 #            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=npadAbundancies, tempTaxonomyTree=None, tempWeighted=True)
@@ -213,7 +213,7 @@ class MicroPITA:
 
         #Get distance matrix
         distanceMatrix=self.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric)
-        if(ValidateData.isFalse(distanceMatrix)):
+        if(ValidateData.funcIsFalse(distanceMatrix)):
           logging.error("MicroPITA.funcGetCentralSamplesByKMedoids. Received false for betaMetrix matrix generation, returning false.")
           return False
 
@@ -1127,7 +1127,7 @@ class MicroPITA:
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
         #Abundance table object to read in and manage data
-        totalAbundanceTable = AbundanceTable.makeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
+        totalAbundanceTable = AbundanceTable.funcMakeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
                                    cDelimiter=cDelimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter)
         
         if not totalAbundanceTable:
@@ -1174,7 +1174,7 @@ class MicroPITA:
                         #Must first generate metrics that do not want normalization before normalization occurs
                         #Expects Observations (Taxa (row) x sample (column))
                         #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                        internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
+                        internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
                         #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                         #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
                         mostDiverseAlphaSamplesIndexesNoNorm = microPITA.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
@@ -1186,7 +1186,7 @@ class MicroPITA:
                             selectedSamples[astrSelectionMethod].extend(mostDiverseAlphaSamplesIndexesNoNorm[index])
 
                     #Abundance matrix transposed
-                    npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
+                    npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), fRemoveAdornments=True)
 
                     if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
                         logging.info("Performing representative selection on unnormalized data.")
@@ -1194,7 +1194,7 @@ class MicroPITA:
                         for bMetric in diversityMetricsBetaNoNormalize:
 
                             #Get representative dissimilarity samples
-                            medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
+                            medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
 
                             if(not medoidSamples == False):
                                 astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1234,7 +1234,7 @@ class MicroPITA:
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
+                internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = diversityMetricsAlpha)
                 #Get top ranked alpha diversity by most diverse
                 #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                 #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
@@ -1254,7 +1254,7 @@ class MicroPITA:
             if((c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
 
                 #Abundance matrix transposed
-                npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
+                npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), fRemoveAdornments=True)
 
                 #Get center selection using clusters/tiling
                 #This will be for beta metrics in normalized space
@@ -1263,7 +1263,7 @@ class MicroPITA:
                     for bMetric in diversityMetricsBeta:
 
                         #Get representative dissimilarity samples
-                        medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
+                        medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
 
                         if(not medoidSamples == False):
                             astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1300,7 +1300,7 @@ class MicroPITA:
             if(c_RUN_RANK_AVERAGE_USER_4):
               if not microPITA.c_USER_RANKED in selectedSamples:
                   selectedSamples[microPITA.c_USER_RANKED]=list()
-              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.funcSelectTargetedTaxaSamples(tempMatrix=stratAbundanceTable, lsTargetedTaxa=userDefinedTaxa, iSampleSelectionCount=iSampleSelectionCount, sMethod=sFeatureSelectionMethod))
+              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.funcSelectTargetedTaxaSamples(abndMatrix=stratAbundanceTable, lsTargetedTaxa=userDefinedTaxa, iSampleSelectionCount=iSampleSelectionCount, sMethod=sFeatureSelectionMethod))
             logging.info("Selected Samples 4")
             logging.info(selectedSamples)
 

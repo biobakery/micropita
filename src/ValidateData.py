@@ -144,7 +144,15 @@ class ValidateData:
     #@param ParameterValue value to be evaluated as a string
     #@return bool Indicator of string parameter validity
     @staticmethod
-    def isValidStringType(parameterValue):
+    def funcIsValidStringType(parameterValue):
+        """
+        Validates a boolean parameter as a string. This allows the string to be blank or empty.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a string type.
+        :type	Boolean
+        """
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -159,7 +167,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidString(parameterValue):
         """
-        Validates a boolean parameter as a string.
+        Validates a boolean parameter as a string. Does NOT allow string to be blank or empty.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -168,7 +176,7 @@ class ValidateData:
         """
 
         #Type check
-        if not ValidateData.isValidStringType(parameterValue):
+        if not ValidateData.funcIsValidStringType(parameterValue):
             return False
 
         #Check to see it is not blank
@@ -185,7 +193,7 @@ class ValidateData:
     @staticmethod
     def isValidFormatString(parameterValue):
         lettersValid = False
-        if ValidateData.isValidString(parameterValue):
+        if ValidateData.funcIsValidString(parameterValue):
             validChars = "BbcdfHhIiLlPpsx0123456789"
             for letter in parameterValue:
                 lettersValid = letter in validChars
@@ -201,7 +209,7 @@ class ValidateData:
     #@return bool Indicator of char parameter validity
     @staticmethod
     def isValidChar(parameterValue):
-        return ValidateData.isValidString(parameterValue)
+        return ValidateData.funcIsValidString(parameterValue)
 
     ##
     #Validates char parameters that must be a number of 0 or more
@@ -212,7 +220,7 @@ class ValidateData:
     @staticmethod
     def isValidPositiveNumberChar(parameterValue):
         #Check to make sure is a valid string
-        if not ValidateData.isValidString(parameterValue):
+        if not ValidateData.funcIsValidString(parameterValue):
             return False
 
         #Try to convert to decimal
@@ -249,7 +257,7 @@ class ValidateData:
     @staticmethod
     def isValidBoundedIntegerChar(parameterValue, tempValueOne, tempValueTwo):
         #Check to make sure is a valid string
-        if not ValidateData.isValidString(parameterValue):
+        if not ValidateData.funcIsValidString(parameterValue):
             return False
 
         #Check to make sure is a valid integer
@@ -306,7 +314,7 @@ class ValidateData:
             if parameterValue[i] == None:
                 return False
             if type(parameterValue[i]) is ListType:
-                if ValidateData.isValidList(parameterValue[i]) == False:
+                if ValidateData.funcIsValidList(parameterValue[i]) == False:
                     return False
         return True
 
@@ -367,7 +375,7 @@ class ValidateData:
         #Check elements
         listSize = len(parameterValue)
         for i in xrange(0,listSize):
-            if(not ValidateData.isValidString(parameterValue[i])):
+            if(not ValidateData.funcIsValidString(parameterValue[i])):
                 return False
         return True
 
@@ -438,7 +446,7 @@ class ValidateData:
     #@return bool Indicator of parameter validity
     @staticmethod
     def isValidDNASequence(parameterValue):
-        if ValidateData.isValidString(parameterValue):
+        if ValidateData.funcIsValidString(parameterValue):
             expression = re.compile(r'[^atcgATCG]')
             if not None == expression.search(parameterValue):
                 return False
@@ -478,7 +486,7 @@ class ValidateData:
         :type	Boolean
         """
 
-        if(ValidateData.isValidString(parameterValue)):
+        if(ValidateData.funcIsValidString(parameterValue)):
             return os.path.exists(parameterValue)
         return False
 
@@ -493,7 +501,7 @@ class ValidateData:
     def isValidClass(tempClassInstance, tempCorrectName):
         if(tempClassInstance==None):
             return False
-        if not ValidateData.isValidString(tempCorrectName):
+        if not ValidateData.funcIsValidString(tempCorrectName):
             return False
         classType = type(tempClassInstance).__name__
         if(classType == tempCorrectName):

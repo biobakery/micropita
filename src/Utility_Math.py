@@ -37,7 +37,7 @@ class Utility_Math():
     ##
     #Happy path test 2
     @staticmethod
-    def convertToBHQValue(ldPValues, iNumberOfTests=None):
+    def funcConvertToBHQValue(ldPValues, iNumberOfTests=None):
         """
         Convert a list of p-value to a list of q-values.
 
@@ -121,7 +121,7 @@ class Utility_Math():
 
     #Testing Status: Light happy path testing 2
     @staticmethod
-    def transposeDataMatrix(npaMatrix, fRemoveAdornments=False):
+    def funcTransposeDataMatrix(npaMatrix, fRemoveAdornments=False):
         """
         Transposes a numpy array.
 
