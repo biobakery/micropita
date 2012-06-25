@@ -5,10 +5,10 @@
 #######################################################
 
 __author__ = "Timothy Tickle"
-__copyright__ = "Copyright 2011"
+__copyright__ = "Copyright 2012"
 __credits__ = ["Timothy Tickle"]
-__license__ = "GPL"
-__version__ = "1.0"
+__license__ = ""
+__version__ = ""
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
@@ -24,29 +24,35 @@ from random import shuffle
 from ValidateData import ValidateData
 
 class SVM:
+    """
+    Class which holds generic methods for SVM use.
+    """
 
     #1 Happy Path tested
-    #Converts abundance files to input SVM files.
-    #@tempInputFile Abundance file to read (should be a standard Qiime output abundance table)
-    #@tempOutputSVMFile File to save SVM data to when converted from teh abundance table
-    #@tempDelimiter Delimiter of the Abundance table
-    #@tempLabels Ordered labels to use to classify the samples in the abundance table
-    #@sLastMetadataName The name of the last row in the abundance table representing metadata
-    #@tempSkipFirstColumn Boolean Indicates to skip the first column (true) (for instance if it contains taxonomy identifiers)
-    #@tempNormalize Boolean to indicate if the abundance data should be normalized (true) before creating the file (normalized by total sample abundance)
     @staticmethod
-    def convertAbundanceTableToSVMFile(abndAbundanceTable, tempOutputSVMFile, sMetadataLabel):
+    def funcConvertAbundanceTableToSVMFile(abndAbundanceTable, strOutputSVMFile, sMetadataLabel):
+        """
+        Converts abundance files to input SVM files.
+
+        :param strOutputSVMFile: File to save SVM data to when converted from the abundance table.
+        :type	String
+        :param	sMetadataLabel: The name of the last row in the abundance table representing metadata.
+        :type	String
+        :return	lsUniqueLabels:	List of unique labels.
+        :type	List	List of strings
+        """
+
         #Validate parameters
         if abndAbundanceTable == None:
             print "Error, invalid Abundance table."
             return False
-        if(not ValidateData.isValidString(tempOutputSVMFile)):
-            print "Error, file not valid. File:"+str(tempOutputSVMFile)
+        if(not ValidateData.isValidString(strOutputSVMFile)):
+            print "Error, file not valid. File:"+str(strOutputSVMFile)
             return False
 
         #If output file exists, delete
-        if(os.path.exists(tempOutputSVMFile)):
-            os.remove(tempOutputSVMFile)
+        if(os.path.exists(strOutputSVMFile)):
+            os.remove(strOutputSVMFile)
 
         #Create data matrix
         dataMatrix = zip(*abndAbundanceTable.funcGetAbundanceCopy())
@@ -65,14 +71,21 @@ class SVM:
             iRowIndex = iRowIndex + 1
 
         #Output file
-        with open(tempOutputSVMFile,'a') as f:
+        with open(strOutputSVMFile,'a') as f:
             (f.write("".join(llData)))
-        f.close()
+
         return lsUniqueLabels
 
     #Tested
     @staticmethod
     def funcScaleFeature(npdData):
+        """
+        Scale a feature between 0 and 1.
+
+        :param	npdData:	Feature data to scale.
+        :type	Numpy Array	Scaled feature data.
+        """
+
         if sum(npdData) == 0 or len(set(npdData))==1:
             return npdData
         dMin = min(npdData)
@@ -81,6 +94,15 @@ class SVM:
     #Tested
     @staticmethod
     def funcWeightLabels(lLabels):
+        """
+        Returns weights for labels based on how balanced the labels are. Weights try to balance unbalanced results.
+
+        :params	lLabels:	List of labels to use for measure how balanced the comparison is.
+        :type	List
+        :return	List:		[dictWeights ({"label":weight}),lUniqueLabels (unique occurences of original labels)]
+        :type	List
+        """
+
         #Convert to dict
         lUniqueLabels = list(set(lLabels))
         dictLabels = dict(zip(lUniqueLabels, range(len(lUniqueLabels))))
@@ -102,14 +124,15 @@ class SVM:
     #Tested 3/4 cases could add in test 12 with randomize True
     def func10FoldCrossvalidation(self, iTotalSampleCount, fRandomise = False):
         """
+        Generator.
         Generates the indexes for a 10 fold crossvalidation given a sample count.
         If there are less than 10 samples, it uses the sample count as the K-fold crossvalidation
         as a leave one out method.
 
 	:param	iTotalSampleCount:	Total Sample Count
-	:type	int:	Sample Count
+	:type	Integer	Sample Count
 	:param	fRandomise:	Random sample indices
-	:type	boolean:	True indicates randomise (Default False)
+	:type	Boolean	True indicates randomise (Default False)
         """
 
         #Make indices and shuffle if needed

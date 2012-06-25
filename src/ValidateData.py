@@ -7,6 +7,15 @@
 #
 #######################################################
 
+__author__ = "Timothy Tickle"
+__copyright__ = "Copyright 2012"
+__credits__ = ["Timothy Tickle"]
+__license__ = ""
+__version__ = ""
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
+
 #Import local code
 from types import *
 import decimal
@@ -53,13 +62,17 @@ class ValidateData:
                 return True
         return False
 
-    #Happy path tested
-    ##
-    #Validates a boolean parameter as false
-    #@param ParameterValue value to be evaluated as a False
-    #@return bool Indicator of boolean parameter validity
     @staticmethod
-    def isFalse(parameterValue):
+    def funcIsFalse(parameterValue):
+        """
+        Validates a boolean parameter as false.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is False.
+        :type	Boolean
+        """
+
         if(ValidateData.isValidBoolean(parameterValue)):
             if(parameterValue == False):
                 return True
@@ -143,14 +156,16 @@ class ValidateData:
 
         return True
 
-    ##
-    #Validates string parameters
-    #Created 10/4/09
-    #Tested 12/12/09
-    #@param ParameterValue value to be evaluated as a string
-    #@return bool Indicator of string parameter validity
     @staticmethod
-    def isValidString(parameterValue):
+    def funcIsValidString(parameterValue):
+        """
+        Validates a boolean parameter as a string.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a string.
+        :type	Boolean
+        """
 
         #Type check
         if not ValidateData.isValidStringType(parameterValue):
@@ -266,14 +281,16 @@ class ValidateData:
     #Collections
     ####
 
-    ##
-    #Validates list parameters
-    #Created 10/4/09
-    #Tested 12/12/09
-    #@param ParameterValue value to be evaluated as a list
-    #@return bool Indicator of list parameter validity
     @staticmethod
-    def isValidList(parameterValue):
+    def funcIsValidList(parameterValue):
+        """
+        Validates a boolean parameter as a list.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a list
+        :type	Boolean
+        """
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -449,13 +466,18 @@ class ValidateData:
     ####
     #Classes, Functions, and Instances
     ####
-    ##
-    #Validates string file or directory names that exist
-    #Created 10/04/11
-    #@param ParameterValue value to be evaluated as a file name
-    #@return bool Indicator of char parameter validity
+
     @staticmethod
-    def isValidFileName(parameterValue):
+    def funcIsValidFileName(parameterValue):
+        """
+        Validates a boolean parameter as a valid file name.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid file path.
+        :type	Boolean
+        """
+
         if(ValidateData.isValidString(parameterValue)):
             return os.path.exists(parameterValue)
         return False

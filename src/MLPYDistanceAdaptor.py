@@ -4,7 +4,7 @@
 #######################################################
 
 __author__ = "Timothy Tickle"
-__copyright__ = "Copyright 2011"
+__copyright__ = "Copyright 2012"
 __credits__ = ["Timothy Tickle"]
 __license__ = ""
 __version__ = ""

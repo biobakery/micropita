@@ -4,10 +4,10 @@
 #######################################################
 
 __author__ = "Timothy Tickle"
-__copyright__ = "Copyright 2011"
+__copyright__ = "Copyright 2012"
 __credits__ = ["Timothy Tickle"]
-__license__ = "GPL"
-__version__ = "1.0"
+__license__ = ""
+__version__ = ""
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
@@ -31,17 +31,15 @@ c_iSumAllCladeLevels = -1
 c_fOutputLeavesOnly = False
 
 class AbundanceTable:
+    """
+    Represents an abundance table and contains common function to perform on the object.
 
-    #Constructors..ish
+    This class is made from an abundance data file. What is expected is a text file delimited by
+    a character (which is given to the object). The first column is expected to be the id column
+    for each of the rows. Metadata is expected before measurement data. Columns are samples and
+    rows are features (bugs). 
+    """
 
-    #Constructor
-    #npaAbundance Numpy Array abundance table
-    #dictMetadata Dict metadata
-    #strName Original string file which the AbundanceTable came from
-    #fIsNormalized boolean Indicating if the abundance table is normalized when created
-    #fISSummed boolean Indicating if the abundance table is summed
-    #cFileDelimiter The delimiter for the abundace table
-    #cFeatureDelimiter The delimiter for feature names
     def __init__(self, npaAbundance, dictMetadata, strName, fIsNormalized, fIsSummed, cFileDelimiter = Constants.TAB, cFeatureNameDelimiter="|"):
       """
       Averages feature abundance.
@@ -104,29 +102,51 @@ class AbundanceTable:
       else:
         print "Abundance or metadata was None, should be atleast an empty object"
 
-    #Happy path tested
-    #Allows an Abundance Table to be directly made from a file
     @staticmethod
     def makeFromFile(strInputFile, fIsNormalized, fIsSummed, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None, cFeatureNameDelimiter="|"):
+        """
+        Creates an abundance table from a table file.
 
-      #Read in from text file to create the abundance and metadata structures
-      lContents = AbundanceTable._textToStructuredArray(strInputFile=strInputFile, cDelimiter=cDelimiter,
+        :param	strInputFile:	Path to input file.
+        :type	String		String path.
+        :param	fIsNormalized:	Indicates if the data is already normalized on read.
+        :type	Boolean		True indicates the data IS normalized.
+        :param	fIsSummed:	Indicates if the data is already summed.
+        :type	Boolean		True indicates the data IS summed at the clade levels.
+        :param	cDelimiter:	Delimiter for parsing the input file.
+        :type	Character	Character.
+        :param	sMetadataID:	String ID that is a metadata row ID (found on the first column) and used as an ID for samples
+        :type	String		String ID
+        :param	sLastMetadata:	The ID of the metadata that is the last metadata before measurement or feature rows.
+        :type	String		String ID
+        :param	cFeatureNameDelimiter:	Used to parse Feature (bug) names if they are complex.
+                                        For example if they are consensus lineages and contain parent clade information.
+        :type	Character	Delimiting letter
+        :return	AbundanceTable:	Will return an AbundanceTable object on no error. Returns False on error.
+        :type	AbundanceTable or False
+        """
+
+
+        #Read in from text file to create the abundance and metadata structures
+        lContents = AbundanceTable._textToStructuredArray(strInputFile=strInputFile, cDelimiter=cDelimiter,
                                                         sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
 
-      #If contents is not a false then set contents to appropriate objects
-      if lContents:
-        return AbundanceTable(npaAbundance=lContents[0], dictMetadata=lContents[1], strName=strInputFile, 
+        #If contents is not a false then set contents to appropriate objects
+        if lContents:
+            return AbundanceTable(npaAbundance=lContents[0], dictMetadata=lContents[1], strName=strInputFile, 
                               fIsNormalized=fIsNormalized, fIsSummed=fIsSummed, cFileDelimiter=cDelimiter, cFeatureNameDelimiter=cFeatureNameDelimiter)
-      return False
+        return False
 
-    #Functions to represent and print
-    #Represent
     def __repr__(self):
-      return "AbundanceTable"
+        """
+        Represent or print object
+        """
+        return "AbundanceTable"
 
-    #Indirectly Happy path tested
-    #To string
     def __str__(self):
+      """
+      Create a string representation of the Abundance Table.
+      """
 
       return "".join(["Sample count:", str(len(self._npaFeatureAbundance.dtype.names[1:])),
       "\nFeature count:", str(len(self._npaFeatureAbundance[self._npaFeatureAbundance.dtype.names[0]])),
@@ -145,17 +165,28 @@ class AbundanceTable:
     #Private Methods
 
     #Testing Status: Light happy path testing
-    #Reads in a file that is Samples (column) by Taxa (rows) into a structured array.
-    #@params strInputFile File to read in abundacy data. Tested against Qiime output.
-    #@params cDelimiter The delimiter used in the file being read.
-    #@params iNameRow The index that is the id row.
-    #@params iFirstDataRow The index that is the first data to be read.
-    #@returns [A structured array of all data read, A structured array of the metadata].
-    #Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
-    #Metadata include the taxa ID column name if one is given
     @staticmethod
     def _textToStructuredArray(strInputFile = None, cDelimiter = Constants.TAB, sMetadataID = None, sLastMetadata = None):
-    #Validate parameters
+        """
+        Private method
+        Used to read in a file that is samples (column) and taxa (rows) into a structured array.
+
+        :param	strInputFile:	Path to input file.
+        :type	String		String path.
+        :param	cDelimiter:	Delimiter for parsing the input file.
+        :type	Character	Character.
+        :param	sMetadataID:	String ID that is a metadata row ID (found on the first column) and used as an ID for samples
+        :type	String		String ID
+        :param	sLastMetadata:	The ID of the metadata that is the last metadata before measurement or feature rows.
+        :type	String		String ID
+        :return	[taxData,metadata]:	Numpy Structured Array of abundance data and dictionary of metadata.
+                                        Metadata is a dictionary as such {"ID", [value,value,values...]}
+                                        Values are in the order thety are read in (and the order of the sample names).
+                                        ID is the first column in each metadata row.
+        :type [Numpy structured Array, Dictionary]
+        """
+
+        #Validate parameters
         if(not ValidateData.isValidFileName(strInputFile)):
             print "".join(["AbundanceTable:textToStructuredArray::Error, input file not valid. File:",str(strInputFile)])
             return False
@@ -172,7 +203,6 @@ class AbundanceTable:
         #Read in file
         with open(strInputFile,'r') as f:
             contents = f.read()
-        f.close()
 
         #Turn to lines of the file
         contents = contents.replace("\"","")
@@ -247,43 +277,56 @@ class AbundanceTable:
 
         return [taxData,metadata]
 
-    #Public methods
-
     #Happy path tested
-    #Returns the samples of the Abundance table
-    #Returns an empty list on error or no underlying table
     def funcGetSampleNames(self):
+        """
+        Returns the sample names (IDs) contained in the abundance table.
+
+        :return	Sample Name:	A List of sample names indicated by the metadata associated with the sMetadataId given in table creation.
+        :type	List of strings	A list tof string names or empty list on error as well as no underlying table.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.dtype.names[1:]
         else:
             return []
 
     #Happy Path Tested
-    #Returns the metadata name which links to the metadata used
-    #as IDs (for instance Sample Ids)
     def funcGetIDMetadataName(self):
+        """
+        Returns the metadata id.
+
+        :return	ID:	The metadata id (the sample Id).
+        :type	String	Returns none on error.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.dtype.names[0]
         else:
-            return []
+            return None
 
     #Happy path tested
-    #Returns a deep copy of the abundance data
     def funcGetAbundanceCopy(self):
+        """
+        Returns a deep copy of the abundance table.
+
+        :return	Numpy Structured Array:	The measurement data in the Abundance table. Can use sample names to access each column of measurements.
+        :type	Numpy Structured Array	Returns none on error.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.copy()
         return None
 
     #Happy path tested
-    #Get average feature abundance
     def funcGetAverageAbundancePerSample(self, lsTargetedFeatures):
 	"""
 	Averages feature abundance.
 
 	:param	lsTargetedFeatures:	String names of features to average
-	:type	list:	list of string names of features which are measured
-        :return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample and the feature's average abudance
-        :type	list:	[[sample,average abundance of selected taxa]] or False on error
+	:type	list	list of string names of features which are measured
+        :return	List: of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample and the feature's average abudance
+        :type	list	[[sample,average abundance of selected taxa]] or False on error
 	"""
 
         #Sample rank averages [[sample,average abundance of selected taxa]]
@@ -327,8 +370,16 @@ class AbundanceTable:
         return sampleAbundanceAverages
 
     #Happy Path Tested
-    #Returns a copy of the current abundance table with the abundance of just the given features
     def funcGetFeatureAbundanceTable(self, lsFeatures):
+        """
+        Returns a copy of the current abundance table with the abundance of just the given features.
+
+        :param	lsFeatures:	String Feature IDs that are kept in the compressed abundance table.
+        :type	List of strings	Feature IDs (found as the first entry of a filter in the input file.
+        :return	AbundanceTable:	A compressed version of the abundance table.
+        :type	AbundanceTable	On an error None is returned.
+        """
+
         if (not self._npaFeatureAbundance == None) and lsFeatures:
             #Get a list of boolean indicators that the row is from the features list
             lfFeatureData = [sRowID.strip() in lsFeatures for sRowID in self.funcGetFeatureNames()]
@@ -346,21 +397,41 @@ class AbundanceTable:
         return None
 
     #Happy path tested
-    #The delimiter of the feature names (concensus lineages)
     def funcGetFeatureDelimiter(self):
+        """
+        The delimiter of the feature names (For example to use on concensus lineages).
+
+        :return	Delimiter:	Delimiter for the feature name pieces if it is complex.
+        :type	Character	Delimiter.
+        """
+
         return self._cFeatureDelimiter
 
     #Happy path tested
-    #Returns the current feature count
     def funcGetFeatureCount(self):
+        """
+        Returns the current feature count.
+
+        :return	Count:	Returns the int count of features in the abundance table.
+        :type	Int	Returns None on error.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance.shape[0]
         else:
             return None
 
     #Happy path tested
-    #Returns float sum of feature values across the samples
     def funcGetFeatureSumAcrossSamples(self,sFeatureName):
+        """
+        Returns float sum of feature values across the samples.
+
+        :param	sFeatureName:
+        :type	String.
+        :return	Sum:	Sum of one feature across samples.
+        :type	Double
+        """
+
         if (not self._npaFeatureAbundance == None):
             for sFeature in self._npaFeatureAbundance:
                 if sFeature[0] == sFeatureName:
@@ -370,26 +441,54 @@ class AbundanceTable:
 
     #Happy path tested
     def funcGetFeatureNames(self):
+        """
+        Return the feature names as a list.
+
+        :return	Feature Names:	List of feature names (or IDs) as strings.
+        :type	List of strings.	As an error returns empty list.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance[self.funcGetIDMetadataName()]
         return []
 
     #Happy path tested
-    #The delimiter of the file the data was read from and which is also the
-    #delimiter which would be used to write the data to a file
     def funcGetFileDelimiter(self):
+        """
+        The delimiter of the file the data was read from and which is also the delimiter which would be used to write the data to a file.
+
+        :return	Delimiter:	Delimiter for the parsing and writing the file.
+        :type	Character	Delimiter.
+        """
+
         return self._cDelimiter
 
     #Happy path tested
     def funcGetSample(self,sSampleName):
+        """
+        Return a copy of the feature measurements of a sample.
+
+        :param	sSampleName:	Name of sample to return.	
+        :type	String	
+        :return	Sample: Measurements	Feature measurements of a sample.
+        :type	Numpy Array	Empty numpy array returned on error.
+        """
+
         if (not self._npaFeatureAbundance == None):
             return self._npaFeatureAbundance[sSampleName].copy()
-        return []
+        return np.array([])
 
     #Happy path tested
-    #Returns a specific list of metadata associated with the
-    #metadata name (key) that is given
     def funcGetMetadata(self, strMetadataName):
+        """
+        Returns a list of metadata that is associated with the given metadata name (id).
+
+        :param	strMetadataName:	String metadata ID to be returned
+        :type	String	ID
+        :return	Metadata:	List of metadata
+        :type	List	
+        """
+
         if self._dictTableMetadata:
             retValue = self._dictTableMetadata.get(strMetadataName,None)
             if retValue:
@@ -398,46 +497,83 @@ class AbundanceTable:
         return None
 
     #Happy path tested
-    #Returns a deep copy of the metadata
     def funcGetMetadataCopy(self):
+        """
+        Returns a deep copy of the metadata.
+
+	:return	Metadata copy:	{"ID":[value,value...]}
+        :type	Dictionary
+        """
+
         if self._dictTableMetadata:
             return copy.deepcopy(self._dictTableMetadata)
         return None
 
     #Happy path tested
-    #Returns the name of the object which is the file name that generated it.
-    #If the object was generated from an Abundance Table (for instance through stratification)
-    #The name is still in the form of a file that could be written to which is informative
-    #Of the changes that have occured on the dataset.
     def funcGetName(self):
+        """
+        Returns the name of the object which is the file name that generated it.
+        If the object was generated from an Abundance Table (for instance through stratification)
+        the name is still in the form of a file that could be written to which is informative
+        of the changes that have occured on the dataset.
+        """
+
         return self._strOriginalName
 
     #Happy path tested
-    #True indicates it is normalized
     def funcIsNormalized(self):
+        """
+        Returns if the data has been normalized.
+
+        :return	Boolean:	Indicates if the data is normalized.
+        :type	Boolean	True indicates it the data is normalized.
+        """
+
         return self._fIsNormalized
 
     #Happy path tested
     #True indicates the metadata exists and are of unique values
     def funcIsPrimaryIdMetadata(self,sMetadataName):
+        """
+        Checks the metadata data associatd with the sMetadatName and returns if the metadata is unique.
+        This is important to some of the functions in the Abundance Table specifically when translating from one metadata to another.
+        
+        :param	sMetadataName:	ID of metadata to check for uniqueness.
+        :type	String	Metadata ID.
+        :return	Boolean:	Returns indicator of uniqueness.
+        :type	Boolean	True indicates unique.
+        """
+
         lMetadata = self.funcGetMetadata(sMetadataName)
         if not lMetadata:
             return False
         return (len(lMetadata) == len(set(lMetadata)))
 
     #Happy path tested
-    #True indicates the clades are summed
     def funcIsSummed(self):
+        """
+        Return is the data is summed.
+
+        :return	Boolean:	Indicator of being summed. 
+        :type	Boolean	True indicates summed.
+        """
+
         return self._fIsSummed
 
     #Happy path tested
-    #Filter abundance by percentile.
-    #This method of filtering is inspired from Nicola
-    #A feature is removed if it's abundance is not found in the top X percetile a certain percentage of the samples
     def funcFilterAbundanceByPercentile(self, dPercentileCutOff = 95.0, dPercentageAbovePercentile=1.0):
         """
+        Filter on features.
         A feature is removed if it's abundance is not found in the top X percentile a certain percentage of the samples.
+
+        :param	dPercentileCutOff:	The percentile used for filtering.
+        :type	double	A double between 0.0 and 100.0
+        :param	dPercentageAbovePercentile:	The percentage above the given percentile (dPercentileCutOff) that must exist to keep the feature.
+        :type	double	Between 0.0 and 100.0
+        :return	Boolean:	Indicator of filtering occuring without error.	
+        :type	Boolean	True indicates filtering occuring.
         """
+
         #No need to do anything
         if(dPercentileCutOff==0.0) or (dPercentageAbovePercentile==0.0):
             return True
@@ -474,12 +610,19 @@ class AbundanceTable:
         return True
 
     #Happy path tested
-    #Filter abundance by requiring features to have a minimum sequence occurence in a minimum number of samples
-    #Will evaluate greater than or equal to the iMinSequence and iMinSamples
     def funcFilterAbundanceBySequenceOccurence(self, iMinSequence = 2, iMinSamples = 2):
         """
-        Filter abundance by requiring features to have a minimum sequence occurence in a minimum number of samples
+        Filter abundance by requiring features to have a minimum sequence occurence in a minimum number of samples.
+        Will evaluate greater than or equal to the iMinSequence and iMinSamples.
+
+        :param	iMinSequence:	Minimum sequence to occur.
+        :type	Integer	Number Greater than 1.
+        :param	iMinSamples:	Minimum samples to occur in.
+        :type	Integer	Number greater than 1.
+        :return	Boolean:	Indicator of the filter running without error.
+        :type	Boolean	False indicates error.
         """
+
         #No need to do anything
         if(iMinSequence==0) or (iMinSamples==0):
             return True
@@ -506,11 +649,16 @@ class AbundanceTable:
         return True
    
     #1 Happy path test
-    #A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSDCutoff
     def funcFilterFeatureBySD(self, dMinSDCuttOff = 0.0):
         """
         A feature is removed if it's abundance is not found to have standard deviation more than the given dMinSDCutoff.
+
+        :param	dMinSDCuttOff:	Standard deviation threshold.
+        :type	Double	A double greater than 0.0.
+        :return	Boolean:	Indicator of success.
+        :type	Boolean	False indicates error.
         """
+
         #No need to do anything
         if(dMinSDCuttOff==0.0):
             return True
@@ -532,19 +680,28 @@ class AbundanceTable:
         return True
 
     #Happy path tested
-    #Convenience method which will call which ever normalization is approriate on the data.
     def funcNormalize(self):
+        """
+        Convenience method which will call which ever normalization is approriate on the data.
+        """
+
         if self._fIsSummed:
             return self.funcNormalizeColumnsWithSummedClades()
         else:
             return self.funcNormalizeColumnsBySum()
 
     #Testing Status: Light happy path testing
-    #Normalize the columns (samples) of the abundance table
-    #Normalizes as a fraction of the total (number/(sum of all numbers in the column))
-    #@returns Normalized structured array or False on error. 
-    #All columns are returned, this could be no normalization, all normalization or mixed normalized columns.
     def funcNormalizeColumnsBySum(self):
+        """
+        Normalize the data in a manner that is approrpiate for NOT summed data.
+        Normalize the columns (samples) of the abundance table.
+        Normalizes as a fraction of the total (number/(sum of all numbers in the column)).
+        Will not act on summed tables.
+
+        :return	Boolean:	Indicator of success.
+        :type	Boolean	False indicates error.
+        """
+
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
             return False
@@ -572,7 +729,15 @@ class AbundanceTable:
     #The data will be summed first and then normalized
     #If already normalized, the current normalization is kept
     def funcNormalizeColumnsWithSummedClades(self):
-        print "AbundanceTable:funcNormalizeColumnsWithSummedClades called"
+        """
+        Normalizes a summed Abundance Table.
+        If this is called on a dataset which is not summed and not normalized.
+        The data will be summed first and then normalized.
+        If already normalized, the current normalization is kept.
+
+        :return	Boolean:	Indicator of success.
+        :type	Boolean	False indicates error.
+        """
 
         if self._fIsNormalized:
             print "This table is already normalized, did not perform new normalization request."
@@ -611,6 +776,13 @@ class AbundanceTable:
 
     #1 Happy path test
     def funcRankAbundance(self):
+        """
+        Rank abundances of features with in a sample.
+
+        :return	AbundanceTable:	Abundance table data ranked (Features with in samples).
+        :type	AbundanceTable	None is returned on error.
+        """
+
         if not self._npaFeatureAbundance == None:
 
             #Sample rank averages [[sample,average rank of selected taxa]]
@@ -660,6 +832,15 @@ class AbundanceTable:
     #Happy Path Tested
     #Reduce the current table to a certain clade level
     def funcReduceFeaturesToCladeLevel(self, iCladeLevel):
+        """
+        Reduce the current table to a certain clade level.
+
+        :param	iCladeLevel:	The level of the clade to trim the features to.
+        :type	Integer	The higher the number the more clades are presevered in the consensus lineage contained in the feauture name.
+        :return	Boolean:	Indicator of success.
+        :type	Boolean	False indicates error.
+        """
+
         if iCladeLevel < 1: return False
         if not self._npaFeatureAbundance == None:
             liFeatureKeep = []
@@ -675,8 +856,14 @@ class AbundanceTable:
             return False
 
     #Happy path testing
-    #Sums abundance data by clades indicated in the feature name (as consensus lineages)
     def funcSumClades(self):
+        """
+        Sums abundance data by clades indicated in the feature name (as consensus lineages).
+
+        :return	Boolean:	Indicator of success.
+        :type	Boolean	False indicates an error.
+        """
+
         if not self.funcIsSummed():
 
             #Read in the data
@@ -736,13 +923,22 @@ class AbundanceTable:
         return True
 
     #Happy path tested
-    #Stratifies the AbundanceTable by the given metadata.
-    #Will write each stratified abundance table to file
-    #if fWriteToFile is True the object will used it's internally stored name as a file to write to
-    #if fWriteToFile is a string then it should be a directory and end with /. This will rebase the file
-    #and store it in a different directory but with an otherwise unchanged name
-    #Returns a list of AbundanceTables which are deep copies of the original
-    def funcStratifyByMetadata(self,strMetadata,xWriteToFile=False):
+    def funcStratifyByMetadata(self, strMetadata, fWriteToFile=False):
+        """
+        Stratifies the AbundanceTable by the given metadata.
+        Will write each stratified abundance table to file
+        if fWriteToFile is True the object will used it's internally stored name as a file to write to
+        if fWriteToFile is a string then it should be a directory and end with "." This will rebase the file
+        and store it in a different directory but with an otherwise unchanged name.
+
+        :param	strMetadata:	Metadata ID to stratify data with.
+        :type	String	ID for a metadata.
+        :param	fWriteToFile:	Indicator to write to file.
+        :type	Boolean	True indicates to write to file.
+        :return	List:	List of AbundanceTables which are deep copies of the original.
+        :type	List	List of AbundanceTables. Empty list on error.
+        """
+
         retlAbundanceTables = []
 
         if (not self._npaFeatureAbundance == None) and self._dictTableMetadata :
@@ -757,9 +953,9 @@ class AbundanceTable:
             elif len(setValues) == 1:
               retlAbundanceTables.append(self)
               #Write to file if need be before returning data
-              if xWriteToFile:
-                  if isinstance(xWriteToFile, basestring):
-                      self.funcWriteToFile("".join([xWriteToFile,os.path.split(self.getName())[1]]))
+              if fWriteToFile:
+                  if isinstance(fWriteToFile, basestring):
+                      self.funcWriteToFile("".join([fWriteToFile,os.path.split(self.getName())[1]]))
                   else:
                       self.funcWriteToFile(self.getName())
               return retlAbundanceTables
@@ -786,9 +982,9 @@ class AbundanceTable:
                                               fIsNormalized=self._fIsNormalized, fIsSummed=self._fIsSummed, cFeatureNameDelimiter=self._cFeatureDelimiter)
 
                 #Write to file if needed
-                if xWriteToFile:
-                    if isinstance(xWriteToFile, basestring):
-                        objStratifiedAbundanceTable.funcWriteToFile("".join([xWriteToFile,os.path.split(objStratifiedAbundanceTable.funcGetName())[1]]))
+                if fWriteToFile:
+                    if isinstance(fWriteToFile, basestring):
+                        objStratifiedAbundanceTable.funcWriteToFile("".join([fWriteToFile,os.path.split(objStratifiedAbundanceTable.funcGetName())[1]]))
                     else:
                         objStratifiedAbundanceTable.funcWriteToFile(objStratifiedAbundanceTable.funcGetName())
 
@@ -798,13 +994,24 @@ class AbundanceTable:
         return retlAbundanceTables
 
     #Happy Path Tested
-    #Takes the given data values in one metadata and translates it to values in another
-    #metadata of the sample samples holding the values of the first metadata
-    #FPrimaryIds, if true the sMetadataFrom are checked for unique values,
-    #If FPrimaryIds is not true, duplicate values can stop the preservation of order
-    #Or may cause duplication in the "to" group. This is not advised.
-    #if the sMetadataFrom has any duplicates the function fails and return false
     def funcTranslateIntoMetadata(self, lsValues, sMetadataFrom, sMetadataTo, fFromPrimaryIds=True):
+        """
+        Takes the given data values in one metadata and translates it to values in another
+        metadata of the sample samples holding the values of the first metadata
+        FPrimaryIds, if true the sMetadataFrom are checked for unique values,
+        If FPrimaryIds is not true, duplicate values can stop the preservation of order
+        Or may cause duplication in the "to" group. This is not advised.
+        if the sMetadataFrom has any duplicates the function fails and return false.
+
+        :param	lsValues:	Values to translate.
+        :type	List	List of values.
+        :param	sMetadataFrom:	The metadata the lsValues come from.
+        :type	String	ID for the metadata.
+        :param	sMetadataTo:	The metadata the lsValues will be translated into keeping the samples the same.
+        :type	String	ID for the metadata.
+        :param	fFromPrimaryIds:	The metadata that are in the from metadata list must be unique in each sample.
+        :type	Boolean	True indicates the metadata list should be unique in each sample. Otherwise a false will return.
+        """
 
         #Get metadata
         lFromMetadata = self.funcGetMetadata(sMetadataFrom)
@@ -830,19 +1037,33 @@ class AbundanceTable:
         return False
 
     #Happy path tested
-    #Returns a numpy array of the current Abundance Table.
-    #Removes the first ID head column and the numpy array is
-    #Made of lists, not tuples.
     def funcToArray(self):
+        """
+        Returns a numpy array of the current Abundance Table.
+        Removes the first ID head column and the numpy array is
+        Made of lists, not tuples.
+
+        :return Numpy Array:	np.array([[float,float,...],[float,float,...],[float,float,...]])
+        :type	Numpy Array	None is returned on error.
+        """
+
         if not self._npaFeatureAbundance == None:
             return np.array([list(tplRow)[1:] for tplRow in self._npaFeatureAbundance],'float')
         return None
 
     #Happy Path tested
-    #Writes the AbundanceTable to a file strOutputFile.
-    #Will rewrite over a file as needed.
-    #Will use the cDelimiter to delimit columns if provided.
     def funcWriteToFile(self, strOutputFile, cDelimiter=None):
+        """
+        Writes the AbundanceTable to a file strOutputFile.
+        Will rewrite over a file as needed.
+        Will use the cDelimiter to delimit columns if provided.
+
+        :param	strOutputFile:	File path to write the file to.
+        :type	String	File Path
+        :param	cDelimiter:	Delimiter for the output file.
+        :type	Character	If cDlimiter is not specified, the internally stored file delimiter is used.
+        """
+
         with open(strOutputFile, 'w') as f:
             #Check delimiter argument
             if not cDelimiter:
@@ -858,17 +1079,34 @@ class AbundanceTable:
             for curAbundanceRow in curAbundance:
                 lsOutput.append(cDelimiter.join([str(curAbundanceElement) for curAbundanceElement in curAbundanceRow]))
             f.write(Constants.ENDLINE.join(lsOutput))
-            f.close()
-
-    #Static methods
 
     #Testing Status: 1 Happy path test
-    #This method will read in two files and abridge both files (saved as new files)
-    #to just the samples in common between the two files given a common identifier.
-    #***If the identifier is not unique in each data set, the first sample is taken
-    #Expects the files to have the sample delimiters
     @staticmethod
     def funcPairTables(strFileOne, strFileTwo, strIdentifier, cDelimiter, strOutFileOne, strOutFileTwo, lsIgnoreValues=None):
+        """
+        This method will read in two files and abridge both files (saved as new files)
+        to just the samples in common between the two files given a common identifier.
+        ***If the identifier is not unique in each data set, the first sample with the pairing id is taken so make sure the ID is unique.
+        Expects the files to have the sample delimiters.
+
+        :param	strFileOne:	Path to file one to be paired.
+        :type	String	File path.
+        :param	strFileTwo:	Path to file two to be paired.
+        :type	String	File path.
+        :param	strIdentifier:	Metadata ID that is used for pairing.
+        :type	String	Metadata ID.
+        :param	cDelimiter:	Character delimiter to read the files.
+        :type	Character	Delimiter.
+        :param	strOutFileOne:	The output file for the paired version of the first file.
+        :type	String	File path.
+        :param	strOutFileTwo:	The output file for the paired version of the second file.
+        :type	String	File path.
+        :param	lsIgnoreValues:	These values are ignored even if common IDs between the two files.
+        :type	List	List of strings.
+        :return	Boolean:	Indicator of no errors.
+        :type	Boolean	False indicates errors.
+        """
+
         #Validate parameters
         if(not ValidateData.isValidFileName(strFileOne)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strFileOne)
@@ -882,7 +1120,6 @@ class AbundanceTable:
         #Read in file
         with open(strFileOne,'r') as f:
             sContentsOne = f.read()
-        f.close()
 
         #Get the file identifier for file one
         fileOneIdentifier = None
@@ -896,7 +1133,6 @@ class AbundanceTable:
         #Read in file
         with open(strFileTwo,'r') as f:
             sContentsTwo = f.read()
-        f.close()
 
         #Get the file identifier for file two
         fileTwoIdentifier = None
@@ -924,28 +1160,36 @@ class AbundanceTable:
         with open(strOutFileOne, 'w') as f:
             f.write(Constants.ENDLINE.join([cDelimiter.join(np.compress(lfFileOneElements,sLine.split(cDelimiter)))
                                            for sLine in filter(None, sContentsOne.split(Constants.ENDLINE))]))
-        f.close()
 
         #Write out file two
         with open(strOutFileTwo, 'w') as f:
             f.write(Constants.ENDLINE.join([cDelimiter.join(np.compress(lfFileTwoElements,sLine.split(cDelimiter)))
                                            for sLine in filter(None, sContentsTwo.split(Constants.ENDLINE))]))
-        f.close()
 
         return True
 
     #Testing Status: Light happy path testing
-    #Check the input otu or phlotype abundance table
-    #Currently reduces the taxa that have no occurence
-    #Also inserts a NA for blank metadta and a 0 for blank abundance data
-    #@params strReadDataFileName String. Data file name
-    #@params strOutputFileName String. The file path to save the checked file as.
-    #If left empty (defualt) a path will be created from the input file name
-    #Placing the file in the same directory as the current file.
-    #@params cDelimiter Character. Delimiter for the data
-    #@return Return string file path
     @staticmethod
     def funcCheckRawDataFile(strReadDataFileName, iFirstDataIndex= -1, sLastMetadataName = None, strOutputFileName = "", cDelimiter = Constants.TAB):
+        """
+        Check the input otu or phlotype abundance table.
+        Currently reduces the features that have no occurence.
+        Also inserts a NA for blank metadata and a 0 for blank abundance data.
+
+        :param	strReadDataFileName:	File path of file to read and check.
+        :type	String	File path.
+        :param	iFirstDataIndex:	First (row) index of data not metadata in the abundance file.
+        :type	Integer	Index starting at 0.
+        :param	sLastMetadataName:	The ID of the last metadata in the file. Rows of measurements should follow this metadata.
+        :type	String	Matadata ID.
+        :param	strOutputFileName:	File path of out put file.
+        :type	String	File path.
+        :param	cDelimiter:	Character delimiter for reading and writing files.
+        :type	Character	Delimiter.
+        :return	Output Path:	Output path for written checked file.
+        :type	String	File Path.
+        """
+
         #Validate parameters
         if(not ValidateData.isValidFileName(strReadDataFileName)):
             print "AbundanceTable:checkRawDataFile::Error, file not valid. File:"+str(strReadDataFileName)
@@ -969,7 +1213,6 @@ class AbundanceTable:
         readData = ""
         with open(strReadDataFileName,'r') as f:
             readData = f.read()
-        f.close()
         readData = filter(None,readData.split(Constants.ENDLINE))
 
         #Read the length of each line and make sure there is no jagged data
@@ -1032,23 +1275,30 @@ class AbundanceTable:
                 #Write to file
                 if(writeToFile):    
                     f.write(sCleanFeatureName+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
-        f.close()
         return outputFile
 
     #Testing Status: Light happy path testing
-    #Splits an abundance table into multiple abundance tables stratified by the metadata
-    #@params strInputFile String file path to read in and stratify
-    #These assumptions are based on the current default formating of an abundance file
-    #@cDelimiter The delimiter used in the adundance file
-    #@iStratifyByRow The row which contains the metadata to use in stratification.
-    #Can be the index of the row starting with 0 or a keyword found in the first column of the row.
-    #llsGroupings is a list of string lists where each string list holds values that are equal and should be grouped together.
-    #So for example, if you wanted to group metadata "1", "2", and "3" seperately but "4" and "5" together you would
-    #Give the following [["4","5"]].
-    #If you know what "1" and "3" also together you would give [["1","3"],["4","5"]]
-    #@return Returns boolean true or false. True indicating completion without detected errors
     @staticmethod
     def funcStratifyAbundanceTableByMetadata(strInputFile = None, strDirectory = "", cDelimiter = Constants.TAB, iStratifyByRow = 1, llsGroupings = []):
+        """
+        Splits an abundance table into multiple abundance tables stratified by the metadata
+
+        :param	strInputFile:	String file path to read in and stratify.
+        :type	String	File path.
+        :param	strDirectory:	Output directory to write stratified files.
+        :type	String	Output directory path.
+        :param	cDelimiter:	The delimiter used in the adundance file.
+        :type	Character	Delimiter.
+        :param	iStratifyByRow:	The row which contains the metadata to use in stratification.
+        :type	Integer	Positive integer index.
+        :param	llsGroupings:	A list of string lists where each string list holds values that are equal and should be grouped together.
+                                So for example, if you wanted to group metadata "1", "2", and "3" seperately but "4" and "5" together you would
+                                Give the following [["4","5"]].
+                                If you know what "1" and "3" also together you would give [["1","3"],["4","5"]]
+        :type	List	List of list of strings
+        :return	Boolean:	Indicator of NO error.
+        :type	Booelan	False indicates an error.
+        """
 
         #Validate parameters
         if(not ValidateData.isValidFileName(strInputFile)):
@@ -1075,7 +1325,6 @@ class AbundanceTable:
         sFileContents = None
         with open(strInputFile,'r') as f:
             sFileContents = f.read()
-        f.close()
         sFileContents = filter(None,re.split(Constants.ENDLINE,sFileContents))
 
         #Collect metadata
@@ -1140,6 +1389,5 @@ class AbundanceTable:
             with open(sOutputFile,'w') as f:
                 sFileContents = f.write(Constants.ENDLINE.join(stratifiedAbundanceTables[metadata]))
                 lsFilesWritten.append(sOutputFile)
-            f.close()
 
         return lsFilesWritten

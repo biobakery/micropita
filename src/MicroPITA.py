@@ -5,10 +5,10 @@ Description: Class to Run analysis for the microPITA paper
 """
 
 __author__ = "Timothy Tickle"
-__copyright__ = "Copyright 2011"
+__copyright__ = "Copyright 2012"
 __credits__ = ["Timothy Tickle"]
 __license__ = ""
-__version__ = "1.0"
+__version__ = ""
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
@@ -109,118 +109,124 @@ class MicroPITA:
 ####Group 1## Diversity
 
     #Testing: Happy path Testing (8)
-    def getTopRankedSamples(self, tempMatrix = None, tempSampleNames = None, tempTopAmount = None):
+    def funcGetTopRankedSamples(self, lldMatrix = None, lsSampleNames = None, iTopAmount = None):
 	"""
-	Given a list of lists of measurements, for each list the indices of the highest values are returned. If tempSamplesNames is given
+	Given a list of lists of measurements, for each list the indices of the highest values are returned. If lsSamplesNames is given
         it is treated as a list of string names that is in the order of the measurements in each list. Indices are returned or the sample
         names positionally associated with the indices.
 	
-	:param	tempMatrix:	List of lists [[value,value,value,value],[value,value,value,value]].
-	:type	List of lists:	List of measurements. Each list is a different measurement. Each measurement in possionally related to a sample.
-	:param	tempSampleNames:	List of sample names positionally related (the same) to each list (Optional).
-	:type	List of strings:	List of strings
-	:param	tempTopAmount:		The amount of top measured samples (assumes the higher measurements are better)
-	:type	integer:	Integer amount of sample names/ indices to return.
+	:param	lldMatrix:	List of lists [[value,value,value,value],[value,value,value,value]].
+	:type	List of lists	List of measurements. Each list is a different measurement. Each measurement in possionally related to a sample.
+	:param	lsSampleNames:	List of sample names positionally related (the same) to each list (Optional).
+	:type	List of strings	List of strings.
+	:param	iTopAmount:	The amount of top measured samples (assumes the higher measurements are better).
+	:type	integer	Integer amount of sample names/ indices to return.
+        :return	List:	List of samples to be selected.
+        :type	List	List of strings.
 	"""
 
         topRankList = []
-        if(len(tempMatrix)<1):
+        if(len(lldMatrix)<1):
             return topRankList
-        for rowMetrics in tempMatrix:
+        for rowMetrics in lldMatrix:
             #Create 2 d array to hold value and index and sort
             rowsMetricsLength = len(rowMetrics)
             indexX = [rowMetrics,range(rowsMetricsLength)]
             indexX[1].sort(key = indexX[0].__getitem__,reverse = True)
-            if(tempSampleNames == None):
-                topRankList.append(indexX[1][:tempTopAmount])
+            if(lsSampleNames == None):
+                topRankList.append(indexX[1][:iTopAmount])
             else:
-                sampleIndexes = indexX[1][:tempTopAmount]
+                sampleIndexes = indexX[1][:iTopAmount]
                 addSamplesToRank = []
                 for index in sampleIndexes:
-                    addSamplesToRank.append(tempSampleNames[index])
+                    addSamplesToRank.append(lsSampleNames[index])
                 topRankList.append(addSamplesToRank)
         return topRankList
 
 ####Group 2## Representative Dissimilarity
 
     #Testing: Happy Path Tested for BrayCurtis and Inverse BrayCurtis
-    def getBetaMetric(self, tempAbundancies=None, tempMetric=None):
+    def funcGetBetaMetric(self, npadAbundancies=None, sMetric=None):
 	"""
-	Takes a matrix of values and returns a beta metric matrix. The metric returned is indicated by name (tempMetric).
+	Takes a matrix of values and returns a beta metric matrix. The metric returned is indicated by name (sMetric).
 	
-	:param	tempAbundancies:	Numpy array where row=samples and columns = features
-	:type	Matrix:	Numpy array
-	:param	tempMetric:	String name of beta metric. Possibilities are listed in microPITA.
-	:type	String:	String name of beta metric. Possibilities are listed in microPITA.
+	:param	npadAbundancies:	Numpy arrayof sample abundances to measure against.
+	:type	Numpy Array	Numpy array where row=samples and columns = features.
+	:param	sMetric:	String name of beta metric. Possibilities are listed in microPITA.
+	:type	String	String name of beta metric. Possibilities are listed in microPITA.
+        :return	Double:	Get Measurement indicated by metric for given abundancies
+        :type	Double	Measurement
 	"""
 
-        if(tempMetric == self.c_BRAY_CURTIS_B_DIVERSITY):
-            return Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies=tempAbundancies)
-        elif(tempMetric == self.c_INVERSE_BRAY_CURTIS_B_DIVERSITY):
-            return Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies=tempAbundancies)
+        if(sMetric == self.c_BRAY_CURTIS_B_DIVERSITY):
+            return Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies=npadAbundancies)
+        elif(sMetric == self.c_INVERSE_BRAY_CURTIS_B_DIVERSITY):
+            return Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies=npadAbundancies)
         #Needs NOT normalized abundances
-        elif(tempMetric == self.c_WEIGHTED_UNIFRAC_B_DIVERSITY):
-            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=tempAbundancies, tempTaxonomyTree=None, tempWeighted=True)
-        elif(tempMetric == self.c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY):
-            return False
-#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=tempAbundancies, tempTaxonomyTree=None, tempWeighted=True)
-        #Needs NOT normalized abundances
-        elif(tempMetric == self.c_UNIFRAC_B_DIVERSITY):
-            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=tempAbundancies, tempTaxonomyTree=None, tempWeighted=False)
-        elif(tempMetric == self.c_INVERSE_UNIFRAC_B_DIVERSITY):
-            return False
-#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=tempAbundancies, tempTaxonomyTree=None, tempWeighted=False)
+#        elif(sMetric == self.c_WEIGHTED_UNIFRAC_B_DIVERSITY):
+#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=npadAbundancies, tempTaxonomyTree=None, tempWeighted=True)
+#        elif(sMetric == self.c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY):
+#            return False
+#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=npadAbundancies, tempTaxonomyTree=None, tempWeighted=True)
+#        #Needs NOT normalized abundances
+#        elif(sMetric == self.c_UNIFRAC_B_DIVERSITY):
+#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=npadAbundancies, tempTaxonomyTree=None, tempWeighted=False)
+#        elif(sMetric == self.c_INVERSE_UNIFRAC_B_DIVERSITY):
+#            return False
+#            return Diversity.getUnifracDistance(tempSampleTaxaAbundancies=npadAbundancies, tempTaxonomyTree=None, tempWeighted=False)
         else:
             return False
 
-    def getCentralSamplesByKMedoids(self, tempMatrix=None, tempMetric=None, tempSampleNames=None, tempNumberSamplesReturned=0, fMLPY=True):
+    def funcGetCentralSamplesByKMedoids(self, npaMatrix=None, sMetric=None, lsSampleNames=None, iNumberSamplesReturned=0, fMLPY=True):
 	"""
 	Gets centroid samples by k-medoids clustering of a given matrix.
 	
-	:param	tempMatrix:	Numpy array where row=features and columns=samples
-	:type	Matrix:	Numpy array
-	:param	tempMetric:	String name of beta metric used as the distance metric.
-	:type	String:	String name of beta metric. Possibilities are listed in microPITA.
-	:param	tempSampleNames:	The names of the sample
-	:type	List:	List of strings
-	:param	tempNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
-	:type	Integer:	Number of samples to return
+	:param	npaMatrix:	Numpy array where row=features and columns=samples
+	:type	Numpy array	Abundance Data.
+	:param	sMetric:	String name of beta metric used as the distance metric.
+	:type	String	String name of beta metric. Possibilities are listed in microPITA.
+	:param	lsSampleNames:	The names of the sample
+	:type	List	List of strings
+	:param	iNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
+	:type	Integer	Number of samples to return
+        :return	List:	List of selected samples.
+        :type	List	List of strings, returns false on error.
 	"""
 
         #Validate parameters
-        if(tempNumberSamplesReturned < 0):
-            logging.error("MicroPITA.getCentralSamplesByKMedoids. Number of samples to return must be atleast 1.")
+        if(iNumberSamplesReturned < 0):
+            logging.error("MicroPITA.funcGetCentralSamplesByKMedoids. Number of samples to return must be atleast 1.")
             return False
 
         #Count of how many rows
-        sampleCount = tempMatrix.shape[0]
-        if(tempNumberSamplesReturned > sampleCount):
-            logging.error("".join(["MicroPITA.getCentralSamplesByKMedoids. There are not enough samples to return the amount of samples specified. Return sample count = ",str(tempNumberSamplesReturned),". Sample number = ",str(sampleCount),"."]))
+        sampleCount = npaMatrix.shape[0]
+        if(iNumberSamplesReturned > sampleCount):
+            logging.error("".join(["MicroPITA.funcGetCentralSamplesByKMedoids. There are not enough samples to return the amount of samples specified. Return sample count = ",str(iNumberSamplesReturned),". Sample number = ",str(sampleCount),"."]))
             return False
 
         #Samples to return
         returningSamples = list()
 
         #If the cluster count is equal to the sample count return all samples
-        if(sampleCount == tempNumberSamplesReturned):
-            return list(tempSampleNames)
+        if(sampleCount == iNumberSamplesReturned):
+            return list(lsSampleNames)
 
         #Get distance matrix
-        distanceMatrix=self.getBetaMetric(tempAbundancies=tempMatrix, tempMetric=tempMetric)
+        distanceMatrix=self.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric)
         if(ValidateData.isFalse(distanceMatrix)):
-          logging.error("MicroPITA.getCentralSamplesByKMedoids. Received false for betaMetrix matrix generation, returning false.")
+          logging.error("MicroPITA.funcGetCentralSamplesByKMedoids. Received false for betaMetrix matrix generation, returning false.")
           return False
 
         #Log distance matrix
-        logging.debug("".join(["Distance matrix for representative selection using metric=",str(tempMetric)]))
+        logging.debug("".join(["Distance matrix for representative selection using metric=",str(sMetric)]))
 
-        if(( tempMetric==Diversity.c_UNIFRAC_B_DIVERSITY ) or ( tempMetric==Diversity.c_WEIGHTED_UNIFRAC_B_DIVERSITY )):
+        if(( sMetric==Diversity.c_UNIFRAC_B_DIVERSITY ) or ( sMetric==Diversity.c_WEIGHTED_UNIFRAC_B_DIVERSITY )):
           distanceMatrix = distanceMatrix['distance_matrix'][0]
 
         #Run MLPY implementation
         if not fMLPY:
             #Perform Kmedoid clustering in pycluster
-            lclusterid, error, nfound = kmedoids (distance=distanceMatrix, nclusters=tempNumberSamplesReturned, npass=1000, initialid=None)
+            lclusterid, error, nfound = kmedoids (distance=distanceMatrix, nclusters=iNumberSamplesReturned, npass=1000, initialid=None)
             #TODO make sure you are getting condensed for unifrac and braycurtis
             #TODO figure out a way to select optimal k medoid iteration 
             logging.debug("Results from the kmedoid method in representative selection:")
@@ -230,23 +236,23 @@ class MicroPITA:
 
             #Convert centroid indexes to names and return
             #Return centroids
-            return [tempSampleNames[iindex] for iindex in set(lclusterid)]
+            return [lsSampleNames[iindex] for iindex in set(lclusterid)]
 
         #Run Pycluster implementation
         else:
             distance = MLPYDistanceAdaptor(npaDistanceMatrix=distanceMatrix, fIsCondensedMatrix=True)
 
             #Create object to determine clusters/medoids
-            medoidsMaker = Kmedoids(k=tempNumberSamplesReturned, dist=distance)
+            medoidsMaker = Kmedoids(k=iNumberSamplesReturned, dist=distance)
 
             #medoidsData includes(1d numpy array, medoids indexes; 
             #              1d numpy array, non-medoids indexes;
             #              1d numpy array, cluster membership for non-medoids;
             #              double, cost of configuration)
-            #tempMatrix is samples x rows
+            #npaMatrix is samples x rows
             #Build a matrix of lists of indicies to pass to the distance matrix
             indicesMatrix = []
-            for indexPosition in xrange(0,len(tempMatrix)):
+            for indexPosition in xrange(0,len(npaMatrix)):
                 indicesMatrix.append([indexPosition])
             medoidsData = medoidsMaker.compute(np.array(indicesMatrix))
             logging.debug("Results from the kmedoid method in representative selection:")
@@ -255,29 +261,31 @@ class MicroPITA:
             #If returning the same amount of clusters and samples
             #Return centroids
             selectedIndexes = medoidsData[0]
-            for index in xrange(0,tempNumberSamplesReturned):
-                returningSamples.append(tempSampleNames[selectedIndexes[index]])
+            for index in xrange(0,iNumberSamplesReturned):
+                returningSamples.append(lsSampleNames[selectedIndexes[index]])
             return returningSamples
 
 ####Group 3## Highest Dissimilarity
-    def selectExtremeSamplesFromHClust(self, tempBetaMetric, tempAbundanceMatrix, tempSampleNames, tempSelectSampleCount):
+    def funcSelectExtremeSamplesFromHClust(self, strBetaMetric, npaAbundanceMatrix, lsSampleNames, iSelectSampleCount):
 	"""
 	Select extreme samples from HClustering.
 	
-	:param	tempBetaMetric:	The beta metric to use for distance matrix generation
-	:type	String:	The name of the beta metric to use
-	:param	tempAbundanceMatrix:	Numpy array where row=samples and columns=features
-	:type	Matrix:	Numpy Array
-	:param	tempSampleNames:	The names of the sample
-	:type	List:	List of strings
-	:param	tempSelectSampleCount:	Number of samples to select (return)
-	:type	Integer:	Integer number of samples returned
+	:param	strBetaMetric:	The beta metric to use for distance matrix generation.
+	:type	String	The name of the beta metric to use.
+	:param	npaAbundanceMatrix:	Numpy array where row=samples and columns=features.
+	:type	Numpy Array	Abundance data.
+	:param	lsSampleNames:	The names of the sample.
+	:type	List	List of strings.
+	:param	iSelectSampleCount:	Number of samples to select (return).
+	:type	Integer	Integer number of samples returned.
+        :return	Samples:	List of samples.
+        :type	List of strings	Selected samples.
 	"""
 
         #If they want all the sample count, return all sample names
-        sampleCount=len(tempAbundanceMatrix[:,0])
-        if(tempSelectSampleCount==sampleCount):
-          return(tempSampleNames)
+        sampleCount=len(npaAbundanceMatrix[:,0])
+        if(iSelectSampleCount==sampleCount):
+          return(lsSampleNames)
 
         #Holds the samples to be returned
         returnSamples = []
@@ -289,7 +297,7 @@ class MicroPITA:
 
         #Generate beta matrix
         #Returns condensed matrix
-        tempDistanceMatrix = self.getBetaMetric(tempAbundancies=tempAbundanceMatrix, tempMetric=tempBetaMetric)
+        tempDistanceMatrix = self.funcGetBetaMetric(npadAbundancies=npaAbundanceMatrix, sMetric=strBetaMetric)
 
         #Feed beta matrix to linkage to cluster
         #Send condensed matrix
@@ -303,18 +311,18 @@ class MicroPITA:
 
         #This method just takes the lowest metric measurement (highest distance pairs/clusters)
         #Works much better than the original technique
-        iSampleCount = len(tempSampleNames)
+        iSampleCount = len(lsSampleNames)
         iSelectedSampleCount = 0
         for row in linkageMatrix:
-            if(iSelectedSampleCount < tempSelectSampleCount):
+            if(iSelectedSampleCount < iSelectSampleCount):
                 iNode = int(row[0])
                 if(iNode<iSampleCount):
-                    returnSamples.append(tempSampleNames[iNode])
+                    returnSamples.append(lsSampleNames[iNode])
                     iSelectedSampleCount = iSelectedSampleCount + 1
-            if(iSelectedSampleCount < tempSelectSampleCount):
+            if(iSelectedSampleCount < iSelectSampleCount):
                 iNode = int(row[1])
                 if(iNode<iSampleCount):
-                    returnSamples.append(tempSampleNames[iNode])
+                    returnSamples.append(lsSampleNames[iNode])
                     iSelectedSampleCount = iSelectedSampleCount + 1
 
         #Return selected samples
@@ -322,26 +330,26 @@ class MicroPITA:
 
 ####Group 4## Rank Average of user Defined Taxa
     #Happy Path Tested
-    def getAverageAbundanceSamples(self, abndTable, lsTargetedFeature, fRank=False):
+    def funcGetAverageAbundanceSamples(self, abndTable, lsTargetedFeature, fRank=False):
 	"""
 	Averages feature abundance or ranked abundance. Expects a column 0 of taxa id that is skipped.
 	
 	:param	abndTable:	Abundance Table to analyse
-	:type	AbundanceTable:	Abundance Table
+	:type	AbundanceTable	Abundance Table
 	:param	lsTargetedFeature:	String names
-	:type	list:	list of string names of features (bugs) which are measured after ranking against the full sample
+	:type	list	list of string names of features (bugs) which are measured after ranking against the full sample
         :param  fRank:	Indicates to rank the abundance before getting the average abundance of the features (default false)
-        :type   boolean:	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
+        :type   boolean	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
         :return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample, feature average abundance or ranked abundance and somethign to break ties
 						Lists will already be sorted.
-        :type	list:	For not Ranked [[sample,average abundance of selected feature,1]]
+        :type	list	For not Ranked [[sample,average abundance of selected feature,1]]
         		For Ranked [[sample,average ranked abundance, average abundance of selected feature]]
 			Error Returns false
 	"""
 
         llAbundance = abndTable.funcGetAverageAbundancePerSample(lsTargetedFeature)
         if not llAbundance:
-            logging.error("".join(["MicroPITA.getAverageAbundanceSamples. Could not get average abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
+            logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not get average abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
 
         #Add a space for ranking if needed
         #Not ranked will be [[sSample,average abundance,1]]
@@ -354,11 +362,11 @@ class MicroPITA:
         if fRank:
             abndRanked = abndTable.funcRankAbundance()
             if abndTable == None:
-                logging.error("".join(["MicroPITA.getAverageAbundanceSamples. Could not rank the abundance table, returned false."]))
+                logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not rank the abundance table, returned false."]))
                 return False
             dictRankedAbundance = dict([tuple(lRankedItem) for lRankedItem in abndRanked.funcGetAverageAbundancePerSample(lsTargetedFeature)])
             if not dictRankedAbundance:
-                logging.error("".join(["MicroPITA.getAverageAbundanceSamples. Could not get average ranked abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
+                logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not get average ranked abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
                 return False
 
             #Check for the case where all features are 0
@@ -386,76 +394,76 @@ class MicroPITA:
         return llRetAbundance
 
     #Happy Path Tested
-    def selectTargetedTaxaSamples(self, tempMatrix, tempTargetedTaxa, sampleSelectionCount, sMethod):
+    def funcSelectTargetedTaxaSamples(self, abndMatrix, lsTargetedTaxa, iSampleSelectionCount, sMethod):
       """
       Selects samples with the highest ranks or abundance of targeted features.
       If ranked, select the highest abundance for tie breaking
 
-      :param	tempMatrix:	Abundance table to analyse 
-      :type	AbundanceTable:	Abundance table
-      :param	tempTargetedTaxa:	List of features
-      :type	list:	list of strings
-      :param	sampleSelectionCount:	Number of samples to select
-      :type	integer:	integer
+      :param	abndMatrix:	Abundance table to analyse 
+      :type	AbundanceTable	Abundance table
+      :param	lsTargetedTaxa:	List of features
+      :type	list	list of strings
+      :param	iSampleSelectionCount:	Number of samples to select
+      :type	integer	integer
       :param	sMethod:	Method to select targeted features
-      :type	string:	String (Can be values found in microPITA)
-      :return	List of strings	List of sample names which were selected
+      :type	string	String (Can be values found in microPITA)
+      :return	List of strings:	List of sample names which were selected
       :type	List of strings	Empty list is returned on an error.
       """
 
       #Check data
-      if(len(tempTargetedTaxa) < 1):
-        logging.error("MicroPITA.selectTargetedTaxaSamples. Taxa defined selection was requested but no features were given.")
+      if(len(lsTargetedTaxa) < 1):
+        logging.error("MicroPITA.funcSelectTargetedTaxaSamples. Taxa defined selection was requested but no features were given.")
         return []
       if not sMethod:
-        logging.error("MicroPITA.selectTargetedTaxaSamples. Taxa defined selection was requested but no Method were given.")
+        logging.error("MicroPITA.funcSelectTargetedTaxaSamples. Taxa defined selection was requested but no Method were given.")
         return []
 
       #Call function
       lsTargetedSamples = False
       if sMethod.lower() == self.c_TARGETED_METHOD_RANKED.lower():
-          lsTargetedSamples = self.getAverageAbundanceSamples(abndTable=tempMatrix, lsTargetedFeature=tempTargetedTaxa, fRank=True)
+          lsTargetedSamples = self.funcGetAverageAbundanceSamples(abndTable=abndMatrix, lsTargetedFeature=lsTargetedTaxa, fRank=True)
       elif sMethod.lower() == self.c_TARGETED_METHOD_ABUNDANCE.lower():
-          lsTargetedSamples = self.getAverageAbundanceSamples(abndTable=tempMatrix, lsTargetedFeature=tempTargetedTaxa, fRank=False)
+          lsTargetedSamples = self.funcGetAverageAbundanceSamples(abndTable=abndMatrix, lsTargetedFeature=lsTargetedTaxa, fRank=False)
 
       #If an error occured or the key word for the method was not recognized
       if lsTargetedSamples == False: 
-          logging.error("MicroPITA::selectTargetedTaxaSamples: Was not able to select for the features given. So targeted feature selection was performed. Check to make sure the features are spelled correctly and exist in the abundance file.")
+          logging.error("MicroPITA::funcSelectTargetedTaxaSamples: Was not able to select for the features given. So targeted feature selection was performed. Check to make sure the features are spelled correctly and exist in the abundance file.")
           return []
 
       #Select from results
-      return [sSample[0] for sSample in lsTargetedSamples[:sampleSelectionCount]]
+      return [sSample[0] for sSample in lsTargetedSamples[:iSampleSelectionCount]]
 
 
 ####Group 5## Random
 
     #Happy path Tested
-    #Returns random sample names of the number given
-    #@return A list of sample name lists with each list having a randomly selected 
-    #amount of sample names as defined by tempNumberOfSamplesToReturn [[randomName1, randomName2,...],[randomName1, randomName2,...]]
-    def getRandomSamples(self, tempSamples=None, tempNumberOfSamplesToReturn=0):
+    def funcGetRandomSamples(self, lsSamples=None, iNumberOfSamplesToReturn=0):
 	"""
 	Returns random sample names of the number given. No replacement.
 	
-	:param	tempSamples:	List of sample names 
-	:type	list:	list of strings
-	:param	tempNumberOfSamplesToReturn:	Number of samples to select
-	:type	integer:	integer
+	:param	lsSamples:	List of sample names 
+	:type	list	list of strings
+	:param	iNumberOfSamplesToReturn:	Number of samples to select
+	:type	integer	integer.
+        :return	List:	List of selected samples.
+        :type	List	List of strings.
 	"""
+
         #Input matrix sample count
-        sampleCount = len(tempSamples)
+        sampleCount = len(lsSamples)
 
         #Validate Number of samples is not negative and not greater than the matrix
-        if((tempNumberOfSamplesToReturn < 0) or (tempNumberOfSamplesToReturn > sampleCount)):
-            logging.error("".join(["MicroPITA.getRandomSamples. TempNumberOfSamples was not useful for deriving subset. ",str(tempNumberOfSamplesToReturn)]))
+        if((iNumberOfSamplesToReturn < 0) or (iNumberOfSamplesToReturn > sampleCount)):
+            logging.error("".join(["MicroPITA.funcGetRandomSamples. TempNumberOfSamples was not useful for deriving subset. ",str(iNumberOfSamplesToReturn)]))
             return False
 
         #Return the full matrix if they ask for a return matrix where length == original
-        if(tempNumberOfSamplesToReturn == sampleCount):
-            return tempSamples
+        if(iNumberOfSamplesToReturn == sampleCount):
+            return lsSamples
 
         #Get the random indices for the sample (without replacement)
-        randomIndices = random.sample(range(sampleCount), tempNumberOfSamplesToReturn)
+        randomIndices = random.sample(range(sampleCount), iNumberOfSamplesToReturn)
 
         #Create a boolean array of if indexes are to be included in the reduced array
         randomIndicesBoolean = list()
@@ -463,30 +471,28 @@ class MicroPITA:
             randomIndicesBoolean.append(rIndex in randomIndices)
 
         #Reduce array to just what is randomly sampled
-        return np.compress(condition=randomIndicesBoolean, a=tempSamples)
+        return np.compress(condition=randomIndicesBoolean, a=lsSamples)
 
 ####Group 6## Supervised
     #@return Dictionary of file paths which were generated by the model and prediction steps
-    def runLIBSVM(self, abndTable, tempOutputSVMFile, sLabelID, tempSVMScaleLowestBound = 0, tempSVMLogG="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", tempSVMProbabilistic=True):
+    def funcRunLIBSVM(self, abndTable, strOutputSVMFile, sLabelID, iSVMScaleLowestBound = 0, strSVMLogC="-5,-4,-3,-2,-1,0,1,2,3,4,5", strSVMProbabilistic=True):
 	"""
 	Runs a linear SVM (Adapted from the easy.py script included in the standard libsvm install).
 
-	:param	tempOutputSVMFile:	String File path and name to output in SVM format based on the input file
-	:type	string:	String file path
-	:param	tempMatrixLabels:	List of labels (does not have to be strings, just have to be appropriate for labels when casted to string type
-	:type	List:	List of strings
-	:param	sLastMetadataName:	String Found immediately before the first row to read (skips header rows)
-	:type	string:	string
-	:param	tempSkipFirstColumn:	Boolean True indicates the first column will be skipped (due to it containing row identifying information like OTU names).
-	:type	boolean:	boolean
-	:param	tempNormalize:	Boolean True indicates normalizes to relative abundancy per sample (column)
-	:type	boolean:	boolean
-	:param	tempSVMScaleLowestBound:	Lowest value (0 or -1) the values were scaled to (max = 1)
-	:type	integer:	integer
-	:param	tempSVMLogC:	Comma delimited string giving values for C cross validation
-	:type	string:	Comma delimited string
-	:param	tempSVMProbabilistic:	Get probablistic outcome for SVM
-	:type	boolean:	boolean
+	:param	abndTable:	AbundanceTable of data.
+	:type	AbundanceTable	Data.
+	:param	strOutputSVMFile:	Out path used for basing ouput files generated by LIBSVM.
+	:type	String	List of strings
+	:param	sLabelID:	Metadata data ID for the labels.
+	:type	String	Metadta ID
+	:param	iSVMScaleLowestBound:	Lowest value (0 or -1) the values were scaled to (max = 1)
+	:type	Integer	integer
+	:param	strSVMLogC:	Comma delimited string giving values for C cross validation
+	:type	String	Comma delimited string
+	:param	strSVMProbabilistic:	Get probablistic outcome for SVM
+	:type	Boolean	boolean
+        :return	Files:	Dictionary of generated files.
+        :type	Dictionary	Dictionary of file paths.
 	"""
 
         #Create SVM object
@@ -499,26 +505,26 @@ class MicroPITA:
         predictionFiles = None
 
         #Convert abundancies file to SVM file
-        noError = svm.convertAbundanceTableToSVMFile(abndAbundanceTable=abndTable, tempOutputSVMFile=tempOutputSVMFile, sMetadataLabel=sLabelID)
+        noError = svm.convertAbundanceTableToSVMFile(abndAbundanceTable=abndTable, strOutputSVMFile=strOutputSVMFile, sMetadataLabel=sLabelID)
         modelFiles = False
         predictionFiles = False
         #Run SVM
         if(not noError==False):
-            modelFiles = svm.createLinearModel(tempInputFileName=tempOutputSVMFile, tempScaling=tempSVMScaleLowestBound, tempLogC=tempSVMLogC, tempProbabilistic=tempSVMProbabilistic)
+            modelFiles = svm.createLinearModel(tempInputFileName=strOutputSVMFile, tempScaling=iSVMScaleLowestBound, tempLogC=strSVMLogC, tempProbabilistic=strSVMProbabilistic)
             if(not modelFiles == False):
-                predictionFiles = svm.predictFromLinearModel(tempDataFileName=tempOutputSVMFile, tempModelFileName=modelFiles[svm.c_KEYWORD_MODEL_FILE], tempRangeFileName=modelFiles[svm.c_KEYWORD_RANGE_FILE], tempProbabilistic=tempSVMProbabilistic)
+                predictionFiles = svm.predictFromLinearModel(tempDataFileName=strOutputSVMFile, tempModelFileName=modelFiles[svm.c_KEYWORD_MODEL_FILE], tempRangeFileName=modelFiles[svm.c_KEYWORD_RANGE_FILE], tempProbabilistic=strSVMProbabilistic)
             else:
-                logging.error("".join(["MicroPITA.runSVM: Could not run prediction, model file was false."]))
+                logging.error("".join(["MicroPITA.funcRunLIBSVM: Could not run prediction, model file was false."]))
         #Combine output dictionarys and return
         if(not predictionFiles == False):
             for pKey in predictionFiles:
                 modelFiles[pKey]=(predictionFiles[pKey])
         else:
-            logging.error("MicroPITA.runSVM: Prediction files were false.")
+            logging.error("MicroPITA.funcRunLIBSVM: Prediction files were false.")
         return modelFiles
 
     #@return Dictionary of file paths which were generated by the model and prediction steps
-    def runMLPYSVM(self, abndAbundanceTable, sMetadataForLabel, strPredictionFile, liCost = [1], fPredictWithFullData = True, fClassifyByProbability = True):
+    def funcRunMLPYSVM(self, abndAbundanceTable, sMetadataForLabel, strPredictionFile, liCost = [1], fPredictWithFullData = True, fClassifyByProbability = True):
 	"""
 	Runs a linear SVM using MLPY.
 	
@@ -528,6 +534,11 @@ class MicroPITA:
 	:type	string:	string
         :param	liCost	List of integers which will be used to define the cost as 2^iCost
         :type	List	List of integers
+        :return	Analysis Results:	[dictIBestPredictions (dictionary of predictions),
+                                         dictDBestProbabilities (dictionary of probabilities),
+                                         dictLabels (list of original labels),
+                                         lsLabels (list of the labels in order of the MLPY output, these are unique values]
+        :type	List	[dictIBestPredictions,dictDBestProbabilities,dictLabels,lsLabels]
 	"""
 
         #SVM general class
@@ -667,8 +678,8 @@ class MicroPITA:
             dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions = ldictReturn
 
         #Log best
-        logging.debug("".join(["runMLPYSVM::Best Accuracy=", str(dBestAccuracy)]))
-        logging.debug("".join(["runMLPYSVM::Best Cost=", str(iBestCost)]))
+        logging.debug("".join(["funcRunMLPYSVM::Best Accuracy=", str(dBestAccuracy)]))
+        logging.debug("".join(["funcRunMLPYSVM::Best Cost=", str(iBestCost)]))
 
         #Create output prediction file
         strPredictionOutput = " ".join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+Constants.ENDLINE
@@ -689,27 +700,33 @@ class MicroPITA:
         """
         Takes the validation probabilities and stores in a collection of dictionaries
 
-        param:	lsValidationSamples	List of samples (strings) being evaluated
-        type:	List of strings	Order is important, should match npaDistances
-        param:	ldValidationLabels	Original labels of each sample
-        type:	List of int	Order is important, should lsValidationSamples
-        param:	lSVMLabels	Unique labels in order of the probabilities/distances in (npaDistances)
-        type:	List of int	Labeled ordering
-        param:	npaDistances	Distances from the MLPY pred and probablity functions
-        type:	Numpy Array
-        param:	lPredictions	List of labels which are the prediction from MLPY from the pred()
-        type:	List of int	Order matching lsValidationSamples
-        param:	dictdProbability	Dictionary to add probabilities {"SampleName":probability}
-        type:	Dictionary	Order is important, should match npaDistances
-        param:	dictAllProbabilities	Dictionary to add all returned probabilities {"SampleName":[probability label 1,probablitity label 2]...}
-        type:	Dictionary	Order is important, should math npaDistances
-        param:	dictiPrediction	Dictionary to add label prdictions {"SampleName":label}
-        type:	Dictionary	Order is important, should math npaDistances
-        param:	dictAllPredictions	Dictionary to add all returned predictions {"SampleName":[label 1,label 2]...}
-        type:	Dictionary	Order is important, should math npaDistances
-        param:	fClassifyByProbability Indicates if the distance from the hyperplane is measured from the probabilities or the predictions
-        type:	Boolean	True = Probabilities, False = Predictions
+        :param	lsValidationSamples:	List of samples (strings) being evaluated
+        :type	List of strings	Order is important, should match npaDistances
+        :param	ldValidationLabels:	Original labels of each sample
+        :type	List of int	Order is important, should lsValidationSamples
+        :param	lSVMLabels:	Unique labels in order of the probabilities/distances in (npaDistances)
+        :type	List of int	Labeled ordering
+        :param	npaDistances:	Distances from the MLPY pred and probablity functions
+        :type	Numpy Array
+        :param	lPredictions:	List of labels which are the prediction from MLPY from the pred()
+        :type	List of int	Order matching lsValidationSamples
+        :param	dictdProbability:	Dictionary to add probabilities {"SampleName":probability}
+        :type	Dictionary	Order is important, should match npaDistances
+        :param	dictAllProbabilities:	Dictionary to add all returned probabilities {"SampleName":[probability label 1,probablitity label 2]...}
+        :type	Dictionary	Order is important, should math npaDistances
+        :param	dictiPrediction:	Dictionary to add label prdictions {"SampleName":label}
+        :type	Dictionary	Order is important, should math npaDistances
+        :param	dictAllPredictions:	Dictionary to add all returned predictions {"SampleName":[label 1,label 2]...}
+        :type	Dictionary	Order is important, should math npaDistances
+        :param	fClassifyByProbability: Indicates if the distance from the hyperplane is measured from the probabilities or the predictions
+        :type	Boolean	True = Probabilities, False = Predictions
+        :return	Analysis Results:	[dictIBestPredictions (dictionary of predictions),
+                                         dictDBestProbabilities (dictionary of probabilities),
+                                         dictLabels (list of original labels),
+                                         lsLabels (list of the labels in order of the MLPY output, these are unique values]
+        :type	List	[dictIBestPredictions,dictDBestProbabilities,dictLabels,lsLabels]
         """
+
         #Store fold results
         for indexSamples, sSampleName in enumerate(lsValidationSamples):
             print "indexSamples, sSampleName ",indexSamples," ", sSampleName
@@ -733,38 +750,39 @@ class MicroPITA:
 
         return [dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions]
 
+#TODO Normalize? When is this done?
     #Run the supervised methods
-    def runSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
+    def funcRunSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
                                    strOuputSVMFile, strSupervisedMetadata, sampleSVMSelectionCount,
-                                   sLastMetadataName, fSkipFirstColumn, fNormalize,
+                                   sLastMetadataName, fNormalize,
                                    iScaleLowestBound, strCostRange, fProbabilitic, fLibSVM=False):
         """
 	Runs supervised methods.
 	
 	:param	abundanceTable:	AbundanceTable
-	:type	AbudanceTable:	Data to analyze
+	:type	AbudanceTable	Data to analyze
 	:param	fRunDistinct:	Run distinct selection method
-	:type	boolean:	boolean (true runs method)
+	:type	Boolean	boolean (true runs method)
 	:param	fRunDiscriminant:	Run discriminant method
-	:type	boolean:	boolean (true runs method)
+	:type	Boolean	boolean (true runs method)
 	:param	strOutputSVMFile:	File output from  SVM
-	:type	string:	String
+	:type	String	String
 	:param	strSupervisedMetadata:	Label for supervised selection
-	:type	string:	String
+	:type	String	String
 	:param	sampleSVMSelectionCount:	Number of samples to select
-	:type	int:	int sample selection count
+	:type	Integer	int sample selection count
 	:param	sLastMetadataName:	The metadata id for the last metadata in the abundance table
-	:type	string:	String metadata id
-	:param	fSkipFirstColumn:	Indicates skipping the first row
-	:type	boolean:	boolean (true=skip)
+	:type	String	String metadata id
 	:param	fNormalize:	Indicates the need to normalize
-	:type	boolean:	
+	:type	Boolean	True indicates to normalize.
 	:param	iScaleLowestBound:	Integer min value data is scaled to (-1 0r 0)
-	:type	integer: -1 or 0
+	:type	Integer -1 or 0
 	:param	strCostRange:	String of comma delimited values to cross validate cost values with
-	:type	string:
-	:param	fProbabilistic:	Indicator or getting probabilistic ouput from the SVM.
-	:type	boolean:	
+	:type	String
+	:param	fProbabilistic:	Indicator of getting probabilistic ouput from the SVM.
+	:type	Boolean	True indicates receiving probabilities outcome.
+        :return	Selected Samples:	A dictionary of selected samples by selection ID
+        :type	Dictionary	{"Selection Method":["SampleID","SampleID"...]
 	"""
 
         #Run supervised blocks
@@ -810,8 +828,8 @@ class MicroPITA:
             logging.debug("".join(["Using LibSVM Support Vector machine package"]))
 
             #Run linear SVM
-            svmRelatedData = self.runLIBSVM(abndTable=abundanceTable, tempOutputSVMFile=strOuputSVMFile, sLabelID=strSupervisedMetadata, tempSVMScaleLowestBound=iScaleLowestBound,
-                                     tempSVMLogC=strCostRange, tempSVMProbabilistic=fProbabilitic)
+            svmRelatedData = self.funcRunLIBSVM(abndTable=abundanceTable, strOutputSVMFile=strOuputSVMFile, sLabelID=strSupervisedMetadata, iSVMScaleLowestBound=iScaleLowestBound,
+                                     strSVMLogC=strCostRange, strSVMProbabilistic=fProbabilitic)
             print "svmRelatedData", svmRelatedData
             #Read in prediction file and select samples
             if svmRelatedData:
@@ -884,7 +902,7 @@ class MicroPITA:
             liCost = [int(float(strCost)) for strCost in strCostRange.split(",")]
 
             #Run MLPY SVM
-            svmRelatedData = self.runMLPYSVM(abndAbundanceTable=abundanceTable, sMetadataForLabel=strSupervisedMetadata,
+            svmRelatedData = self.funcRunMLPYSVM(abndAbundanceTable=abundanceTable, sMetadataForLabel=strSupervisedMetadata,
                                              strPredictionFile=predictFile, liCost=liCost)
 
             #Returned data
@@ -981,48 +999,50 @@ class MicroPITA:
         return dictSelectedSamples
 
     #Start micropita selection
-    def run(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
+    def funcRun(self, fIsAlreadyNormalized, fCladesAreSummed, strOutputFile="MicroPITAOutput.txt", cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|", strInputAbundanceFile=None,
             strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", strCheckedAbndFile = "", iSampleSelectionCount=0, iSupervisedSampleCount=1,
             strSelectionTechnique=None, strLabel=None, strStratify=None, sMetadataID=None, sLastMetadataName=None, fSumData=True, sFeatureSelectionMethod=None, sCostRange="0"):
 	"""
 	Writes the selection of samples by method to an output file.
 	
-	:param	fIsAlreadyNormalized:	Indicates if the abundance table is normalized
-	:type	boolean:	boolean indicator if the table is normalized (true= normalized)
-	:param	fCladesAreSummed:	Indicates if the abundance table is summed
-	:type	boolean:	boolean indicator if the table is summed (true= summed)
-	:param	strOutputFile:	File to store selection data
-	:type	string:	String file path
-	:param	cDelimiter:	Delimiter of abundance table
-	:type	char:	Char (default TAB)
+	:param	fIsAlreadyNormalized:	Indicates if the abundance table is normalized.
+	:type	boolean	boolean indicator if the table is normalized (true= normalized).
+	:param	fCladesAreSummed:	Indicates if the abundance table is summed.
+	:type	boolean	boolean indicator if the table is summed (true= summed).
+	:param	strOutputFile:	File to store selection data.
+	:type	String	String file path.
+	:param	cDelimiter:	Delimiter of abundance table.
+	:type	Character	Char (default TAB).
 	:param	cFeatureNameDelimiter:	Delimiter of the name of features (for instance if they contain consensus lineages indicating clades).
-	:type	char:	Char (default |)
-	:param	strInputAbundanceFile:	Abundance table data file
-	:type	string:	String path to abundance table file
-	:param	strUserDefinedTaxaFile:	File containing features to select for
-	:type	string:	String path to existing file
-	:param	strTemporaryDirectory:	Directory that will be used to store secondary files important to analysis but not the direct deliverable
-	:type	string:	String directory path
+	:type	Character	Char (default |).
+	:param	strInputAbundanceFile:	Abundance table data file.
+	:type	String	String path to abundance table file.
+	:param	strUserDefinedTaxaFile:	File containing features to select for.
+	:type	String	String path to existing file.
+	:param	strTemporaryDirectory:	Directory that will be used to store secondary files important to analysis but not the direct deliverable.
+	:type	String	String directory path.
         :param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
-        :type	string: String file path
-	:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods
-	:type	integer:	integer
-	:param	iSupervisedSampleCount:	Number of samples to select with supervised methods
-	:type	integer:	integer
-	:param	strSelectionTechnique:	List of strings indicating selection techniques
-	:type	string:	List of strings each a selection technique
-	:param	strLabel:	The metadata used for supervised labels
-	:type	string:	String (metadata id)
-	:param	strStratify:	The metadata used to stratify unsupervised data
-	:type	string:	String (metadata id)
-	:param	sMetadataID:	The id of the metadata used as an id for each sample
-	:type	string:	String metadata id
+        :type	String String file path.
+	:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods.
+	:type	Integer	integer.
+	:param	iSupervisedSampleCount:	Number of samples to select with supervised methods.
+	:type	Integer	integer.
+	:param	strSelectionTechnique:	List of strings indicating selection techniques.
+	:type	String	List of strings each a selection technique.
+	:param	strLabel:	The metadata used for supervised labels.
+	:type	String	String (metadata id).
+	:param	strStratify:	The metadata used to stratify unsupervised data.
+	:type	String	String (metadata id).
+	:param	sMetadataID:	The id of the metadata used as an id for each sample.
+	:type	String	String metadata id.
 	:param	sLastMetadataName:	The id of the metadata positioned last in the abundance table.
-	:type	string:	String metadata id
-	:param	sFeatureSelectionMethod:	Which method to use to select features in a targeted manner (Using average ranked abundance or abundance)
-	:type	string:	String (specific values indicated in microPITA)
-        :param	sCostRange:	A comma delimited list of intergers (positive and negative) to be used as the cost range in the supervised methods (in MLPY only the highest is used)
-        :type	string:	String (comma delimited integers)	
+	:type	String	String metadata id.
+	:param	sFeatureSelectionMethod:	Which method to use to select features in a targeted manner (Using average ranked abundance or abundance).
+	:type	String	String (specific values indicated in microPITA).
+        :param	sCostRange:	A comma delimited list of intergers (positive and negative) to be used as the cost range in the supervised methods (in MLPY only the highest is used).
+        :type	String	String (comma delimited integers).
+        :return	Selected Samples:	Samples selected by methods.
+        :type	Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 	"""
 
         #microPITA object
@@ -1064,7 +1084,7 @@ class MicroPITA:
             c_RUN_RANK_AVERAGE_USER_4 = True
             if(strUserDefinedTaxaFile == None):
                 c_RUN_RANK_AVERAGE_USER_4 = False
-                logging.error("MicroPITA.run. No taxa file was given for taxa selection.")
+                logging.error("MicroPITA.funcRun. No taxa file was given for taxa selection.")
             #Read in taxa list, break down to lines and filter out empty strings
             with open(strUserDefinedTaxaFile,'r') as fhndlTaxaInput:
                 userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
@@ -1083,7 +1103,6 @@ class MicroPITA:
         inputFileComponents = os.path.splitext(strInputAbundanceFile)
         inputFilePrefix = inputFileComponents[0]
 
-        sampleSelectionCount = iSampleSelectionCount
         sampleSVMSelectionCount = iSupervisedSampleCount
 
         #Holds the alpha diversity metrics for samples
@@ -1112,7 +1131,7 @@ class MicroPITA:
                                    cDelimiter=cDelimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter)
         
         if not totalAbundanceTable:
-            logging.error("MicroPITA.run. Could not read abundance table. Stopped.")
+            logging.error("MicroPITA.funcRun. Could not read abundance table. Stopped.")
             return False
 
         if fSumData:
@@ -1120,7 +1139,7 @@ class MicroPITA:
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
         #Log metadata keys
-        logging.debug(" ".join(["Micropita:run.","Received metadata keys=",str(dictTotalMetadata.keys())]))
+        logging.debug(" ".join(["Micropita:funcRun.","Received metadata keys=",str(dictTotalMetadata.keys())]))
 
         #If there is only 1 unique value for the labels, do not run the Supervised methods
         if len(set(dictTotalMetadata.get(strLabel,[]))) < 2:
@@ -1128,7 +1147,7 @@ class MicroPITA:
             c_RUN_DISTINCT = False
             logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
 
-        logging.debug(" ".join(["Micropita:run.","Received metadata=",str(dictTotalMetadata)]))
+        logging.debug(" ".join(["Micropita:funcRun.","Received metadata=",str(dictTotalMetadata)]))
 
         #Run unsupervised methods###
         #Stratify the data if need be and drop the old data
@@ -1155,10 +1174,10 @@ class MicroPITA:
                         #Must first generate metrics that do not want normalization before normalization occurs
                         #Expects Observations (Taxa (row) x sample (column))
                         #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                        internalAlphaMatrix = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
+                        internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlphaNoNormalize)
                         #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                         #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
-                        mostDiverseAlphaSamplesIndexesNoNorm = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=lsSampleNames, tempTopAmount=sampleSelectionCount)
+                        mostDiverseAlphaSamplesIndexesNoNorm = microPITA.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
                         #Add to results
                         for index in xrange(0,len(diversityMetricsAlphaNoNormalize)):
                             astrSelectionMethod = microPITA.convertAMetricDiversity[diversityMetricsAlphaNoNormalize[index]]
@@ -1167,7 +1186,7 @@ class MicroPITA:
                             selectedSamples[astrSelectionMethod].extend(mostDiverseAlphaSamplesIndexesNoNorm[index])
 
                     #Abundance matrix transposed
-                    npaTransposedUnnormalizedAbundance = Utility_Math.transposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
+                    npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
 
                     if(c_RUN_REPRESENTIVE_DISSIMILARITY_2):
                         logging.info("Performing representative selection on unnormalized data.")
@@ -1175,7 +1194,7 @@ class MicroPITA:
                         for bMetric in diversityMetricsBetaNoNormalize:
 
                             #Get representative dissimilarity samples
-                            medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberSamplesReturned=sampleSelectionCount)
+                            medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
 
                             if(not medoidSamples == False):
                                 astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1192,7 +1211,7 @@ class MicroPITA:
                             #This involves inverting the distance metric,
                             #Taking the dendrogram level of where the number cluster == the number of samples to select
                             #Returning a representative sample from each cluster
-                            extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=npaTransposedUnnormalizedAbundance, tempSampleNames=lsSampleNames, tempSelectSampleCount=sampleSelectionCount)
+                            extremeSamples = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedUnnormalizedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount)
 
                             #Add selected samples
                             if not extremeSamples == False:
@@ -1207,7 +1226,7 @@ class MicroPITA:
                 #Normalize data at this point
                 fNormalizeSuccess = stratAbundanceTable.funcNormalize()
                 if not fNormalizeSuccess:
-                    logging.error("MicroPITA.run. Error occured during normalizing data. Stopped.")
+                    logging.error("MicroPITA.funcRun. Error occured during normalizing data. Stopped.")
                     return False
 
             #Generate alpha metrics and get most diverse
@@ -1215,11 +1234,11 @@ class MicroPITA:
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), tempSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
+                internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(tempSampleAbundance = stratAbundanceTable.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, tempDiversityMetricAlpha = diversityMetricsAlpha)
                 #Get top ranked alpha diversity by most diverse
                 #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
                 #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
-                mostDiverseAlphaSamplesIndexes = microPITA.getTopRankedSamples(tempMatrix=internalAlphaMatrix, tempSampleNames=lsSampleNames, tempTopAmount=sampleSelectionCount)
+                mostDiverseAlphaSamplesIndexes = microPITA.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
 
                 #Add to results
                 for index in xrange(0,len(diversityMetricsAlpha)):
@@ -1235,7 +1254,7 @@ class MicroPITA:
             if((c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
 
                 #Abundance matrix transposed
-                npaTransposedUnnormalizedAbundance = Utility_Math.transposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
+                npaTransposedUnnormalizedAbundance = Utility_Math.funcTransposeDataMatrix(stratAbundanceTable.funcGetAbundanceCopy(), tempRemoveAdornments=True)
 
                 #Get center selection using clusters/tiling
                 #This will be for beta metrics in normalized space
@@ -1244,7 +1263,7 @@ class MicroPITA:
                     for bMetric in diversityMetricsBeta:
 
                         #Get representative dissimilarity samples
-                        medoidSamples=microPITA.getCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, tempMetric=bMetric, tempSampleNames=lsSampleNames, tempNumberSamplesReturned=sampleSelectionCount)
+                        medoidSamples=microPITA.funcGetCentralSamplesByKMedoids(tempMatrix=npaTransposedUnnormalizedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
 
                         if(not medoidSamples == False):
                             astrSelectionMethod = microPITA.convertBMetricRepresentative[bMetric]
@@ -1262,7 +1281,7 @@ class MicroPITA:
                         #This involves inverting the distance metric,
                         #Taking the dendrogram level of where the number cluster == the number of samples to select
                         #Returning a repersentative sample from each cluster
-                        extremeSamples = microPITA.selectExtremeSamplesFromHClust(tempBetaMetric=bMetric, tempAbundanceMatrix=npaTransposedUnnormalizedAbundance, tempSampleNames=lsSampleNames, tempSelectSampleCount=sampleSelectionCount)
+                        extremeSamples = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedUnnormalizedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount)
 
                         #Add selected samples
                         if(not extremeSamples == False):
@@ -1281,7 +1300,7 @@ class MicroPITA:
             if(c_RUN_RANK_AVERAGE_USER_4):
               if not microPITA.c_USER_RANKED in selectedSamples:
                   selectedSamples[microPITA.c_USER_RANKED]=list()
-              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.selectTargetedTaxaSamples(tempMatrix=stratAbundanceTable, tempTargetedTaxa=userDefinedTaxa, sampleSelectionCount=sampleSelectionCount, sMethod=sFeatureSelectionMethod))
+              selectedSamples[microPITA.c_USER_RANKED].extend(microPITA.funcSelectTargetedTaxaSamples(tempMatrix=stratAbundanceTable, lsTargetedTaxa=userDefinedTaxa, iSampleSelectionCount=iSampleSelectionCount, sMethod=sFeatureSelectionMethod))
             logging.info("Selected Samples 4")
             logging.info(selectedSamples)
 
@@ -1290,7 +1309,7 @@ class MicroPITA:
             if(c_RUN_RANDOM_5):
 
                 #Select randomly from sample names
-                randomlySelectedSamples = microPITA.getRandomSamples(tempSamples=lsSampleNames, tempNumberOfSamplesToReturn=sampleSelectionCount)
+                randomlySelectedSamples = microPITA.funcGetRandomSamples(lsSamples=lsSampleNames, iNumberOfSamplesToReturn=iSampleSelectionCount)
                 if not microPITA.c_RANDOM in selectedSamples:
                     selectedSamples[microPITA.c_RANDOM]=list()
                 selectedSamples[microPITA.c_RANDOM].extend(list(randomlySelectedSamples))
@@ -1302,10 +1321,10 @@ class MicroPITA:
         lStratifiedAbundanceTables = None
         totalAbundanceTable.funcNormalize()
         if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-            selectedSamples.update(self.runSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
+            selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
                                    strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
                                    strSupervisedMetadata=strLabel, sampleSVMSelectionCount=sampleSVMSelectionCount, sLastMetadataName=sLastMetadataName,
-                                   fSkipFirstColumn=c_SKIP_FIRST_COLUMN, fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
+                                   fNormalize=c_NORMALIZE_RELATIVE_ABUNDANCY,
                                    iScaleLowestBound=c_SVM_SCALING_LOWER_BOUND, strCostRange=sCostRange, fProbabilitic=c_SVM_PROBABILISTIC))
             logging.info("Selected Samples Unsupervised")
             logging.info(selectedSamples)
@@ -1319,9 +1338,9 @@ class MicroPITA:
 	Writes the selection of samples by method to an output file.
 	
 	:param	dictSelection:	The dictionary of selections by method to be written to a file.
-	:type	Dictionary:	The dictionary of selections by method {"method":["sample selected","sample selected"...]}
+	:type	Dictionary	The dictionary of selections by method {"method":["sample selected","sample selected"...]}
 	:param	strOutputFilePath:	String path to file to output dictionary.
-	:type	String:	String path to file to write to
+	:type	String	String path to file to write to
 	"""
 
         #Holds the output content
@@ -1346,7 +1365,7 @@ class MicroPITA:
 	
 	:param	strInputFile:	String path to file to read and translate into a dictionary.
                                 {"method":["sample selected","sample selected"...]}
-	:type	String:	String path to file to read and translate
+	:type	String	String path to file to read and translate
 	"""
 
         #Read in selection file
@@ -1464,7 +1483,7 @@ def _main( ):
         args.strTMPDir = "."
 
 
-    dictSelectedSamples = microPITA.run(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
+    dictSelectedSamples = microPITA.funcRun(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, strOutputFile=args.strOutFile,
                                         cDelimiter=args.cFileDelimiter, cFeatureNameDelimiter = args.cFeatureNameDelimiter, strInputAbundanceFile=args.strFileAbund,
                                         strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir, strCheckedAbndFile = args.strCheckedFile,
                                         iSampleSelectionCount=args.iUnsupervisedSelectionCount,
@@ -1482,6 +1501,4 @@ def _main( ):
 
 if __name__ == "__main__":
     _main( )
-
-
 

@@ -391,6 +391,82 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertNotEqual(str(result.funcGetAbundanceCopy())+str(result),str(answer1+answer2),"".join([str(self),"::\nExpected=\n",str(answer1+answer2),". \nReceived=\n",str(result.funcGetAbundanceCopy())+str(result),"."]))
 
+    def testFuncGetFeatureAbundanceTableForGoodCaseCheckMetadata(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
+                                                        "Bacteria|unclassified|4904",
+                                                        "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"])
+
+        result = result.funcGetMetadataCopy()
+        result = [result[key] for key in sorted(result.keys())]
+
+        #Correct Answer
+        answer = ""
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))
+
+    def testFuncGetFeatureAbundanceTableForGoodCaseCheckOtheData(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
+                                                        "Bacteria|unclassified|4904",
+                                                        "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"])
+
+        result = str(result)
+
+        #Correct Answer
+        answer = ""
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))
+
+    def testFuncGetFeatureAbundanceTableForGoodCaseCheckAbudanceData(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+
+        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
+                                                        "Bacteria|unclassified|4904",
+                                                        "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"])
+
+        result = str(result.funcGetAbundanceDataCopy())
+
+        #Correct Answer
+        answer = ""
+
+        #Check result against answer
+        self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))
+
     #Test funcGetFeatureDelimiter
     def testFuncGetFeatureDelimiter(self):
         #Inputs

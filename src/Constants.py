@@ -7,18 +7,27 @@
 #
 #######################################################
 
-#Import libaries
-import Constants
+__author__ = "Timothy Tickle"
+__copyright__ = "Copyright 2012"
+__credits__ = ["Timothy Tickle"]
+__license__ = ""
+__version__ = ""
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
 
 ##
 #Used to test the FileIO class
 class Constants():
+    """
+    Class to hold project constants.
+    """
 
     #Src code locations
     #Source Code for Cogent
-    COGENT_SRC = "./external/PyCogent-1.5.1/"
+#    COGENT_SRC = "./external/PyCogent-1.5.1/"
     #Source Code for QIIME
-    QIIME_SRC = "./external/Qiime-1.3.0/"
+#    QIIME_SRC = "./external/Qiime-1.3.0/"
 
     #File Locations
     ##Directory that holds all testing oriented documents but not code
