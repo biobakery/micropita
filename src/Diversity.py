@@ -55,18 +55,16 @@ class Diversity:
     #Richness
     c_OBSERVED_COUNT = "Observed_Count"
 
-    #@params ldSampleTaxaAbundancies Vector of organisms in a sample
-    #@return 1 float is returned
     @staticmethod
     def funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies=None):
         """
         Calculates the Simpsons diversity index as defined as sum(Pi*Pi).
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
 
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:	List of measurements to calculate metric on (a sample).
+        :type	List	List of doubles
+        :return	Double:	Diversity metric
+        :type	Double
         """
 
         #Calculate metric
@@ -79,10 +77,10 @@ class Diversity:
         This is multiplicative inverse which reverses the order of the simpsons diversity index.
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
 
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:	List of measurements to calculate metric on (a sample).
+        :type	List	List of doubles
+        :return	Double:	Diversity metric
+        :type	Double
         """
 
         simpsons = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies)
@@ -101,10 +99,10 @@ class Diversity:
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
         If not normalized, include N in the parameter tempTotalN and it will be.
 
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:	List of measurements to calculate metric on (a sample).
+        :type	List	List of doubles
+        :return	Double:	Richness metric
+        :type	Double
         """
 
         #Calculate metric
@@ -114,20 +112,18 @@ class Diversity:
             return 0.0
         return -1 * tempIntermediateNumber
 
-    #@params tempSampleTaxaAbundance =
-    #@params fCorrectForBias False indicates uncorrected for bias (uncorrected = Chao 1984, corrected = Chao 1987, Eq. 2)
     @staticmethod
     def funcGetChao1DiversityIndex(ldSampleTaxaAbundancies=None, fCorrectForBias=False):
         """
         Calculates the Chao1 diversity index.
         Note***: Not normalized by abundance.
 
-        :param	:
-        :type
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:	List of measurements to calculate metric on (a sample).
+        :type	List	List of doubles
+        :param	fCorrectForBias:	Indicator to use bias correction.
+        :type	Boolean	False indicates uncorrected for bias (uncorrected = Chao 1984, corrected = Chao 1987, Eq. 2)
+        :return	Double:	Diversity metric
+        :type	Double
         """
 
         #Observed = total number of species observed in all samples pooled
@@ -154,14 +150,14 @@ class Diversity:
         """
         Count how many bugs / features have a value of greater than 0 or the threshold given.
         Expects a vector of abundances.
-        Do not normalize data if using the threshold.
+        ****Do not normalize data if using the threshold.
 
-        :param	:
-        :type
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleAbundances:	List of measurements to calculate metric on (a sample).
+        :type	List	List of doubles
+        :param	dThreshold:	The lowest number the measurement can be to be counted as an observation.
+        :type	Double
+        :return	Count:	Number of features observed in a sample.
+        :type	Integer
         """
 
         return sum([1 for observation in ldSampleAbundances if observation > dThreshold])
@@ -178,10 +174,10 @@ class Diversity:
         condensed form = [d(r1,r2), d(r1,r3), d(r1,r4), d(r1,r5), d(r2,r3), d(r2,r4), d(r2,r5), d(r3,r4), d(r3,r5), d(r4,r5)].
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
 
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:
+        :type	List	List of doubles
+        :return	Double:	Dissimilarity metric
+        :type	Double
         """
 
         #Calculate metric
@@ -198,15 +194,15 @@ class Diversity:
         """
         Calculates 1 - the BrayCurtis Beta diversity index.
         d(u,v)=1-(sum(abs(row1-row2))/sum(row1+row2)).
-        This is scale invariant.
+        This is scale invariant and ranges between 0 and 1.
         If you have 5 rows (labeled r1,r2,r3,r4,r5) the vector are the distances in this order.
         condensed form = [d(r1,r2), d(r1,r3), d(r1,r4), d(r1,r5), d(r2,r3), d(r2,r4), d(r2,r5), d(r3,r4), d(r3,r5), d(r4,r5)].
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
 
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldSampleTaxaAbundancies:	An np.array of samples (rows) x measurements (columns) in which diversity is measured between rows
+        :type	List	List of doubles
+        :return	Double	1 - Bray-Curtis dissimilarity.	
+        :type	Inverse Dissimilarity Metric
         """
 
         bcValue = Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = ldSampleTaxaAbundancies)
@@ -214,21 +210,21 @@ class Diversity:
             return 1.0-bcValue
         return False
 
-    #Beta diversity
-    #Testing: Happy path tested the unweighted option
-    #Testing: Need to test the weigthed option
-    #Calculates the Unifrac Beta diversity index
-    #Note: It seems unifrac takes abundancies not relative abundancies
-    #@params tempTaxonomyTree String A rooted (outgroup) Newick format phylogenetics tree
-    #@params ldSampleTaxaAbundancies String filename of the Qiime output formatted abundancy matrix
-    ##TODO Abundancy matrix Rows = Samples, Columns = Sequences (Taxa,OTU) in a Qiime format
-    #@return ndarray A condensed distance matrix
+#    #Beta diversity
+#    #Testing: Happy path tested the unweighted option
+#    #Testing: Need to test the weigthed option
+#    #Calculates the Unifrac Beta diversity index
+#    #Note: It seems unifrac takes abundancies not relative abundancies
+#    #@params tempTaxonomyTree String A rooted (outgroup) Newick format phylogenetics tree
+#    #@params ldSampleTaxaAbundancies String filename of the Qiime output formatted abundancy matrix
+#    ##TODO Abundancy matrix Rows = Samples, Columns = Sequences (Taxa,OTU) in a Qiime format
+#    #@return ndarray A condensed distance matrix
 #    @staticmethod
 #    def getUnifracDistance(ldSampleTaxaAbundancies=None, tempTaxonomyTree=None, tempWeighted=True):
-        #Validate data
-        #Translate abundances into dict for unifrac
-        #The following if clause code is from the qiime script convert_otu_table_to_unifrac_sample_mapping.py
-        #Used it in this manner to avoid commandline calls and to tie directly into Qiime
+#        #Validate data
+#        #Translate abundances into dict for unifrac
+#        #The following if clause code is from the qiime script convert_otu_table_to_unifrac_sample_mapping.py
+#        #Used it in this manner to avoid commandline calls and to tie directly into Qiime
 #        if(ValidateData.isValidFileName(ldSampleTaxaAbundancies)):
 #            otuReader = open(ldSampleTaxaAbundancies, 'U')
 #            sample_ids, otu_ids, otu_table_array, lineages = parse_otu_table(otuReader, float)
@@ -244,33 +240,30 @@ class Diversity:
 #                        envs_Dict[elements[0]] = dict([[elements[1],int(float(elements[2]))]])
 #                    else:
 #                        envs_Dict[elements[0]][elements[1]]=int(float(elements[2]))
-
-            #prefunction for the tree
+#
+#            #prefunction for the tree
 #            tr = DndParser(tempTaxonomyTree, UniFracTreeNode)
-            #Calculate metric
-            #Results of unifrac
-            #The distance matrix is res['distance_matrix']
-            #The PCoA data is res['pcoa']
+#            #Calculate metric
+#            #Results of unifrac
+#            #The distance matrix is res['distance_matrix']
+#            #The PCoA data is res['pcoa']
 #            return fast_unifrac(tr,envs_Dict,weighted=tempWeighted)
 #        else:
 #            print "".join(["Diversity.getUnifracDistance. Invalid ldSampleTaxaAbundancies filename. Received=",str(ldSampleTaxaAbundancies)])
 #            return False
 
     #TODO Need to figure out how to combine the non normalized and normalized metric values going in and going out of metric creation
-    #@params ldAbundancies List of values to compute diversity
-    #@params strMetric Alpha metric to use to define diversity
-    #@return float
     @staticmethod
     def funcGetAlphaMetric(ldAbundancies=None, strMetric=None):
         """
         Get alpha abundance of the metric for the vector.
 
-        :param	:
-        :type
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	ldAbundancies:	List of values to compute metric (a sample).
+        :type	List	List of doubles.
+        :param	strMetric:	The metric to measure.
+        :type	String	Metric name (Use from constants above).
+        :return	Metric:	Metric specified by strMetric derived from ldAbundancies.
+        :type	Double
         """
 
         if(not ValidateData.funcIsValidString(strMetric)):
@@ -289,26 +282,20 @@ class Diversity:
         else:
             return False
 
-    #Testing: Happy path Testing (3)
-    #@params npaSampleAbundance Observations (Taxa (row) x sample (column))
-    #@params lsSampleNames List of sample names of samples to measure (do not include the taxa id column name or other column names which should not be read)
-    #@params lsDiversityMetricAlpha List of diversity metrics to use in measuring
-    #@return A lists of lists. Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
-    #[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
     @staticmethod
     def funcBuildAlphaMetricsMatrix(npaSampleAbundance = None, lsSampleNames = None, lsDiversityMetricAlpha = None):
         """
         Build a matrix of alpha diversity metrics for each sample
         Row = metric, column = sample
 
-        :param	:
-        :type
-        :param	:
-        :type
-        :param	:
-        :type
-        :return	:
-        :type
+        :param	npaSampleAbundance:	Observations (Taxa (row) x sample (column))
+        :type	Numpy Array
+        :param	lsSampleNames:	List of sample names of samples to measure (do not include the taxa id column name or other column names which should not be read).
+        :type	List of strings	Strings being samples to measure from the npaSampleAbundance.
+        :param	lsDiversityMetricAlpha:	List of diversity metrics to use in measuring.
+        :type	List of strings	Strings being metrics to derived from the indicated samples.
+        :return	List of List of doubles:	Each internal list is a list of (floats) indicating a specific metric measurement method measuring multiple samples
+        :type	List of Lists	[[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
         """
 
         if not ValidateData.funcIsValidList(lsDiversityMetricAlpha):
