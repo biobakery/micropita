@@ -32,7 +32,7 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
 #Outputfile
-argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_genericOutputFigureFileHelp )
+argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_strGenericOutputFigureFileHelp )
 #Selection parameter
 argp.add_argument("strSelectionMethods", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionMethodsCommaHelp)
 #Micropita selection file (predicted samples)

@@ -52,7 +52,7 @@ argp.add_argument( "strSelectionAbundanceFile", metavar = "Selection_Abundance_f
 argp.add_argument( "strSelectionFile", metavar = "Selection_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 
 #Outputfile
-argp.add_argument( "strOutFigure", metavar = "BoxPlotOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
+argp.add_argument( "strOutFigure", metavar = "BoxPlotOutputFile", help = Constants_Arguments.c_strGenericOutputFigureFileHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -81,7 +81,7 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     #Validation table
-    abndValidationData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
+    abndValidationData = AbundanceTable.funcMakeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
                                             fIsSummed=fValidationIsSummed, sMetadataID=args.sValidationIDName, sLastMetadata=args.sValidationLastMetadataName)
     if not fValidationIsSummed:
         abndValidationData.funcSumClades()
@@ -89,7 +89,7 @@ def _main( ):
         abndValidationData.funcNormalize()
 
     #Selection table
-    abndSelectionTable = AbundanceTable.makeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
+    abndSelectionTable = AbundanceTable.funcMakeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
     if not fIsSummed:
         abndSelectionTable.funcSumClades()
@@ -104,10 +104,10 @@ def _main( ):
 
     #For each diversity methodology in the selection
     for sMethod in dictAllSelectionStudies.keys():
-        if sMethod == MicroPITA.c_DIVERSITY_1:
+        if sMethod == MicroPITA.c_strDiversity1:
 
             #Get the alpha metric being used and normalize
-            sMetric = MicroPITA.convertMicroPITAToAMetric[sMethod]
+            sMetric = MicroPITA.dictConvertMicroPITAToAMetric[sMethod]
             
             #Get the selection
             setsDiversitySelection = set(dictAllSelectionStudies[sMethod])
@@ -165,8 +165,8 @@ def _main( ):
 
                     #Create selected and not selected groupings
                     #Measure diversity of selected and not selected groupings
-                    ldSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = lsSelectedInValidation, tempDiversityMetricAlpha = sMetric)
-                    ldNotSelectedDiversity = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abndValidationData.funcGetAbundanceCopy(), tempSampleNames = (setsValidationMetadata-set(lsSelectedInValidation)), tempDiversityMetricAlpha = sMetric)
+                    ldSelectedDiversity = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndValidationData.funcGetAbundanceCopy(), lsSampleNames = lsSelectedInValidation, lsDiversityMetricAlpha = sMetric)
+                    ldNotSelectedDiversity = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndValidationData.funcGetAbundanceCopy(), lsSampleNames = (setsValidationMetadata-set(lsSelectedInValidation)), lsDiversityMetricAlpha = sMetric)
 
                     #Make box plot
                     bp = plt.boxplot(x=[ldSelectedDiversity[0],ldNotSelectedDiversity[0]], notch=1, patch_artist=True)

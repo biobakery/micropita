@@ -46,7 +46,7 @@ class SVM:
         if abndAbundanceTable == None:
             print "Error, invalid Abundance table."
             return False
-        if(not ValidateData.isValidString(strOutputSVMFile)):
+        if(not ValidateData.funcIsValidString(strOutputSVMFile)):
             print "Error, file not valid. File:"+str(strOutputSVMFile)
             return False
 
@@ -80,7 +80,7 @@ class SVM:
     @staticmethod
     def funcScaleFeature(npdData):
         """
-        Scale a feature between 0 and 1.
+        Scale a feature between 0 and 1. Using 01 and not 01,1 because it keeps te sparsity of the data and may save time.
 
         :param	npdData:	Feature data to scale.
         :type	Numpy Array	Scaled feature data.

@@ -38,11 +38,11 @@ class SVMTest(unittest.TestCase):
 
         strOutputFile = "".join([Constants_Testing.c_strTestingTMP,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-SVMFile.txt"])
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
-        lsUniqueLabels = SVM.convertAbundanceTableToSVMFile(abndAbundanceTable=abndData, tempOutputSVMFile=strOutputFile, sMetadataLabel=sLastMetadata)
+        lsUniqueLabels = SVM.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abndData, strOutputSVMFile=strOutputFile, sMetadataLabel=sLastMetadata)
 
         #Correct Answer
         sLAntecubitalFossa = lsUniqueLabels.index("L_Antecubital_fossa")

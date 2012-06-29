@@ -35,8 +35,8 @@ from scikits.learn.cluster import AffinityPropagation
 #Tests the Blog object
 class MicroPITATest(unittest.TestCase):
 
-#####Test GetTopRankedSamples
-    def testGetTopRankedSamplesForGoodCase1(self):
+#####Test funcGetTopRankedSamples
+    def testfuncGetTopRankedSamplesForGoodCase1(self):
         
         #Inputs
         scores = [[1,2,3,4,5,6,7,8,9,10]]
@@ -46,12 +46,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[9,8,7]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase2(self):
+    def testfuncGetTopRankedSamplesForGoodCase2(self):
         
         #Inputs
         scores = [[10,9,8,7,6,5,4,3,2,1]]
@@ -61,12 +61,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[0,1,2]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase3(self):
+    def testfuncGetTopRankedSamplesForGoodCase3(self):
         
         #Inputs
         scores = [[10,3,40,56,35,678,3,0,-2366]]
@@ -76,12 +76,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[5,3,2]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase4(self):
+    def testfuncGetTopRankedSamplesForGoodCase4(self):
         
         #Inputs
         scores = [[.1,.4,.2,.5,.6,.7,.46,.9]]
@@ -91,12 +91,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[7,5,4]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase5(self):
+    def testfuncGetTopRankedSamplesForGoodCase5(self):
         
         #Inputs
         scores = [[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1]]
@@ -106,12 +106,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[9,8,7]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase6(self):
+    def testfuncGetTopRankedSamplesForGoodCase6(self):
         
         #Inputs
         scores = [[1,2,3,4,5,6,7,8,9,10],[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1],[.1,.4,.2,.5,.6,.7,.46,.9]]
@@ -121,12 +121,12 @@ class MicroPITATest(unittest.TestCase):
         answer = [[9,8,7],[9,8,7],[7,5,4]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix = scores, tempTopAmount = N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix = scores, iTopAmount = N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCase6WithSamples(self):
+    def testfuncGetTopRankedSamplesForGoodCase6WithSamples(self):
         
         #Inputs
         scores = [[1,2,3,4,5,6,7,8,9,10],[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1],[.1,.4,.2,.5,.6,.7,.46,.9]]
@@ -137,17 +137,17 @@ class MicroPITATest(unittest.TestCase):
         answer = [["Nine","Eight","Seven"],["Nine","Eight","Seven"],["Seven","Five","Four"]]
 
         #Call method
-        result = MicroPITA().getTopRankedSamples(tempMatrix=scores, tempSampleNames=names, tempTopAmount=N)
+        result = MicroPITA().funcGetTopRankedSamples(lldMatrix=scores, lsSampleNames=names, iTopAmount=N)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -160,7 +160,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 1
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -168,8 +168,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "['Sample_1']"
@@ -177,12 +177,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -195,7 +195,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 1
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -203,8 +203,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "['Sample_1']"
@@ -212,12 +212,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -230,7 +230,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 1
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -238,8 +238,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "['Sample_1']"
@@ -247,12 +247,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData1InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -265,7 +265,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 1
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -273,8 +273,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_1']]"
@@ -282,12 +282,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData2InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData2InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -300,7 +300,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 2
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -308,8 +308,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_1', 'Sample_2']]"
@@ -317,12 +317,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData3InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData3InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -335,7 +335,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 3
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -343,8 +343,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_1', 'Sample_2', 'Sample_3']]"
@@ -352,12 +352,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData4InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData4InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -370,7 +370,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 4
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -378,8 +378,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_1', 'Sample_2', 'Sample_3', 'Sample_4']]"
@@ -387,12 +387,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData5InvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData5InvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -405,7 +405,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 5
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData.funcNormalize()
@@ -413,8 +413,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_1', 'Sample_2', 'Sample_3', 'Sample_4', 'Sample_5']]"
@@ -422,12 +422,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData1Choa(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData1Choa(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity]
 
         #Generate data
         #Inputs
@@ -440,7 +440,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 1
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -448,8 +448,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50']]"
@@ -457,12 +457,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData2Choa(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData2Choa(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity]
 
         #Generate data
         #Inputs
@@ -475,7 +475,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 2
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -483,8 +483,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50', 'Sample_49']]"
@@ -492,12 +492,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData3Choa(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData3Choa(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity]
 
         #Generate data
         #Inputs
@@ -510,7 +510,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 3
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -518,8 +518,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50', 'Sample_49', 'Sample_48']]"
@@ -527,12 +527,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData4Choa(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData4Choa(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity]
 
         #Generate data
         #Inputs
@@ -545,7 +545,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 4
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -553,8 +553,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50', 'Sample_49', 'Sample_48', 'Sample_47']]"
@@ -562,12 +562,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData5Choa(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData5Choa(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity]
 
         #Generate data
         #Inputs
@@ -580,7 +580,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 5
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -588,8 +588,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50', 'Sample_49', 'Sample_48', 'Sample_47', 'Sample_46']]"
@@ -597,12 +597,12 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetTopRankedSamplesForGoodCaseAbridgedData5ChoaInvSimpson(self):
+    def testfuncGetTopRankedSamplesForGoodCaseAbridgedData5ChoaInvSimpson(self):
 
         #Inputs
         normalize = True
         microPITA = MicroPITA()
-        metric = [microPITA.c_CHAO1_A_DIVERSITY,microPITA.c_INV_SIMPSON_A_DIVERSITY]
+        metric = [microPITA.c_strChao1Diversity,microPITA.c_strInverseSimpsonDiversity]
 
         #Generate data
         #Inputs
@@ -615,7 +615,7 @@ class MicroPITATest(unittest.TestCase):
         fIsNormalized = True
         iSelectCount = 5
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -623,8 +623,8 @@ class MicroPITATest(unittest.TestCase):
         sampleNames = abndData.funcGetSampleNames()
 
         #Get results
-        metrics = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
-        result = microPITA.getTopRankedSamples(tempMatrix = metrics, tempSampleNames = sampleNames, tempTopAmount = iSelectCount)
+        metrics = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
+        result = microPITA.funcGetTopRankedSamples(lldMatrix = metrics, lsSampleNames = sampleNames, iTopAmount = iSelectCount)
 
         #Correct Answer
         answer = "[['Sample_50', 'Sample_49', 'Sample_48', 'Sample_47', 'Sample_46'], ['Sample_1', 'Sample_2', 'Sample_3', 'Sample_4', 'Sample_5']]"
@@ -633,8 +633,8 @@ class MicroPITATest(unittest.TestCase):
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 
-#####Test GetBetaMetric Need to test other beta metrics as they come on line
-    def testGetBetaMetricForGoodCaseBrayCurtisMetric(self):
+#####Test funcGetBetaMetric Need to test other beta metrics as they come on line
+    def testfuncGetBetaMetricForGoodCaseBrayCurtisMetric(self):
 
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -645,22 +645,22 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        rawData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
         microPITA = MicroPITA()
-        metric = microPITA.c_BRAY_CURTIS_B_DIVERSITY
+        metric = microPITA.c_strBrayCurtisDissimilarity
 
         #Generate data
         abundance = rawData.funcGetAbundanceCopy()
         sampleNames = rawData.funcGetSampleNames()
-        abundance = Utility_Math.transposeDataMatrix(abundance)
+        abundance = Utility_Math.funcTransposeDataMatrix(abundance)
         abundance = abundance[1:4]
 
         #Get results
         #tempAbundancies Abundancies to be measured. Matrix should be where row = samples and columns = organisms
-        result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
+        result = microPITA.funcGetBetaMetric(npadAbundancies=abundance, sMetric=metric)
 
         #Correct Answer
         answer = "[ 1.  1.  1.]"
@@ -668,7 +668,7 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetBetaMetricForGoodCaseBrayCurtisMetric4(self):
+    def testfuncGetBetaMetricForGoodCaseBrayCurtisMetric4(self):
 
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -679,23 +679,22 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        rawData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
         microPITA = MicroPITA()
-        metric = microPITA.c_BRAY_CURTIS_B_DIVERSITY
+        metric = microPITA.c_strBrayCurtisDissimilarity
 
         #Generate data
         abundance = rawData.funcGetAbundanceCopy()
         sampleNames = rawData.funcGetSampleNames()
-        abundance = Utility_Math.transposeDataMatrix(abundance)
+        abundance = Utility_Math.funcTransposeDataMatrix(abundance)
         abundance = abundance[1:5]
-        print "abundance", abundance
 
         #Get results
         #tempAbundancies Abundancies to be measured. Matrix should be where row = samples and columns = organisms
-        result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
+        result = microPITA.funcGetBetaMetric(npadAbundancies=abundance, sMetric=metric)
 
         #Correct Answer
         answer = "[ 1.          1.          0.90697674  1.          0.49714286  1.        ]"
@@ -703,7 +702,7 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetBetaMetricForGoodCaseInvBrayCurtisMetric(self):
+    def testfuncGetBetaMetricForGoodCaseInvBrayCurtisMetric(self):
 
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -714,21 +713,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
         microPITA = MicroPITA()
-        metric = microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY
+        metric = microPITA.c_strInvBrayCurtisDissimilarity
 
-        rawData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
         #Generate data
         abundance = rawData.funcGetAbundanceCopy()
         sampleNames = rawData.funcGetSampleNames()
-        abundance = Utility_Math.transposeDataMatrix(abundance)
+        abundance = Utility_Math.funcTransposeDataMatrix(abundance)
         abundance = abundance[1:4]
 
         #Get results
         #tempAbundancies Abundancies to be measured. Matrix should be where row = samples and columns = organisms
-        result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
+        result = microPITA.funcGetBetaMetric(npadAbundancies=abundance, sMetric=metric)
 
         #Correct Answer
         answer = "[ 0.  0.  0.]"
@@ -736,7 +735,7 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testGetBetaMetricForGoodCaseInvBrayCurtisMetric4(self):
+    def testfuncGetBetaMetricForGoodCaseInvBrayCurtisMetric4(self):
 
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -747,21 +746,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
         microPITA = MicroPITA()
-        metric = microPITA.c_INVERSE_BRAY_CURTIS_B_DIVERSITY
+        metric = microPITA.c_strInvBrayCurtisDissimilarity
 
-        rawData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
         #Generate data
         abundance = rawData.funcGetAbundanceCopy()
         sampleNames = rawData.funcGetSampleNames()
-        abundance = Utility_Math.transposeDataMatrix(abundance)
+        abundance = Utility_Math.funcTransposeDataMatrix(abundance)
         abundance = abundance[1:5]
 
         #Get results
         #tempAbundancies Abundancies to be measured. Matrix should be where row = samples and columns = organisms
-        result = microPITA.getBetaMetric(tempAbundancies=abundance, tempMetric=metric)
+        result = microPITA.funcGetBetaMetric(npadAbundancies=abundance, sMetric=metric)
 
         #Correct Answer
         answer = "[ 0.          0.          0.09302326  0.          0.50285714  0.        ]"
@@ -769,8 +768,8 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-#####Test GetCentralSamplesByKMedoids
-    def testGetCentralSamplesByKMedoidsForGoodCaseBC(self):
+#####Test funcGetCentralSamplesByKMedoids
+    def testfuncGetCentralSamplesByKMedoidsForGoodCaseBC(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -797,22 +796,206 @@ class MicroPITATest(unittest.TestCase):
         answer = "['Six', 'One', 'Four']"
 
         #Call method
-        result = microPITA.getCentralSamplesByKMedoids(tempMatrix=data, tempMetric=Diversity.c_BRAY_CURTIS_B_DIVERSITY, tempSampleNames = sampleNames, tempNumberSamplesReturned = numberSamplesReturned)
+        result = microPITA.funcGetCentralSamplesByKMedoids(npaMatrix=data, sMetric=Diversity.c_strBrayCurtisDissimilarity, lsSampleNames = sampleNames, iNumberSamplesReturned = numberSamplesReturned)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 ###Test selectExtremeSamplesFromHClust
-    def testFuncSelectExtremeSamplesForGoodCase(self):
+    def testFuncSelectExtremeSamplesForGoodCase1Different(self):
 
-        answer = "."
-        result = ""
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six"]
+        iSelectSampleCount = 1
+        npaAbundanceMatrix = np.array([[1,0,0,0,0],[0,1,1,1,1],[0,0,1,1,1],[1,1,0,1,1],[1,1,1,0,1],[1,1,1,1,0]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+        result.sort()
+
+        answer = ["One"]
+        answer.sort()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-###Test GetAverageAbundanceSamples
-    def testGetAverageAbundanceSamplesForGoodCase1Feature(self):
+    def testFuncSelectExtremeSamplesForGoodCase2Different(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six"]
+        iSelectSampleCount = 2
+        npaAbundanceMatrix = np.array([[1,0,0,0,0],[0,1,1,1,1],[0,0,1,1,1],[1,1,0,1,1],[1,1,1,0,1],[1,1,1,1,0]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+        result.sort()
+
+        answer = ["One","Three"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectExtremeSamplesForGoodCase1Different1Groups(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four"]
+        iSelectSampleCount = 1
+        npaAbundanceMatrix = np.array([[1,0,0,0],
+                                       [1,1,1,0],
+                                       [1,1,0,0],
+                                       [0,1,1,0]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+
+        result.sort()
+
+        answer = ["One"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectExtremeSamplesForGoodCase2GradientGroups2Samples(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine"]
+        iSelectSampleCount = 2
+        npaAbundanceMatrix = np.array([[1,0,0,0,0],
+                                       [1,1,0,0,0],
+                                       [1,1,1,0,0],
+                                       [1,1,1,1,0],
+                                       [1,1,1,1,1],
+                                       [0,1,1,1,1],
+                                       [0,0,1,1,1],
+                                       [0,0,0,1,1],
+                                       [0,0,0,0,1]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+
+        result.sort()
+
+        answer = ["Four","Nine"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectExtremeSamplesForGoodCase2GradientGroups4Samples(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine"]
+        iSelectSampleCount = 4
+        npaAbundanceMatrix = np.array([[1,0,0,0,0],
+                                       [1,1,0,0,0],
+                                       [1,1,1,0,0],
+                                       [1,1,1,1,0],
+                                       [1,1,1,1,1],
+                                       [0,1,1,1,1],
+                                       [0,0,1,1,1],
+                                       [0,0,0,1,1],
+                                       [0,0,0,0,1]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+
+        result.sort()
+
+        answer = ["Three","Four","Eight","Nine"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectExtremeSamplesForGoodCase2GradientGroups6Samples(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine"]
+        iSelectSampleCount = 6
+        npaAbundanceMatrix = np.array([[1,0,0,0,0],
+                                       [1,1,0,0,0],
+                                       [1,1,1,0,0],
+                                       [1,1,1,1,0],
+                                       [1,1,1,1,1],
+                                       [0,1,1,1,1],
+                                       [0,0,1,1,1],
+                                       [0,0,0,1,1],
+                                       [0,0,0,0,1]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+
+        result.sort()
+
+        answer = ["Two","Three","Four","Seven","Eight","Nine"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectExtremeSamplesForGoodCase3Different3Groups(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strBetaMetric = microPITA.c_strInvBrayCurtisDissimilarity
+        lsSampleNames = ["One","Two","Three","Four","Five","Six"]
+        iSelectSampleCount = 3
+        npaAbundanceMatrix = np.array([[1,0,0,0],
+                                       [0,0,0,1],
+                                       [1,0,0,1],
+                                       [1,1,0,0],
+                                       [0,0,1,1],
+                                       [1,1,1,1]])
+
+        #Get results
+        result = microPITA.funcSelectExtremeSamplesFromHClust(strBetaMetric=strBetaMetric, npaAbundanceMatrix=npaAbundanceMatrix,
+                                                 lsSampleNames=lsSampleNames, iSelectSampleCount=iSelectSampleCount)
+
+        result.sort()
+
+        answer = ["One","Four","Five"]
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+
+###Test funcGetAverageAbundanceSamples
+    def testfuncGetAverageAbundanceSamplesForGoodCase1Feature(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -830,17 +1013,17 @@ class MicroPITATest(unittest.TestCase):
 
         answer= [["700098980","12.0",1],["700037470","6.0",1],["700098986","1.0",1],["700098988","1.0",1],["700098982","0.0",1]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCase1FeatureRanked(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCase1FeatureRanked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -858,17 +1041,17 @@ class MicroPITATest(unittest.TestCase):
 
         answer= [["700037470","2.0",6.0],["700098986","3.0",1.0],["700098980","4.0",12.0],["700098988","5.0",1.0],["700098982","9.0",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCase2Feature(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCase2Feature(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -887,17 +1070,17 @@ class MicroPITATest(unittest.TestCase):
                       "Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"]
         answer= [["700037470","25.5",1],["700098980","20.5",1],["700098986","2.0",1],["700098988","2.0",1],["700098982","0.0",1]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCase2FeatureRanked(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCase2FeatureRanked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -916,17 +1099,17 @@ class MicroPITATest(unittest.TestCase):
                       "Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"]
         answer= [["700037470","1.5",25.5],["700098986","2.5",2.0],["700098980","3.5",20.5],["700098988","4.0",2.0],["700098982","9.0",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCaseAllFeature(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCaseAllFeature(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -946,17 +1129,17 @@ class MicroPITATest(unittest.TestCase):
                       "Bacteria|3417"]
         answer= [["700098980","24.0",1],["700037470","11.4",1],["700098988","3.0",1],["700098986","1.8",1],["700098982","0.0",1]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCaseAllFeatureRankedWithTie(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCaseAllFeatureRankedWithTie(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -976,17 +1159,17 @@ class MicroPITATest(unittest.TestCase):
                       "Bacteria|3417"]
         answer= [["700037470","2.2",11.4],["700098986","2.8",1.8],["700098980","3.0",24.0],["700098988","3.0",3.0],["700098982","9.0",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testGetAverageAbundanceSamplesForGoodCaseAllFeatureRankedWithTies2(self):
+    def testfuncGetAverageAbundanceSamplesForGoodCaseAllFeatureRankedWithTies2(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1003,18 +1186,18 @@ class MicroPITATest(unittest.TestCase):
         liFeatures = ["Bacteria|unclassified|4904"]
         answer= [["700098980","1.0",43.0],["700098988","4.0",2.0],["700098986","6.0",0.0],["700037470","7.0",0.0],["700098982","9.0",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.getAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
+        result = microPITA.funcGetAverageAbundanceSamples(abndTable=abndData, lsTargetedFeature=liFeatures, fRank=fRanked)
         result = [[resultList[0],"{0:.1f}".format(resultList[1]),resultList[2]] for resultList in result]
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-###Test selectTargetedTaxaSamples
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect1(self):
+###Test funcSelectTargetedTaxaSamples
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect1(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1028,21 +1211,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 1
-        sMethod = MicroPITA.c_TARGETED_METHOD_ABUNDANCE
+        sMethod = MicroPITA.c_strTargetedAbundance
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700098980"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect2(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect2(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1056,21 +1239,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 2
-        sMethod = MicroPITA.c_TARGETED_METHOD_ABUNDANCE
+        sMethod = MicroPITA.c_strTargetedAbundance
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700098980","700037470"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect3(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect3(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1084,21 +1267,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 3
-        sMethod = MicroPITA.c_TARGETED_METHOD_ABUNDANCE
+        sMethod = MicroPITA.c_strTargetedAbundance
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700098980","700037470","700098986"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect4(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect4(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1112,21 +1295,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 4
-        sMethod = MicroPITA.c_TARGETED_METHOD_ABUNDANCE
+        sMethod = MicroPITA.c_strTargetedAbundance
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700098980","700037470","700098986","700098988"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect5(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect5(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1140,21 +1323,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 5
-        sMethod = MicroPITA.c_TARGETED_METHOD_ABUNDANCE
+        sMethod = MicroPITA.c_strTargetedAbundance
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700098980","700037470","700098986","700098988","700098982"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect1Ranked(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect1Ranked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1168,21 +1351,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 1
-        sMethod = MicroPITA.c_TARGETED_METHOD_RANKED
+        sMethod = MicroPITA.c_strTargetedRanked
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700037470"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect2Ranked(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect2Ranked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1196,21 +1379,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 2
-        sMethod = MicroPITA.c_TARGETED_METHOD_RANKED
+        sMethod = MicroPITA.c_strTargetedRanked
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700037470","700098986"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect3Ranked(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect3Ranked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1224,21 +1407,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 3
-        sMethod = MicroPITA.c_TARGETED_METHOD_RANKED
+        sMethod = MicroPITA.c_strTargetedRanked
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700037470","700098986","700098980"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect4Ranked(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect4Ranked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1252,21 +1435,21 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 4
-        sMethod = MicroPITA.c_TARGETED_METHOD_RANKED
+        sMethod = MicroPITA.c_strTargetedRanked
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700037470","700098986","700098980","700098988"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testSelectTargetedTaxaSamplesForGoodCase1FeatureSelect5Ranked(self):
+    def testfuncSelectTargetedTaxaSamplesForGoodCase1FeatureSelect5Ranked(self):
 
         #Micropita object
         microPITA = MicroPITA()
@@ -1280,22 +1463,22 @@ class MicroPITATest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
         iSampleCount = 5
-        sMethod = MicroPITA.c_TARGETED_METHOD_RANKED
+        sMethod = MicroPITA.c_strTargetedRanked
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
 
         answer= ["700037470","700098986","700098980","700098988","700098982"]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
-        result = microPITA.selectTargetedTaxaSamples(tempMatrix=abndData, tempTargetedTaxa=liFeatures, sampleSelectionCount=iSampleCount, sMethod=sMethod)
+        result = microPITA.funcSelectTargetedTaxaSamples(abndMatrix=abndData, lsTargetedTaxa=liFeatures, iSampleSelectionCount=iSampleCount, sMethod=sMethod)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-##### Test GetRandomSamples
-    def testGetRandomSamplesForGoodCase1of10Samples(self):
+##### Test funcGetRandomSamples
+    def testfuncGetRandomSamplesForGoodCase1of10Samples(self):
         
         #Inputs
         samples = ["one","two","three","four","five","six","seven","eight","nine","ten"]
@@ -1309,7 +1492,7 @@ class MicroPITATest(unittest.TestCase):
         errorString = ""
 
         #Call method
-        result = MicroPITA().getRandomSamples(tempSamples = samples, tempNumberOfSamplesToReturn = N)
+        result = MicroPITA().funcGetRandomSamples(lsSamples = samples, iNumberOfSamplesToReturn = N)
 
         #Check to make sure only N samples are returned
         samplesReturnLength=len(result)
@@ -1328,7 +1511,7 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(foundError),str(answer),"".join([str(self),"::",str(errorString),"."]))
 
-    def testGetRandomSamplesForGoodCase3of10Samples(self):
+    def testfuncGetRandomSamplesForGoodCase3of10Samples(self):
         
         #Inputs
         samples = ["one","two","three","four","five","six","seven","eight","nine","ten"]
@@ -1342,7 +1525,7 @@ class MicroPITATest(unittest.TestCase):
         errorString = ""
 
         #Call method
-        result = MicroPITA().getRandomSamples(tempSamples = samples, tempNumberOfSamplesToReturn = N)
+        result = MicroPITA().funcGetRandomSamples(lsSamples = samples, iNumberOfSamplesToReturn = N)
 
         #Check to make sure only N samples are returned
         samplesReturnLength=len(result)
@@ -1361,7 +1544,7 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(foundError),str(answer),"".join([str(self),"::",str(errorString),"."]))
 
-    def testGetRandomSamplesForGoodCase10of10Samples(self):
+    def testfuncGetRandomSamplesForGoodCase10of10Samples(self):
         
         #Inputs
         samples = ["one","two","three","four","five","six","seven","eight","nine","ten"]
@@ -1375,7 +1558,7 @@ class MicroPITATest(unittest.TestCase):
         errorString = ""
 
         #Call method
-        result = MicroPITA().getRandomSamples(tempSamples = samples, tempNumberOfSamplesToReturn = N)
+        result = MicroPITA().funcGetRandomSamples(lsSamples = samples, iNumberOfSamplesToReturn = N)
 
         #Check to make sure only N samples are returned
         samplesReturnLength=len(result)
@@ -1394,8 +1577,8 @@ class MicroPITATest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(foundError),str(answer),"".join([str(self),"::",str(errorString),"."]))
 
-    ##### RunSVM
-    def nottestRunSVM(self):
+    ##### funcRunSVM
+    def nottestfuncRunSVM(self):
 
         #Inputs
         #Reading file
@@ -1416,7 +1599,7 @@ class MicroPITATest(unittest.TestCase):
         labels = [0,0,0,0,0,1,1,1,1,1]
 
         #Generate data
-        microPITA.runSVM(tempInputFile=inputFile, tempDelimiter=Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
+        microPITA.funcRunSVM(tempInputFile=inputFile, tempDelimiter=Constants.TAB, tempOutputSVMFile=outputFile, tempMatrixLabels=labels, sLastMetadataName=sLastMetadataName, tempSkipFirstColumn=skipColumn1, tempNormalize=normalize, tempSVMScaleLowestBound=lowestScaleBound, tempSVMLogG=gRange, tempSVMLogC=cRange, tempSVMProbabilistic=probabilistic)
 
         #Get results
         result = ""
@@ -1604,6 +1787,751 @@ class MicroPITATest(unittest.TestCase):
         result = ""
 
         #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+### test _funcSelectSupervisedSamplesFromPredictFile
+    def testFuncSelectSupervisedSamplesFromPredictFile2Classes(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 1
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Eight","One"],microPITA.c_strSVMFar:["Three","Seven"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.464303 0.535697",
+                                                      "1 0.510597 0.489403",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "0 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "0 1:0.514484",
+                                                      "1 1:0.38026 2:0.61974",
+                                                      "0 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesDistinct(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = False
+        fSelectDistinct = True
+        iSelectCount = 1
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMFar:["Three","Seven"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.464303 0.535697",
+                                                      "1 0.510597 0.489403",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "0 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "0 1:0.514484",
+                                                      "1 1:0.38026 2:0.61974",
+                                                      "0 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesDiscriminant(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = False
+        iSelectCount = 1
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Eight","One"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.464303 0.535697",
+                                                      "1 0.510597 0.489403",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "0 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "0 1:0.514484",
+                                                      "1 1:0.38026 2:0.61974",
+                                                      "0 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturn8(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 2
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Eight","One","Six","Nine"],microPITA.c_strSVMFar:["Four","Five","Seven","Ten"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.464303 0.535697",
+                                                      "1 0.510597 0.489403",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.514484",
+                                                      "0 1:0.38026 2:0.61974",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnAll(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 2
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["One","Four","Six","Seven"],microPITA.c_strSVMFar:["Two","Three","Five","Eight"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnMoreThanExists(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 9
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["One","Four","Six","Seven","Two","Three","Five","Eight"],microPITA.c_strSVMFar:["One","Four","Six","Seven","Two","Three","Five","Eight"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnMoreThanExistsMislabeled(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 9
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["One","Four","Six","Seven","Five","Eight"],microPITA.c_strSVMFar:["One","Four","Six","Seven","Five","Eight"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "1 1:0.464303 2:0.535697",
+                                                      "0 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnMoreThanExistsClassMislabeled(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 9
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Three","Five","Six","Seven"],microPITA.c_strSVMFar:["Three","Five","Six","Seven"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["1 1:0.482089 2:0.517911",
+                                                      "1 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "1 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "1 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnMoreThanExistsClassMislabeled2(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 9
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["One","Two","Four","Eight"],microPITA.c_strSVMFar:["One","Two","Four","Eight"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "0 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "0 1:0.388271 2:0.611729",
+                                                      "0 1:0.5 2:0.5",
+                                                      "0 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile2ClassesReturnLess0(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 2
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Two","Six","Seven"],microPITA.c_strSVMFar:["Two","Three","Five"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0",
+                                                      "0 0.482089 0.517911",
+                                                      "0 0.409344 0.590656",
+                                                      "1 0.99 0.01",
+                                                      "0 0.5 0.5",
+                                                      "1 0.988271 0.011729",
+                                                      "1 0.5 0.5",
+                                                      "1 0.510373 0.489627",
+                                                      "0 0.410257 0.589743"])
+        strInputFileContents = Constants.ENDLINE.join(["1 1:0.482089 2:0.517911",
+                                                      "0 1:0.464303 2:0.535697",
+                                                      "1 1:0.510597",
+                                                      "1 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "1 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "1 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile3Classes(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 1
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Four","Seven","Six"],microPITA.c_strSVMFar:["One","Five","Three"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0 2",
+                                                      "0 0.1 0.5",
+                                                      "1 0.2 0.8",
+                                                      "2 0.99 0.01",
+                                                      "0 0.3 0.3",
+                                                      "1 0.988271 0.011729",
+                                                      "2 0.3 0.3",
+                                                      "1 0.5 0.4",
+                                                      "0 0.4 0.5"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "1 1:0.464303 2:0.535697",
+                                                      "2 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "2 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile3ClassesSelect2(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 2
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["Four","Eight","Seven","Two","Six","Three"],microPITA.c_strSVMFar:["One","Eight","Five","Two","Three","Six"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0 2",
+                                                      "0 0.1 0.5",
+                                                      "1 0.2 0.8",
+                                                      "2 0.99 0.01",
+                                                      "0 0.3 0.3",
+                                                      "1 0.988271 0.011729",
+                                                      "2 0.3 0.3",
+                                                      "1 0.5 0.4",
+                                                      "0 0.4 0.5"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "1 1:0.464303 2:0.535697",
+                                                      "2 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "2 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncSelectSupervisedSamplesFromPredictFile3ClassesSelect3(self):
+
+        #Micropita object
+        microPITA = MicroPITA()
+
+        #Inputs
+        strPredictFilePath = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromPredictionFile.txt"])
+        strOriginalInputFile = "".join([Constants_Testing.c_strTestingTMP,"TestFuncSelectSupervisedSamplesFromInputFile.txt"])
+        fSelectDiscriminant = True
+        fSelectDistinct = True
+        iSelectCount = 3
+        lsSampleNames = ["One","Two","Three","Four","Five","Six","Seven","Eight"]
+
+        #Answer
+        answer = {microPITA.c_strSVMClose:["One","Two","Three","Four","Five","Six","Seven","Eight"],microPITA.c_strSVMFar:["One","Two","Three","Four","Five","Six","Seven","Eight"]}
+
+        #Set up. Write rpedict and input files
+        strPredFileContents = Constants.ENDLINE.join(["labels 1 0 2",
+                                                      "0 0.1 0.5",
+                                                      "1 0.2 0.8",
+                                                      "2 0.99 0.01",
+                                                      "0 0.3 0.3",
+                                                      "1 0.988271 0.011729",
+                                                      "2 0.3 0.3",
+                                                      "1 0.5 0.4",
+                                                      "0 0.4 0.5"])
+        strInputFileContents = Constants.ENDLINE.join(["0 1:0.482089 2:0.517911",
+                                                      "1 1:0.464303 2:0.535697",
+                                                      "2 1:0.510597",
+                                                      "0 1:0.409344 2:0.590656",
+                                                      "1 1:0.388271 2:0.611729",
+                                                      "2 1:0.5 2:0.5",
+                                                      "1 2:0.489627",
+                                                      "0 1:0.410257 2:0.589743"])
+
+        with open(strPredictFilePath, 'w') as f, open(strOriginalInputFile, 'w') as g:
+            f.write(strPredFileContents)
+            g.write(strInputFileContents)
+
+        #Get answer
+        result = microPITA._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=strOriginalInputFile, strPredictFilePath=strPredictFilePath,
+                                                                         lsSampleNames=lsSampleNames, iSelectCount=iSelectCount, 
+                                                                         fSelectDiscriminant=fSelectDiscriminant, fSelectDistinct=fSelectDistinct)
+
+        #Standardize answer and result
+        answer = [[strKey,sorted(answer[strKey])] for strKey in answer]
+        result = [[strKey,sorted(result[strKey])] for strKey in result]
+
+        #Delete predict file
+        for strFile in [strPredictFilePath,strOriginalInputFile]:
+            if os.path.exists(strFile):
+                os.remove(strFile)
+
+        #Check result
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 ### Test run

@@ -31,9 +31,9 @@ argp = argparse.ArgumentParser( prog = "MicropitaPaperConstructDataSets.py", des
 argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", metavar= "Loglevel", default="INFO", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 #Outputfile
-argp.add_argument( "strOutputDataFile", metavar = "output.txt", help = Constants_Arguments.c_genericOutputDataFileHelp )
+argp.add_argument( "strOutputDataFile", metavar = "output.txt", help = Constants_Arguments.c_strGenericOutputDataFileHelp )
 #Data key to determine which data set to generate
-argp.add_argument( "strDataKey", metavar = "Data Set key", help = Constants_Arguments.c_dataSetKeyHelp )
+argp.add_argument( "strDataKey", metavar = "Data Set key", help = Constants_Arguments.c_strDataSetKeyHelp )
 #Actual sample selection
 argp.add_argument( "strActualFile", action="store", metavar = "Actual_file", help = Constants_Arguments.c_strMicropitaActualFileHelp, default = None, nargs = '?')
 
@@ -55,10 +55,10 @@ def _main( ):
 
     if args.strDataKey =="Diversity":
         print("Diversity")
-        Utility_Data.generateDiversityAbundanceTable(args.strOutputDataFile)
+        Utility_Data.funcGenerateDiversityAbundanceTable(args.strOutputDataFile)
     elif args.strDataKey =="Unbalanced":
         print("Unbalanced")
-        Utility_Data.generateAbundanceTable(args.strOutputDataFile,args.strActualFile)
+        Utility_Data.funcGenerateAbundanceTable(args.strOutputDataFile,args.strActualFile)
     else:
         logging.error("".join(["The following key is not valid. Did not generate data set. Key=",args.strDataKey]))
 

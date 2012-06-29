@@ -34,7 +34,7 @@ argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", act
 #Micropita selection file (predicted samples)
 argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 #Outputfile
-argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_genericOutputFigureFileHelp )
+argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_strGenericOutputFigureFileHelp )
 #Selection parameter
 argp.add_argument("strSelectionMethods", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionMethodsHelp, nargs="*")
 

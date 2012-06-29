@@ -23,7 +23,6 @@ import matplotlib.cm as cm
 from MicroPITA import MicroPITA
 import os
 from PCoA import PCoA
-from ValidateData import ValidateData
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperStratifiedPCoA.py", description = """Creates PCoA plots for stratified MicroPITA results (Both supervised and unsupervised).""" )
@@ -92,7 +91,7 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+    rawData = AbundanceTable.funcMakeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Normalize if needed and sum clades

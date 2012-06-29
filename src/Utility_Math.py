@@ -134,10 +134,10 @@ class Utility_Math():
         """
 
         #Validate parameters
-        if(not ValidateData.isValidNPArray(npaMatrix)):
+        if(not ValidateData.funcIsValidNPArray(npaMatrix)):
             print "".join(["Utility_Math:transposeDataMatrix::Error, transposeDataMatrix was an invalid structured array. Value =",str(npaMatrix)])
             return False
-        if(not ValidateData.isValidBoolean(fRemoveAdornments)):
+        if(not ValidateData.funcIsValidBoolean(fRemoveAdornments)):
             print "".join(["Utility_Math:transposeDataMatrix::Error, fRemoveAdornments was an invalid boolean. Value =",str(fRemoveAdornments)])
             return False
 

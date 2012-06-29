@@ -32,9 +32,9 @@ class MicropitaPaperSelectionHCL:
 
     def redefineMetricSelectionsAsAbsPres(self, tempSelectedSamplesDict=None, tempOutputFile=None):
         #Validate data
-        if(not ValidateData.isValidDictionary(tempSelectedSamplesDict)):
+        if(not ValidateData.funcIsValidDictionary(tempSelectedSamplesDict)):
           return False
-        if(not ValidateData.isValidString(tempOutputFile)):
+        if(not ValidateData.funcIsValidString(tempOutputFile)):
           return False
 
         #Get all unique samples/indexes
@@ -138,7 +138,7 @@ argp.add_argument( "strHCLLoc", metavar = "HClust_location", help = Constants_Ar
 argp.add_argument( "strOutHCLDataFile", metavar = "HCLData.txt", nargs = "?", help = Constants_Arguments.c_strHCLDataFileHelp)
 argp.add_argument( "strOutHCLColorFile", metavar = "HCLColor.txt", nargs = "?", help = Constants_Arguments.c_strHCLColorFileHelp)
 argp.add_argument( "strOutHCLLabelFile", metavar = "HCLLabel.txt", nargs = "?", help = Constants_Arguments.c_strHCLLabelFileHelp)
-argp.add_argument( "strOutFigure", metavar = "SelectionHCL.png", nargs = "?", help = Constants_Arguments.c_genericOutputFigureFileHelp)
+argp.add_argument( "strOutFigure", metavar = "SelectionHCL.png", nargs = "?", help = Constants_Arguments.c_strGenericOutputFigureFileHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 

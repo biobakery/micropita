@@ -116,7 +116,7 @@ argp.add_argument( "strSelectionFile", action="store", metavar = "Select_file", 
 #Actual sample selection
 argp.add_argument( "strActualFile", action="store", metavar = "Actual_file", help = Constants_Arguments.c_strMicropitaActualFileHelp)
 #Outputfile
-argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_genericOutputFigureFileHelp )
+argp.add_argument( "strOutputFigure", metavar = "output.txt", help = Constants_Arguments.c_strGenericOutputFigureFileHelp )
 #Selection parameter
 argp.add_argument("strSelectionMethods", metavar = "Selection_Methods", help = Constants_Arguments.c_strSelectionMethodsHelp, nargs="*")
 

@@ -144,31 +144,31 @@ class Constants_Figures():
             self.c_dAlpha = 0.5
 
     #Can be used to convert method names to colors
-    dictConvertMethodToHEXColor={MicroPITA.c_DIVERSITY_1:invSimpsonColor,
-                              MicroPITA.c_DIVERSITY_2:chao1Color,
-                              MicroPITA.c_EXTREME_DISSIMILARITY_1:inBrayCurtisColor,
-                              MicroPITA.c_SVM_CLOSE:svmClose,
-                              MicroPITA.c_SVM_FAR:svmFar,
-                              MicroPITA.c_RANDOM:randomColor,
-                              MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColor,
-                              MicroPITA.c_USER_RANKED:userRanked}
+    dictConvertMethodToHEXColor={MicroPITA.c_strDiversity1:invSimpsonColor,
+                              MicroPITA.c_strDiversity2:chao1Color,
+                              MicroPITA.c_strExtremeDissimiarity1:inBrayCurtisColor,
+                              MicroPITA.c_strSVMClose:svmClose,
+                              MicroPITA.c_strSVMFar:svmFar,
+                              MicroPITA.c_strRandom:randomColor,
+                              MicroPITA.c_strRepresentativeDissimilarity1:brayCurtisColor,
+                              MicroPITA.c_strUserRanked:userRanked}
 
     #Can be used to convert method names to rgb tuples
-    dictConvertMethodToRGBLetter={MicroPITA.c_DIVERSITY_1:invSimpsonColorLetter,
-                              MicroPITA.c_DIVERSITY_2:chao1ColorLetter,
-                              MicroPITA.c_EXTREME_DISSIMILARITY_1:inBrayCurtisColorLetter,
-                              MicroPITA.c_SVM_CLOSE:svmCloseLetter,
-                              MicroPITA.c_SVM_FAR:svmFarLetter,
-                              MicroPITA.c_RANDOM:randomColorLetter,
-                              MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColorLetter,
-                              MicroPITA.c_USER_RANKED:userRankedLetter}
+    dictConvertMethodToRGBLetter={MicroPITA.c_strDiversity1:invSimpsonColorLetter,
+                              MicroPITA.c_strDiversity2:chao1ColorLetter,
+                              MicroPITA.c_strExtremeDissimiarity1:inBrayCurtisColorLetter,
+                              MicroPITA.c_strSVMClose:svmCloseLetter,
+                              MicroPITA.c_strSVMFar:svmFarLetter,
+                              MicroPITA.c_strRandom:randomColorLetter,
+                              MicroPITA.c_strRepresentativeDissimilarity1:brayCurtisColorLetter,
+                              MicroPITA.c_strUserRanked:userRankedLetter}
 
     #Can be used to convert method names to rgb strings
-    dictConvertMethodToRGBString={MicroPITA.c_DIVERSITY_1:invSimpsonColorN,
-                              MicroPITA.c_DIVERSITY_2:chao1ColorN,
-                              MicroPITA.c_EXTREME_DISSIMILARITY_1:inBrayCurtisColorN,
-                              MicroPITA.c_SVM_CLOSE:svmCloseN,
-                              MicroPITA.c_SVM_FAR:svmFarN,
-                              MicroPITA.c_RANDOM:randomColorN,
-                              MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:brayCurtisColorN,
-                              MicroPITA.c_USER_RANKED:userRankedN}
+    dictConvertMethodToRGBString={MicroPITA.c_strDiversity1:invSimpsonColorN,
+                              MicroPITA.c_strDiversity2:chao1ColorN,
+                              MicroPITA.c_strExtremeDissimiarity1:inBrayCurtisColorN,
+                              MicroPITA.c_strSVMClose:svmCloseN,
+                              MicroPITA.c_strSVMFar:svmFarN,
+                              MicroPITA.c_strRandom:randomColorN,
+                              MicroPITA.c_strRepresentativeDissimilarity1:brayCurtisColorN,
+                              MicroPITA.c_strUserRanked:userRankedN}

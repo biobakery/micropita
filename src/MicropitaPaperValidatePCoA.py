@@ -18,7 +18,6 @@ import argparse
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from Constants_Figures import Constants_Figures
-from Diversity import Diversity
 import itertools
 import logging
 import matplotlib.pyplot as plt
@@ -55,7 +54,7 @@ argp.add_argument( "strSelectionAbundanceFile", metavar = "Selection_Abundance_f
 argp.add_argument( "strSelectionFile", metavar = "Selection_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp)
 
 #Outputfile
-argp.add_argument( "strOutFigure", metavar = "OutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
+argp.add_argument( "strOutFigure", metavar = "OutputFile", help = Constants_Arguments.c_strGenericOutputFigureFileHelp)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
@@ -82,7 +81,7 @@ def _main( ):
     fValidationIsNormalized = (args.fValidationIsNormalized.lower() == "true")
 
     #Number of dimensions to explore
-    iDimensionCount = 4
+    iDimensionCount = 2
 
     #Analysis object
     analysis = PCoA()
@@ -98,7 +97,7 @@ def _main( ):
     #Read abundance file
     #Abundance table object to read in and manage data
     #Validation table
-    abndValidationData = AbundanceTable.makeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
+    abndValidationData = AbundanceTable.funcMakeFromFile(strInputFile=args.strValidationAbundanceFile, fIsNormalized=fValidationIsNormalized,
                                             fIsSummed=fValidationIsSummed, sMetadataID=args.sValidationIDName, sLastMetadata=args.sValidationLastMetadataName)
     if not fValidationIsSummed:
         abndValidationData.funcSumClades()
@@ -106,7 +105,7 @@ def _main( ):
         abndValidationData.funcNormalize()
 
     #Selection table
-    abndSelectionTable = AbundanceTable.makeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
+    abndSelectionTable = AbundanceTable.funcMakeFromFile(strInputFile=args.strSelectionAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
     if not fIsSummed:
         abndSelectionTable.funcSumClades()

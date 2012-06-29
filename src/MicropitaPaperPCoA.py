@@ -23,7 +23,6 @@ import matplotlib.cm as cm
 from MicroPITA import MicroPITA
 import os
 from PCoA import PCoA
-from ValidateData import ValidateData
 
 #Set up arguments reader
 argp = argparse.ArgumentParser( prog = "MicropitaPaperPCoA.py", description = """Creates PCoA plots for MicroPITA results.""" )
@@ -88,7 +87,7 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+    rawData = AbundanceTable.funcMakeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Normalize if needed and sum clades
@@ -110,6 +109,9 @@ def _main( ):
     #File path components
     asFilePathPieces = os.path.splitext(args.strOutFile)
 
+    #Only print these metadata
+    setImportantTruth = set(["STSite"])
+
     #Generate PCoA
     #LoadData
     analysis.loadData(xData=rawData, fIsRawData=True)
@@ -118,8 +120,9 @@ def _main( ):
 
     #Draw known truths
     #Draw labeling from metadata
-#    for asMetadata in metadata:
-#      analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
+    for asMetadata in metadata:
+      if asMetadata in setImportantTruth:
+          analysis.plotList(lsLabelList=metadata[asMetadata],strOutputFileName="".join([asFilePathPieces[0],"-Truth-",str(asMetadata),"-",asFilePathPieces[1]]),iSize=c_shapeSize, dAlpha =dAlpha, fInvert=c_fInvert)
 
     #Read in prediction file is supplied
     lsPredictions = list()
@@ -163,7 +166,7 @@ def _main( ):
                 acharSelection.append(c_NotSelected)
 
         #Draw PCoA
-        if astrSelectionMethod[0] in [MicroPITA.c_SVM_CLOSE, MicroPITA.c_SVM_FAR]:
+        if astrSelectionMethod[0] in [MicroPITA.c_strSVMClose, MicroPITA.c_strSVMFar]:
           analysis.plotList(lsLabelList=lsPredictions[1:],strOutputFileName="".join([asFilePathPieces[0],"-",astrSelectionMethod[0],asFilePathPieces[1]]),
               iSize=c_shapeSize, dAlpha=dAlpha, charForceColor=[acharColors,acharSelection], fInvert=c_fInvert)
         else:

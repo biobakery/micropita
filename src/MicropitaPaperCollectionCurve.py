@@ -192,7 +192,7 @@ argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", act
 #Select file
 argp.add_argument( "strAbundanceFile", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
 #Outputfile
-argp.add_argument( "strOutFigure", metavar = "CollectionCurveOutputFile", help = Constants_Arguments.c_genericOutputFigureFileHelp)
+argp.add_argument( "strOutFigure", metavar = "CollectionCurveOutputFile", help = Constants_Arguments.c_strGenericOutputFigureFileHelp)
 argp.add_argument( "strSelectionFiles", metavar = "InputSelectionFiles", nargs = "+", help = Constants_Arguments.c_strSelectionMethodsHelp)
 #Selection parameter
 argp.add_argument(Constants_Arguments.c_strPlotSelectedArgument, metavar = "Selection_Methods", nargs = "+", help = Constants_Arguments.c_strPlotSelectedHelp)

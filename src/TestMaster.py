@@ -27,15 +27,15 @@ import Utility_MathTest
 import ValidateDataTest
 
 suite = unittest.TestSuite()
-suite.addTest(AbundanceTableTest.suite())
-#suite.addTest(CladogramTest.suite())
-suite.addTest(DiversityTest.suite())
+#suite.addTest(AbundanceTableTest.suite())
+##suite.addTest(CladogramTest.suite())
+#suite.addTest(DiversityTest.suite())
 suite.addTest(MicroPITATest.suite())
-suite.addTest(MLPYDistanceAdaptorTest.suite())
-#suite.addTest(PCoATest.suite())
+#suite.addTest(MLPYDistanceAdaptorTest.suite())
+##suite.addTest(PCoATest.suite())
 suite.addTest(SVMTest.suite())
-suite.addTest(Utility_MathTest.suite())
-suite.addTest(ValidateDataTest.suite())
+#suite.addTest(Utility_MathTest.suite())
+#suite.addTest(ValidateDataTest.suite())
 
 runner = unittest.TextTestRunner()
 runner.run(suite)

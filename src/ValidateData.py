@@ -31,7 +31,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidBoolean(parameterValue):
         """
-        Validates a boolean parameter as a valid boolean.
+        Validates a parameter as a valid boolean.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -51,7 +51,7 @@ class ValidateData:
     @staticmethod
     def funcIsTrue(parameterValue):
         """
-        Validates a boolean parameter as true.
+        Validates a parameter as true.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -67,7 +67,7 @@ class ValidateData:
     @staticmethod
     def funcIsFalse(parameterValue):
         """
-        Validates a boolean parameter as false.
+        Validates a parameter as false.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -75,7 +75,7 @@ class ValidateData:
         :type	Boolean
         """
 
-        if(ValidateData.isValidBoolean(parameterValue)):
+        if(ValidateData.funcIsValidBoolean(parameterValue)):
             if(parameterValue == False):
                 return True
         return False
@@ -83,7 +83,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidInteger(parameterValue):
         """
-        Validates a boolean parameter as an integer.
+        Validates a parameter as an integer.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -104,7 +104,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidPositiveInteger(parameterValue, tempZero = False):
         """
-        Validates a boolean parameter as false.
+        Validates a parameter as false.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -130,7 +130,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidNumeric(parameterValue):
         """
-        Validates a boolean parameter as an integer.
+        Validates a parameter as an integer.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -150,7 +150,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidStringType(parameterValue):
         """
-        Validates a boolean parameter as a string. This allows the string to be blank or empty.
+        Validates a parameter as a string. This allows the string to be blank or empty.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -171,7 +171,7 @@ class ValidateData:
     @staticmethod
     def funcIsValidString(parameterValue):
         """
-        Validates a boolean parameter as a string. Does NOT allow string to be blank or empty.
+        Validates a parameter as a string. Does NOT allow string to be blank or empty.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -188,14 +188,16 @@ class ValidateData:
             return False
         return True
 
-    ##
-    #Validates format strings used for binary data I/O
-    #Created 5/24/2010
-    #Tested 6-24-2012
-    #@param ParameterValue value to be evaluated as a format string
-    #@return bool Indicator of parameter validity
     @staticmethod
     def funcIsValidFormatString(parameterValue):
+        """
+        Validates a parameter as a valid format string.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
 
         lettersValid = False
         if ValidateData.funcIsValidString(parameterValue):
@@ -206,24 +208,30 @@ class ValidateData:
                     break
         return lettersValid
 
-    ##
-    #Validates char parameters
-    #Created 11/15/09
-    #Tested 12/12/09
-    #@param ParameterValue value to be evaluated as a character
-    #@return bool Indicator of char parameter validity
     @staticmethod
     def funcIsValidChar(parameterValue):
+        """
+        Validates a parameter as a valid character.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         return ValidateData.funcIsValidString(parameterValue)
 
-    ##
-    #Validates char parameters that must be a number of 0 or more
-    #Created 4/11/10
-    #Tested 4/12/10
-    #@param ParameterValue value to be evaluated as a char representing a decimal equal to or greater than 0
-    #@return bool Indicator of parameter validity
     @staticmethod
     def funcIsValidPositiveNumberChar(parameterValue):
+        """
+        Validates a parameter as a valid character representing a number.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         #Check to make sure is a valid string
         if not ValidateData.funcIsValidString(parameterValue):
             return False
@@ -237,67 +245,70 @@ class ValidateData:
             return False
         return True
 
-    ##
-    #Validates char parameters that must be a 0 or 1
-    #Created 4/11/10
-    #Tested 4/12/10
-    #@param ParameterValue value to be evaluated as a boolean
-    #@return bool Indicator of parameter validity
     @staticmethod
     def funcIsValidFlagChar(parameterValue):
+        """
+        Validates a parameter as a valid character representing a boolean.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         if parameterValue == '0' or parameterValue == "0" or parameterValue == '1' or parameterValue == "1":
             return True
         return False
 
-    ##
-    #Validates char parameters that must represent a integer between and including the two given integers.
-    #The lower integer bounds the number at the lower end and the higher bounds at the higher.
-    #The integers can be given in highest or lowest first. The bounding includes the integer.
-    #Created 4/13/10
-    #Tested 4/13/10
-    #@param ParameterValue value to be evaluated as an integer
-    #@param tempValueOne integer representing the one value that bounds the paramterValue
-    #@param tempValueTwo integer representing the a second value that bounds the paramterValue
-    #@return bool Indicator of parameter validity
     @staticmethod
-    def funcIsValidBoundedIntegerChar(parameterValue, tempValueOne, tempValueTwo):
+    def funcIsValidBoundedIntegerChar(parameterValue, iValueOne, iValueTwo):
+        """
+        Validates a parameter as a valid characater that represents an integer inclusively bounded by two given values.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :param	iValueOne:	One bound for the value.
+        :type	Integer
+        :param	iValueTwo:	The other bound for the data.
+        :type	Integer
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         #Check to make sure is a valid string
         if not ValidateData.funcIsValidString(parameterValue):
             return False
 
         #Check to make sure is a valid integer
-        if not ValidateData.funcIsValidInteger(tempValueOne):
+        if not ValidateData.funcIsValidInteger(iValueOne):
             return False
 
         #Check to make sure is a valid integer
-        if not ValidateData.funcIsValidInteger(tempValueTwo):
+        if not ValidateData.funcIsValidInteger(iValueTwo):
             return False
 
         #Try to convert to decimal
         try:
             intConversion = int(parameterValue)
-            if(tempValueOne < tempValueTwo):
-                if ((intConversion >= tempValueOne) and (intConversion <= tempValueTwo)):
+            if(iValueOne < iValueTwo):
+                if ((intConversion >= iValueOne) and (intConversion <= iValueTwo)):
                     return True
                 return False
-            if(tempValueTwo < tempValueOne):
-                if ((intConversion >= tempValueTwo) and (intConversion <= tempValueOne)):
+            if(iValueTwo < iValueOne):
+                if ((intConversion >= iValueTwo) and (intConversion <= iValueOne)):
                     return True
                 return False
-            if(tempValueOne == tempValueTwo):
-                if (intConversion == tempValueOne):
+            if(iValueOne == iValueTwo):
+                if (intConversion == iValueOne):
                     return True
                 return False
         except:
             return False
-    ####
-    #Collections
-    ####
 
     @staticmethod
     def funcIsValidList(parameterValue):
         """
-        Validates a boolean parameter as a list.
+        Validates a parameter as a list.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -323,13 +334,16 @@ class ValidateData:
                     return False
         return True
 
-    ##
-    #Validates tuple parameters
-    #Tested 11/25/2011
-    #@param ParameterValue value to be evaluated as a tuple
-    #@return bool Indicator of list parameter validity
     @staticmethod
     def funcIsValidTuple(parameterValue):
+        """
+        Validates a parameter as a tuple.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a tuple
+        :type	Boolean
+        """
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -346,14 +360,17 @@ class ValidateData:
                 return False
         return True
 
-    ##
-    #Validates list parameters with only numeric types
-    #Tests created 6-24-2012
-    #Tested 6-24-2012
-    #@param ParameterValue value to be evaluated as a numeric list
-    #@return bool Indicator of list parameter validity
     @staticmethod
     def funcIsValidNumericList(parameterValue):
+        """
+        Validates a parameter as a list of numeric values.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a list of numeric values.
+        :type	Boolean
+        """
+
         #Check is valid list
         if(not ValidateData.funcIsValidList(parameterValue)):
             return False
@@ -365,14 +382,17 @@ class ValidateData:
                 return False
         return True
 
-    ##
-    #Validates list parameters with only string types
-    #Created tests 6-24-2012
-    #Tested 6-24-2012
-    #@param ParameterValue value to be evaluated as a string list
-    #@return bool Indicator of list parameter validity
     @staticmethod
     def funcIsValidStringList(parameterValue):
+        """
+        Validates a parameter as a list of string values.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a list of string values.
+        :type	Boolean
+        """
+
         #Check is valid list
         if(not ValidateData.funcIsValidList(parameterValue)):
             return False
@@ -384,11 +404,16 @@ class ValidateData:
                 return False
         return True
 
-    ##
-    #Makes sure the object is not none and has a type of ndarray
-    #Created 2/25/2011
     @staticmethod
     def funcIsValidNPArray(parameterValue):
+        """
+        Validates a parameter as a numpy array.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a numpy array.
+        :type	Boolean
+        """
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -400,14 +425,16 @@ class ValidateData:
 
         return True
 
-    ##
-    #Validates list parameters
-    #Created 2/8/2010
-    #Tested 2/8/2010
-    #@param ParameterValue value to be evaluated as a dictionary
-    #@return bool Indicator of dictionary parameter validity
     @staticmethod
     def funcIsValidDictionary(parameterValue):
+        """
+        Validates a parameter as a dictionary.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a dictionary.
+        :type	Boolean
+        """
 
         #Check to make sure it is not null
         if parameterValue == None:
@@ -439,18 +466,17 @@ class ValidateData:
                     return False
         return True
 
-    ####
-    #Bioinformatics Primitives
-    ####
-
-    ##
-    #Validates DNA Sequences parameters
-    #Created 2/8/2010
-    #Tested 2/8/2010
-    #@param ParameterValue value to be evaluated as a DNA sequence
-    #@return bool Indicator of parameter validity
     @staticmethod
     def funcIsValidDNASequence(parameterValue):
+        """
+        Validates a parameter as a valid DNA sequence.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         if ValidateData.funcIsValidString(parameterValue):
             expression = re.compile(r'[^atcgATCG]')
             if not None == expression.search(parameterValue):
@@ -458,32 +484,26 @@ class ValidateData:
             return True
         return False
 
-    ##
-    #Validates Nucleotide bases
-    #Created 5/10/2010
-    #Tested 5/10/2010
-    #@param ParameterValue value to be evaluated as a nucleotide base
-    #@return bool Indicator of parameter validity
     @staticmethod
     def funcIsValidNucleotideBase(parameterValue):
+        """
+        Validates a parameter as a character which is a valid nucleotide representation.
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
         if (ValidateData.funcIsValidDNASequence(parameterValue) or (parameterValue == 'u') or (parameterValue == "U")):
             if (len(parameterValue) == 1):
                 return True
         return False
 
-    ####
-    #File Structure
-    ####
-    
-
-    ####
-    #Classes, Functions, and Instances
-    ####
-
     @staticmethod
     def funcIsValidFileName(parameterValue):
         """
-        Validates a boolean parameter as a valid file name.
+        Validates a parameter as a valid file name.
 
         :param	parameterValue:	Value to be evaluated.
         :type	Unknown
@@ -495,24 +515,28 @@ class ValidateData:
             return os.path.exists(parameterValue)
         return False
 
-    ##
-    #Validates classes to be of the give type
-    #Created 6-24-2012
-    #Tested 6-24-2012
-    #@param tempClassInstance Instance of the class to be evaluated
-    #@param tempCorrectName TestName of the class to evaluate the instance against
-    #@return bool Indicator of parameter validity
     @staticmethod
-    def funcIsValidClass(tempClassInstance, tempCorrectName):
-        if(tempClassInstance==None):
+    def funcIsValidClass(parameterValue, strCorrectName):
+        """
+        Validates a parameter as a valid class (of a specifc type given by name).
+
+        :param	parameterValue:	Value to be evaluated.
+        :type	Unknown
+        :param	strCorrectName:	Name of te class the parameter should be.
+        :type	Unknown
+        :return	Boolean:	True indicates the parameter is a valid value.
+        :type	Boolean
+        """
+
+        if(parameterValue==None):
             return False
-        if not ValidateData.funcIsValidString(tempCorrectName):
+        if not ValidateData.funcIsValidString(strCorrectName):
             return False
-        classType = type(tempClassInstance).__name__
-        if(classType == tempCorrectName):
+        classType = type(parameterValue).__name__
+        if(classType == strCorrectName):
             return True
         if(classType == 'instance'):
-            if(tempClassInstance.__class__.__name__==tempCorrectName):
+            if(parameterValue.__class__.__name__==strCorrectName):
                 return True
             else:
                 return False

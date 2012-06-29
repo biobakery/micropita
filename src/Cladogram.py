@@ -127,8 +127,8 @@ class Cladogram:
     :param fOverwrite If element is already indicated to be highlighted, overwrite the color to the one provided here.
     :type fOverwrite boolean (True == overwrite color)
     """
-    if ValidateData.isValidDictionary(dictClades):
-        if ValidateData.isValidBoolean(fOverwrite):
+    if ValidateData.funcIsValidDictionary(dictClades):
+        if ValidateData.funcIsValidBoolean(fOverwrite):
             for strElement in dictClades:
                 if(strElement in self.dictForcedHighLights):
                     if(fOverwrite):
@@ -300,7 +300,7 @@ class Cladogram:
     :param dictColors Color Name and RGB specification
     :type dictColorsDictionary strings 
     """
-    if ValidateData.isValidDictionary(dictColors):
+    if ValidateData.funcIsValidDictionary(dictColors):
       self.dictColors = dictColors
       if not Constants_Figures.c_strBackgroundColorName in self.dictColors:
         self.dictColors[Constants_Figures.c_strBackgroundColorName]=Constants_Figures.c_strBackgroundColor

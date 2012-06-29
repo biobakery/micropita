@@ -26,7 +26,6 @@ import numpy as np
 import os
 import scipy.stats.stats as stats
 from Utility_Math import Utility_Math
-from ValidateData import ValidateData
 
 class MicropitaPaperSelectionCladogram:
     """
@@ -135,7 +134,7 @@ def _main( ):
     sCladogramDetails = "".join(["Input File:",args.strInputFile,Constants.ENDLINE])
 
     #Get Abundance table data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strInputFile, fIsNormalized=fIsNormalized,
+    rawData = AbundanceTable.funcMakeFromFile(strInputFile=args.strInputFile, fIsNormalized=fIsNormalized,
                                           fIsSummed=fIsSummed, sMetadataID=args.sIDName, 
                                           sLastMetadata=args.sLastMetadataName,cFeatureNameDelimiter=c_strLineageDelim)
 
@@ -233,18 +232,14 @@ def _main( ):
                         Constants.ENDLINE.join(["".join([sKey,"=",str([dictSelection[sKey]])]) for sKey in dictSelection.keys()]),Constants.ENDLINE,Constants.ENDLINE])
 
     #Set Color Data
-    dictColors = {MicroPITA.c_DIVERSITY_1:objColors.invSimpsonColorN,
-                  MicroPITA.c_DIVERSITY_2:objColors.chao1ColorN,
-                  MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_1:objColors.brayCurtisColorN,
-                  MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_2:objColors.unifracColorN,
-                  MicroPITA.c_REPRESENTATIVE_DISSIMILARITY_3:objColors.weightedUnifracColorN,
-                  MicroPITA.c_EXTREME_DISSIMILARITY_1:objColors.inBrayCurtisColorN,
-                  MicroPITA.c_EXTREME_DISSIMILARITY_2:objColors.inUnifracColorN,
-                  MicroPITA.c_EXTREME_DISSIMILARITY_3:objColors.inWeightedUnifracColorN,
-                  MicroPITA.c_USER_RANKED:objColors.userRankedN,
-                  MicroPITA.c_RANDOM:objColors.randomColorN,
-                  MicroPITA.c_SVM_CLOSE:objColors.svmCloseN,
-                  MicroPITA.c_SVM_FAR:objColors.svmFarN,
+    dictColors = {MicroPITA.c_strDiversity1:objColors.invSimpsonColorN,
+                  MicroPITA.c_strDiversity2:objColors.chao1ColorN,
+                  MicroPITA.c_strRepresentativeDissimilarity1:objColors.brayCurtisColorN,
+                  MicroPITA.c_strExtremeDissimiarity1:objColors.inBrayCurtisColorN,
+                  MicroPITA.c_strUserRanked:objColors.userRankedN,
+                  MicroPITA.c_strRandom:objColors.randomColorN,
+                  MicroPITA.c_strSVMClose:objColors.svmCloseN,
+                  MicroPITA.c_strSVMFar:objColors.svmFarN,
                   objColors.c_strBackgroundColorName:objColors.c_strBackgroundColor}
     cladogram.setColorData(dictColors)
 
@@ -290,11 +285,11 @@ def _main( ):
       for sHighlight in lsUserDefinedHighlighted:
         if c_strLabelDelim in sHighlight:
           lsHighlightElements = filter(None,sHighlight.split(c_strLabelDelim))
-          dictTaxaHighlights[lsHighlightElements[0]] = MicroPITA.c_DIVERSITY_2
+          dictTaxaHighlights[lsHighlightElements[0]] = MicroPITA.c_strDiversity2
           dictRelabel[lsHighlightElements[0]] = "".join([str(iLabelCount),":",lsHighlightElements[1]])
           iLabelCount = iLabelCount + 1
         else:
-          dictTaxaHighlights[sHighlight] = MicroPITA.c_DIVERSITY_2
+          dictTaxaHighlights[sHighlight] = MicroPITA.c_strDiversity2
       cladogram.addHighLights(dictTaxaHighlights,True)
       if len(dictRelabel) > 0:
         cladogram.relabelIDs(dictRelabel)
@@ -369,7 +364,7 @@ def _main( ):
           #If using qvalues generate them with FDR BH
           if fIsQValue:
             #Convert pvalues to qvalues
-            ldOrderedQValues = Utility_Math.convertToBHQValue(ldOrderedPValues)
+            ldOrderedQValues = Utility_Math.funcConvertToBHQValue(ldOrderedPValues)
 
             #Update the score data with qvalues
             for iQIndex in xrange(0,len(ldOrderedQValues)):

@@ -27,7 +27,7 @@ class CommandLine():
     def runCommandLine(self,tempCommand = None):
         print "Command="+str(tempCommand)
         #Makes sure the the input data is a list of strings
-        if(not ValidateData.isValidStringList(tempCommand)):
+        if(not ValidateData.funcIsValidStringList(tempCommand)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempCommand)+"."
             return False
 
@@ -56,7 +56,7 @@ class CommandLine():
     #@return False = Failure or the return code from the subprocess
     def runPipedCommandLine(self,tempCommand = None):
         #Makes sure the the input data is a list of strings
-        if(not ValidateData.isValidStringList(tempCommand)):
+        if(not ValidateData.funcIsValidStringList(tempCommand)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempCommand)+"."
             return False
 
@@ -84,7 +84,7 @@ class CommandLine():
         success = True
 
         #Makes sure the the input data is list of strings
-        if(not ValidateData.isValidStringList(tempArrayOfCommands)):
+        if(not ValidateData.funcIsValidStringList(tempArrayOfCommands)):
             print "Error:: tempCommand must be an array of strings. Received="+str(tempArrayOfCommands)+"."
             return False
 

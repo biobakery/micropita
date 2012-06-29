@@ -92,7 +92,7 @@ def _main( ):
 
     #Read abundance file
     #Abundance table object to read in and manage data
-    rawData = AbundanceTable.makeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
+    rawData = AbundanceTable.funcMakeFromFile(strInputFile=args.strFileAbund, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
     #Normalize if needed and sum clades
@@ -154,7 +154,7 @@ def _main( ):
                     if not acharColors[iindex] == objFigureControl.c_charNoSelect:
                         #Update colors (this is where the pie cut marker is indicated to the PCoA software)
                         curColor = acharColors[iindex]
-                        if not ValidateData.isValidList(curColor):
+                        if not ValidateData.funIsValidList(curColor):
                           acharColors[iindex] = [curColor]
                         acharColors[iindex].append(charSelectedColor)
                         #Update selection which will be used to name selection

@@ -24,8 +24,8 @@ from ValidateData import ValidateData
 
 #External libraries
 from cogent.maths.stats.alpha_diversity import chao1_uncorrected, chao1_bias_corrected
-from cogent.maths.unifrac.fast_unifrac import fast_unifrac
-from cogent.maths.unifrac.fast_tree import UniFracTreeNode, count_envs
+#from cogent.maths.unifrac.fast_unifrac import fast_unifrac
+#from cogent.maths.unifrac.fast_tree import UniFracTreeNode, count_envs
 from cogent.parse.tree import DndParser
 #from qiime.format import format_unifrac_sample_mapping
 #from qiime.parse import parse_otu_table
@@ -37,23 +37,23 @@ class Diversity:
     """
 
     #Diversity metrics Alpha
-    c_SHANNON_A_DIVERSITY = "ShannonD"
-    c_SIMPSON_A_DIVERSITY = "SimpsonD"
-    c_INV_SIMPSON_A_DIVERSITY = "InSimpsonD"
-    c_CHAO1_A_DIVERSITY = "Chao1"
+    c_strSimpsonDiversity = "SimpsonD"
+    c_strInvSimpsonDiversity = "InSimpsonD"
+    c_strChao1Diversity = "Chao1"
 
     #Diversity metrics Beta
-    c_UNIFRAC_B_DIVERSITY = "uUnifrac"
-    c_WEIGHTED_UNIFRAC_B_DIVERSITY = "wUnifrac"
-    c_BRAY_CURTIS_B_DIVERSITY = "B_Curtis"
+#    c_UNIFRAC_B_DIVERSITY = "uUnifrac"
+#    c_WEIGHTED_UNIFRAC_B_DIVERSITY = "wUnifrac"
+    c_strBrayCurtisDissimilarity = "B_Curtis"
 
     #Addative inverses of beta metrics
-    c_INVERSE_BRAY_CURTIS_B_DIVERSITY = "InB_Curtis"
-    c_INVERSE_UNIFRAC_B_DIVERSITY = "InuUnifrac"
-    c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY = "InwUnifrac"
+    c_strInvBrayCurtisDissimilarity = "InB_Curtis"
+#    c_INVERSE_UNIFRAC_B_DIVERSITY = "InuUnifrac"
+#    c_INVERSE_WEIGHTED_UNIFRAC_B_DIVERSITY = "InwUnifrac"
 
     #Richness
-    c_OBSERVED_COUNT = "Observed_Count"
+    c_strShannonRichness = "ShannonR"
+    c_strObservedCount = "Observed_Count"
 
     @staticmethod
     def funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies=None):
@@ -93,9 +93,9 @@ class Diversity:
         return simpsons
 
     @staticmethod
-    def funcGetShannonDiversityIndex(ldSampleTaxaAbundancies=None):
+    def funcGetShannonRichnessIndex(ldSampleTaxaAbundancies=None):
         """
-        Calculates the Shannon diversity index.
+        Calculates the Shannon richness index.
         Note***: Assumes that the abundance measurements are already normalized by the total population N.
         If not normalized, include N in the parameter tempTotalN and it will be.
 
@@ -268,16 +268,16 @@ class Diversity:
 
         if(not ValidateData.funcIsValidString(strMetric)):
             return False
-        elif(strMetric == Diversity.c_SHANNON_A_DIVERSITY):
-            return Diversity.funcGetShannonDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_SIMPSON_A_DIVERSITY):
+        elif(strMetric == Diversity.c_strShannonRichness):
+            return Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies=ldAbundancies)
+        elif(strMetric == Diversity.c_strSimpsonDiversity):
             return Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_INV_SIMPSON_A_DIVERSITY):
+        elif(strMetric == Diversity.c_strInvSimpsonDiversity):
             return Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_OBSERVED_COUNT):
+        elif(strMetric == Diversity.c_strObservedCount):
             return Diversity.funcGetObservedCount(npaSampleAbundances=ldAbundancies)
         #Needs NOT Normalized Abundance
-        elif(strMetric == Diversity.c_CHAO1_A_DIVERSITY):
+        elif(strMetric == Diversity.c_strChao1Diversity):
             return Diversity.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
         else:
             return False
