@@ -82,7 +82,7 @@ class Utility_MathTest(unittest.TestCase):
           "0.9991397849462366, 0.9992553191489363, 0.9993684210526316, 0.9994791666666666, 0.9995876288659793, ",
           "0.9996938775510203, 0.9997979797979798, 0.9998999999999999, 1.0]"])
 
-        ldResults = Utility_Math.convertToBHQValue(ldInputPvalues)
+        ldResults = Utility_Math.funcConvertToBHQValue(ldInputPvalues)
         self.assertEquals(strCorrectAnswer, str(ldResults), methodName+" did not give correct result. Expected ."+strCorrectAnswer+". but received ."+str(ldResults)+".")
 
     def testConvertToBHQValueForGoodCase2(self):
@@ -98,7 +98,7 @@ class Utility_MathTest(unittest.TestCase):
         strCorrectAnswer = "".join(["[0.027, 0.05940000000000001, 0.318, 1.157142857142857, 1.1025, 0.0030000000000000005, ",
                                     "0.999, 0.0013499999999999999, 9e-05]"])
 
-        ldResults = Utility_Math.convertToBHQValue(ldInputPvalues)
+        ldResults = Utility_Math.funcConvertToBHQValue(ldInputPvalues)
         self.assertEquals(str(strCorrectAnswer), str(ldResults), methodName+" did not give correct result. Expected ."+str(strCorrectAnswer)+". but received ."+str(ldResults)+".")
 
     def testFuncSampleWithReplacementForGoodCase1(self):
@@ -176,9 +176,9 @@ class Utility_MathTest(unittest.TestCase):
       answer = "[[ 'Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72'\n  'Bacteria|unclassified|4904'\n  'Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361'\n  'Bacteria|3417'\n  'Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368']\n ['1.0' '0.0' '3.0' '0.0' '5.0']\n ['0.0' '10.0' '0.0' '45.0' '0.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']\n ['12.0' '43.0' '29.0' '34.0' '2.0']\n ['0.0' '6.0' '0.0' '3.0' '0.0']\n ['6.0' '0.0' '45.0' '0.0' '6.0']\n ['0.0' '23.0' '0.0' '0.0' '0.0']\n ['2.0' '0.0' '1.0' '0.0' '1.0']\n ['1.0' '1.0' '1.0' '1.0' '1.0']\n ['0.0' '0.0' '0.0' '0.0' '0.0']]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+      result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
                                            cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
-      result = Utility_Math.transposeDataMatrix(tempMatrix=result.funcGetAbundanceCopy(), tempRemoveAdornments=removeAdornment)
+      result = Utility_Math.funcTransposeDataMatrix(npaMatrix=result.funcGetAbundanceCopy(), fRemoveAdornments=removeAdornment)
 
       #Check result against answer
       self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -196,9 +196,9 @@ class Utility_MathTest(unittest.TestCase):
       answer = "[[  1.   0.   3.   0.   5.]\n [  0.  10.   0.  45.   0.]\n [  0.   0.   0.   0.   0.]\n [ 12.  43.  29.  34.   2.]\n [  0.   6.   0.   3.   0.]\n [  6.   0.  45.   0.   6.]\n [  0.  23.   0.   0.   0.]\n [  2.   0.   1.   0.   1.]\n [  1.   1.   1.   1.   1.]\n [  0.   0.   0.   0.   0.]]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+      result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
                                            cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
-      result = Utility_Math.transposeDataMatrix(tempMatrix=result.funcGetAbundanceCopy(), tempRemoveAdornments=removeAdornment)
+      result = Utility_Math.funcTransposeDataMatrix(npaMatrix=result.funcGetAbundanceCopy(), fRemoveAdornments=removeAdornment)
 
       #Check result against answer
       self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -215,7 +215,7 @@ class Utility_MathTest(unittest.TestCase):
       answer = "[22.0, 83.0, 79.0, 83.0, 15.0]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+      result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
                                            cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
       result = Utility_Math.funcSumRowsOfColumns(npaAbundance=result.funcGetAbundanceCopy(), lsSampleNames=result.funcGetSampleNames())
 
@@ -235,7 +235,7 @@ class Utility_MathTest(unittest.TestCase):
       answer = "[13.0, 66.0, 32.0, 34.0, 7.0]"
 
       #Call method
-      result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
+      result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False,
                                            cDelimiter=delimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadata)
       result = Utility_Math.funcSumRowsOfColumns(npaAbundance=result.funcGetAbundanceCopy(), lsSampleNames=lsSampleNames)
 

@@ -388,9 +388,6 @@ class Cladogram:
   def addCircle(self, lsTaxa, strCircle, dBorder=0.0, strShape="R", dAlpha=1.0, fForced=False):
     """
     This methods allows one to add a circle to the outside of the cladogram.
-    Note, this will automatically add any valid circle to the tick marks if tickmarks exist
-    One can add pieces of the circle at a time, the itck marks will reflect the order of the first
-    Instance of a specific circle being added to the figure.
 
     :param lsTaxa Taxa to highlight with this circle
     :type lsTaxa List of strings (taxa names)
@@ -677,50 +674,6 @@ class Cladogram:
       self.writeToFile(self.strTreeFilePath, Constants.ENDLINE.join(lsFullTree), False)
     return True
 
-#TODO Test
-  ##Returns only terminal nodes given the list's structure
-  @staticmethod
-  def funcGetTerminalNodes(lsTaxa,cDelim):
-    #Return list
-    lsRetList = list()
-
-    #Build hash
-    dictCounts = dict()
-    for strTaxaName in lsTaxa:
-      #Split into the elements of the clades
-      lsClades = filter(None,strTaxaName.split(cDelim))
-      #Count clade levels
-      iCladeLength = len(lsClades)
-    
-      #Make sure there is data to work with
-      if iCladeLength < 0:
-        pass
-
-      #Evaluate first element
-      sClade = lsClades[0]
-      if sClade in dictCounts:
-        dictCounts[sClade] = False
-      else:
-        dictCounts[sClade] = True
-
-      #Evaluate the rest of the elements
-      if iCladeLength > 1:
-        for iIndex in xrange(1,iCladeLength):
-          prevClade = sClade
-          sClade = cDelim.join([sClade,lsClades[iIndex]])
-          if sClade in dictCounts:
-            dictCounts[sClade] = False
-            dictCounts[prevClade] = False
-          else:
-            dictCounts[sClade] = True
-            dictCounts[prevClade] = False
-
-    #Return only the elements that were of count 1
-    for sName in dictCounts:
-      if dictCounts[sName]==True:
-        lsRetList.append(sName)
-    return lsRetList
-
   #Happy Path tested
   def filterByAbundance(self, lsIDs):
     """
@@ -767,7 +720,7 @@ class Cladogram:
     :type lsIDs List of strings
     """
     #First get terminal nodes
-    lsTerminalNodes = Cladogram.funcGetTerminalNodes(lsIDs,self.cFeatureDelimiter)
+    lsTerminalNodes = AbundanceTable.funcGetTerminalNodes(lsIDs,self.cFeatureDelimiter)
 
     #Count up clades
     cladeCounts = dict()

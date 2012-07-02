@@ -520,6 +520,66 @@ class AbundanceTable:
 
         return self._strOriginalName
 
+    #Happy path tested. could do more
+    def funcGetTerminalNodes(self):
+        """
+        Returns the terminal nodes given the current feature names in the abundance table. The 
+        features must contain a consensus lineage or all will be returned.
+        """
+        return AbundanceTable.funcGetTerminalNodesFromList(lsNames=self.funcGetFeatureNames(),cNameDelimiter=self.funcGetFeatureDelimiter())
+
+    @staticmethod
+    def funcGetTerminalNodesFromList(lsNames,cNameDelimiter):
+        """
+        Returns the terminal nodes given the current feature names in the abundance table. The 
+        features must contain a consensus lineage or all will be returned.
+
+        :param	lsNames:	The list of string names to parse and filter.
+        :type	List of strings
+        :param	cNameDelimiter:	The delimiter for the name of the features.
+        :type	Character	Delimiter
+        """
+
+        #Return list
+        lsRetList = list()
+
+        #Build hash
+        dictCounts = dict()
+        for strTaxaName in lsNames:
+            #Split into the elements of the clades
+            lsClades = filter(None,strTaxaName.split(cNameDelimiter))
+            #Count clade levels
+            iCladeLength = len(lsClades)
+    
+            #Make sure there is data to work with
+            if iCladeLength < 0:
+                pass
+
+            #Evaluate first element
+            sClade = lsClades[0]
+            if sClade in dictCounts:
+                dictCounts[sClade] = False
+            else:
+                dictCounts[sClade] = True
+
+            #Evaluate the rest of the elements
+            if iCladeLength > 1:
+                for iIndex in xrange(1,iCladeLength):
+                    prevClade = sClade
+                    sClade = cNameDelimiter.join([sClade,lsClades[iIndex]])
+                    if sClade in dictCounts:
+                        dictCounts[sClade] = False
+                        dictCounts[prevClade] = False
+                    else:
+                        dictCounts[sClade] = True
+                        dictCounts[prevClade] = False
+
+        #Return only the elements that were of count 1
+        for sName in dictCounts:
+            if dictCounts[sName]==True:
+                lsRetList.append(sName)
+        return lsRetList
+
     #Happy path tested
     def funcIsNormalized(self):
         """
@@ -532,7 +592,6 @@ class AbundanceTable:
         return self._fIsNormalized
 
     #Happy path tested
-    #True indicates the metadata exists and are of unique values
     def funcIsPrimaryIdMetadata(self,sMetadataName):
         """
         Checks the metadata data associatd with the sMetadatName and returns if the metadata is unique.
@@ -724,10 +783,6 @@ class AbundanceTable:
         return True
 
     #Happy path tested
-    #Normalizes a summed Abundance Table
-    #If this is called on a dataset which is not summed and not normalized
-    #The data will be summed first and then normalized
-    #If already normalized, the current normalization is kept
     def funcNormalizeColumnsWithSummedClades(self):
         """
         Normalizes a summed Abundance Table.
@@ -830,7 +885,6 @@ class AbundanceTable:
         return None
 
     #Happy Path Tested
-    #Reduce the current table to a certain clade level
     def funcReduceFeaturesToCladeLevel(self, iCladeLevel):
         """
         Reduce the current table to a certain clade level.

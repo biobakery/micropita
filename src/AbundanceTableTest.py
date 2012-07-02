@@ -37,7 +37,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -71,7 +71,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = True
         fIsNormalized = True
 
-        result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -105,7 +105,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = False
 
-        result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -129,8 +129,8 @@ class AbundanceTableTest(unittest.TestCase):
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
     #Test private methods
-    #TestTextToStructuredArray
-    def testTextToStructuredArrayForGoodCase(self):
+    #TestfuncTextToStructuredArray
+    def testfuncTextToStructuredArrayForGoodCase(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
@@ -138,33 +138,33 @@ class AbundanceTableTest(unittest.TestCase):
         normalize = False
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'TID': ['700098986', '700098984', '700098982', '700098980', '700098988', '700037470', '700037472', '700037474', '700037476', '700037478'], 'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
 
         #Call method
-        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
+        result = data._funcTextToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
-    def testTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
+    def testfuncTextToStructuredArrayForGoodCaseSpaceDelimiter(self):
         
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged_Space.txt"])
         delimiter = Constants.WHITE_SPACE
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
         answer = "[array([ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0),\n       ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0),\n       ('Bacteria|3417', 0.0, 45.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0),\n       ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)], \n      dtype=[('TID', '|S158'), ('700098986', '<f8'), ('700098984', '<f8'), ('700098982', '<f8'), ('700098980', '<f8'), ('700098988', '<f8'), ('700037470', '<f8'), ('700037472', '<f8'), ('700037474', '<f8'), ('700037476', '<f8'), ('700037478', '<f8')]), {'TID': ['700098986', '700098984', '700098982', '700098980', '700098988', '700037470', '700037472', '700037474', '700037476', '700037478'], 'STSite': ['L_Antecubital_fossa', 'R_Retroauricular_crease', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}]"
 
         #Call method
-        result = data._textToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
+        result = data._funcTextToStructuredArray(strInputFile=inputFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -181,7 +181,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = result.funcGetSampleNames()
@@ -203,7 +203,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        result = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        result = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = result.funcGetIDMetadataName()
@@ -225,7 +225,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetAbundanceCopy()
@@ -246,7 +246,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetAbundanceCopy()
@@ -271,7 +271,7 @@ class AbundanceTableTest(unittest.TestCase):
         liFeatures = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"]
         answer= [["700098980",12.0],["700037470",6.0],["700098986",1.0],["700098988",1.0],["700098982",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -294,7 +294,7 @@ class AbundanceTableTest(unittest.TestCase):
                       "Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"]
         answer= [["700037470",25.5],["700098980",20.5],["700098986",2.0],["700098988",2.0],["700098982",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -319,7 +319,7 @@ class AbundanceTableTest(unittest.TestCase):
                       "Bacteria|3417"]
         answer= [["700098980",24.0],["700037470",11.4],["700098988",3.0],["700098986",1.8],["700098982",0.0]]
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -341,7 +341,7 @@ class AbundanceTableTest(unittest.TestCase):
         liFeatures = [""]
         answer= False
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
 
@@ -361,7 +361,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
@@ -401,7 +401,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
@@ -427,7 +427,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
@@ -452,14 +452,14 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
                                                         "Bacteria|unclassified|4904",
                                                         "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"])
 
-        result = str(result.funcGetAbundanceDataCopy())
+        result = str(result.funcGetAbundanceCopy())
 
         #Correct Answer
         answer = ""
@@ -478,7 +478,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureDelimiter()
@@ -499,7 +499,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureDelimiter()
@@ -521,7 +521,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureCount()
@@ -542,7 +542,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
@@ -569,7 +569,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sFeature = "Bacteria|3417"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
@@ -592,7 +592,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sFeature = "Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
@@ -615,7 +615,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sFeature = "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
@@ -638,7 +638,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sFeature = "Bacteria|Lost"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureSumAcrossSamples(sFeature)
@@ -660,7 +660,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFeatureNames()
@@ -685,7 +685,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         abndData = abndData.funcGetFeatureAbundanceTable(["Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
@@ -713,7 +713,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsSummed = False
         fIsNormalized = True
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetFileDelimiter()
@@ -736,7 +736,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700098986"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetSample(sSample)
@@ -758,7 +758,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037470"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetSample(sSample)
@@ -780,7 +780,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetSample(sSample)
@@ -803,7 +803,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetMetadata(sLastMetadata)
@@ -825,7 +825,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetMetadata("error")
@@ -847,7 +847,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetMetadata(None)
@@ -869,7 +869,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetMetadataCopy()
@@ -896,7 +896,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetMetadataCopy()
@@ -920,7 +920,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcGetName()
@@ -930,6 +930,66 @@ class AbundanceTableTest(unittest.TestCase):
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    #Test funcGetTerminalNode
+    def testFuncGetTerminalNodesForGoodCase(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sSample = "700037478"
+
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        result = abndData.funcGetTerminalNodes()
+
+        #Correct Answer
+        answer = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72",
+                  "Bacteria|unclassified|4904",
+                  "Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
+                  "Bacteria|3417",
+                  "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"]
+        result.sort()
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    #Test funcGetTerminalNode
+    def testFuncGetTerminalNodesForGoodCase2(self):
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = True
+        sSample = "700037478"
+
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+        abndData.funcSumClades()
+        result = abndData.funcGetTerminalNodes()
+
+        #Correct Answer
+        answer = ["Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72",
+                  "Bacteria|unclassified|4904",
+                  "Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361",
+                  "Bacteria|3417",
+                  "Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"]
+        result.sort()
+        answer.sort()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
 
     #Test funcIsNormalized
     def testFuncIsNormalizedForGoodCaseTrue(self):
@@ -943,7 +1003,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = True
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsNormalized()
@@ -965,7 +1025,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = False
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsNormalized()
@@ -988,7 +1048,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = False
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsPrimaryIdMetadata(sNameRow)
@@ -1010,7 +1070,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = False
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsPrimaryIdMetadata(sLastMetadata)
@@ -1033,7 +1093,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = False
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsSummed()
@@ -1055,7 +1115,7 @@ class AbundanceTableTest(unittest.TestCase):
         fIsNormalized = False
         sSample = "700037478"
 
-        abndData = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
                                              cDelimiter = delimiter, sMetadataID = sNameRow,
                                              sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
         result = abndData.funcIsSummed()
@@ -1074,7 +1134,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1082,7 +1142,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 60
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1098,7 +1158,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1106,7 +1166,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 70
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1122,7 +1182,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1130,7 +1190,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 20
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1146,7 +1206,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1154,7 +1214,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 20
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1170,7 +1230,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1178,7 +1238,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 100
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1194,7 +1254,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1202,7 +1262,7 @@ class AbundanceTableTest(unittest.TestCase):
         dPercentageAboveThreshold = 30
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceByPercentile(dPercentileCutOff=dPercentileCutOffThreshold, dPercentageAbovePercentile=dPercentageAboveThreshold)
@@ -1220,7 +1280,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1228,7 +1288,7 @@ class AbundanceTableTest(unittest.TestCase):
         iMinSequenceThreshold = 2
 
         #Correct Answer
-        abndDataAnswer, metadataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer, metadataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceBySequenceOccurence(iMinSequence = iMinSequenceThreshold, iMinSamples = iMinSampleThreshold)
@@ -1245,7 +1305,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
@@ -1253,7 +1313,7 @@ class AbundanceTableTest(unittest.TestCase):
         iMinSequenceThreshold = 0
 
         #Correct Answer
-        abndDataAnswer, metadataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer, metadataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterAbundanceBySequenceOccurence(iMinSequence = iMinSequenceThreshold, iMinSamples = iMinSampleThreshold)
@@ -1270,14 +1330,14 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Filter options
         dMinSD = 5
 
         #Correct Answer
-        abndDataAnswer = data._textToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
+        abndDataAnswer = data._funcTextToStructuredArray(strInputFile=strAnswerFile, cDelimiter=delimiter, sMetadataID = nameRow, sLastMetadata = firstDataRow)  
 
         #Call method
         data.funcFilterFeatureBySD(dMinSDCuttOff=dMinSD)
@@ -1294,7 +1354,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
@@ -1323,7 +1383,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
@@ -1348,7 +1408,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
@@ -1369,7 +1429,7 @@ class AbundanceTableTest(unittest.TestCase):
         delimiter = Constants.TAB
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Correct Answer
@@ -1401,7 +1461,7 @@ class AbundanceTableTest(unittest.TestCase):
         firstDataRow = "#OTU ID"
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcSumClades()
         data.funcNormalizeColumnsWithSummedClades()
@@ -1441,7 +1501,7 @@ class AbundanceTableTest(unittest.TestCase):
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-ForRanked.txt"])
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data = data.funcRankAbundance()
         data._strOriginalName = ""
@@ -1449,7 +1509,7 @@ class AbundanceTableTest(unittest.TestCase):
         
 
         #Correct Answer
-        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         answer._strOriginalName = ""
         answerStr = str(answer)+str(answer.funcGetAbundanceCopy())
@@ -1470,7 +1530,7 @@ class AbundanceTableTest(unittest.TestCase):
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade1.txt"])
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Reduce Clades
@@ -1478,7 +1538,7 @@ class AbundanceTableTest(unittest.TestCase):
         resultStr = str(data.funcGetAbundanceCopy())
 
         #Correct Answer
-        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         answerStr = str(answer.funcGetAbundanceCopy())
 
@@ -1498,7 +1558,7 @@ class AbundanceTableTest(unittest.TestCase):
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade3.txt"])
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Reduce Clades
@@ -1506,7 +1566,7 @@ class AbundanceTableTest(unittest.TestCase):
         resultStr = str(data.funcGetAbundanceCopy())
 
         #Correct Answer
-        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         answerStr = str(answer.funcGetAbundanceCopy())
 
@@ -1526,7 +1586,7 @@ class AbundanceTableTest(unittest.TestCase):
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade5.txt"])
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Reduce Clades
@@ -1534,7 +1594,7 @@ class AbundanceTableTest(unittest.TestCase):
         resultStr = str(data.funcGetAbundanceCopy())
 
         #Correct Answer
-        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         answerStr = str(answer.funcGetAbundanceCopy())
 
@@ -1554,7 +1614,7 @@ class AbundanceTableTest(unittest.TestCase):
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-FakeCladesAnswerClade10.txt"])
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
 
         #Reduce Clades
@@ -1562,7 +1622,7 @@ class AbundanceTableTest(unittest.TestCase):
         resultStr = str(data.funcGetAbundanceCopy())
 
         #Correct Answer
-        answer = AbundanceTable.makeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=sAnswerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         answerStr = str(answer.funcGetAbundanceCopy())
 
@@ -1580,14 +1640,14 @@ class AbundanceTableTest(unittest.TestCase):
         firstDataRow = "#OTU ID"
 
         #Make array
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcSumClades()
         result = data._npaFeatureAbundance
 
         #Correct Answer
         answerFile = "".join([Constants_Testing.c_strTestingTruth,"test1otu-summed.txt"])
-        answer = AbundanceTable.makeFromFile(strInputFile=answerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        answer = AbundanceTable.funcMakeFromFile(strInputFile=answerFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")._npaFeatureAbundance
 
         #Check result against answer
@@ -1617,9 +1677,9 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(sFile)
 
         #Get result
-        table = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        table = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
-        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,xWriteToFile=fWriteToFile)
+        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,fWriteToFile=fWriteToFile)
         result = Constants.ENDLINE.join([str(abndTable) for abndTable in result])
 
         answer = ""
@@ -1688,9 +1748,9 @@ class AbundanceTableTest(unittest.TestCase):
                 os.remove(sFile)
 
         #Get result
-        table = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        table = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
-        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,xWriteToFile=fWriteToFile)
+        result = table.funcStratifyByMetadata(strMetadata=firstDataRow,fWriteToFile=fWriteToFile)
         result = Constants.ENDLINE.join([str(abndTable) for abndTable in result])
 
         result = ""
@@ -1732,7 +1792,7 @@ class AbundanceTableTest(unittest.TestCase):
         sFrom = nameRow
         sTo = firstDataRow
         fPrimary = False
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcTranslateIntoMetadata(lsValues=data.funcGetMetadata(sFrom),
                                                 sMetadataFrom=sFrom, sMetadataTo=sTo, fFromPrimaryIds=fPrimary)
@@ -1756,7 +1816,7 @@ class AbundanceTableTest(unittest.TestCase):
         sFrom = firstDataRow
         sTo = nameRow
         fPrimary = False
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcTranslateIntoMetadata(lsValues=data.funcGetMetadata(sFrom),
                                                 sMetadataFrom=sFrom, sMetadataTo=sTo, fFromPrimaryIds=fPrimary)
@@ -1779,7 +1839,7 @@ class AbundanceTableTest(unittest.TestCase):
         sFrom = nameRow
         sTo = firstDataRow
         fPrimary = True
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcTranslateIntoMetadata(lsValues=data.funcGetMetadata(sFrom),
                                                 sMetadataFrom=sFrom, sMetadataTo=sTo, fFromPrimaryIds=fPrimary)
@@ -1803,7 +1863,7 @@ class AbundanceTableTest(unittest.TestCase):
         sFrom = firstDataRow
         sTo = nameRow
         fPrimary = True
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcTranslateIntoMetadata(lsValues=data.funcGetMetadata(sFrom),
                                                 sMetadataFrom=sFrom, sMetadataTo=sTo, fFromPrimaryIds=fPrimary)
@@ -1828,7 +1888,7 @@ class AbundanceTableTest(unittest.TestCase):
         sTo = firstDataRow
         fPrimary = False
 
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         lsRevValues = data.funcGetMetadata(sFrom)
         lsRevValues.reverse()
@@ -1851,7 +1911,7 @@ class AbundanceTableTest(unittest.TestCase):
         normalize = False
         nameRow = "TID"
         firstDataRow = "STSite"
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         result = data.funcToArray()
 
@@ -1872,7 +1932,7 @@ class AbundanceTableTest(unittest.TestCase):
         firstDataRow = "STSite"
         sWriteToTempFile = "".join([Constants_Testing.c_strTestingTMP,"testFuncWriteToForGoodCase.txt"])
         sAnswerFile = "".join([Constants_Testing.c_strTestingTruth,"hq.otu_04-nul-nul-mtd-trn-flt-abridged-ForWrite.txt"])
-        data = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
                                              sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
         data.funcWriteToFile(strOutputFile=sWriteToTempFile, cDelimiter=data.funcGetFileDelimiter())
 

@@ -31,18 +31,18 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = True
-        metric = Diversity.c_SIMPSON_A_DIVERSITY
+        metric = Diversity.c_strSimpsonDiversity
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance.funcNormalize()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+        result = Diversity.funcGetAlphaMetric(ldAbundancies = abundance[sampleNames[0]], strMetric = metric)
 
         #Correct Answer
         answer = "0.432098765432"
@@ -56,18 +56,18 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = True
-        metric = Diversity.c_INV_SIMPSON_A_DIVERSITY
+        metric = Diversity.c_strInvSimpsonDiversity
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance.funcNormalize()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+        result = Diversity.funcGetAlphaMetric(ldAbundancies = abundance[sampleNames[0]], strMetric = metric)
 
         #Correct Answer
         answer = "2.31428571429"
@@ -81,18 +81,18 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = True
-        metric = Diversity.c_SHANNON_A_DIVERSITY
+        metric = Diversity.c_strShannonRichness
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance.funcNormalize()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+        result = Diversity.funcGetAlphaMetric(ldAbundancies = abundance[sampleNames[0]], strMetric = metric)
 
         #Correct Answer
         answer = "0.936888307539"
@@ -106,17 +106,17 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = False
-        metric = Diversity.c_CHAO1_A_DIVERSITY
+        metric = Diversity.c_strChao1Diversity
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.getAlphaMetric(tempAbundancies = abundance[sampleNames[0]], tempMetric = metric)
+        result = Diversity.funcGetAlphaMetric(ldAbundancies = abundance[sampleNames[0]], strMetric = metric)
 
         #Correct Answer
         answer = "3"
@@ -131,18 +131,18 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = True
-        metric = [Diversity.c_SIMPSON_A_DIVERSITY]
+        metric = [Diversity.c_strSimpsonDiversity]
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance.funcNormalize()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+        result = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
 
         #Correct Answer
         answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0]]"
@@ -156,17 +156,17 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = False
-        metric = [Diversity.c_CHAO1_A_DIVERSITY]
+        metric = [Diversity.c_strChao1Diversity]
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+        result = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
 
         #Correct Answer
         answer = "[[3, 2, 0, 5, 2, 3, 1, 5.0, 5, 0]]"
@@ -180,18 +180,18 @@ class DiversityTest(unittest.TestCase):
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
         normalize = True
-        metric = [Diversity.c_SIMPSON_A_DIVERSITY,Diversity.c_INV_SIMPSON_A_DIVERSITY,Diversity.c_SHANNON_A_DIVERSITY]
+        metric = [Diversity.c_strSimpsonDiversity,Diversity.c_strInvSimpsonDiversity,Diversity.c_strShannonRichness]
         sMetadataID = "TID"
         sLastMetadata = "STSite"
 
         #Generate data
-        abundance = AbundanceTable.makeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
+        abundance = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = Constants.TAB, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata, cFeatureNameDelimiter="|")
         sampleNames = abundance.funcGetSampleNames()
         abundance.funcNormalize()
         abundance = abundance.funcGetAbundanceCopy()
 
         #Get results
-        result = Diversity.buildAlphaMetricsMatrix(tempSampleAbundance = abundance, tempSampleNames = sampleNames, tempDiversityMetricAlpha = metric)
+        result = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abundance, lsSampleNames = sampleNames, lsDiversityMetricAlpha = metric)
 
         #Correct Answer
         answer = "[[0.4320987654320988, 0.70247933884297531, 0.0, 0.27736111111111111, 0.55555555555555558, 0.64542936288088648, 1.0, 0.375, 0.20000000000000004, 0.0], [2.3142857142857141, 1.4235294117647057, False, 3.6054081121682522, 1.7999999999999998, 1.5493562231759654, 1.0, 2.6666666666666665, 4.9999999999999991, False], [0.93688830753901586, 0.47413931305783735, 0.0, 1.3667866091157435, 0.63651416829481278, 0.66057888765207562, 0.0, 1.0397207708399179, 1.6094379124341005, 0.0]]"
@@ -209,7 +209,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.1144"
 
         #Call method
-        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -224,7 +224,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.974338"
 
         #Call method
-        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -239,7 +239,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -254,7 +254,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.getSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -269,7 +269,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1/0.1144
 
         #Call method
-        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -284,7 +284,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1/0.974338
 
         #Call method
-        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -299,7 +299,7 @@ class DiversityTest(unittest.TestCase):
         answer = False
 
         #Call method
-        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -314,7 +314,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -329,7 +329,7 @@ class DiversityTest(unittest.TestCase):
         answer = "2.65980629671"
 
         #Call method
-        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -344,7 +344,7 @@ class DiversityTest(unittest.TestCase):
         answer = "0.0693716084143"
 
         #Call method
-        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -359,7 +359,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -374,7 +374,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.getShannonDiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -387,7 +387,7 @@ class DiversityTest(unittest.TestCase):
         answer = 3
 
         #Call method
-        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+        result = Diversity.funcGetObservedCount(ldSampleAbundances = sampleAbundances)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -400,7 +400,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0
 
         #Call method
-        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+        result = Diversity.funcGetObservedCount(ldSampleAbundances = sampleAbundances)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -413,7 +413,7 @@ class DiversityTest(unittest.TestCase):
         answer = 7
 
         #Call method
-        result = Diversity.getObservedCount(tempSampleAbundances = sampleAbundances)
+        result = Diversity.funcGetObservedCount(ldSampleAbundances = sampleAbundances)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -428,7 +428,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333]"
 
         #Call method
-        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -445,7 +445,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333  0.14285714  0.2       ]"
 
         #Call method
-        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -461,7 +461,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.33333333  0.14285714  0.4         0.2         0.46666667  0.37142857]"
 
         #Call method
-        result = Diversity.getBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -476,7 +476,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667]"
 
         #Call method
-        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -493,7 +493,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667  0.85714286  0.8       ]"
 
         #Call method
-        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -509,7 +509,7 @@ class DiversityTest(unittest.TestCase):
         answer = "[ 0.66666667  0.85714286  0.6         0.8         0.53333333  0.62857143]"
 
         #Call method
-        result = Diversity.getInverseBrayCurtisDissimilarity(tempSampleTaxaAbundancies = sampleAbundancies)
+        result = Diversity.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies = sampleAbundancies)
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -526,7 +526,7 @@ class DiversityTest(unittest.TestCase):
         answer = 16.25
 
         #Call method
-        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies, fCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -542,7 +542,7 @@ class DiversityTest(unittest.TestCase):
         answer = 1.0
 
         #Call method
-        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies, fCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -558,7 +558,7 @@ class DiversityTest(unittest.TestCase):
         answer = 0.0
 
         #Call method
-        result = Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies = sampleAbundancies, tempCorrectForBias = correctBias)
+        result = Diversity.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies = sampleAbundancies, fCorrectForBias = correctBias)
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
@@ -587,7 +587,7 @@ class DiversityTest(unittest.TestCase):
        [ 0.26666667,  0.2       ,  0.        ]]), ['sample1', 'sample2', 'sample3'])"""
 
         #Call method
-        result = Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
+        result = Diversity.funcGetUnifracDistance(ldSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
         result = str(result['distance_matrix'])
 
         #Check result against answer
@@ -607,7 +607,7 @@ class DiversityTest(unittest.TestCase):
         envs = Constants.INPUT_DATA_DIRECTORY+"HMPQiimeFormatAbundanceTable/otu_table_psn_v35.red.txt"
 
         #Call method
-        result = Diversity.getUnifracDistance(tempSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
+        result = Diversity.funcGetUnifracDistance(ldSampleTaxaAbundancies=envs, tempTaxonomyTree = taxTree, tempWeighted=False)
         result = "Ran"
         answer = "Ran"
 

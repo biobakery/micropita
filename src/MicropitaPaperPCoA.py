@@ -110,7 +110,7 @@ def _main( ):
     asFilePathPieces = os.path.splitext(args.strOutFile)
 
     #Only print these metadata
-    setImportantTruth = set(["STSite"])
+    setImportantTruth = set(["STSite","Group","DTPBMI","DVDPFPH"])
 
     #Generate PCoA
     #LoadData

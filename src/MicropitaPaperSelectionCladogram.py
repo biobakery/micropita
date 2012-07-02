@@ -314,109 +314,110 @@ def _main( ):
           sCladogramDetails = "".join([sCladogramDetails,"Selection Method:",selectedSampleMethod])
           #All samples that were selected by the method
           lsSelectedSamples = dictSelection[selectedSampleMethod]
-          #Samples selected
-          lfSelectedSamplesUTest = []
-          lfNotSelectedSamplesUTest = []
-          #Set up boolean list to compress array
-          for sample in lsAllSampleNames:
-            wasSelected = sample in lsSelectedSamples
-            lfSelectedSamplesUTest.append(wasSelected)
-            lfNotSelectedSamplesUTest.append(not wasSelected)
+          if len(lsSelectedSamples) > 0:
+            #Samples selected
+            lfSelectedSamplesUTest = []
+            lfNotSelectedSamplesUTest = []
+            #Set up boolean list to compress array
+            for sample in lsAllSampleNames:
+              wasSelected = sample in lsSelectedSamples
+              lfSelectedSamplesUTest.append(wasSelected)
+              lfNotSelectedSamplesUTest.append(not wasSelected)
 
-          #Holds t-tests,pvalues,qvalues as needed
-          lsTaxaTScores = list()
+            #Holds t-tests,pvalues,qvalues as needed
+            lsTaxaTScores = list()
 
-          #Compress arrays to one or the other distribution
-          #Conduct wilcoxon tests on all taxa
+            #Compress arrays to one or the other distribution
+            #Conduct wilcoxon tests on all taxa
           
-          for iTaxonIndex in xrange(0,len(lsAllTaxa)):
-            npaTaxaData = list(abundance[iTaxonIndex,])
-            strTaxaId = npaTaxaData[0]
-            #Hold info about the taxa to store in the cladogram info file
-            sTaxaData = "".join([Constants.ENDLINE,strTaxaId])
+            for iTaxonIndex in xrange(0,len(lsAllTaxa)):
+              npaTaxaData = list(abundance[iTaxonIndex,])
+              strTaxaId = npaTaxaData[0]
+              #Hold info about the taxa to store in the cladogram info file
+              sTaxaData = "".join([Constants.ENDLINE,strTaxaId])
 
-            if(strTaxaId in lsTerminalTaxa):
-              npaDistribution = np.array(npaTaxaData[1:])
-              npaSelectedDistribution = np.compress(lfSelectedSamplesUTest,npaDistribution)
-              npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
-              dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
-              sTaxaData = " ".join([sTaxaData,"Score",str(dScore),"P-value",str(dPvalue),Constants.ENDLINE])
-              if(sum(npaSelectedDistribution)==0):
+              if(strTaxaId in lsTerminalTaxa):
+                npaDistribution = np.array(npaTaxaData[1:])
+                npaSelectedDistribution = np.compress(lfSelectedSamplesUTest,npaDistribution)
+                npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
+                dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
+                sTaxaData = " ".join([sTaxaData,"Score",str(dScore),"P-value",str(dPvalue),Constants.ENDLINE])
+                if(sum(npaSelectedDistribution)==0):
                   sTaxaData = "".join([sTaxaData,"Selected Average: 0 Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
-              else:
+                else:
                   sTaxadata = "".join([sTaxaData,"Selected Average: ",str(sum(npaSelectedDistribution)/float(len(npaSelectedDistribution)))," Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
-              if(sum(npaNotSelectedDistribution)==0):
+                if(sum(npaNotSelectedDistribution)==0):
                   sTaxaData = "".join([sTaxaData,"Not Selected Average: 0 Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
-              else:
+                else:
                   sTaxaData = "".join([sTaxaData,"Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)])
 
-              #[ID,TScore,PValue,QValue,SortOrder]
-              lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
-            else:
-              sTaxaData = " ".join([sTaxaData,"Not terminal, not measured"])
-            sCladogramDetails = "".join([sCladogramDetails,sTaxaData])
+                #[ID,TScore,PValue,QValue,SortOrder]
+                lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
+              else:
+                sTaxaData = " ".join([sTaxaData,"Not terminal, not measured"])
+              sCladogramDetails = "".join([sCladogramDetails,sTaxaData])
 
-          #Get a list of pvalues preserving order
-          ldOrderedPValues = list()
-          for iScoreDataIndex in lsTaxaTScores:
-            ldOrderedPValues.append(iScoreDataIndex[c_PVALUEINDEX])
+            #Get a list of pvalues preserving order
+            ldOrderedPValues = list()
+            for iScoreDataIndex in lsTaxaTScores:
+              ldOrderedPValues.append(iScoreDataIndex[c_PVALUEINDEX])
 
-          #If using qvalues generate them with FDR BH
-          if fIsQValue:
-            #Convert pvalues to qvalues
-            ldOrderedQValues = Utility_Math.funcConvertToBHQValue(ldOrderedPValues)
-
-            #Update the score data with qvalues
-            for iQIndex in xrange(0,len(ldOrderedQValues)):
-              lsTaxaTScores[iQIndex][c_QVALUEINDEX] = ldOrderedQValues[iQIndex]
-
-          lsAlpha = list()
-          lsShapes = list()
-          lsTaxa = list()
-
-          for iTaxa in xrange(0,len(lsTaxaTScores)):
-            lsCur = lsTaxaTScores[iTaxa]
-            lsTaxa.append(lsCur[c_IDINDEX])
-            dCurScore = lsCur[c_TSCOREINDEX]
-            dValue = -1
+            #If using qvalues generate them with FDR BH
             if fIsQValue:
-              dValue = lsCur[c_QVALUEINDEX]
-            else:
-              dValue = lsCur[c_PVALUEINDEX]
+              #Convert pvalues to qvalues
+              ldOrderedQValues = Utility_Math.funcConvertToBHQValue(ldOrderedPValues)
 
-            if(dValue <= float(args.dAlpha)):
-              if dCurScore > 0.0:
-                lsAlpha.append(str(1-dValue))
-                lsShapes.append(c_IncreasedEnrichment)
-              elif(dCurScore < 0.0):
-                lsAlpha.append(str(1-dValue))
-                lsShapes.append(c_DecreasedEnrichment)
-              elif(dCurScore == 0.0):
+              #Update the score data with qvalues
+              for iQIndex in xrange(0,len(ldOrderedQValues)):
+                lsTaxaTScores[iQIndex][c_QVALUEINDEX] = ldOrderedQValues[iQIndex]
+
+            lsAlpha = list()
+            lsShapes = list()
+            lsTaxa = list()
+
+            for iTaxa in xrange(0,len(lsTaxaTScores)):
+              lsCur = lsTaxaTScores[iTaxa]
+              lsTaxa.append(lsCur[c_IDINDEX])
+              dCurScore = lsCur[c_TSCOREINDEX]
+              dValue = -1
+              if fIsQValue:
+                dValue = lsCur[c_QVALUEINDEX]
+              else:
+                dValue = lsCur[c_PVALUEINDEX]
+
+              if(dValue <= float(args.dAlpha)):
+                if dCurScore > 0.0:
+                  lsAlpha.append(str(1-dValue))
+                  lsShapes.append(c_IncreasedEnrichment)
+                elif(dCurScore < 0.0):
+                  lsAlpha.append(str(1-dValue))
+                  lsShapes.append(c_DecreasedEnrichment)
+                elif(dCurScore == 0.0):
+                  lsAlpha.append("0.0")
+                  lsShapes.append(c_NoChangeEnrichment)
+              else:
                 lsAlpha.append("0.0")
                 lsShapes.append(c_NoChangeEnrichment)
-            else:
-              lsAlpha.append("0.0")
-              lsShapes.append(c_NoChangeEnrichment)
 
-          #Add circle for this data
-          cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
-          sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE,Constants.ENDLINE,"Circle Data:",Constants.ENDLINE,Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]),str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
+            #Add circle for this data
+            cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
+            sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE,Constants.ENDLINE,"Circle Data:",Constants.ENDLINE,Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]),str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
 
-          #Update detail: Enrichment details
-          #Build method enrichment detail
-          iIncreasedEnrichmentCounts = sum([1 if cEnrichment == c_IncreasedEnrichment else 0 for cEnrichment in lsShapes])
-          iDecreasedEnrichmentCounts = sum([1 if cEnrichment == c_DecreasedEnrichment else 0 for cEnrichment in lsShapes])
-          iNoChangeEnrichmentCounts = sum([1 if cEnrichment == c_NoChangeEnrichment else 0 for cEnrichment in lsShapes])
-          sMethodEnrichment = ""
-          if iIncreasedEnrichmentCounts:
-            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Increased Enrichment= ",str(iIncreasedEnrichmentCounts),Constants.ENDLINE])
-          if iDecreasedEnrichmentCounts:
-            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Decreased Enrichment= ",str(iDecreasedEnrichmentCounts),Constants.ENDLINE])
-          if iNoChangeEnrichmentCounts:
-            sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa significant but with no change= ",str(iNoChangeEnrichmentCounts),Constants.ENDLINE])
-          #Add method enrichment to total enrichment details
-          if sMethodEnrichment:
-            sCladogramDetails = "".join([sCladogramDetails, selectedSampleMethod,": ",Constants.ENDLINE,sMethodEnrichment,Constants.ENDLINE,Constants.ENDLINE])
+            #Update detail: Enrichment details
+            #Build method enrichment detail
+            iIncreasedEnrichmentCounts = sum([1 if cEnrichment == c_IncreasedEnrichment else 0 for cEnrichment in lsShapes])
+            iDecreasedEnrichmentCounts = sum([1 if cEnrichment == c_DecreasedEnrichment else 0 for cEnrichment in lsShapes])
+            iNoChangeEnrichmentCounts = sum([1 if cEnrichment == c_NoChangeEnrichment else 0 for cEnrichment in lsShapes])
+            sMethodEnrichment = ""
+            if iIncreasedEnrichmentCounts:
+              sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Increased Enrichment= ",str(iIncreasedEnrichmentCounts),Constants.ENDLINE])
+            if iDecreasedEnrichmentCounts:
+              sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Decreased Enrichment= ",str(iDecreasedEnrichmentCounts),Constants.ENDLINE])
+            if iNoChangeEnrichmentCounts:
+              sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa significant but with no change= ",str(iNoChangeEnrichmentCounts),Constants.ENDLINE])
+            #Add method enrichment to total enrichment details
+            if sMethodEnrichment:
+              sCladogramDetails = "".join([sCladogramDetails, selectedSampleMethod,": ",Constants.ENDLINE,sMethodEnrichment,Constants.ENDLINE,Constants.ENDLINE])
 
     #Generate cladogram PDF
     cladogram.generate(strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, iTerminalCladeLevel=args.iTerminalCladeLevel, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)

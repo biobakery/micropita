@@ -282,15 +282,16 @@ def _main( ):
                 lsCurSampleSelections = dictCurStudy[strCurrentMethod]
 
                 iSampleCount = len(lsCurSampleSelections)
-                setiSampleCounts.add(iSampleCount)
+                if iSampleCount > 0:
+                    setiSampleCounts.add(iSampleCount)
 
-                #Calculate measurement
-                #This assumes that a method is not ran multiple times in the same study at the same count
-                #And if so that the same method at the same count will give the same results which is currently true
-                ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
+                    #Calculate measurement
+                    #This assumes that a method is not ran multiple times in the same study at the same count
+                    #And if so that the same method at the same count will give the same results which is currently true
+                    ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
-                #Get measurement (observed count)
-                dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
+                    #Get measurement (observed count)
+                    dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
     logging.debug(dictMetricsBySampleN)

@@ -282,7 +282,7 @@ class CladogramTest(unittest.TestCase):
         result = cladogram.updateToRoot(tempClades)
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnTrue(self):
+    def testAddingAndGeneratingCircleDataForReturnTrue(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnTrue"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -303,7 +303,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = True
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnFalseLengthBorder(self):
+    def testAddingAndGeneratingCircleDataForReturnFalseLengthBorder(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnFalseLengthBorder"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -325,7 +325,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = False
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnFalseLengthShape(self):
+    def testAddingAndGeneratingCircleDataForReturnFalseLengthShape(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnFalseLengthBorder"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -347,7 +347,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = False
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnFalseLengthAlpha(self):
+    def testAddingAndGeneratingCircleDataForReturnFalseLengthAlpha(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnFalseLengthAlpha"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -369,7 +369,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = False
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnTrueLengthBorder(self):
+    def testAddingAndGeneratingCircleDataForReturnTrueLengthBorder(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnTrueLengthBorder"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -391,7 +391,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = True
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnTrueLengthShape(self):
+    def testAddingAndGeneratingCircleDataForReturnTrueLengthShape(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnTrueLengthBorder"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -413,7 +413,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = True
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForReturnTrueLengthAlpha(self):
+    def testAddingAndGeneratingCircleDataForReturnTrueLengthAlpha(self):
         methodName = "testAddingAndGeneratingCircleDataForReturnTrueLengthAlpha"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -435,7 +435,7 @@ class CladogramTest(unittest.TestCase):
         correctAnswer = True
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthAlpha(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthAlpha(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthAlpha"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -463,7 +463,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthBorder(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthBorder(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthBorder"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -491,7 +491,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthShape(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthShape(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthShape"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -519,7 +519,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot"
 
         lsTestTaxa = ["1A|2A|3A|4A|1","1A|2A|3A|4A|2","1A|2A|3A|4A|3","1A|2A|3A|4A|4",
@@ -548,7 +548,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot2(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot2(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot2"
 
         lsTestTaxa = ["1A|2A|3A|4A|1","1A|2A|3A|4A|2","1A|2A|3A|4A|3","1A|2A|3A|4A|4",
@@ -577,7 +577,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthBorderForcedRoot(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthBorderForcedRoot(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthBorderForcedRoot"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -606,7 +606,7 @@ class CladogramTest(unittest.TestCase):
         fhdlOutputFile.close()
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
-    def donttestAddingAndGeneratingCircleDataForContentTrueLengthAlphaForcedRoot(self):
+    def testAddingAndGeneratingCircleDataForContentTrueLengthAlphaForcedRoot(self):
         methodName = "testAddingAndGeneratingCircleDataForContentTrueLengthAlphaForcedRoot"
 
         lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
@@ -778,7 +778,7 @@ class CladogramTest(unittest.TestCase):
         lsCorrectIds = ["Taxa1","Taxa2","Taxa8","Taxa9","Taxa10"]
 
         #Get Abundance table data
-        rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=strTestFile, fIsNormalized=False,
                                           fIsSummed=True, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
         cladogram = Cladogram()
         cladogram.setAbundanceData(rawData)
@@ -798,7 +798,7 @@ class CladogramTest(unittest.TestCase):
         answerFileContents = "Taxa1\t19.1938205472\nTaxa2\t24.2073385653\nTaxa3\t0.000130281830588\nTaxa4\t20.7493620036\nTaxa5\t23.3284684971"
 
         #Get Abundance table data
-        rawData = AbundanceTable.makeFromFile(strInputFile=strTestFile, fIsNormalized=False,
+        rawData = AbundanceTable.funcMakeFromFile(strInputFile=strTestFile, fIsNormalized=False,
                                           fIsSummed=True, sMetadataID = sMetadataID, sLastMetadata = sLastMetadata)
 
         cladogram = Cladogram()

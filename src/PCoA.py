@@ -46,7 +46,7 @@ class PCoA:
     pcoa = None
 
     #Current dimensions
-    _iDimensions = 1
+    _iDimensions = 2
 
     #Get plot colors
     objFigureControl = Constants_Figures()

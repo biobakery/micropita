@@ -299,13 +299,14 @@ class MicroPITA:
                 iCurrentSelectCount = iCurrentSelectCount + 1
             if iCurrentSelectCount == iSelectSampleCount:
                 break
-            if(iNode1<iSampleCount):
+            if(iNode2<iSampleCount):
                 returnSamples.append(lsSampleNames[iNode2])
                 iCurrentSelectCount = iCurrentSelectCount + 1
             if iCurrentSelectCount == iSelectSampleCount:
                 break
 
         #Return selected samples
+        print "returnSamples", returnSamples
         return returnSamples
 
 ####Group 4## Rank Average of user Defined Taxa
@@ -330,7 +331,7 @@ class MicroPITA:
         llAbundance = abndTable.funcGetAverageAbundancePerSample(lsTargetedFeature)
         if not llAbundance:
             logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not get average abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
-
+            return False
         #Add a space for ranking if needed
         #Not ranked will be [[sSample,average abundance,1]]
         #(where 1 will not discriminant ties if used in later functions, so this generalizes)
@@ -1084,11 +1085,11 @@ class MicroPITA:
 
         #Diversity metrics to run
         diversityMetricsAlpha = [microPITA.c_strInverseSimpsonDiversity]
-        diversityMetricsBeta = []#[microPITA.c_strBrayCurtisDissimilarity]
+        diversityMetricsBeta = [microPITA.c_strBrayCurtisDissimilarity]
         inverseDiversityMetricsBeta = [microPITA.c_strInvBrayCurtisDissimilarity]
         diversityMetricsAlphaNoNormalize = [microPITA.c_strChao1Diversity]
-        diversityMetricsBetaNoNormalize = [microPITA.c_strBrayCurtisDissimilarity]#[]
-        inverseDiversityMetricsBetaNoNormalize = [microPITA.c_strInvBrayCurtisDissimilarity]#[]
+        diversityMetricsBetaNoNormalize = []
+        inverseDiversityMetricsBetaNoNormalize = []
 
         #Targeted taxa
         userDefinedTaxa = []
@@ -1148,7 +1149,7 @@ class MicroPITA:
         #Abundance table object to read in and manage data
         totalAbundanceTable = AbundanceTable.funcMakeFromFile(strInputFile=strInputAbundanceFile, fIsNormalized=fIsAlreadyNormalized, fIsSummed=fCladesAreSummed,
                                    cDelimiter=cDelimiter, sMetadataID=sMetadataID, sLastMetadata=sLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter)
-        
+
         if not totalAbundanceTable:
             logging.error("MicroPITA.funcRun. Could not read abundance table. Stopped.")
             return False
@@ -1156,6 +1157,9 @@ class MicroPITA:
         if fSumData:
             totalAbundanceTable.funcSumClades()
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
+
+#Remove
+#        totalAbundanceTable.funcReduceFeaturesToCladeLevel(6)
 
         #Log metadata keys
         logging.debug(" ".join(["Micropita:funcRun.","Received metadata keys=",str(dictTotalMetadata.keys())]))

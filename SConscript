@@ -68,8 +68,7 @@ c_strSufValidatedFeature = "-ValidatedFeature.pdf"
 c_strSufValidatedFeatureHistogram = "-ValidatedFeatureHist.pdf"
 c_strSufValidatedExtreme = "-ValidatedMaxDis.pdf"
 c_strSufValidatedRepresentative = "-ValidatedMaxRep.pdf"
-c_strSufValidatedDistinct = "-ValidatedDistinct.pdf"
-c_strSufValidatedDiscriminant = "-ValidatedDisrciminant.pdf"
+c_strSufValidatedSupervised = "-Validated.pdf"
 
 #Dict keys
 c_strSelectionFiles = "SelectionFiles"
@@ -660,9 +659,15 @@ for fileConfigMicropita in lMicropitaFiles:
   fileCheckedValidationFile = None
 
   #Check the validation file
+  print "sFileConfiguration[c_strConfigValidationFile]", sFileConfiguration[c_strConfigValidationFile]
+  print "sFileConfiguration[c_strConfigInputFile]", sFileConfiguration[c_strConfigInputFile]
   if((not sFileConfiguration[c_strConfigValidationFile].lower() == "none") and (not sFileConfiguration[c_strConfigValidationFile] == sFileConfiguration[c_strConfigInputFile])):
     fileValidationFile = File(sfle.d(fileDirInput.get_abspath(),sFileConfiguration[c_strConfigValidationFile]))
     fileCheckedValidationFile = File(sfle.d(fileDirDataName,sfle.rebase(sFileConfiguration[c_strConfigValidationFile], c_strSufUncheckedTable, c_strSufCheckedTable)))
+
+    print "fileValidationFile",fileValidationFile
+    print "fileCheckedValidationFile",fileCheckedValidationFile
+
     Command(fileCheckedValidationFile,[c_fileProgCheckFile, fileValidationFile], 
             funcCheckAbundanceData( " ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                     " ".join([Constants_Arguments.c_strLastMetadataNameArgument, sFileConfiguration[c_strConfigValidationLastMetadataName]])))
@@ -968,7 +973,7 @@ for fileConfigMicropita in lMicropitaFiles:
 
 #      if c_DISTINCT in lsSelectionMethods:
         #Validate Distinct selection
-#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDistinct)]) )),
+#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedSupervised)]) )),
 #              [c_fileProgValidateSupervisedPCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
 #              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
 #                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
@@ -986,7 +991,7 @@ for fileConfigMicropita in lMicropitaFiles:
 
       if c_DISTINCT in lsSelectionMethods:
         #Validate Distinct selection
-        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDistinct)]) )),
+        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedSupervised)]) )),
               [c_fileProgValidateSupervised, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
               funcValidateInSupervised(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                       " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
@@ -1006,9 +1011,9 @@ for fileConfigMicropita in lMicropitaFiles:
 
 #      if c_DISCRIMINANT in lsSelectionMethods:
 #        #Validate Discriminant selection
-#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiscriminant)]) )),
+#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedSupervised)]) )),
 #              [c_fileProgValidateSupervised, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
-#              funcValidateInSupPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+#              funcValidateInSupervised(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
 #                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
 #                                      " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
 #                                      " ".join([Constants_Arguments.c_strValidationIDNameArgument,sFileConfiguration[c_strConfigValidationIDName]]),
@@ -1025,7 +1030,7 @@ for fileConfigMicropita in lMicropitaFiles:
 
 #      if c_DISCRIMINANT in lsSelectionMethods:
 #        #Validate Discriminant selection
-#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedDiscriminant)]) )),
+#        Command(File(sfle.d( sOutputDir,"".join([sPrefix,sfle.rebase(fileCheckedValidationFile.get_abspath(), c_strSufCheckedTable, c_strSufValidatedSupervised)]) )),
 #              [c_fileProgValidateSupervisedPCoA, fileCheckedValidationFile, sCheckedAbundanceFile, sMicropitaOutput],
 #              funcValidateInPCoA(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
 #                                      " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
