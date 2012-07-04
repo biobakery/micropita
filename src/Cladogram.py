@@ -384,7 +384,7 @@ class Cladogram:
     """
     self.llsTicks = llsTicks
 
-#TODO Test
+  #Happy Path tested with createCircleFile
   def addCircle(self, lsTaxa, strCircle, dBorder=0.0, strShape="R", dAlpha=1.0, fForced=False):
     """
     This methods allows one to add a circle to the outside of the cladogram.
@@ -414,11 +414,11 @@ class Cladogram:
     dictCircleData[self.c_sShape]=strShape
     dictCircleData[self.c_sAlpha]=dAlpha
     dictCircleData[self.c_sForced]=fForced
-    #TODO validate data, if not valid, return false and no add
+
     self.ldictCircleData.append(dictCircleData)
     return True
 
-#TODO Test
+  #Happy Path tested with AddCircle
   def createCircleFile(self, lsIDs):
     """
     Write circle data to file.
@@ -580,7 +580,7 @@ class Cladogram:
 
 ############################################################
 
-#TODO Test
+  #Happy Path tested
   def createHighlightFile(self, lsIDs):
     """
     Write highlight data to file
@@ -648,7 +648,7 @@ class Cladogram:
         self.fSizeFileMade=True
     return True
 
-#TODO Test
+  #Happy path tested 1
   def createTreeFile(self, lsIDs):
     """
     Write tree data to file. The tree file defines the internal cladogram and all it's points.
@@ -720,7 +720,7 @@ class Cladogram:
     :type lsIDs List of strings
     """
     #First get terminal nodes
-    lsTerminalNodes = AbundanceTable.funcGetTerminalNodes(lsIDs,self.cFeatureDelimiter)
+    lsTerminalNodes = AbundanceTable.funcGetTerminalNodesFromList(lsIDs,self.cFeatureDelimiter)
 
     #Count up clades
     cladeCounts = dict()
@@ -774,7 +774,7 @@ class Cladogram:
         sCircladerColor = "".join(["_c_[",str(iR),",",str(iG),",",str(iB),"]"])
     return sCircladerColor
 
-#TODO Test
+  #Happy path tested
   def generateLabels(self, lsIDs):
     """
     Labels for visualization. 
@@ -797,7 +797,7 @@ class Cladogram:
         dictRet[sID] = sLabel
     return dictRet
 
-#TODO Test
+  #Happy path tested
   def manageFilePaths(self, sTaxaFileName, strStyleFile, sColorFileName=None, sTickFileName=None, sHighlightFileName=None, sSizeFileName=None, sCircleFileName=None):
     """
     This method sets the naming to the files generated that Circlader acts on.
@@ -818,45 +818,31 @@ class Cladogram:
     :type strHighlightFile File path (string)
     :param strSizeFile File path indicating the size file to use
     :type strSizeFile File path (string)
+    :return boolean:	True indicates success, false indicates error
     """
     #Do not remove the style file, it is static
-    if(not os.path.exists(strStyleFile)):
-      print("Error, no log file")
-      return(-1)
+    if strStyleFile is None:
+      print("Error, style file is None")
+      return(False)
+    if not os.path.exists(strStyleFile):
+      print("Error, no style file")
+      return(False)
     else:
       self.strStyleFilePath = strStyleFile
 
-    #Set file names and remove if they exist
-    #Tree file
+    #Set output files and remove if needed
     self.strTreeFilePath = sTaxaFileName
-    if not self.strTreeFilePath == None:
-      if(os.path.exists(self.strTreeFilePath)):
-        os.remove(self.strTreeFilePath)
-    #Color file
     self.strColorFilePath = sColorFileName
-    if not self.strColorFilePath == None:
-      if(os.path.exists(self.strColorFilePath)):
-        os.remove(self.strColorFilePath)
-    #Tick file
     self.strTickFilePath = sTickFileName
-    if not self.strTickFilePath == None:
-      if(os.path.exists(self.strTickFilePath)):
-        os.remove(self.strTickFilePath)
-    #Highlight file
     self.strHighLightFilePath = sHighlightFileName
-    if not self.strHighLightFilePath == None:
-      if(os.path.exists(self.strHighLightFilePath)):
-        os.remove(self.strHighLightFilePath)
-    #Size file
     self.strSizeFilePath = sSizeFileName
-    if not self.strSizeFilePath == None:
-      if(os.path.exists(self.strSizeFilePath)):
-        os.remove(self.strSizeFilePath)
-    #Circle file
     self.strCircleFilePath = sCircleFileName
-    if not self.strCircleFilePath == None:
-      if(os.path.exists(self.strCircleFilePath)):
-        os.remove(self.strCircleFilePath)
+    for sFile in [self.strTreeFilePath,self.strColorFilePath,self.strTickFilePath,
+                  self.strHighLightFilePath,self.strSizeFilePath,self.strCircleFilePath]:
+      if not sFile == None:
+        if(os.path.exists(sFile)):
+          os.remove(sFile)
+    return True
 
   #Not tested
   def relabelIDs(self, dictLabels):
@@ -864,7 +850,7 @@ class Cladogram:
     Allows the relabeling of ids. Can be used to make numeric labeling of ids or renaming
 
     :param dictLabels Should label (key) (after unclassified is modified) and new label (value)
-    :type dictLabels Dictionary of string (key) string (value)
+    :type dictLabels Dictionary of string (key:label to replace) string (value:new label to use in replacing)
     """
     self.dictRelabels = dictLabels
 
@@ -905,6 +891,9 @@ class Cladogram:
     :param fAppend Indicates if an append should occur (True == Append)
     :type fAppend boolean
     """
-    with open(strFileName,'a') as f:
+
+    cMode = 'w'
+    if fAppend:
+      cMode = 'a'
+    with open(strFileName,cMode) as f:
         f.write(strDataToWrite)
-    f.close()

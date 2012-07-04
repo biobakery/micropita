@@ -154,7 +154,7 @@ def _main( ):
                     if not acharColors[iindex] == objFigureControl.c_charNoSelect:
                         #Update colors (this is where the pie cut marker is indicated to the PCoA software)
                         curColor = acharColors[iindex]
-                        if not ValidateData.funIsValidList(curColor):
+                        if not ValidateData.funcIsValidList(curColor):
                           acharColors[iindex] = [curColor]
                         acharColors[iindex].append(charSelectedColor)
                         #Update selection which will be used to name selection

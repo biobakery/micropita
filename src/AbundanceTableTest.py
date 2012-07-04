@@ -412,12 +412,14 @@ class AbundanceTableTest(unittest.TestCase):
         result = [result[key] for key in sorted(result.keys())]
 
         #Correct Answer
-        answer = ""
+        answer = [["L_Antecubital_fossa","R_Retroauricular_crease","L_Retroauricular_crease","Subgingival_plaque","R_Antecubital_fossa",
+                  "L_Retroauricular_crease","R_Retroauricular_crease","L_Antecubital_fossa","R_Antecubital_fossa","Anterior_nares"],
+                  ["700098986","700098984","700098982","700098980","700098988","700037470","700037472","700037474","700037476","700037478"]]
 
         #Check result against answer
-        self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))
+        self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
-    def testFuncGetFeatureAbundanceTableForGoodCaseCheckOtheData(self):
+    def testFuncGetFeatureAbundanceTableForGoodCaseCheckOtherData(self):
         #Inputs
         inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
         delimiter = Constants.TAB
@@ -437,7 +439,10 @@ class AbundanceTableTest(unittest.TestCase):
         result = str(result)
 
         #Correct Answer
-        answer = ""
+        answer = "".join(["Sample count:10\nFeature count:3\nId Metadata:TID\nMetadata ids:['TID', 'STSite']\n",
+                  "Metadata count:2\nOriginating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged-3-Features.txt\n",
+                  "Original feature count:3\nOriginal sample count:10\n",
+                  "Is normalized:True\nIs summed:False\nCurrent filtering state:\nFeature delimiter:|\nFile delimiter:\t"])
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))
@@ -462,7 +467,9 @@ class AbundanceTableTest(unittest.TestCase):
         result = str(result.funcGetAbundanceCopy())
 
         #Correct Answer
-        answer = ""
+        answer = "".join(["[ ('Bacteria|unclassified|4904', 0.0, 10.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)\n",
+                           " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)\n",
+                           " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"])
 
         #Check result against answer
         self.assertEqual(result,answer,"".join([str(self),"::\nExpected=\n",answer,". \nReceived=\n",result,"."]))

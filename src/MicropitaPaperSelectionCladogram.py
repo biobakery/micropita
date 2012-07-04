@@ -200,7 +200,7 @@ def _main( ):
     cladogram.setAbundanceData(rawData)
 
     #Terminal taxa in the study
-    lsTerminalTaxa = Cladogram.funcGetTerminalNodes(lsAllTaxa, c_strLineageDelim)
+    lsTerminalTaxa = AbundanceTable.funcGetTerminalNodesFromList(lsAllTaxa, c_strLineageDelim)
 
     #Genus Level of the ancestry to filter on
     fFilterClades = (not args.iCladeFilterLevel.lower() == "none")

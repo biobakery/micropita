@@ -702,9 +702,11 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Make more file names, these for cladogram options
     cCladogramSelectedTaxa = None
+    sMicropitaSelectedTaxa = None
     if c_strConfigSelectedTaxa in sFileConfiguration:
       if(not sFileConfiguration[c_strConfigSelectedTaxa].lower() == "none"):
         cCladogramSelectedTaxa = File(c_strPathDelim.join(["input",sFileConfiguration[c_strConfigSelectedTaxa]]))
+        sMicropitaSelectedTaxa = " ".join([Constants_Arguments.c_strTargetedSelectionFileArgument,cCladogramSelectedTaxa.get_abspath()])
 
     cCladogramHighlightedTaxa = None
     if c_strConfigHighlightClades in sFileConfiguration:
@@ -733,12 +735,11 @@ for fileConfigMicropita in lMicropitaFiles:
         fIsNormalized, fIsSummed, fSumData,
         " ".join([Constants_Arguments.c_strTargetedFeatureMethodArgument,sFileConfiguration[c_strConfigTargetedSelection]]),
         " ".join([Constants_Arguments.c_strUnsupervisedCountArgument,sFileConfiguration[c_strConfigUnsupervisedCount][iCountIndex]]),
-        " ".join([Constants_Arguments.c_strTargetedSelectionFileArgument,cCladogramSelectedTaxa.get_abspath()]),
+        sMicropitaSelectedTaxa,
         " ".join([Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument,sFileConfiguration[c_strConfigUnsupervisedStratify]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
         " ".join([Constants_Arguments.c_strSupervisedLabelCountArgument,sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]]),
         " ".join([Constants_Arguments.c_strTemporaryDirectoryArgument,fileDirTmp.get_abspath()]),
-        " ".join([Constants_Arguments.c_strCostArgument,dictGeneralSettings[c_strConfigCost]]),
         lsSelectionMethods))
 
 

@@ -290,7 +290,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder = 0.45
         strTestShape = "v"
@@ -311,7 +311,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=[0.45,0.0]
         strTestShape="v"
@@ -333,7 +333,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape=["v","v","v"]
@@ -355,7 +355,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape="v"
@@ -377,7 +377,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=[0.16,0.15,0.14,0.13,0.12,0.11,0.10,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
         strTestShape="v"
@@ -399,7 +399,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape=["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"]
@@ -421,7 +421,7 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape="v"
@@ -443,8 +443,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape="v"
@@ -455,12 +455,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(lsTestTaxa)
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthBorder(self):
@@ -471,8 +471,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=[0.16,0.15,0.14,0.13,0.12,0.11,0.10,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
         strTestShape="v"
@@ -483,12 +483,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(lsTestTaxa)
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthShape(self):
@@ -499,8 +499,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape=["v","^","^","v","v","^","^","v","v","^","v","^","v","^","v","^"]
@@ -511,12 +511,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(lsTestTaxa)
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot(self):
@@ -527,8 +527,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3","1B|2B|3B|4B|4","1B|2B|3B|4B|5","1B|2B|3B|4B|6","1B|2B|3B|4B|7",
                       "1C|2C|3C|4C|1","1D|2D|3D|4D|1","1E|2E|3E|4E|1"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape=["v","^","^","v","v","^","^","v","v","^","v","^","v","^","v","^"]
@@ -540,12 +540,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(cladogram.updateToRoot(lsTestTaxa))
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthShapeForcedRoot2(self):
@@ -556,8 +556,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3","1B|2B|3B|4B|4","1B|2B|3B|4B|5","1B|2B|3B|4B|6","1B|2B|3B|4B|7",
                       "1C|2C|3C|4C|1","1D|2D|3D|4D|1","1E|2E|3E|4E|1"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape=["v","^","^","v","v","^","^","v","v","^","v","^","v","^","v","^"]
@@ -569,12 +569,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(cladogram.updateToRoot(lsTestTaxa))
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthBorderForcedRoot(self):
@@ -585,8 +585,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=[0.16,0.15,0.14,0.13,0.12,0.11,0.10,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
         strTestShape="v"
@@ -598,12 +598,12 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(cladogram.updateToRoot(lsTestTaxa))
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddingAndGeneratingCircleDataForContentTrueLengthAlphaForcedRoot(self):
@@ -614,8 +614,8 @@ class CladogramTest(unittest.TestCase):
                       "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
                       "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
 
-        strCircleAnswerFile = Constants_Testing.c_strTestingTMP+methodName+"Correct.txt"
-        strCircleOutputFile = Constants_Testing.c_strTestingTMP+methodName+".txt"
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
         strTestCircle = "Test1"
         dTestBorder=0.45
         strTestShape="v"
@@ -627,12 +627,229 @@ class CladogramTest(unittest.TestCase):
         cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=strTestCircle, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
         cladogram.createCircleFile(cladogram.updateToRoot(lsTestTaxa))
 
-        fhdlCorrectFile = open(strCircleAnswerFile,"r")
-        correctAnswer = fhdlCorrectFile.read()
-        fhdlCorrectFile.close()
-        fhdlOutputFile = open(strCircleOutputFile,"r")
-        result = fhdlOutputFile.read()
-        fhdlOutputFile.close()
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testAddingAndGeneratingCircleDataForMultCircles(self):
+        methodName = "testAddingAndGeneratingCircleDataForMultCircles"
+
+        lsTestTaxa = ["1A|2A|3A|4A|1A","1A|2A|3A|4A|2A","1A|2A|3A|4A|3A","1A|2A|3A|4A|4A",
+                      "1A|2A|3A|4A|5A","1A|2A|3A|4A|6A","1B|2B|3B|4B|1B","1B|2B|3B|4B|2B",
+                      "1B|2B|3B|4B|3B","1B|2B|3B|4B|4B","1B|2B|3B|4B|5B","1B|2B|3B|4B|6B","1B|2B|3B|4B|7B",
+                      "1C|2C|3C|4C|1C","1D|2D|3D|4D|1D","1E|2E|3E|4E|1E"]
+
+        strCircleAnswerFile = "".join([Constants_Testing.c_strTestingTruth,methodName,"Correct.txt"])
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dTestBorder=0.45
+        strTestShape="v"
+        dTestAlpha=[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.10,0.11,0.12,0.13,0.14,0.15]
+
+        cladogram = Cladogram()
+        cladogram.strCircleFilePath = strCircleOutputFile
+
+        for sCircleName in ["Test1","Test2","Test3","Test4","Test5","Test6"]:
+          cladogram.addCircle(lsTaxa=lsTestTaxa, strCircle=sCircleName, dBorder=dTestBorder, strShape=strTestShape, dAlpha=dTestAlpha, fForced=False)
+        cladogram.createCircleFile(lsTestTaxa)
+
+        correctAnswer = ""
+        result = ""
+        with open(strCircleAnswerFile,"r") as fhdlCorrectFile, open(strCircleOutputFile,"r") as fhdlOutputFile:
+          correctAnswer = sorted(filter(None,fhdlCorrectFile.read().split("\n")))
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCase(self):
+        methodName = "testCreateHighlightFileForGoodCase"
+
+        #Inputs
+        lsIDs = ["1","2"]
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = ["1\t1\t\t_c_[0.0,0.0,0.0]","2\t2\t\t_c_[1.0,1.0,1.0]"]
+        result = ""
+        with open(strCircleOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCaseNoList(self):
+        methodName = "testCreateHighlightFileForGoodCaseNoList"
+
+        #Inputs
+        lsIDs = []
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #No file should be created becasue the lsIDs was empty
+        correctAnswer = False
+        result = os.path.exists(strCircleOutputFile)
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCase1Id(self):
+        methodName = "testCreateHighlightFileForGoodCase1Id"
+
+        #Inputs
+        lsIDs = ["2"]
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = ["2\t2\t\t_c_[1.0,1.0,1.0]"]
+        result = ""
+        with open(strCircleOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCase1NotOverwrite(self):
+        methodName = "testCreateHighlightFileForGoodCase1NotOverwrite"
+
+        #Inputs
+        lsIDs = ["1","2"]
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.addHighLights(dictClades={"One":"255,255,255"},fOverwrite=False)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = ["1\t1\t\t_c_[0.0,0.0,0.0]","2\t2\t\t_c_[1.0,1.0,1.0]"]
+        result = ""
+        with open(strCircleOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCase1Overwrite(self):
+        methodName = "testCreateHighlightFileForGoodCase1Overwrite"
+
+        #Inputs
+        lsIDs = ["1","2"]
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.addHighLights(dictClades={"1":"Two"},fOverwrite=True)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = ["1\t1\t\t_c_[1.0,1.0,1.0]","2\t2\t\t_c_[1.0,1.0,1.0]"]
+        result = ""
+        with open(strCircleOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testCreateHighlightFileForGoodCase1OverwriteTwice(self):
+        methodName = "testCreateHighlightFileForGoodCase1OverwriteTwice"
+
+        #Inputs
+        lsIDs = ["1","2"]
+        dictAddHighlights = {"1":"One","2":"Two"}
+        fOverwrite = False
+        strCircleOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+        dictColors = {"One":"0,0,0","Two":"255,255,255"}
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Add highlights
+        #{strName1:strColorName1,strName2:strColorName2,...}
+        cladogram.addHighLights(dictClades=dictAddHighlights,fOverwrite=fOverwrite)
+        cladogram.addHighLights(dictClades={"1":"Two"},fOverwrite=True)
+        cladogram.addHighLights(dictClades={"2":"One"},fOverwrite=True)
+        cladogram.setColorData(dictColors)
+        cladogram.strHighLightFilePath = strCircleOutputFile
+
+        #Write file
+        cladogram.createHighlightFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = ["1\t1\t\t_c_[1.0,1.0,1.0]","2\t2\t\t_c_[0.0,0.0,0.0]"]
+        result = ""
+        with open(strCircleOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
         self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
     def testAddHighLightsForAddingNothingToNothing(self):
@@ -787,7 +1004,7 @@ class CladogramTest(unittest.TestCase):
 
         self.assertEquals(str(lsCorrectIds),str(lsRet), methodName+"Did not get the correct file, expected:"+str(lsCorrectIds)+" but received:"+str(lsRet)+".")
 
-    # Test create size file
+    #Test create size file
     def testCreateSizeFileForGoodCase(self):
         methodName = "testCreateSizeFileForGoodCase"
 
@@ -815,6 +1032,344 @@ class CladogramTest(unittest.TestCase):
         fhdlResultFile.close()
 
         self.assertEquals(answerFileContents,resultFileContents, methodName+"Did not get the correct file, expected:"+answerFileContents+" but received:"+resultFileContents+".")
+
+    def testCreateTreeFileForGoodCase(self):
+        methodName = "testCreateTreeFileForGoodCase"
+
+        #Inputs
+        lsIDs = ["1|2|3|4|5","1|12|16|17","1|2|3|4|6","1|2|3|4|7","1|12|18|19","1|20"]
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Set file name
+        cladogram.strTreeFilePath = strOutputFile
+
+        #Write file
+        cladogram.createTreeFile(lsIDs)
+
+        #Read file and correct result file
+        correctAnswer = sorted(["1","1.2","1.12","1.12.16","1.12.18","1.20","1.2.3","1.2.3.4","1.12.16.17","1.12.18.19","1.2.3.4.5","1.2.3.4.6","1.2.3.4.7"])
+        result = ""
+        with open(strOutputFile,"r") as fhdlOutputFile:
+          result = sorted(filter(None,fhdlOutputFile.read().split("\n")))
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testGenerateLabelsForGoodCase(self):
+        methodName = "testGenerateLabelsForGoodCase"
+
+        #Inputs
+        lsIDs = ["1|2|3|4|5","1|12|16|17","1|2|3|4|6","1|2|3|4|7","1|12|18|19","1|20"]
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Write file
+        result = cladogram.generateLabels(lsIDs)
+
+        #Answer
+        correctAnswer = {"1|2|3|4|5":"5","1|12|16|17":"17","1|2|3|4|6":"6","1|2|3|4|7":"7","1|12|18|19":"19","1|20":"20"}
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testGenerateLabelsForGoodCaseUnclassified(self):
+        methodName = "testGenerateLabelsForGoodCase"
+
+        #Inputs
+        lsIDs = ["1|2|3|4|5","1|12|16|17|unclassified","1|2|3|4|6","1|2|3|4|7","1|12|18|19","1|20"]
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Write file
+        result = cladogram.generateLabels(lsIDs)
+
+        #Answer
+        correctAnswer = {"1|2|3|4|5":"5","1|12|16|17|unclassified":"17.unclassified","1|2|3|4|6":"6","1|2|3|4|7":"7","1|12|18|19":"19","1|20":"20"}
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testGenerateLabelsForGoodCase2Unclassified(self):
+        methodName = "testGenerateLabelsForGoodCase"
+
+        #Inputs
+        lsIDs = ["1|2|3|4|5","1|12|16|17|unclassified","1|2|3|4|6","1|2|3|4|7","1|12|18|19","1|20|unclassified"]
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Write file
+        result = cladogram.generateLabels(lsIDs)
+
+        #Answer
+        correctAnswer = {"1|2|3|4|5":"5","1|12|16|17|unclassified":"17.unclassified","1|2|3|4|6":"6","1|2|3|4|7":"7","1|12|18|19":"19","1|20|unclassified":"20.unclassified"}
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testGenerateLabelsForGoodCase2UnclassifiedAndLabels(self):
+        methodName = "testGenerateLabelsForGoodCase"
+
+        #Inputs
+        lsIDs = ["1|2|3|4|5","1|12|16|17|unclassified","1|2|3|4|6","1|2|3|4|7","1|12|18|19","1|20|unclassified"]
+        strOutputFile = "".join([Constants_Testing.c_strTestingTMP,methodName,".txt"])
+
+        #Get cladogram object
+        cladogram = Cladogram()
+        cladogram.relabelIDs({"7":"456","5":"768"})
+
+        #Write file
+        result = cladogram.generateLabels(lsIDs)
+
+        #Answer
+        correctAnswer = {"1|2|3|4|5":"768","1|12|16|17|unclassified":"17.unclassified","1|2|3|4|6":"6","1|2|3|4|7":"456","1|12|18|19":"19","1|20|unclassified":"20.unclassified"}
+
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testManageFilesForGoodCaseForMakeFile(self):
+        methodName = "testManageFilesForGoodCaseForMakeFile"
+
+        #Inputs
+        sTaxaFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_taxa.txt"])
+        strStyleFile = "".join([Constants_Testing.c_strTestingTMP,methodName,"_style.txt"])
+        sColorFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_color.txt"])
+        sTickFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_tick.txt"])
+        sHighlightFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_hl.txt"])
+        sSizeFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_size.txt"])
+        sCircleFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_circle.txt"])
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = False
+        result = not os.path.exists(strStyleFile)
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+            result = True
+
+        if os.path.exists(strStyleFile):
+          os.remove(strStyleFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testManageFilesForGoodCaseForMakeFile2(self):
+        methodName = "testManageFilesForGoodCaseForMakeFile2"
+
+        #Inputs
+        sTaxaFileName = ""
+        strStyleFile = "".join([Constants_Testing.c_strTestingTMP,methodName,"_style.txt"])
+        sColorFileName = ""
+        sTickFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_tick.txt"])
+        sHighlightFileName = ""
+        sSizeFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_size.txt"])
+        sCircleFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_circle.txt"])
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = False
+        result = not os.path.exists(strStyleFile)
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+            result = True
+
+        if os.path.exists(strStyleFile):
+          os.remove(strStyleFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testManageFilesForGoodCaseForMakeFile3(self):
+        methodName = "testManageFilesForGoodCaseForMakeFile3"
+
+        #Inputs
+        sTaxaFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_taxa.txt"])
+        strStyleFile = "".join([Constants_Testing.c_strTestingTMP,methodName,"_style.txt"])
+        sColorFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_color.txt"])
+        sTickFileName = ""
+        sHighlightFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_hl.txt"])
+        sSizeFileName = ""
+        sCircleFileName = ""
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = False
+        result = not os.path.exists(strStyleFile)
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+            result = True
+
+        if os.path.exists(strStyleFile):
+          os.remove(strStyleFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testManageFilesForGoodCaseForReturnTrue(self):
+        methodName = "testManageFilesForGoodCaseForReturnTrue"
+
+        #Inputs
+        sTaxaFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_taxa.txt"])
+        strStyleFile = "".join([Constants_Testing.c_strTestingTMP,methodName,"_style.txt"])
+        sColorFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_color.txt"])
+        sTickFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_tick.txt"])
+        sHighlightFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_hl.txt"])
+        sSizeFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_size.txt"])
+        sCircleFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_circle.txt"])
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        result = cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = True
+        for sFile in [sTaxaFileName, strStyleFile, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+
+    def testManageFilesForGoodCaseForReturnFalseNone(self):
+        methodName = "testManageFilesForGoodCaseForReturnFalseNone"
+
+        #Inputs
+        sTaxaFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_taxa.txt"])
+        strStyleFile = None
+        sColorFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_color.txt"])
+        sTickFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_tick.txt"])
+        sHighlightFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_hl.txt"])
+        sSizeFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_size.txt"])
+        sCircleFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_circle.txt"])
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        result = cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = False
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
+    def testManageFilesForGoodCaseForReturnFalseNotExisting(self):
+        methodName = "testManageFilesForGoodCaseForReturnFalseNotExisting"
+
+        #Inputs
+        sTaxaFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_taxa.txt"])
+        strStyleFile = "blahgfdsfdsfsdfs.ffasfsfsfdsjgfkfkfutkudfcjcjgufkighll"
+        sColorFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_color.txt"])
+        sTickFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_tick.txt"])
+        sHighlightFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_hl.txt"])
+        sSizeFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_size.txt"])
+        sCircleFileName = "".join([Constants_Testing.c_strTestingTMP,methodName,"_circle.txt"])
+        
+        #Get cladogram object
+        cladogram = Cladogram()
+
+        #Create files
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if not sFile == "":
+            with open(sFile,'w') as hndlFile:
+              hndlFile.write("Testing but content unimportant.")
+
+        #Get manage files
+        result = cladogram.manageFilePaths(sTaxaFileName=sTaxaFileName, strStyleFile=strStyleFile, sColorFileName=sColorFileName,
+                                  sTickFileName=sTickFileName, sHighlightFileName=sHighlightFileName, sSizeFileName=sSizeFileName,
+                                  sCircleFileName=sCircleFileName)
+
+        #Check result
+        #Should always exist, false = success
+        correctAnswer = False
+        for sFile in [sTaxaFileName, sColorFileName, sTickFileName, sHighlightFileName, sSizeFileName, sCircleFileName]:
+          if os.path.exists(sFile):
+            os.remove(sFile)
+
+        #Compare
+        #Compare file contents
+        self.assertEquals(str(correctAnswer), str(result), methodName+" did not give correct result. Expected ."+str(correctAnswer)+". but received ."+str(result)+".")
 
 ##
 #Create a suite to be called to test
