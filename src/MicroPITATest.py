@@ -2636,6 +2636,7 @@ class MicroPITATest(unittest.TestCase):
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
 ### Test run
+    ### Run all Methods
     def testFuncRunForGoodCase(self):
         sMethodName = "testFuncRunForGoodCase"
 
@@ -2661,6 +2662,1132 @@ class MicroPITATest(unittest.TestCase):
         strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
 #        strCheckedFile = 
         iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseStratify(self):
+        sMethodName = "testFuncRunForGoodCaseStratify"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = "Label"
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForErrorCaseNoSelection(self):
+        sMethodName = "testFuncRunForErrorCaseNoSelection"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 0
+        iSupervisedCount = 0
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForErrorNoExistInputFile(self):
+        """
+        Test handling a scenario where the input file is specified but does not exist.
+        """
+        
+        sMethodName = "testFuncRunForErrorNoExistInputFile"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForErrorIncorrectID(self):
+        """
+        Test handling a scenario where the given id is incorrect.
+        """
+        
+        sMethodName = "testFuncRunForErrorIncorrectID"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "BADID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForErrorIncorrectLastMetadataName(self):
+        """
+        Test handling a scenario where the given lastMetadataId is incorrect.
+        """
+        
+        sMethodName = "testFuncRunForErrorIncorrectLastMetadataName"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "BADLabel"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForErrorNoSelection(self):
+        """
+        Test handling a scenario where no selection technique is given.
+        """
+        
+        sMethodName = "testFuncRunForErrorNoSelection"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = []
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForBadTaxaFileName(self):
+        """
+        Handling the scenario where the targeted feature file is incorrect / non-existent.
+        """
+        
+        sMethodName = "testFuncRunForBadTaxaFileName"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.badtaxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForBadLabelName(self):
+        """
+        Handling the scenario where the label is incorrect.
+        """
+        
+        sMethodName = "testFuncRunForBadLabelName"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "BadLabel"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForNoneLabelName(self):
+        """
+        Handling the scenario where the label is None.
+        """
+        
+        sMethodName = "testFuncRunForNoneLabelName"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForNoFeatureSelection(self):
+        """
+        Handling the scenario where there is no feature selection method indicated.
+        """
+        
+        sMethodName = "testFuncRunForNoneLabelName"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,MicroPITA.c_strRepresentativeDissimilarity,
+                        MicroPITA.c_strTaxa,MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        iSupervisedCount = 3
+        sLabel = "Label"
+        sUnsupervisedStratify = None
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseDiversity(self):
+        """
+        Test running just diversity
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseDiversity"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseDiversityStratified(self):
+        """
+        Test running just diversity stratified
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseDiversityStratified"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseRepresentative(self):
+        """
+        Test running just representative
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseDiversity"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strRepresentativeDissimilarity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseRepresentativeStratified(self):
+        """
+        Test running just representative stratified
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseRepresentativeStratified"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strRepresentativeDissimilarity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseExtreme(self):
+        """
+        Test running just extreme
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseExtreme"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strExtremeDissimilarity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseExtremeStratified(self):
+        """
+        Test running just extreme stratified
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseExtremeStratified"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strExtremeDissimilarity]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseTargetedWithSelectionMethod(self):
+        """
+        Test running just targeted
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseTargetedWithSelectionMethod"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strTaxa]
+
+        #Other inputs
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        sFeatureSelection = microPITA.c_strTargetedRanked
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseTargetedWithSelectionMethodStratified(self):
+        """
+        Test running just targeted stratified
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseTargetedWithSelectionMethodStratified"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strTaxa]
+
+        #Other inputs
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        sFeatureSelection = microPITA.c_strTargetedRanked
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseTargetedWithoutSelectionMethod(self):
+        """
+        Test running just targeted
+        """
+        
+        sMethodName = "testFuncRunForGoodCaseTargetedWithoutSelectionMethod"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = []
+
+        #Other inputs
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        sFeatureSelection = microPITA.c_strTargetedRanked
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        strSelectionTechnique=strSelection, fSumData=fSumData)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseAllUnsupervised(self):
+        sMethodName = "testFuncRunForGoodCaseAllUnsupervised"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,
+                        MicroPITA.c_strRepresentativeDissimilarity,MicroPITA.c_strTaxa]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForGoodCaseAllUnsupervisedStratfied(self):
+        sMethodName = "testFuncRunForGoodCaseAllUnsupervisedStratified"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiversity,MicroPITA.c_strExtremeDissimilarity,
+                        MicroPITA.c_strRepresentativeDissimilarity,MicroPITA.c_strTaxa]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 6
+        fSumData = False
+        sFeatureSelection = microPITA.c_strTargetedRanked
+
+        #Answer file
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Get result
+        result = microPITA.funcRun(fIsAlreadyNormalized=fIsNormalized, fCladesAreSummed=fIsSummed, sMetadataID=sIDName, sLastMetadataName=sLastMetadataName,
+                                        strInputAbundanceFile=strFileAbund, strOutputFile=strOutFile,
+                                        cDelimiter=cFileDelimiter, cFeatureNameDelimiter = cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=strFileTaxa, strTemporaryDirectory=strTMPDir, 
+                                        iSampleSelectionCount=iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=iSupervisedCount, strLabel=sLabel,
+                                        strStratify=sUnsupervisedStratify, strSelectionTechnique=strSelection, fSumData=fSumData,
+                                        sFeatureSelectionMethod=sFeatureSelection)
+
+        answer = microPITA.funcReadSelectionFileToDictionary(strAnswerFile)
+       
+        #Sort answers
+        answer = str(["".join([str(key),":",str(value)]) for key,value in answer])
+        result = str(["".join([str(key),":",str(value)]) for key,value in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def ntestFuncRunForSupervisedMethod(self):
+        sMethodName = "testFuncRunForSupervisedMethod"
+
+        microPITA = MicroPITA()
+
+        #Correct ouput
+        strAnswerFile = "".join([Constants_Testing.c_strTestingTruth,sMethodName,"-Correct.txt"])
+
+        #Required inputs
+        strFileAbund = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.pcl"])
+        fIsNormalized = False
+        fIsSummed = False
+        sIDName = "ID"
+        sLastMetadataName = "Label"
+        strSelection = [MicroPITA.c_strDiscriminant,MicroPITA.c_strDistinct]
+
+        #Other inputs
+        strOutFile = "".join([Constants_Testing.c_strTestingTMP,sMethodName,".txt"])
+        cFileDelimiter = Constants.TAB
+        cFeatureNameDelimiter = "|"
+        strFileTaxa = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/Unbalanced48-GenNoise-0-SignalNoise-5.taxa"])
+        strTMPDir = "".join([Constants_Testing.c_strTestingTMP])
+#        strCheckedFile = 
+        iUnsupervisedSelectionCount = 0
         iSupervisedCount = 3
         sLabel = "Label"
         sUnsupervisedStratify = None
