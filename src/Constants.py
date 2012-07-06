@@ -68,6 +68,8 @@ class Constants():
     c_strEmptyAbundanceData = "0"
     c_strEmptyDataMetadata = "NA"
 
+    lNAs = list(set(["NA","na","Na","nA",c_strEmptyDataMetadata]))
+
     #Testing Variables
     TEMPORARY_TEST_FILE = TEST_DATA_TEMP_DIRECTORY+"TEMPTESTINGFILEEEEEEEANDIMGONE.txt"
 

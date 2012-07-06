@@ -10,7 +10,7 @@
 class Constants_Arguments():
     #afc Abundance filter cut off
     c_strAbundanceFilterCutoffArgument = "--afc"
-    c_strAbundanceFilterCutoffHelp = "The percentage of samples inwhich a terminal node must be above the AbundanceFilterPercentile to not be filtered."
+    c_strAbundanceFilterCutoffHelp = "The percentage of samples in which a terminal node must be above the AbundanceFilterPercentile to not be filtered."
 
     #afp Abundance filter percentile
     c_strAbundanceFilterPercentileArgument = "--afp"
@@ -22,11 +22,11 @@ class Constants_Arguments():
 
     #c Circlader highlight clade file
     c_strHighlightCladeFileArgument = "-c"
-    c_strHighlightCladeHelp = "The file containing the clades or taxa/OTUs to highlight in the circlader."
+    c_strHighlightCladeHelp = "The file containing the clades or taxa/OTUs to highlight in circlader."
 
     #checked Checked abundance file
     c_strCheckedAbundanceFileArgument = "--checked"
-    c_strCheckedAbundanceFileHelp = "Optional name for the file analysis will be ran on which is created by checking the raw abundance file and save a new fiel with the result. Default will append a -Checked to the end of the file name."
+    c_strCheckedAbundanceFileHelp = "Before analysis abundance files are checked and a new file results which analysis is perfromed on. The name fo the checked file can be specified of the default will will be used (appending a -Checked to the end of the file name)."
 
     #cfl Circlader clade filter level (when filtering by clades this is the level in the clade which is filtered; the ancestor clade)
     c_strCladeFilterLevelArgument = "--cfl"
@@ -55,7 +55,7 @@ class Constants_Arguments():
 
     #delim File delimiter
     c_strFileDelimiterArgument = "--delim"
-    c_strFileDelimiterHelp = "The delimiter for the abundance table."
+    c_strFileDelimiterHelp = "The delimiter for the abundance table (default = TAB)"
 
     #e Enrichment method for circlader
     c_strEnrichmentMethodArgument = "-e"
@@ -78,15 +78,15 @@ class Constants_Arguments():
 
     #isnorm flag indicating the original file is normalized as read in
     c_strIsNormalizedArgument = "--isnorm"
-    c_strIsNormalizedHelp = "Indicates ic_CheckedAbundanceFileHelpf the file is normalized when read in (True indicates normalized)."
+    c_strIsNormalizedHelp = "If used this flag indicates the file is already normalized."
 
     #issum flag indicating the original file is summed as read in
     c_strIsSummedArgument = "--issum"
-    c_strIsSummedHelp = "Indicates if the file is summed when read in (True indicates summed)."
+    c_strIsSummedHelp = "If used this flag indicates the file is already summed."
 
     #label Supervised Label
     c_strSupervisedLabelArgument = "--label"
-    c_strSupervisedLabelHelp = "The name of the phenotype data row on which to perform supervised methods"
+    c_strSupervisedLabelHelp = "The name of the metadata on which to perform supervised methods"
 
     #lastmeta The name of the last metadata
     c_strLastMetadataNameArgument = "--lastmeta"
@@ -112,7 +112,7 @@ class Constants_Arguments():
 
     #nsup Supervised label count
     c_strSupervisedLabelCountArgument = "--nsup"
-    c_strSupervisedLabelCountHelp = "The count of labeled data to select per label. (An integer greater than 0)."
+    c_strSupervisedLabelCountHelp = "The number of samples to select per label for supervised methods. (An integer greater than 0)."
 
     #nun The Number of unsupervised sample selection
     c_strUnsupervisedCountArgument = "--nun"
@@ -155,13 +155,10 @@ class Constants_Arguments():
     c_strUnsupervisedStratifyMetadataArgument = "--stratify"
     c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
 
-    #t Taxa file path
-    c_strTaxaFilePathArgument = "-t"
-    c_strTaxaFileHelp= "The file containing the clades or taxa/OTUs to highlight in the circlader."
-
     #targetmethod Taxa selection method
     c_strTargetedFeatureMethodArgument = "--targetmethod"
     c_strTargetedFeatureMethodHelp = "The method used to select targeted features."
+
     #Order is important, the first is the default
     c_strTargetedRanked = "Targeted_Rank"
     c_strTargetedAbundance = "Targeted_Abundance"

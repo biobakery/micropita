@@ -252,8 +252,8 @@ def funcCheckAbundanceData( sLogging, sMetadataName ):
   return funcCheckAbundanceDataRet
 
 ##Call micropita to run
-def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed, fSumData, sFeatureSelection, iUnsupervisedCount, strCost, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel, iSupervisedCount, strDirTmp, lsSelectionMethods):
-  def funcMicroPitaRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData, sFeatureSelection=sFeatureSelection, iUnsupervisedCount=iUnsupervisedCount, strCost=strCost, strTaxaFile=strTaxaFile, strUnsupervisedStratify=strUnsupervisedStratify, strSupervisedLabel=strSupervisedLabel, iSupervisedCount=iSupervisedCount, strDirTmp=strDirTmp, lsSelectionMethods=lsSelectionMethods):
+def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed, fSumData, sFeatureSelection, iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel, iSupervisedCount, strDirTmp, lsSelectionMethods):
+  def funcMicroPitaRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData, sFeatureSelection=sFeatureSelection, iUnsupervisedCount=iUnsupervisedCount, strTaxaFile=strTaxaFile, strUnsupervisedStratify=strUnsupervisedStratify, strSupervisedLabel=strSupervisedLabel, iSupervisedCount=iSupervisedCount, strDirTmp=strDirTmp, lsSelectionMethods=lsSelectionMethods):
     strT, astrSs = sfle.ts( target, source )
     strProg, strAbnd = astrSs[0], astrSs[1]
     lsCommandline = [strProg,strLoggingLevel, sIDName, sLastMetadata]
@@ -263,7 +263,7 @@ def funcMicroPita( strLoggingLevel, sIDName, sLastMetadata, fNormalized, fSummed
         lsCommandline = lsCommandline + [Constants_Arguments.c_strIsSummedArgument]
     if not fSumData:
         lsCommandline = lsCommandline + [Constants_Arguments.c_strSumDataArgument]
-    return sfle.ex( lsCommandline + [sFeatureSelection, iUnsupervisedCount, strCost, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel,
+    return sfle.ex( lsCommandline + [sFeatureSelection, iUnsupervisedCount, strTaxaFile, strUnsupervisedStratify, strSupervisedLabel,
                     iSupervisedCount, strDirTmp]+[strAbnd, strT] + lsSelectionMethods)
   return funcMicroPitaRet
 
@@ -808,8 +808,8 @@ for fileConfigMicropita in lMicropitaFiles:
 
     #Create a cladogram figure 2
     #Manage files which are optional
-    strTaxaArgForCladogram = "-t"
-    strHighlightArgForCladogram = "-c"
+    strTaxaArgForCladogram = Constants_Arguments.c_strTargetedSelectionFileArgument
+    strHighlightArgForCladogram = Constants_Arguments.c_strHighlightCladeFileArgument
     lsFig2Sources = [c_fileProgSelectionCladogramFigure, sMicropitaOutput, sCheckedAbundanceFile, c_fileCladogramStyleFile]
     if not cCladogramSelectedTaxa == None:
       lsFig2Sources.append(cCladogramSelectedTaxa)
@@ -1118,7 +1118,7 @@ for fileMetamatrixConfig in lMetamatrixConfigFiles:
   dictMetadetails = funcReadConfigFile(sMetaFileName)
   
   #Actual file
-  strActualFile = File(sfle.d(fileDirInput,dictMetadetails[c_strConfigActualFile]))
+  strActualFile = File(sfle.d(fileDirInput,dictMetadetails[strHighlightCladeFileArgumentc_strConfigActualFile]))
   #Invert
   strInvert = dictMetadetails[c_strConfigInvertImage]
   #Logging

@@ -63,8 +63,8 @@ class MicroPITA:
     c_strRandom = "Random"
     c_strRepresentativeDissimilarity = "Representative"
     c_strTaxa = "Taxa_Defined"
-    c_lsAllSupervisedMethods = [c_strDiversity,c_strExtremeDissimilarity,c_strRandom,c_strRepresentativeDissimilarity,c_strTaxa]
-    c_lsAllUnsupervisedMethods = [c_strDiscriminant,c_strDistinct]
+    c_lsAllUnsupervisedMethods = [c_strDiversity,c_strExtremeDissimilarity,c_strRandom,c_strRepresentativeDissimilarity,c_strTaxa]
+    c_lsAllSupervisedMethods = [c_strDiscriminant,c_strDistinct]
 
     #Technique Names
     c_strDiversity1 = "".join([c_strDiversity,"_I"])
@@ -308,7 +308,6 @@ class MicroPITA:
                 break
 
         #Return selected samples
-        print "returnSamples", returnSamples
         return returnSamples
 
 ####Group 4## Rank Average of user Defined Taxa
@@ -550,6 +549,12 @@ class MicroPITA:
 
         #Get labels
         lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataForLabel)
+        print "lsLabels",lsLabels
+        #Remove NAs
+        lfGoodMetadata = [sLabel in Constants.lNAs for sLabel in lsLabels]
+        print "lfGoodMetadata",lfGoodMetadata
+        lsLabels = [sLabel for sLabel in lsLabels if not sLabel in Constants.lNAs]
+        print "lsLabels",lsLabels
 
         #Get weights for labels
         dictWeights, ldWeightLabels = SVM.funcWeightLabels(lsLabels)
@@ -559,6 +564,9 @@ class MicroPITA:
 
         #Get 2D array of data (has feature names)
         npData = abndAbundanceTable.funcGetAbundanceCopy()
+        print "npData", npData
+        print "Compressed:",abndAbundanceTable.funcGetSample(abndAbundanceTable.funcGetSampleNames())
+        #Reduce the data by the good metadata, axis = 1 is reduce columns
 
         #Scale features (has feature names)
         for iRowIdex, npadRow in enumerate(npData):
@@ -1080,13 +1088,24 @@ class MicroPITA:
 
         #Check parameters
         if not strOutputFile or not strTemporaryDirectory:
-          return selectedSamples
+          logging.error("MicroPITA.funcRun. Please specify output file and temporary directory. Stopped.")
+          return False
         if not sMetadataID or not sLastMetadataName or not cDelimiter or not cFeatureNameDelimiter:
-          return selectedSamples
+          if not sMetadataID:
+            logging.error("MicroPITA.funcRun. Please specify Metadata ID. Stopped.")
+          if not sLastMetadataName:
+            logging.error("MicroPITA.funcRun. Please specify Last meta data name. Stopped.")
+          if not cDelimiter:
+            logging.error("MicroPITA.funcRun. Please specify delimiter. Stopped.")
+          if not cFeatureNameDelimiter:
+            logging.error("MicroPITA.funcRun. Please specify feature name delimiter. Stopped.")
+          return False
         if iSampleSelectionCount+iSupervisedSampleCount < 1:
-          return selectedSamples
+          logging.error("MicroPITA.funcRun. Please specify a selection amount. Stopped.")
+          return False
         if len(strSelectionTechnique) < 1:
-          return selectedSamples
+          logging.error("MicroPITA.funcRun. Please specify a selection technique. Stopped.")
+          return False
 
         if not strCheckedAbndFile:
           strCheckedAbndFile = os.path.splitext(strInputAbundanceFile)[0]+"-checked.pcl"
@@ -1114,35 +1133,41 @@ class MicroPITA:
 
         #Perform different flows flags
         c_RUN_MAX_DIVERSITY_1 = False
-        if(microPITA.c_strDiversity in strSelectionTechnique):
+        if microPITA.c_strDiversity in strSelectionTechnique:
             c_RUN_MAX_DIVERSITY_1 = True
         c_RUN_REPRESENTIVE_DISSIMILARITY_2 = False
-        if(microPITA.c_strRepresentativeDissimilarity in strSelectionTechnique):
+        if microPITA.c_strRepresentativeDissimilarity in strSelectionTechnique:
             c_RUN_REPRESENTIVE_DISSIMILARITY_2 = True
         c_RUN_MAX_DISSIMILARITY_3 = False
-        if(microPITA.c_strExtremeDissimilarity in strSelectionTechnique):
+        if microPITA.c_strExtremeDissimilarity in strSelectionTechnique:
             c_RUN_MAX_DISSIMILARITY_3 = True
         c_RUN_RANK_AVERAGE_USER_4 = False
-        if(microPITA.c_strTaxa in strSelectionTechnique):
+        if microPITA.c_strTaxa in strSelectionTechnique:
             c_RUN_RANK_AVERAGE_USER_4 = True
-            if(strUserDefinedTaxaFile == None):
-                c_RUN_RANK_AVERAGE_USER_4 = False
-                logging.error("MicroPITA.funcRun. No taxa file was given for taxa selection.")
+            if not strUserDefinedTaxaFile:
+                logging.error("MicroPITA.funcRun. No taxa file was given for taxa selection.") 
+                return False
+            if not os.path.exists(strUserDefinedTaxaFile):
+                logging.error("MicroPITA.funcRun. The taxa file given for selection does not exist.") 
+                return False
+            if not sFeatureSelectionMethod:
+                logging.error("MicroPITA.funcRun. No feature selection method was given for taxa selection.") 
+                return False
             if c_RUN_RANK_AVERAGE_USER_4:
-            #Read in taxa list, break down to lines and filter out empty strings
+                #Read in taxa list, break down to lines and filter out empty strings
                 with open(strUserDefinedTaxaFile,'r') as fhndlTaxaInput:
                     userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
                 if not sFeatureSelectionMethod:
                     sFeatureSelectionMethod = MicroPITA.c_strTargetedRanked
 
         c_RUN_RANDOM_5 = False
-        if(microPITA.c_strRandom in strSelectionTechnique):
+        if microPITA.c_strRandom in strSelectionTechnique:
             c_RUN_RANDOM_5 = True
         c_RUN_DISTINCT = False
-        if((microPITA.c_strDistinct in strSelectionTechnique) and (not strLabel == None)):
+        if (microPITA.c_strDistinct in strSelectionTechnique) and (not strLabel == None):
             c_RUN_DISTINCT = True
         c_RUN_DISCRIMINANT = False
-        if((microPITA.c_strDiscriminant in strSelectionTechnique) and (not strLabel == None)):
+        if (microPITA.c_strDiscriminant in strSelectionTechnique) and (not strLabel == None):
             c_RUN_DISCRIMINANT = True
 
         #Input file path components
@@ -1185,7 +1210,7 @@ class MicroPITA:
         if len(set(dictTotalMetadata.get(strLabel,[]))) < 2:
             c_RUN_DISCRIMINANT = False
             c_RUN_DISTINCT = False
-            logging.error("".join(["The label ",strLabel," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
+            logging.error("".join(["The label ",str(strLabel)," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
 
         logging.debug(" ".join(["Micropita:funcRun.","Received metadata=",str(dictTotalMetadata)]))
 
@@ -1307,6 +1332,11 @@ class MicroPITA:
 
         #Read in selection file
         strSelection = ""
+
+        #Check for file
+        if not os.path.exists(strInputFile):
+            return False
+
         with open(strInputFile,'r') as fHndlInput:
             strSelection = fHndlInput.read()
 
@@ -1330,7 +1360,7 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
                   choices=Constants_Arguments.c_lsLoggingChoices, help= Constants_Arguments.c_strLoggingHelp)
 
 #Abundance associated
-argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "Sample ID Metadata Name", help= Constants_Arguments.c_strIDNameHelp)
+argp.add_argument(Constants_Arguments.c_strIDNameArgument, dest="sIDName", metavar= "Sample ID Metadata Name", default="ID", help= Constants_Arguments.c_strIDNameHelp)
 argp.add_argument(Constants_Arguments.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "Last Metadata Name",
                   help= Constants_Arguments.c_strLastMetadataNameHelp)
 argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store_true", default=False,
@@ -1350,7 +1380,7 @@ argp.add_argument(Constants_Arguments.c_strUnsupervisedStratifyMetadataArgument,
 
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default=None, help= Constants_Arguments.c_strSupervisedLabelCountHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="Label", help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 argp.add_argument(Constants_Arguments.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
                   help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 
@@ -1373,20 +1403,19 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 def _main( ):
     args = argp.parse_args( )
 
-    print "args",args
-
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
         raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
+    print "args:",args
     #TODO does this stop the full analysis process? Not if the selection file already exists...
     if not args.sIDName:
-        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run.")
+        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run. Received="+str(args.sIDName))
         return False
     if not args.sLastMetadataName:
-        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run.")
+        logging.error("MicroPITA::Did not received a value for sLastMetadataName. MiroPITA did not run. Received="+str(args.sLastMetadataName))
         return False
 
     #Run micropita
@@ -1402,10 +1431,13 @@ def _main( ):
     #If a supervised selection method is indicated make sure supervised selection count is indicated and above 0
     #Otherwise stop
     if len(set(microPITA.c_lsAllSupervisedMethods)&set(args.strSelection))>0:
+        if not args.sLabel:
+            logging.error("MicroPITA::Did not received a value for sLabel. MiroPITA did not run. Received="+str(args.sLabel))
+            return -1
         if args.iSupervisedCount < 1:
             logging.error("".join(["MicroPITA::Did not receive a selection count for supervised selection above 0, received=",
                                    str(args.iSupervisedCount),". Did not continue analysis."]))
-            return -1
+            return -2
 
     #If an unsupervised selection method is indicated make sure the unsupervised selection count is above 0
     #Otherwise stop
@@ -1413,7 +1445,7 @@ def _main( ):
         if args.iUnsupervisedSelectionCount < 1:
             logging.error("".join(["MicroPITA::Did not receive a selection count for unsupervised selection above 0, received=",
                                    str(args.iUnsupervisedSelectionCount),". Did not continue analysis."]))
-            return -2
+            return -3
 
     #If the tmp directory is not made, make
     if not args.strTMPDir:

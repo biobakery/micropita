@@ -44,7 +44,7 @@ argp.add_argument(Constants_Arguments.c_strLoggingArgument, dest="strLogLevel", 
 argp.add_argument( "strSelectionFile", metavar = "Select_file", help = Constants_Arguments.c_strMicropitaSelectFileHelp )
 argp.add_argument( "strInputFile", metavar = "Input_Abundance_File", help = Constants_Arguments.c_strAbundanceFileHelp )
 argp.add_argument( "strStyleFile", metavar = "Style_file", help = Constants_Arguments.c_strCircladerStyleFileHelp )
-argp.add_argument(Constants_Arguments.c_strTaxaFilePathArgument, dest="strTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTaxaFileHelp)
+argp.add_argument(Constants_Arguments.c_strTargetedSelectionFileArgument, dest="strTargetedTaxaFile", metavar= "TaxaFilePath", default=None, help= Constants_Arguments.c_strTargetedSelectionFileHelp)
 argp.add_argument(Constants_Arguments.c_strHighlightCladeFileArgument, dest="iHighlightCladeFile", metavar= "HighlightFilePath", default=None, help= Constants_Arguments.c_strHighlightCladeHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strInvertHelp )
 argp.add_argument(Constants_Arguments.c_strRootArgument, dest = "sRoot", metavar= "root", default="None", help = Constants_Arguments.c_strRootHelp )
@@ -176,7 +176,6 @@ def _main( ):
     rawData.funcReduceFeaturesToCladeLevel(args.iTerminalCladeLevel)
     sCladogramDetails = "".join([sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
     sCladogramDetails = "".join([sCladogramDetails," Feature count AFTER reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
-
     sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE.join(rawData.funcGetFeatureNames())])+Constants.ENDLINE
 
     if c_Normalize:
@@ -185,12 +184,14 @@ def _main( ):
     #####
     ## Note all manipulations to the abundance table including feature filtering should occur before this point
     #####
+
+    #Abundance data
     abundance = rawData.funcGetAbundanceCopy()
-    strSampleID = rawData.funcGetIDMetadataName()
+    #All sample names
     lsAllSampleNames = rawData.funcGetSampleNames()
 
     #All taxa in the study
-    lsAllTaxa = [strTaxaId for strTaxaId in list(abundance[strSampleID])]
+    lsAllTaxa = rawData.funcGetFeatureNames()
     sCladogramDetails = "".join([sCladogramDetails," Total Taxa:",str(len(lsAllTaxa)),Constants.ENDLINE,Constants.ENDLINE.join(lsAllTaxa),Constants.ENDLINE])
 
     #Create a cladogram object
@@ -200,33 +201,28 @@ def _main( ):
     cladogram.setAbundanceData(rawData)
 
     #Terminal taxa in the study
-    lsTerminalTaxa = AbundanceTable.funcGetTerminalNodesFromList(lsAllTaxa, c_strLineageDelim)
+    lsTerminalTaxa = rawData.funcGetTerminalNodes()
 
     #Genus Level of the ancestry to filter on
     fFilterClades = (not args.iCladeFilterLevel.lower() == "none")
     iCladeLevelForFiltering = 0
     iCladeLevelForReducing = 0
     iCladeLevelMinimumCount = 0
+
     if(fFilterClades):
       iCladeLevelForFiltering = int(args.iCladeFilterMeasure)
       iCladeLevelForReducing = int(args.iCladeFilterLevel)
       iCladeLevelMinimumCount = int(args.iCladeFilterMinNumber)
     cladogram.setFilterByCladeSize(fCladeSizeFilter = fFilterClades, iCladeLevelToMeasure = iCladeLevelForFiltering, iCladeLevelToReduce = iCladeLevelForReducing, iMinimumCladeSize = iCladeLevelMinimumCount, cFeatureDelimiter=c_strLineageDelim)
-    #Update detail: Clade filtering
-    sCladogramDetails = "".join([sCladogramDetails,"Clade filtering:",Constants.ENDLINE,"Clade level for measuring=",args.iCladeFilterMeasure,Constants.ENDLINE,
-                                                "Clade level for filtering=",args.iCladeFilterLevel,Constants.ENDLINE,"Minimum features needed in the measured clade=",
-                                                args.iCladeFilterMinNumber,Constants.ENDLINE,Constants.ENDLINE])
 
-    #Read in selection file
-    fHndlInput = open(args.strSelectionFile,'r')
-    strSelection = fHndlInput.read()
-    fHndlInput.close()
+    #Update detail: Clade filtering
+    sCladogramDetails = "".join([sCladogramDetails,"Clade filtering:",Constants.ENDLINE,"Clade level for measuring=",str(iCladeLevelForFiltering),Constants.ENDLINE,
+                                                "Clade level for filtering=",str(iCladeLevelForReducing),Constants.ENDLINE,"Minimum features needed in the measured clade=",
+                                                str(iCladeLevelMinimumCount),Constants.ENDLINE,Constants.ENDLINE])
 
     #Dictionary to hold selection data
-    dictSelection = dict()
-    for strSelectionLine in filter(None,strSelection.split(Constants.ENDLINE)):
-        astrSelectionMethod = strSelectionLine.split(Constants.COLON)
-        dictSelection[astrSelectionMethod[0]] = filter(None,[lsSample.strip() for lsSample in astrSelectionMethod[1].split(Constants.COMMA)])
+    dictSelection = MicroPITA.funcReadSelectionFileToDictionary(args.strSelectionFile)
+
     #Update detail: Sampling selection
     sCladogramDetails = "".join([sCladogramDetails,"Sample Selection:",Constants.ENDLINE,
                         Constants.ENDLINE.join(["".join([sKey,"=",str([dictSelection[sKey]])]) for sKey in dictSelection.keys()]),Constants.ENDLINE,Constants.ENDLINE])
@@ -268,7 +264,7 @@ def _main( ):
     if(not args.strTargetedTaxaFile == "None"):
       fhndlTaxaInput = open(args.strTargetedTaxaFile,'r')
       lsUserDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants.ENDLINE))
-      fhndlTaxaInput.close()
+
     #Update detail: Targeted taxa
     sCladogramDetails = "".join([sCladogramDetails,Constants.ENDLINE,"Targeted Taxa:",Constants.ENDLINE,"".join([sTaxa for sTaxa in lsUserDefinedTaxa]),Constants.ENDLINE,Constants.ENDLINE])
 
@@ -276,7 +272,6 @@ def _main( ):
     if(not args.iHighlightCladeFile == "None"):
       fhndlHighlightInput = open(args.iHighlightCladeFile,'r')
       lsUserDefinedHighlighted = filter(None,fhndlHighlightInput.read().split(Constants.ENDLINE))
-      fhndlHighlightInput.close()
 
       #Highlight and relabel data
       dictTaxaHighlights = dict()
@@ -323,33 +318,37 @@ def _main( ):
               wasSelected = sample in lsSelectedSamples
               lfSelectedSamplesUTest.append(wasSelected)
               lfNotSelectedSamplesUTest.append(not wasSelected)
+            sCladogramDetails = "".join([sCladogramDetails,"\nSamples:",str(lsAllSampleNames)])
+            sCladogramDetails = "".join([sCladogramDetails,"\nSelected:",str(lsSelectedSamples)])
+            sCladogramDetails = "".join([sCladogramDetails,"\nSelected samples in total list: ",str(lfSelectedSamplesUTest)])
+            sCladogramDetails = "".join([sCladogramDetails,"\nSamples not selected in total list: ",str(lfNotSelectedSamplesUTest)])
 
             #Holds t-tests,pvalues,qvalues as needed
             lsTaxaTScores = list()
 
             #Compress arrays to one or the other distribution
             #Conduct wilcoxon tests on all taxa
-          
-            for iTaxonIndex in xrange(0,len(lsAllTaxa)):
-              npaTaxaData = list(abundance[iTaxonIndex,])
-              strTaxaId = npaTaxaData[0]
+            for iTaxonIndex, strTaxaId in enumerate(lsAllTaxa):
+              npaDistribution = np.array(list(abundance[iTaxonIndex,])[1:])
               #Hold info about the taxa to store in the cladogram info file
               sTaxaData = "".join([Constants.ENDLINE,strTaxaId])
 
               if(strTaxaId in lsTerminalTaxa):
-                npaDistribution = np.array(npaTaxaData[1:])
                 npaSelectedDistribution = np.compress(lfSelectedSamplesUTest,npaDistribution)
                 npaNotSelectedDistribution = np.compress(lfNotSelectedSamplesUTest,npaDistribution)
+                sCladogramDetails = "".join([sCladogramDetails,"\nTerminal Feature: ",strTaxaId])
+                sCladogramDetails = "".join([sCladogramDetails,"\nnpaSelectedDistribution: ",str(npaSelectedDistribution)])
+                sCladogramDetails = "".join([sCladogramDetails,"\nnpaNotSelectedDistribution: ",str(npaNotSelectedDistribution)])
                 dScore, dPvalue = stats.ranksums(npaSelectedDistribution,npaNotSelectedDistribution)
-                sTaxaData = " ".join([sTaxaData,"Score",str(dScore),"P-value",str(dPvalue),Constants.ENDLINE])
+                sTaxaData = " ".join(["Score",str(dScore),"P-value",str(dPvalue),Constants.ENDLINE])
                 if(sum(npaSelectedDistribution)==0):
-                  sTaxaData = "".join([sTaxaData,"Selected Average: 0 Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
+                  sTaxaData = "".join([sTaxaData,"Selected Average: 0"])
                 else:
-                  sTaxadata = "".join([sTaxaData,"Selected Average: ",str(sum(npaSelectedDistribution)/float(len(npaSelectedDistribution)))," Selected: "]+[str(dValues) for dValues in list(npaSelectedDistribution)]+[Constants.ENDLINE])
+                  sTaxaData = "".join([sTaxaData,"Selected Average: ",str(sum(npaSelectedDistribution)/float(len(npaSelectedDistribution)))])
                 if(sum(npaNotSelectedDistribution)==0):
-                  sTaxaData = "".join([sTaxaData,"Not Selected Average: 0 Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)]+[Constants.ENDLINE])
+                  sTaxaData = "".join([sTaxaData,", Not Selected Average: 0\n"])
                 else:
-                  sTaxaData = "".join([sTaxaData,"Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution)))," Not Selected: "]+[str(dValues) for dValues in list(npaNotSelectedDistribution)])
+                  sTaxaData = "".join([sTaxaData,", Not Selected Average: ",str(sum(npaNotSelectedDistribution)/float(len(npaNotSelectedDistribution))),"\n"])
 
                 #[ID,TScore,PValue,QValue,SortOrder]
                 lsTaxaTScores.append([strTaxaId,dScore,dPvalue,-1])
@@ -358,9 +357,8 @@ def _main( ):
               sCladogramDetails = "".join([sCladogramDetails,sTaxaData])
 
             #Get a list of pvalues preserving order
-            ldOrderedPValues = list()
-            for iScoreDataIndex in lsTaxaTScores:
-              ldOrderedPValues.append(iScoreDataIndex[c_PVALUEINDEX])
+            #Holds terminal feature scores only at this point
+            ldOrderedPValues = [iScoreDataIndex[c_PVALUEINDEX] for iScoreDataIndex in lsTaxaTScores]
 
             #If using qvalues generate them with FDR BH
             if fIsQValue:
@@ -371,12 +369,13 @@ def _main( ):
               for iQIndex in xrange(0,len(ldOrderedQValues)):
                 lsTaxaTScores[iQIndex][c_QVALUEINDEX] = ldOrderedQValues[iQIndex]
 
+            sCladogramDetails = "".join([sCladogramDetails,"\nAll Scores (Id, Score, pvalue) : ",str(lsTaxaTScores)])
+
             lsAlpha = list()
             lsShapes = list()
             lsTaxa = list()
 
-            for iTaxa in xrange(0,len(lsTaxaTScores)):
-              lsCur = lsTaxaTScores[iTaxa]
+            for lsCur in lsTaxaTScores:
               lsTaxa.append(lsCur[c_IDINDEX])
               dCurScore = lsCur[c_TSCOREINDEX]
               dValue = -1
@@ -393,11 +392,15 @@ def _main( ):
                   lsAlpha.append(str(1-dValue))
                   lsShapes.append(c_DecreasedEnrichment)
                 elif(dCurScore == 0.0):
-                  lsAlpha.append("0.0")
-                  lsShapes.append(c_NoChangeEnrichment)
+                  logging.error("MicropitaPaperSelectionCladogram::Recieved a significant feature with no change in t-score...?")
+                  return
               else:
                 lsAlpha.append("0.0")
                 lsShapes.append(c_NoChangeEnrichment)
+
+            sCladogramDetails = "".join([sCladogramDetails,"\nlsAlpha : ",str(lsAlpha),"\n"])
+            sCladogramDetails = "".join([sCladogramDetails,"\nlsShapes : ",str(lsShapes),"\n"])
+            sCladogramDetails = "".join([sCladogramDetails,"\nlsTaxa : ",str(lsTaxa),"\n"])
 
             #Add circle for this data
             cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
@@ -414,10 +417,10 @@ def _main( ):
             if iDecreasedEnrichmentCounts:
               sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with Decreased Enrichment= ",str(iDecreasedEnrichmentCounts),Constants.ENDLINE])
             if iNoChangeEnrichmentCounts:
-              sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa significant but with no change= ",str(iNoChangeEnrichmentCounts),Constants.ENDLINE])
+              sMethodEnrichment = "".join([sMethodEnrichment,"Terminal Taxa with no change= ",str(iNoChangeEnrichmentCounts),Constants.ENDLINE])
             #Add method enrichment to total enrichment details
             if sMethodEnrichment:
-              sCladogramDetails = "".join([sCladogramDetails, selectedSampleMethod,": ",Constants.ENDLINE,sMethodEnrichment,Constants.ENDLINE,Constants.ENDLINE])
+              sCladogramDetails = "".join([sCladogramDetails, "\n", selectedSampleMethod,": ",Constants.ENDLINE,sMethodEnrichment,Constants.ENDLINE,Constants.ENDLINE])
 
     #Generate cladogram PDF
     cladogram.generate(strImageName=args.strOutFigure, strStyleFile=args.strStyleFile, sTaxaFileName=args.sTaxaFileName, iTerminalCladeLevel=args.iTerminalCladeLevel, sColorFileName=args.sColorFileName, sTickFileName=args.sTickFileName, sHighlightFileName=args.sHighlightFileName, sSizeFileName=args.sSizeFileName, sCircleFileName=args.sCircleFileName)
@@ -425,7 +428,6 @@ def _main( ):
     #Write detail file out
     with open( args.strDetailOutputFile, 'w') as f:
       f.write(sCladogramDetails)
-    f.close()
 
 if __name__ == "__main__":
     _main( )

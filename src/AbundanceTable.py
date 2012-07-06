@@ -222,6 +222,11 @@ class AbundanceTable:
                 iFirstDataRow = iIndex + 1
                 break
 
+        #Check to make sure the aLastMetadata was found
+        if iFirstDataRow == -1:
+            print "".join(["AbundanceTable:textToStructuredArray::Error, sLastMetadata was not found. Value =",str(sLastMetadata)])
+            return False
+
         #Check to make sure there is abundance
         if len(contents) <= iFirstDataRow:
             return [np.array([]),metadata]
@@ -346,7 +351,7 @@ class AbundanceTable:
         #If the taxa to be selected are not in the list
         #Return nothing and log
         lsMissing = []
-        for sFeature in lsTargetedFeatures:
+        for sFeature in  slicelsTargetedFeatures:
             if not sFeature in allTaxaNames:
                 lsMissing.append(sFeature)
             else:
@@ -891,8 +896,7 @@ class AbundanceTable:
 
         :param	iCladeLevel:	The level of the clade to trim the features to.
         :type	Integer	The higher the number the more clades are presevered in the consensus lineage contained in the feauture name.
-        :return	Boolean:	Indicator of success.
-        :type	Boolean	False indicates error.
+        :return	Boolean:	Indicator of success. False indicates error.
         """
 
         if iCladeLevel < 1: return False
@@ -908,6 +912,17 @@ class AbundanceTable:
             return True
         else:
             return False
+
+    def funcRemoveSamples(self,lsSampleNames):
+        """
+        Removes the samples given in the list.
+
+        :param	lsSampleNames:	A list of string names of samples to remove.
+        :type	List of strings	Unique values
+        :return Boolean:	Indicator of success (True = success, no error)
+        """
+        pass
+        
 
     #Happy path testing
     def funcSumClades(self):
