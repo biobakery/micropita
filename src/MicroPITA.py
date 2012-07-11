@@ -1111,7 +1111,6 @@ class MicroPITA:
         if not strCheckedAbndFile:
           strCheckedAbndFile = os.path.splitext(strInputAbundanceFile)[0]+"-checked.pcl"
 
-
         #microPITA object
         microPITA = MicroPITA()
 
@@ -1190,8 +1189,6 @@ class MicroPITA:
         if fIsAlreadyNormalized:
             liOccurenceFilter = None
 
-        print "liOccurenceFilter:",liOccurenceFilter
-        print "fIsAlreadyNormalized:",fIsAlreadyNormalized
         strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, lOccurenceFilter = liOccurenceFilter, strOutputFileName=strCheckedAbndFile)
 
         #Read in abundance data
@@ -1206,6 +1203,7 @@ class MicroPITA:
 
         if fSumData:
             totalAbundanceTable.funcSumClades()
+
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
         #Log metadata keys

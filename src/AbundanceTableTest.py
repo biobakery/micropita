@@ -350,6 +350,29 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
 
+    def testFuncGetAverageSampleForGoodCase(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        sNameRow = "TID"
+        sLastMetadata = "STSite"
+        cFeatureDelimiter = "|"
+        fIsSummed = False
+        fIsNormalized = False
+        answer= [2.2,8.3,7.9,8.3,1.5]
+
+        abndData = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=fIsNormalized, fIsSummed=fIsSummed,
+                                             cDelimiter = delimiter, sMetadataID = sNameRow,
+                                             sLastMetadata = sLastMetadata, cFeatureNameDelimiter=cFeatureDelimiter)
+
+        result = abndData.funcGetAverageSample()
+        result = str([float("%.2f" % dResult) for dResult in result])
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+
     #Test funcGetFeatureAbundanceTable
     def testFuncGetFeatureAbundanceTableForGoodCase(self):
         #Inputs

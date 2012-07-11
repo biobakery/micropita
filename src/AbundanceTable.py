@@ -326,7 +326,7 @@ class AbundanceTable:
     #Happy path tested
     def funcGetAverageAbundancePerSample(self, lsTargetedFeatures):
 	"""
-	Averages feature abundance.
+	Averages feature abundance within a sample.
 
 	:param	lsTargetedFeatures:	String names of features to average
 	:type	list	list of string names of features which are measured
@@ -373,6 +373,26 @@ class AbundanceTable:
 
         #return
         return sampleAbundanceAverages
+
+    #Happy path tested 1
+    def funcGetAverageSample(self):
+        """
+        Returns the average sample of the abundance table.
+        This average sample is made of the average of each feature.
+        :return list: A list of averages in the order of the feature names.
+        """
+
+        ldAverageSample = []
+        #If there are no samples then return empty list.
+        if len(self.funcGetSampleNames()) < 1:
+            return ldAverageSample
+
+        #If there are samples return the average of each feature in the order of the feature names.
+        for sFeature in self._npaFeatureAbundance:
+            npFeaturesAbundance = list(sFeature)[1:]
+            ldAverageSample.append(sum(npFeaturesAbundance)/float(len(npFeaturesAbundance)))
+
+        return ldAverageSample
 
     #Happy Path Tested
     def funcGetFeatureAbundanceTable(self, lsFeatures):

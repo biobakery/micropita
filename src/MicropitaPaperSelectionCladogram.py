@@ -153,7 +153,10 @@ class MicropitaPaperSelectionCladogram:
 
     #Add circle for this data
     cladogram.addCircle(lsTaxa=lsTaxa, strShape=lsShapes, dAlpha=lsAlpha, strCircle=selectedSampleMethod, fForced=True)
-    self.sCladogramDetails = "".join([self.sCladogramDetails, Constants.ENDLINE, Constants.ENDLINE,"Circle Data:", Constants.ENDLINE, Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]), str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
+    if len(lsTaxa)>0 and len(lsShapes)>0 and len(lsAlpha)> 0:
+      self.sCladogramDetails = "".join([self.sCladogramDetails, Constants.ENDLINE, Constants.ENDLINE,"Circle Data:", Constants.ENDLINE, Constants.ENDLINE.join([Constants.COMMA.join([str(lsTaxa[iIndex[0]]), str(lsShapes[iIndex[0]]), str(lsAlpha[iIndex[0]])]) for iIndex in enumerate(lsTaxa)])])
+    else:
+      self.sCladogramDetails = "".join([self.sCladogramDetails, Constants.ENDLINE, Constants.ENDLINE,"Circle Data:", Constants.ENDLINE, "lsTaxa:", str(len(lsTaxa)), " lsShapes: ", str(len(lsShapes)), "lsAlpha: ", str(len(lsAlpha))])
 
     #Update detail: Enrichment details
     #Build method enrichment detail
@@ -411,11 +414,11 @@ def _main( ):
           "Filtered Feature Count (After Abundance Filtering)=",str(rawData.funcGetFeatureCount()),Constants.ENDLINE,Constants.ENDLINE])
 
     #Reduce the clades down to a certain clade level
-#    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Feature count before reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
-#    rawData.funcReduceFeaturesToCladeLevel(args.iTerminalCladeLevel)
-#    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
-#    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Feature count AFTER reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
-#    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails,Constants.ENDLINE.join(rawData.funcGetFeatureNames())])+Constants.ENDLINE
+    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Feature count before reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
+    rawData.funcReduceFeaturesToCladeLevel(args.iTerminalCladeLevel)
+    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Reducing clades to the following level:",str(args.iTerminalCladeLevel),Constants.ENDLINE])
+    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails," Feature count AFTER reducing to a clade level:",str(rawData.funcGetFeatureCount()),Constants.ENDLINE])
+    microSelectionCladogram.sCladogramDetails = "".join([microSelectionCladogram.sCladogramDetails,Constants.ENDLINE.join(rawData.funcGetFeatureNames())])+Constants.ENDLINE
 
     if c_Normalize:
       rawData.funcNormalize()

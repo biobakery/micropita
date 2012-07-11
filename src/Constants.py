@@ -111,4 +111,4 @@ class Constants():
 
     #Occurence filter [min abundance, min samples occuring in]
     #To turn off make == None
-    c_liOccurenceFilter = [3,3]
+    c_liOccurenceFilter = [0,0]
