@@ -1636,6 +1636,226 @@ class AbundanceTableTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(resultStr,answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",resultStr,"."]))
 
+    #Test funcRemoveSamples(self,lsSampleNames)
+    def testFuncRemoveSamplesForGoodCaseReturn(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700037476','700098984', '700098982']
+
+        #Reduce table
+        fResult = data.funcRemoveSamples(lsSampleNames)
+
+        answerStr = "True"
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
+    #Test funcRemoveSamples(self,lsSampleNames)
+    def testFuncRemoveSamplesForGoodCaseContent(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700037476','700098984', '700098982']
+
+        #Reduce table
+        fResult = str(data.funcRemoveSamples(lsSampleNames))
+
+        #String output
+        sStringContent = str(data)
+        #Abundance
+        sStringAbundance = str(data.funcGetAbundanceCopy())
+        #Metadata
+        sStringMetadata = str(data.funcGetMetadataCopy())
+        fResult = ",".join([fResult,sStringContent,sStringAbundance,sStringMetadata])
+
+        #Answer
+        sExpectedResult = "True"
+        sExpectedContent = Constants.ENDLINE.join(["Sample count:7","Feature count:5",
+                           "Id Metadata:TID","Metadata ids:['TID', 'STSite']","Metadata count:2",
+                           "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt",
+                           "Original feature count:5","Original sample count:7","Is normalized:False",
+                           "Is summed:False","Current filtering state:","Feature delimiter:|","File delimiter:"+data.funcGetFileDelimiter()])
+        sExpectedAbundance = Constants.ENDLINE.join(["[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 12.0, 0.0, 6.0, 0.0, 2.0, 0.0)",
+                                                    " ('Bacteria|unclassified|4904', 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 29.0, 0.0, 45.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|3417', 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 2.0, 0.0, 6.0, 0.0, 1.0, 0.0)]"])
+        sExpectedMetadata = "".join(["{'TID': ['700098986', '700098980', '700098988', '700037470', '700037472', '700037474', '700037478'], ",
+                                     "'STSite': ['L_Antecubital_fossa', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'Anterior_nares']}"])
+        answerStr = ",".join([sExpectedResult,sExpectedContent,sExpectedAbundance,sExpectedMetadata])
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
+    #Test funcRemoveSamples(self,lsSampleNames)
+    def testFuncRemoveSamplesForGoodCaseContent2(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700098984']
+
+        #Reduce table
+        fResult = str(data.funcRemoveSamples(lsSampleNames))
+
+        #String output
+        sStringContent = str(data)
+        #Abundance
+        sStringAbundance = str(data.funcGetAbundanceCopy())
+        #Metadata
+        sStringMetadata = str(data.funcGetMetadataCopy())
+        fResult = ",".join([fResult,sStringContent,sStringAbundance,sStringMetadata])
+
+        #Answer
+        sExpectedResult = "True"
+        sExpectedContent = Constants.ENDLINE.join(["Sample count:9","Feature count:5",
+                           "Id Metadata:TID","Metadata ids:['TID', 'STSite']","Metadata count:2",
+                           "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt",
+                           "Original feature count:5","Original sample count:9","Is normalized:False",
+                           "Is summed:False","Current filtering state:","Feature delimiter:|","File delimiter:"+data.funcGetFileDelimiter()])
+        sExpectedAbundance = Constants.ENDLINE.join(["[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0)",
+                                                    " ('Bacteria|unclassified|4904', 0.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)",
+                                                    " ('Bacteria|3417', 0.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"])
+        sExpectedMetadata = "".join(["{'TID': ['700098986', '700098982', '700098980', '700098988', '700037470', '700037472', '700037474', '700037476', '700037478'], ",
+                                     "'STSite': ['L_Antecubital_fossa', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}"])
+        answerStr = ",".join([sExpectedResult,sExpectedContent,sExpectedAbundance,sExpectedMetadata])
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
+    #Test funcRemoveSamplesByMetadata(self, sMetadata, lValuesToRemove)
+    def testFuncRemoveSamplesByMetadataForGoodCaseReturn(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700037476','700098984', '700098982']
+
+        #Reduce table
+        fResult = str(data.funcRemoveSamplesByMetadata(data.funcGetIDMetadataName(),lsSampleNames))
+
+        answerStr = "True"
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
+    #Test funcRemoveSamples(self,lsSampleNames)
+    def testFuncRemoveSamplesByMetadataForGoodCaseContent(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700037476','700098984', '700098982']
+
+        #Reduce table
+        fResult = str(data.funcRemoveSamplesByMetadata(data.funcGetIDMetadataName(),lsSampleNames))
+
+        #String output
+        sStringContent = str(data)
+        #Abundance
+        sStringAbundance = str(data.funcGetAbundanceCopy())
+        #Metadata
+        sStringMetadata = str(data.funcGetMetadataCopy())
+        fResult = ",".join([fResult,sStringContent,sStringAbundance,sStringMetadata])
+
+        #Answer
+        sExpectedResult = "True"
+        sExpectedContent = Constants.ENDLINE.join(["Sample count:7","Feature count:5",
+                           "Id Metadata:TID","Metadata ids:['TID', 'STSite']","Metadata count:2",
+                           "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt",
+                           "Original feature count:5","Original sample count:7","Is normalized:False",
+                           "Is summed:False","Current filtering state:","Feature delimiter:|","File delimiter:"+data.funcGetFileDelimiter()])
+        sExpectedAbundance = Constants.ENDLINE.join(["[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 12.0, 0.0, 6.0, 0.0, 2.0, 0.0)",
+                                                    " ('Bacteria|unclassified|4904', 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 29.0, 0.0, 45.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|3417', 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 2.0, 0.0, 6.0, 0.0, 1.0, 0.0)]"])
+        sExpectedMetadata = "".join(["{'TID': ['700098986', '700098980', '700098988', '700037470', '700037472', '700037474', '700037478'], ",
+                                     "'STSite': ['L_Antecubital_fossa', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'Anterior_nares']}"])
+        answerStr = ",".join([sExpectedResult,sExpectedContent,sExpectedAbundance,sExpectedMetadata])
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
+    #Test funcRemoveSamples(self,lsSampleNames)
+    def testFuncRemoveSamplesByMetadataForGoodCaseContent2(self):
+
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt"])
+        delimiter = Constants.TAB
+        nameRow = "TID"
+        firstDataRow = "STSite"
+        data = AbundanceTable.funcMakeFromFile(strInputFile=inputFile, fIsNormalized=False, fIsSummed=False, cDelimiter = delimiter,
+                                             sMetadataID = nameRow, sLastMetadata = firstDataRow, cFeatureNameDelimiter="|")
+
+        #Samples to remove
+        lsSampleNames = ['700098984']
+
+        #Reduce table
+        fResult = str(data.funcRemoveSamplesByMetadata(data.funcGetIDMetadataName(),lsSampleNames))
+
+        #String output
+        sStringContent = str(data)
+        #Abundance
+        sStringAbundance = str(data.funcGetAbundanceCopy())
+        #Metadata
+        sStringMetadata = str(data.funcGetMetadataCopy())
+        fResult = ",".join([fResult,sStringContent,sStringAbundance,sStringMetadata])
+
+        #Answer
+        sExpectedResult = "True"
+        sExpectedContent = Constants.ENDLINE.join(["Sample count:9","Feature count:5",
+                           "Id Metadata:TID","Metadata ids:['TID', 'STSite']","Metadata count:2",
+                           "Originating source:input/micropita/src/Testing/Data/AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.txt",
+                           "Original feature count:5","Original sample count:9","Is normalized:False",
+                           "Is summed:False","Current filtering state:","Feature delimiter:|","File delimiter:"+data.funcGetFileDelimiter()])
+        sExpectedAbundance = Constants.ENDLINE.join(["[ ('Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72', 1.0, 0.0, 12.0, 0.0, 6.0, 0.0, 2.0, 1.0, 0.0)",
+                                                    " ('Bacteria|unclassified|4904', 0.0, 0.0, 43.0, 6.0, 0.0, 23.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361', 3.0, 0.0, 29.0, 0.0, 45.0, 0.0, 1.0, 1.0, 0.0)",
+                                                    " ('Bacteria|3417', 0.0, 0.0, 34.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0)",
+                                                    " ('Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368', 5.0, 0.0, 2.0, 0.0, 6.0, 0.0, 1.0, 1.0, 0.0)]"])
+        sExpectedMetadata = "".join(["{'TID': ['700098986', '700098982', '700098980', '700098988', '700037470', '700037472', '700037474', '700037476', '700037478'], ",
+                                     "'STSite': ['L_Antecubital_fossa', 'L_Retroauricular_crease', 'Subgingival_plaque', 'R_Antecubital_fossa', 'L_Retroauricular_crease', 'R_Retroauricular_crease', 'L_Antecubital_fossa', 'R_Antecubital_fossa', 'Anterior_nares']}"])
+        answerStr = ",".join([sExpectedResult,sExpectedContent,sExpectedAbundance,sExpectedMetadata])
+
+        #Check result against answer
+        self.assertEqual(str(fResult),answerStr,"".join([str(self),"::Expected=",answerStr,". Received=",str(fResult),"."]))
+
     #Test funcSumClades
     def testFuncSumCladesForGoodCase(self):
         
@@ -1986,10 +2206,8 @@ class AbundanceTableTest(unittest.TestCase):
             sResult = None
             with open(sOutputFileOne, 'r') as f:
                 sResult = f.read()
-            f.close()
             with open(sAnswerFile1, 'r') as f:
                 sCorrect = f.read()
-            f.close()
             if not sCorrect.strip() == sResult:
                 sError = " ".join([sError, "Did not receive the correct output for file 1. Expected:",sCorrect,". Received:",sResult,"."])
 
@@ -1997,10 +2215,8 @@ class AbundanceTableTest(unittest.TestCase):
             sResult = None
             with open(sOutputFileTwo, 'r') as f:
                 sResult = f.read()
-            f.close()
             with open(sAnswerFile2, 'r') as f:
                 sCorrect = f.read()
-            f.close()
             if not sCorrect.strip() == sResult:
                 sError = " ".join([sError, "Did not receive the correct output for file 2. Expected:",sCorrect,". Received:",sResult,"."])
 
@@ -2038,10 +2254,8 @@ class AbundanceTableTest(unittest.TestCase):
             sResult = None
             with open(sOutputFileOne, 'r') as f:
                 sResult = f.read()
-            f.close()
             with open(sAnswerFile1, 'r') as f:
                 sCorrect = f.read()
-            f.close()
             if not sCorrect.strip() == sResult:
                 sError = " ".join([sError, "Did not receive the correct output for file 1. Expected:",sCorrect,". Received:",sResult,"."])
 
@@ -2049,10 +2263,8 @@ class AbundanceTableTest(unittest.TestCase):
             sResult = None
             with open(sOutputFileTwo, 'r') as f:
                 sResult = f.read()
-            f.close()
             with open(sAnswerFile2, 'r') as f:
                 sCorrect = f.read()
-            f.close()
             if not sCorrect.strip() == sResult:
                 sError = " ".join([sError, "Did not receive the correct output for file 2. Expected:",sCorrect,". Received:",sResult,"."])
 
@@ -2081,7 +2293,163 @@ class AbundanceTableTest(unittest.TestCase):
         result = ""
         with open(outputFile,'r') as f:
             result = f.read()
-            f.close()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForGoodCaseWithOccurenceFilterZero(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [0,0]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForBadCaseWithOccurenceFilterNegatives(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [-12,-1]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+
+    def testCheckRawDataFileForGoodCaseWithOccurenceFilterOne(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [1,1]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72\"\t1\t0\t0\t12\t0\t6\t0\t2\t1\t0\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368\"\t5\t0\t0\t2\t0\t6\t0\t1\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForGoodCaseWithOccurenceFilterTenTwo(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [10,2]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n\"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361\"\t3\t0\t0\t29\t0\t45\t0\t1\t1\t0\n\"Bacteria|3417\"\t0\t45\t0\t34\t3\t0\t0\t0\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForGoodCaseWithOccurenceFilterFiveThree(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [5,3]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n\"Bacteria|unclassified|4904\"\t0\t10\t0\t43\t6\t0\t23\t0\t1\t0\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
+
+    def testCheckRawDataFileForGoodCaseWithOccurenceFilterFiveFive(self):
+        
+        #Inputs
+        inputFile = "".join([Constants_Testing.c_strTestingData,"AbridgedDocuments/hq.otu_04-nul-nul-mtd-trn-flt-abridged.ForChecking.txt"])
+        outputFile = "".join([Constants_Testing.c_strTestingTMP,os.path.splitext(os.path.split(inputFile)[1])[0],Constants.OUTPUT_SUFFIX])
+        delimiter = Constants.TAB
+        lOccurenceFilter = [5,5]
+
+        #Remove output file before the test
+        if(os.path.exists(outputFile)):
+            os.remove(outputFile)
+
+        #Correct Answer
+        answer = "\"TID\"\t700098986\t700098984\t700098982\t700098980\t700098988\t700037470\t700037472\t700037474\t700037476\t700037478\n\"STSite\"\t\"L_Antecubital_fossa\"\t\"R_Retroauricular_crease\"\t\"L_Retroauricular_crease\"\t\"Subgingival_plaque\"\t\"R_Antecubital_fossa\"\t\"L_Retroauricular_crease\"\t\"R_Retroauricular_crease\"\t\"L_Antecubital_fossa\"\t\"R_Antecubital_fossa\"\t\"Anterior_nares\"\n"
+
+        #Call method
+        AbundanceTable.funcCheckRawDataFile(strReadDataFileName=inputFile, iFirstDataIndex=2, lOccurenceFilter = lOccurenceFilter, strOutputFileName = outputFile, cDelimiter=delimiter)
+
+        #Get answer
+        result = ""
+        with open(outputFile,'r') as f:
+            result = f.read()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
@@ -2107,7 +2475,6 @@ class AbundanceTableTest(unittest.TestCase):
         result = ""
         with open(outputFile,'r') as f:
             result = f.read()
-            f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
@@ -2133,7 +2500,6 @@ class AbundanceTableTest(unittest.TestCase):
         result = ""
         with open(outputFile,'r') as f:
             result = f.read()
-            f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
@@ -2159,7 +2525,6 @@ class AbundanceTableTest(unittest.TestCase):
         result = ""
         with open(outputFile,'r') as f:
             result = f.read()
-            f.close()
 
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::\nExpected=\n",str(answer),". \nReceived=\n",str(result),"."]))
@@ -2181,7 +2546,6 @@ class AbundanceTableTest(unittest.TestCase):
         result = ""
         with open(outputFile,'r') as f:
             result = f.read()
-            f.close()
 
         #Remove output file after the test
         if(os.path.exists(outputFile)):
@@ -2241,11 +2605,9 @@ class AbundanceTableTest(unittest.TestCase):
                 with open(strFile) as f:
                     contents = f.read()
                     contents = filter(None,re.split("\n",contents))
-                    f.close()
                 with open(dictCreatedFiles[strFile]) as f:
                     contentsAnswer = f.read()
                     contentsAnswer = filter(None,re.split("\n",contentsAnswer))
-                    f.close()
                 if(not contents == contentsAnswer):
                     error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
             else:
@@ -2305,11 +2667,9 @@ class AbundanceTableTest(unittest.TestCase):
                 with open(strFile) as f:
                     contents = f.read()
                     contents = filter(None,re.split("\n",contents))
-                    f.close()
                 with open(dictCreatedFiles[strFile]) as f:
                     contentsAnswer = f.read()
                     contentsAnswer = filter(None,re.split("\n",contentsAnswer))
-                    f.close()
                 if(not contents == contentsAnswer):
                     error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
             else:
@@ -2362,11 +2722,9 @@ class AbundanceTableTest(unittest.TestCase):
                 with open(strFile) as f:
                     contents = f.read()
                     contents = filter(None,re.split("\n",contents))
-                    f.close()
                 with open(dictCreatedFiles[strFile]) as f:
                     contentsAnswer = f.read()
                     contentsAnswer = filter(None,re.split("\n",contentsAnswer))
-                    f.close()
                 if(not contents == contentsAnswer):
                     error = error + "\nFile: "+strFile+"\nExpected:"+",".join(contentsAnswer)+".\nReceived:"+",".join(contents)+"."
             else:

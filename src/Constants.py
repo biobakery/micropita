@@ -108,3 +108,7 @@ class Constants():
 
     #Break microbiota driven selection ties by diversity
     fBreakRankTiesByDiversity = False
+
+    #Occurence filter [min abundance, min samples occuring in]
+    #To turn off make == None
+    c_liOccurenceFilter = [3,3]

@@ -351,7 +351,7 @@ class AbundanceTable:
         #If the taxa to be selected are not in the list
         #Return nothing and log
         lsMissing = []
-        for sFeature in  slicelsTargetedFeatures:
+        for sFeature in lsTargetedFeatures:
             if not sFeature in allTaxaNames:
                 lsMissing.append(sFeature)
             else:
@@ -913,6 +913,7 @@ class AbundanceTable:
         else:
             return False
 
+    #Happy path tested
     def funcRemoveSamples(self,lsSampleNames):
         """
         Removes the samples given in the list.
@@ -921,8 +922,45 @@ class AbundanceTable:
         :type	List of strings	Unique values
         :return Boolean:	Indicator of success (True = success, no error)
         """
-        pass
+
+        #Samples to remove
+        setSamples = set(lsSampleNames)
+
+        #Get orignal sample count
+        iOriginalCount  = self._iOriginalSampleCount
+
+        #The samples to keep
+        lsKeepSamples = [sSample for sSample in self.funcGetSampleNames() if not sSample in setSamples]
+        #The sample to keep as boolean flags for compressing the metadata
+        lfKeepSamples = [not sSample in setSamples for sSample in self.funcGetSampleNames()]
         
+        #Reduce the abundance data and update
+        self._npaFeatureAbundance = self._npaFeatureAbundance[[self.funcGetIDMetadataName()]+lsKeepSamples]
+
+        #Reduce the metadata and update
+        for sKey in self._dictTableMetadata:
+            self._dictTableMetadata[sKey] = [value for iindex, value in enumerate(self._dictTableMetadata[sKey]) if lfKeepSamples[iindex]]
+
+        #Update sample number count
+        self._iOriginalSampleCount = len(self.funcGetSampleNames())
+
+        return self._iOriginalSampleCount == (iOriginalCount-len(setSamples))
+
+    #Happy path tested
+    def funcRemoveSamplesByMetadata(self, sMetadata, lValuesToRemove):
+        """
+        Removes samples from the abundance table based on values of a metadata.
+        If a metadata has any value given the associated sample is removed.
+
+        :param	sMetadata:	ID of the metdata to check the given values.
+        :type	String	Metadata ID
+        :param	lValuesToRemove:	A list of values which if equal to a metadata entry indicate to remove the associated sample.
+        :type	List of values:	List
+        :return	Boolean:	Indicator of success (True = success, no error)
+        """
+
+        lsSampleNames = self.funcGetSampleNames()
+        return self.funcRemoveSamples([lsSampleNames[iindex] for iindex, sValue in enumerate(self.funcGetMetadata(sMetadata)) if sValue in lValuesToRemove])
 
     #Happy path testing
     def funcSumClades(self):
@@ -999,6 +1037,7 @@ class AbundanceTable:
         if fWriteToFile is True the object will used it's internally stored name as a file to write to
         if fWriteToFile is a string then it should be a directory and end with "." This will rebase the file
         and store it in a different directory but with an otherwise unchanged name.
+        Note: If the metadata used for stratification has NAs, they will be segregated to thier own table and returned.
 
         :param	strMetadata:	Metadata ID to stratify data with.
         :type	String	ID for a metadata.
@@ -1239,17 +1278,21 @@ class AbundanceTable:
 
     #Testing Status: Light happy path testing
     @staticmethod
-    def funcCheckRawDataFile(strReadDataFileName, iFirstDataIndex= -1, sLastMetadataName = None, strOutputFileName = "", cDelimiter = Constants.TAB):
+    def funcCheckRawDataFile(strReadDataFileName, iFirstDataIndex = -1, sLastMetadataName = None, lOccurenceFilter = None, strOutputFileName = "", cDelimiter = Constants.TAB):
         """
         Check the input otu or phlotype abundance table.
         Currently reduces the features that have no occurence.
         Also inserts a NA for blank metadata and a 0 for blank abundance data.
+        Gives the option to filter features through an occurence filter (a feature must have a level of abundance in a minimal number of samples to be included).
+        Either iFristDataIndex or sLastMetadataName must be given
 
         :param	strReadDataFileName:	File path of file to read and check.
         :type	String	File path.
         :param	iFirstDataIndex:	First (row) index of data not metadata in the abundance file.
         :type	Integer	Index starting at 0.
         :param	sLastMetadataName:	The ID of the last metadata in the file. Rows of measurements should follow this metadata.
+        :param	lOccurenceFilter:	The lowest number of occurences in the lowest number of samples needed for a feature to be kept
+        :type	List[2]	List length 2 [lowest abundance (not normalized), lowest number of samples to occur in] (eg. [2.0,2.0])
         :type	String	Matadata ID.
         :param	strOutputFileName:	File path of out put file.
         :type	String	File path.
@@ -1315,7 +1358,7 @@ class AbundanceTable:
                     if not sElement.strip():
                         lsLineElements[iindex] = Constants.c_strEmptyDataMetadata
                 if len(lsLineElements) < iLongestLength:
-                    lsLineElements = lsLineElements + (["NA"]*(iLongestLength-len(lsLineElements)))
+                    lsLineElements = lsLineElements + ([Constants.c_strEmptyDataMetadata]*(iLongestLength-len(lsLineElements)))
                 f.write(cDelimiter.join(lsLineElements)+Constants.ENDLINE)
 
             #For each data line in the table
@@ -1341,8 +1384,16 @@ class AbundanceTable:
                     else:
                         cleanLine.append(element)
                         writeToFile = True
+
+                #Occurence filtering
+                #Removes features that do not have a given level iLowestAbundance in a given amount of samples iLowestSampleOccurence
+                if lOccurenceFilter:
+                    iLowestAbundance, iLowestSampleOccurence = lOccurenceFilter
+                    if iLowestSampleOccurence > sum([1 if float(sEntry) >= iLowestAbundance else 0 for sEntry in cleanLine]):
+                        writeToFile = False
+
                 #Write to file
-                if(writeToFile):    
+                if writeToFile:    
                     f.write(sCleanFeatureName+cDelimiter+cDelimiter.join(cleanLine)+Constants.ENDLINE)
         return outputFile
 

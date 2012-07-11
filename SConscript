@@ -56,7 +56,7 @@ c_strSufOverlapMatrix = "-overlap.pdf"
 c_strSufPCOA = "-PCoA.pdf"
 c_strProbPCOA = "-ProbalisticPCOA.pdf"
 c_strSufPng = ".pdf"
-c_strSufPredict = "-SVM.predict"
+c_strSufPredict = ".predict"
 c_strSufSelectedTaxa = ".taxa"
 c_strSufStratHCLUSTColor = "-Strat.HCLColor"
 c_strSufStratHCLUSTFig = "-StratHCL.pdf"
@@ -187,7 +187,7 @@ c_fileProgSelectionCladogramFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSe
 c_fileProgSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperSelectionHCL.py" ) )
 c_fileProgStratifiedPCoAFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratifiedPCoA.py" ) )
 c_fileProgStratSelectionHCLFigure = File( sfle.d( fileDirSrc, "MicropitaPaperStratSelectionHCL.py" ) )
-c_fileProgSupervisedPCoA = File( sfle.d( fileDirSrc, "MicropitaPaperSupervisedPCoA.py" ))
+c_fileProgSupervisedPCoA = File( sfle.d( fileDirSrc, "MicropitaPaperProbabilities.py" ))
 c_fileProgSVM = File( sfle.d( fileDirSrc, "SVM.py" ) )
 c_fileProgUtilityData = File( sfle.d( fileDirSrc, "MicropitaPaperConstructDataSets.py" ) )
 c_fileProgValidatePCoA = File( sfle.d( fileDirSrc, "MicropitaPaperValidatePCoA.py" ))
@@ -280,6 +280,17 @@ def funcPCoASelectionMethods( strLoggingLevel, sIDName, sLastMetadata, iNormaliz
                    fSummed, fSumData, strPredictFileArgument]+[ strAbnd, strSelection, strT])
   return funcPCoARet
 
+def funcPCoASupervisedProbabilities( strLoggingLevel, sIDName, sLastMetadata, iNormalize, strInvert,
+                              fNormalized, fSummed, fSumData, sLabel, strPredictFileArgument ):
+  def funcPCoASupervisedProbabilitiesRet( target, source, env, strLoggingLevel=strLoggingLevel, sIDName=sIDName, sLastMetadata=sLastMetadata,
+                   iNormalize=iNormalize, strInvert=strInvert, fNormalized=fNormalized, fSummed=fSummed, fSumData=fSumData,lsLabel = sLabel,
+                   strPredictFileArgument=strPredictFileArgument):
+    strT, astrSs = sfle.ts( target, source )
+    strProg, strAbnd, strSelection = astrSs[0], astrSs[1], astrSs[2]
+    return sfle.ex([strProg]+[strLoggingLevel, sIDName,sLastMetadata,iNormalize,strInvert,fNormalized,
+                   fSummed, fSumData, strPredictFileArgument, sLabel]+[ strAbnd, strSelection, strT])
+  return funcPCoASupervisedProbabilitiesRet
+
 #Visualize output with Combined PCoA (Figure 1A)
 def funcCombinedPCoASelectionMethods( strLoggingLevel, sIDName, sLastMetadata, iNormalize, strInvert,
                                       fNormalized, fSummed, fSumData, lsSelectionMethods):
@@ -319,18 +330,19 @@ def funcOverlapMatrix( strLoggingLevel, strInvert, lsSelectionMethods ):
 #Visualize selected output with Cladogram (Figure 2)
 def funcCladogramSelectionMethods( strLoggingLevel, strTargetedTaxaFile, strHighlightCladeFile, sIDName, sLastMetadata, iNormalize, strInvert,
                                    fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha, strMinSequence, strMinSample, fSumData, iTerminalClade):
+                                   strAbundanceFilterPercentile, strAbundanceFilterPercent, strRingOrder, strTicks, strAlpha, strMinSequence,
+                                   strMinSample, fSumData, iTerminalClade, strPredictFileArgument):
 
   def funcCladogramSelectionRet( target, source, env, strLoggingLevel=strLoggingLevel, strTargetedTaxaFile=strTargetedTaxaFile, strHighlightCladeFile=strHighlightCladeFile, 
                                  sIDName=sIDName, sLastMetadata=sLastMetadata, iNormalize=iNormalize, strInvert=strInvert,
                                  fNormalized=fNormalized, fSummed=fSummed, strRoot=strRoot, strEnrichment=strEnrichment,
                                  strCladeFilterLevel=strCladeFilterLevel, strCladeFilterMeasure=strCladeFilterMeasure, strCladeFilterMin=strCladeFilterMin, strAbundanceFilterPercentile=strAbundanceFilterPercentile,
-                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample, fSumData=fSumData, iTerminalClade=iTerminalClade):
+                                 strAbundanceFitlerPercent=strAbundanceFilterPercent, strRingOrder=strRingOrder, strTicks=strTicks, strAlpha=strAlpha, strMinSequence=strMinSequence, strMinSample=strMinSample, fSumData=fSumData, iTerminalClade=iTerminalClade, strPredictFileArgument=strPredictFileArgument):
     strT, astrSs = sfle.ts( target, source )
     strProg, strSelection, strAbundance, strStyleFile = astrSs[0], astrSs[1], astrSs[2], astrSs[3]
     strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strDetailFile = target[1].get_abspath(), target[2].get_abspath(), target[3].get_abspath(), target[4].get_abspath(), target[5].get_abspath(), target[6].get_abspath(), target[7].get_abspath()
     return sfle.ex([strProg] + [strTargetedTaxaFile, strHighlightCladeFile, sIDName, sLastMetadata, iNormalize, strInvert, fNormalized, fSummed, strRoot, strEnrichment, strCladeFilterLevel, strCladeFilterMeasure, strCladeFilterMin,
-                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, iTerminalClade, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT, strDetailFile])
+                               strAbundanceFilterPercentile, strAbundanceFilterPercent, strAlpha, strMinSequence, strMinSample, fSumData, iTerminalClade, strPredictFileArgument, strRingOrder, strTicks] + [strSelection, strAbundance, strStyleFile, strTaxaFile, strColorFile, strTickFile, strHighlightFile, strSizeFile, strCircleFile, strT, strDetailFile])
   return funcCladogramSelectionRet
 
 #Visualize with HCL selected samples with stratification (Figure 3)
@@ -692,7 +704,7 @@ for fileConfigMicropita in lMicropitaFiles:
     sMicropitaOutput = File(sfle.d(fileDirOutput,c_strPathDelim.join([sFileBase,sMicropitaOutput])))
 
     #Make file names from the input micropita file in the temp directory
-    sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufTable, c_strSufPredict )))
+    sMicropitaPredictFile = File(sfle.d( fileDirTmp, sfle.rebase( sCheckedAbundanceFile, c_strSufTable, "".join(["-select-",str(sFileConfiguration[c_strConfigSupervisedCount][iCountIndex]),"-",sFileConfiguration[c_strConfigSupervisedLabel],"-SVM",c_strSufPredict]))))
 
     #Make files names from the micropita output file
     sOutputFigure1APCoA,sOutputProbabalisticPCOA,sOutputCombinedFigure1APCoA,sOutputFigure4PCoA,sOutputFigure4CombinedPCoA,sOutputFigure1BHCL,sOutputFigure1BConfusion,sOutputFigure1BOverlap,sHCLSelectData,sHCLSelectColor,sHCLSelectLabel,sCladogramSelectFig,sCladogramTaxaFile,\
@@ -763,7 +775,7 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
                                                                                                                                                                 strPredictFileArgument))
       #Make probabalistic pcoa
-      Command(sOutputProbabalisticPCOA, [c_fileProgSupervisedPCoA, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASelectionMethods(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
+      Command(sOutputProbabalisticPCOA, [c_fileProgSupervisedPCoA, sCheckedAbundanceFile, sMicropitaOutput] + c_filePrimarySrc, funcPCoASupervisedProbabilities(" ".join([Constants_Arguments.c_strLoggingArgument, sFileConfiguration[c_strConfigLogging]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strIDNameArgument,sFileConfiguration[c_strConfigSampleRow]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strLastMetadataNameArgument,sFileConfiguration[c_strConfigLastMetadataRow]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strNormalizeArgument,sFileConfiguration[c_strConfigNormalizeAbundance]]),
@@ -771,6 +783,7 @@ for fileConfigMicropita in lMicropitaFiles:
                                                                                                                                                                 " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                                                                                                                                                                 " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
+                                                                                                                                                                " ".join([Constants_Arguments.c_strSupervisedLabelArgument,sFileConfiguration[c_strConfigSupervisedLabel]]),
                                                                                                                                                                 strPredictFileArgument))
     #Create figure 1A PCoA combined
     #Unstratified PCoA of selection
@@ -851,7 +864,8 @@ for fileConfigMicropita in lMicropitaFiles:
                                        " ".join([Constants_Arguments.c_strOccurenceFilterSequenceCountArgument,sFileConfiguration[c_strOccurenceFilterMinSequence]]),
                                        " ".join([Constants_Arguments.c_strOccurenceFilterSampleCountArgument,sFileConfiguration[c_strOccurenceFilterMinSample]]),
                                        " ".join([Constants_Arguments.c_strSumDataArgument,sFileConfiguration[c_strConfigSumData]]),
-                                       " ".join([Constants_Arguments.c_strTerminalLevelArgument,sFileConfiguration[c_strConfigTerminalLevel]])))
+                                       " ".join([Constants_Arguments.c_strTerminalLevelArgument,sFileConfiguration[c_strConfigTerminalLevel]]),
+                                       strPredictFileArgument))
 
     #Create figure 3 HCL version
 #    #Selection in Stratification

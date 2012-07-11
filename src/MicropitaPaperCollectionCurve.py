@@ -116,7 +116,7 @@ class MicropitaPaperCollectionCurve:
             iXMax = max([iXMax]+[iSelectionCount])
 
         #Plot median values as a line
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Bootstrapped"+strMetric)
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Permuted"+strMetric)
 
         #Plot methods
         for strMethod in dictMethods:

@@ -60,7 +60,14 @@ class SVM:
         #Add labels
         llData = []
         lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataLabel)
-        lsUniqueLabels = list(set(lsLabels))
+
+        #Do not use set to make elements unique. Need to preserve order.
+        #First label should be 0
+        lsUniqueLabels = []
+        for sElement in lsLabels:
+            if sElement not in lsUniqueLabels:
+                lsUniqueLabels.append(sElement)
+
         dictLabels = dict([[str(lenuLabels[1]),str(lenuLabels[0])] for lenuLabels in enumerate(lsUniqueLabels)])
         lsLabels = [dictLabels[sLabel] for sLabel in lsLabels]
 
@@ -75,6 +82,21 @@ class SVM:
             (f.write("".join(llData)))
 
         return lsUniqueLabels
+
+    @staticmethod
+    def funcMakeLabels(lsMetadata):
+        """
+        Given a list of metadata, labels are assigned. This is function represents a central location to make labels so all are consistent.
+        """
+        #Do not use set to make elements unique. Need to preserve order.
+        #First label should be 0
+        lsUniqueLabels = []
+        for sElement in lsMetadata:
+            if sElement not in lsUniqueLabels:
+                lsUniqueLabels.append(sElement)
+
+        dictLabels = dict([[str(lenuLabels[1]),str(lenuLabels[0])] for lenuLabels in enumerate(lsUniqueLabels)])
+        return [dictLabels[sLabel] for sLabel in lsMetadata]
 
     #Tested
     @staticmethod
@@ -104,7 +126,12 @@ class SVM:
         """
 
         #Convert to dict
-        lUniqueLabels = list(set(lLabels))
+        #Do not use set to make elements unique. Need to preserve order.
+        #First label should be 0
+        lUniqueLabels = []
+        for sElement in lLabels:
+            if sElement not in lUniqueLabels:
+                lUniqueLabels.append(sElement)
         dictLabels = dict(zip(lUniqueLabels, range(len(lUniqueLabels))))
 
         #Build a dict of weights per label {label:weight, label:weight}

@@ -533,10 +533,12 @@ class MicroPITA:
         svm = SVM()
 
         #Convert abundancies file to SVM file
-        noError = svm.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abndAbundanceTable, strOutputSVMFile=strInputSVMFile, sMetadataLabel=sMetadataForLabel)
-        if not noError:
+        lsUniqueLabelOrder = svm.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abndAbundanceTable, strOutputSVMFile=strInputSVMFile, sMetadataLabel=sMetadataForLabel)
+        if not lsUniqueLabelOrder:
             logging.error("MicroPITA.funcRunMLPYSVM: Received an error when creating the input SVM file in the MLPY LIBSVM analysis pipeline.")
             return False
+
+        print "lsUniqueLabelOrder:",lsUniqueLabelOrder
 
         #Will hold the SVM related return data including files generated during the process.
         #Although these files are not necessary for MLPY Libsvm, they are made to mirror the LIBSVM process and
@@ -550,11 +552,6 @@ class MicroPITA:
         #Get labels
         lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataForLabel)
         print "lsLabels",lsLabels
-        #Remove NAs
-        lfGoodMetadata = [sLabel in Constants.lNAs for sLabel in lsLabels]
-        print "lfGoodMetadata",lfGoodMetadata
-        lsLabels = [sLabel for sLabel in lsLabels if not sLabel in Constants.lNAs]
-        print "lsLabels",lsLabels
 
         #Get weights for labels
         dictWeights, ldWeightLabels = SVM.funcWeightLabels(lsLabels)
@@ -562,11 +559,12 @@ class MicroPITA:
         ldLabels = np.array([ldWeightLabels.index(sLabel) for sLabel in lsLabels])
         logging.debug("".join(["ldLabels ", str(ldLabels)]))
 
+        print "ldLabels:",ldLabels
+        print "ldWeightLabels:",ldWeightLabels
+        print "dictWeights:",dictWeights
+
         #Get 2D array of data (has feature names)
         npData = abndAbundanceTable.funcGetAbundanceCopy()
-        print "npData", npData
-        print "Compressed:",abndAbundanceTable.funcGetSample(abndAbundanceTable.funcGetSampleNames())
-        #Reduce the data by the good metadata, axis = 1 is reduce columns
 
         #Scale features (has feature names)
         for iRowIdex, npadRow in enumerate(npData):
@@ -576,9 +574,11 @@ class MicroPITA:
 
         #Get each sample data (this drops the feature names)
         lsSampleNames = np.array(abndAbundanceTable.funcGetSampleNames())
+        print "lsSampleNames:", lsSampleNames
 
         #SampleName labels
         dictLabels = dict(zip(lsSampleNames,ldLabels))
+        print "zip(lsSampleNames,ldLabels):",zip(lsSampleNames,ldLabels)
 
         #Best Accuracy
         dBestAccuracy = 0
@@ -670,6 +670,7 @@ class MicroPITA:
             #[samples,features]
             lPredictions = svmMLPY.pred(llFullData)
             lSVMLabels = list(svmMLPY.labels())
+            print "lSVMLabels:",lSVMLabels
 
             #Get probabilities
             #svm functions require [samples,features]
@@ -825,7 +826,7 @@ class MicroPITA:
         :type	String
         :param	lsSampleNames:	List of string sample ids.
         :type	String
-        :param	iSelectCount:	Amount os samples to select per label.
+        :param	iSelectCount:	Amount of samples to select per label.
         :type	Integer
         :param	fSelectDiscriminant:	Indicates samples should be selected for the disriminant method.
         :type	Boolean			
@@ -841,7 +842,7 @@ class MicroPITA:
 
         #Holds labels to compare to the predictions
         lsOriginalLabels = None
-        #Open perdiction file and input file and get labels to compare to the predictions
+        #Open prediction file and input file and get labels to compare to the predictions
         with open(strOriginalInputFile,'r') as f, open(strPredictFilePath,'r') as g:
             reader = csv.reader(f, delimiter=Constants.WHITE_SPACE, quoting=csv.QUOTE_NONE)
             lsOriginalLabels = [row[0] for row in reader]
@@ -1184,7 +1185,14 @@ class MicroPITA:
         randomlySelectedSamples = None
 
         #Check/reduce raw abundance data
-        strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, strOutputFileName=strCheckedAbndFile)
+        #If already normalized you cant run the occrunce filter so make None to turn off.
+        liOccurenceFilter = Constants.c_liOccurenceFilter
+        if fIsAlreadyNormalized:
+            liOccurenceFilter = None
+
+        print "liOccurenceFilter:",liOccurenceFilter
+        print "fIsAlreadyNormalized:",fIsAlreadyNormalized
+        strInputAbundanceFile = AbundanceTable.funcCheckRawDataFile(strReadDataFileName=strInputAbundanceFile, sLastMetadataName=sLastMetadataName, lOccurenceFilter = liOccurenceFilter, strOutputFileName=strCheckedAbndFile)
 
         #Read in abundance data
         #Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
@@ -1199,9 +1207,6 @@ class MicroPITA:
         if fSumData:
             totalAbundanceTable.funcSumClades()
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
-
-#Remove
-#        totalAbundanceTable.funcReduceFeaturesToCladeLevel(6)
 
         #Log metadata keys
         logging.debug(" ".join(["Micropita:funcRun.","Received metadata keys=",str(dictTotalMetadata.keys())]))
@@ -1225,13 +1230,20 @@ class MicroPITA:
         #For each stratified abundance block or for the unstratfified abundance
         #Run the unsupervised blocks
         for stratAbundanceTable in lStratifiedAbundanceTables:
+
+            #Check to make sure the stratification is not just NA values which can happen
+            #If so skip them
+            if (not strStratify == None) and (not strStratify == "None"):
+                if len(set(stratAbundanceTable.funcGetMetadata(strStratify)) & set(Constants.lNAs)) > 0:
+                    continue
+
             logging.info("Running abundance block:"+stratAbundanceTable.funcGetName())
 
             #Only perform if the data is not yet normalized
             if not stratAbundanceTable.funcIsNormalized():
 
                 #Need to first work with unnormalized data
-                if((c_RUN_MAX_DIVERSITY_1)or(c_RUN_REPRESENTIVE_DISSIMILARITY_2)or(c_RUN_MAX_DISSIMILARITY_3)):
+                if((c_RUN_MAX_DIVERSITY_1)or(c_RUN_REPRESENTIVE_DISSIMILARITY_2) or (c_RUN_MAX_DISSIMILARITY_3)):
 
                     self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iSampleSelectionCount,
                                                      dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlphaNoNormalize,
@@ -1283,13 +1295,24 @@ class MicroPITA:
         #Run supervised methods#
         lStratifiedAbundanceTables = None
         totalAbundanceTable.funcNormalize()
-        if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-            selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
-                                   strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-SVM.txt"]),
-                                   strTMPDirectory=strTemporaryDirectory,
-                                   strSupervisedMetadata=strLabel, iSampleSVMSelectionCount=sampleSVMSelectionCount))
-            logging.info("Selected Samples Unsupervised")
-            logging.info(selectedSamples)
+
+        ##Remove NA entries from the abundance table for the metadata label
+        ##Warning this modifies the table itself and does NOT return a copy
+        ##Any analysis after the point may be working with a subset of samples
+        #This is valid for running supervised methods on 1 label but not multiple labels
+        #Or adding additional downstream analysis after this point (unless it is contengent on the supervised label).
+        fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,Constants.lNAs)
+
+        if fRemoveSuccess:
+            if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
+                selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
+                                       strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-select-",str(sampleSVMSelectionCount),"-",strLabel,"-SVM.txt"]),
+                                       strTMPDirectory=strTemporaryDirectory,
+                                       strSupervisedMetadata=strLabel, iSampleSVMSelectionCount=sampleSVMSelectionCount))
+                logging.info("Selected Samples Unsupervised")
+                logging.info(selectedSamples)
+        else:
+            logging.error("MicroPITA.funcRun. Error occured when cleaning up table for metadata label values. Supervised methods not ran.")
 
         return selectedSamples
 
@@ -1409,7 +1432,6 @@ def _main( ):
         raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
     logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
 
-    print "args:",args
     #TODO does this stop the full analysis process? Not if the selection file already exists...
     if not args.sIDName:
         logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run. Received="+str(args.sIDName))
