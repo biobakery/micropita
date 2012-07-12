@@ -514,6 +514,34 @@ class DiversityTest(unittest.TestCase):
         #Check result against answer
         self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
 
+    def testFuncGetPielouEvennessForGoodCase1(self):
+
+        #Inputs
+        sampleAbundancies = np.array([.34,.33,.36,.35])
+
+        #Correct Answer
+        answer = 1.0
+
+        #Call method
+        result = Diversity.funcGetPielouEvenness(ldSampleTaxaAbundancies = sampleAbundancies)
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
+    def testFuncGetPielouEvennessForGoodCase2(self):
+
+        #Inputs
+        sampleAbundancies = np.array([.06,.08,.08,.08])
+
+        #Correct Answer
+        answer = 0.2
+
+        #Call method
+        result = Diversity.funcGetPielouEvenness(ldSampleTaxaAbundancies = sampleAbundancies)
+
+        #Check result against answer
+        self.assertEqual(str(result),str(answer),"".join([str(self),"::Expected=",str(answer),". Received=",str(result),"."]))
+
     def testGetChao1DiversityIndexForGoodCase1NoBias(self):
         
         #Inputs

@@ -64,6 +64,10 @@ class Constants_Arguments():
                         FDR shows the PVALUE option but with a Benjamini and Hochberg FDR correction and a threshold of 0.1"""
     c_strEnrichmentChoices = ["PVALUE","FDR"]
 
+    #eco Ecological measurement
+    c_strEcologicalMeasurementArgument = "--eco"
+    c_strEcologicalMeasurementHelp = "The measurement used to summarize sample selection communities."
+
     #featdelim Feature delimiter
     c_strFeatureNameDelimiterArgument = "--featdelim"
     c_strFeatureNameDelimiterHelp = "The delimiter for a feaure name if it contains a consensus sequence."

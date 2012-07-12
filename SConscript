@@ -36,7 +36,9 @@ c_strSufCircStyleInv = "-invert.CStyle"
 c_strSufCircTaxa = ".CTaxa"
 c_strSufCircTick = ".CTick"
 c_strSufCheckedTable = "".join(["-checked",c_strSufTable])
-c_strSufCollectionCurveFigure = "-ColCurv.pdf"
+c_strSufCollectionCurveFigureEvenness = "-Evenness-ColCurv.pdf"
+c_strSufCollectionCurveFigureRichness = "-Richness-ColCurv.pdf"
+c_strSufCollectionCurveFigureDiversity = "-Diversity-ColCurv.pdf"
 c_strSufCollectionCurveText = "-ColCurv.txt"
 c_strSufCombinedPCOA = "-Combined.pdf"
 c_strSufCombinedStratPCOA = "-Combined-StratPCoA.pdf"
@@ -382,9 +384,9 @@ def funcCombinedStratifiedPCoASelectionMethods( strLoggingLevel, sIDName, sLastM
   return funcCombinedStratifiedPCoARet
 
 #Create a summary chart with collection curves
-def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strLastMetadataName, strInvert, fNormalized, fSummed, lsSelectionMethods):
+def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strLastMetadataName, strInvert, strEcoMeasurement, fNormalized, fSummed, lsSelectionMethods):
   def funcCollectionCurveRet( target, source, env, strLoggingLevel=strLoggingLevel, strSampleNameRow=strSampleNameRow,
-                              strLastMetadataName=strLastMetadataName, strInvert=strInvert, fNormalized=fNormalized,
+                              strLastMetadataName=strLastMetadataName, strInvert=strInvert, strEcoMeasurement=strEcoMeasurement, fNormalized=fNormalized,
                               fSummed=fSummed, lsSelectionMethods=lsSelectionMethods):
     strFigureT, astrSs = sfle.ts( target, source )
     strProg, strAbundance = astrSs[0], astrSs[1]
@@ -397,7 +399,7 @@ def funcCollectionCurveSummary( strLoggingLevel, strSampleNameRow, strLastMetada
       iFileCount = iFileCount + 1
     lsSelectionFiles = astrSs[2:iFileCount+1]
     return sfle.ex([strProg, strLoggingLevel, strSampleNameRow, strLastMetadataName, fNormalized,
-                    fSummed, strInvert, strAbundance, strFigureT]+lsSelectionFiles+[lsSelectionMethods])
+                    fSummed, strInvert, strEcoMeasurement, strAbundance, strFigureT]+lsSelectionFiles+[lsSelectionMethods])
   return funcCollectionCurveRet
 
 #Validation steps
@@ -1092,16 +1094,44 @@ if c_fRunCollectionCurve:
 
       lsPlotCollectorSelectionMethods = filter(None,re.split(",",sFileConfiguration[c_strConfigSelectionTechniquesCollectorCurve]))
 
+      #Create Figure 5 - Even
       #Make more files, now for figure 5 Collection Curve
-      sOutputFigure5CC =  File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder, sfle.rebase( strInputSummaryKey, c_strSufTable, c_strSufCollectionCurveFigure)))
-
-      #Create Figure 5
-      #Collection Curve
+      sOutputFigure5CC =  File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder, sfle.rebase( strInputSummaryKey, c_strSufTable, c_strSufCollectionCurveFigureEvenness)))
+      #Collection Curve - Even
       Command([sOutputFigure5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
           funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
                               " ".join([Constants_Arguments.c_strIDNameArgument, curSampleNameRow]),
                               " ".join([Constants_Arguments.c_strLastMetadataNameArgument, curLastMetadataRow]),
                               " ".join([Constants_Arguments.c_strInvertArgument, curInvert]),
+                              " ".join([Constants_Arguments.c_strEcologicalMeasurementArgument, "EVENNESS"]),
+                              " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                              " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                              " ".join([Constants_Arguments.c_strPlotSelectedArgument]+lsPlotCollectorSelectionMethods)))
+
+      #Create Figure 5 - Rich
+      #Make more files, now for figure 5 Collection Curve
+      sOutputFigure5CC =  File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder, sfle.rebase( strInputSummaryKey, c_strSufTable, c_strSufCollectionCurveFigureRichness)))
+      #Collection Curve - Rich
+      Command([sOutputFigure5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
+          funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
+                              " ".join([Constants_Arguments.c_strIDNameArgument, curSampleNameRow]),
+                              " ".join([Constants_Arguments.c_strLastMetadataNameArgument, curLastMetadataRow]),
+                              " ".join([Constants_Arguments.c_strInvertArgument, curInvert]),
+                              " ".join([Constants_Arguments.c_strEcologicalMeasurementArgument, "RICHNESS"]),
+                              " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
+                              " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
+                              " ".join([Constants_Arguments.c_strPlotSelectedArgument]+lsPlotCollectorSelectionMethods)))
+
+      #Create Figure 5 - Diverse
+      #Make more files, now for figure 5 Collection Curve
+      sOutputFigure5CC =  File(sfle.d( fileDirOutput.get_abspath()+strOutputSummaryFolder, sfle.rebase( strInputSummaryKey, c_strSufTable, c_strSufCollectionCurveFigureDiversity)))
+      #Collection Curve - Diverse
+      Command([sOutputFigure5CC], [c_fileProgCollectionCurveFigure, curInputFile] + curListofSelection + ls_srcFig1, 
+          funcCollectionCurveSummary(" ".join([Constants_Arguments.c_strLoggingArgument, curLogging]),
+                              " ".join([Constants_Arguments.c_strIDNameArgument, curSampleNameRow]),
+                              " ".join([Constants_Arguments.c_strLastMetadataNameArgument, curLastMetadataRow]),
+                              " ".join([Constants_Arguments.c_strInvertArgument, curInvert]),
+                              " ".join([Constants_Arguments.c_strEcologicalMeasurementArgument, "DIVERSITY"]),
                               " ".join([Constants_Arguments.c_strIsNormalizedArgument,sFileConfiguration[c_strConfigFileIsNormalized]]),
                               " ".join([Constants_Arguments.c_strIsSummedArgument,sFileConfiguration[c_strConfigFileIsSummed]]),
                               " ".join([Constants_Arguments.c_strPlotSelectedArgument]+lsPlotCollectorSelectionMethods)))

@@ -15,6 +15,7 @@ __status__ = "Development"
 #Update path
 import sys
 from Constants import Constants
+import math
 import numpy as np
 from ValidateData import ValidateData
 #if(not Constants.COGENT_SRC in sys.path):
@@ -209,6 +210,19 @@ class Diversity:
         if(not ValidateData.funcIsFalse(bcValue)):
             return 1.0-bcValue
         return False
+
+    @staticmethod
+    def funcGetPielouEvenness(ldSampleTaxaAbundancies=None):
+        """
+        Calculates the evenness of a sample using Pieulou's metric.
+        This is equivalent to shannon/log(len(ldSampleTaxaAbundancies))
+
+        :param	ldSampleTaxaAbundancies:	An np.array of samples (rows) x measurements (columns) in which diversity is measured between rows
+        :type	List	List of doubles
+        :return	Double:	measurement of evennness
+        """
+
+        return Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies)#/(math.log(Diversity.funcGetObservedCount(ldSampleTaxaAbundancies)))
 
 #    #Beta diversity
 #    #Testing: Happy path tested the unweighted option

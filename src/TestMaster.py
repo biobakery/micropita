@@ -29,7 +29,7 @@ import ValidateDataTest
 suite = unittest.TestSuite()
 suite.addTest(AbundanceTableTest.suite())
 #suite.addTest(CladogramTest.suite())
-#suite.addTest(DiversityTest.suite())
+suite.addTest(DiversityTest.suite())
 #suite.addTest(MicroPITATest.suite())
 #suite.addTest(MLPYDistanceAdaptorTest.suite())
 ##suite.addTest(PCoATest.suite())

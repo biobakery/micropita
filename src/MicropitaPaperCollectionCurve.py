@@ -73,9 +73,9 @@ class MicropitaPaperCollectionCurve:
         imgSubplot.set_xlabel('Number of samples sampled from study (n)')
         if self.c_sMeasurement == self.c_sRichness:
             imgSubplot.set_ylabel("".join(["Sampled Richness (",strMetric,")"]))
-        if self.c_sMeasurement == self.c_sEvenness:
+        elif self.c_sMeasurement == self.c_sEvenness:
             imgSubplot.set_ylabel("".join(["Sampled Evenness (",strMetric,")"]))
-        if self.c_sMeasurement == self.c_sDiversity:
+        elif self.c_sMeasurement == self.c_sDiversity:
             imgSubplot.set_ylabel("".join(["Sampled Diversity (",strMetric,")"]))
         imgSubplot.spines['top'].set_color(objColors.c_strDetailsColorLetter)
         imgSubplot.spines['bottom'].set_color(objColors.c_strDetailsColorLetter)
@@ -129,7 +129,7 @@ class MicropitaPaperCollectionCurve:
             iXMax = max([iXMax]+[iSelectionCount])
 
         #Plot median values as a line
-        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Permuted"+strMetric)
+        plot(liX, liY, color=objColors.c_strDetailsColorLetter, marker="*", linestyle='--', label = "Permuted "+strMetric)
 
         #Plot methods
         for strMethod in dictMethods:
@@ -185,10 +185,10 @@ class MicropitaPaperCollectionCurve:
             else:
                 if self.c_sMeasurement == self.c_sRichness:
                     ldMeasurePerIteration.append(Diversity.funcGetObservedCount(ldSampleAbundances=ldPooledSample))
-                if self.c_sMeasurement == self.c_sEvenness:
-                    ldMeasurePerIteration.append(Diversity.funcGetPieulou(ldSampleAbundances=ldPooledSample))
-                if self.c_sMeasurement == self.c_sDiversity:
-                    ldMeasurePerIteration.append(Diversity.funcGetInverseSimpson(ldSampleAbundances=ldPooledSample))
+                elif self.c_sMeasurement == self.c_sEvenness:
+                    ldMeasurePerIteration.append(Diversity.funcGetPielouEvenness(ldSampleTaxaAbundancies=ldPooledSample))
+                elif self.c_sMeasurement == self.c_sDiversity:
+                    ldMeasurePerIteration.append(Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldPooledSample))
         logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount")
         return ldMeasurePerIteration
 
@@ -243,7 +243,13 @@ def _main( ):
 
     #Instance of plot collection curve script
     mCC = MicropitaPaperCollectionCurve()
-    mCC.c_strMetricCategory = args.sEcologicalMeasurement
+    mCC.c_sMeasurement = args.sEcologicalMeasurement
+    if mCC.c_sMeasurement == mCC.c_sRichness:
+        mCC.c_strMetricCategory = "Observed Occurence"
+    elif mCC.c_sMeasurement == mCC.c_sEvenness:
+        mCC.c_strMetricCategory = "Pielou"
+    elif mCC.c_sMeasurement == mCC.c_sDiversity:
+        mCC.c_strMetricCategory = "Inverse Simson"
     
     #Instance of microPITA; used to generate diversity matrices
     microPITA = MicroPITA()
@@ -260,10 +266,19 @@ def _main( ):
     totalData = AbundanceTable.funcMakeFromFile(strInputFile=args.strAbundanceFile, fIsNormalized=fIsNormalized,
                                             fIsSummed=fIsSummed, sMetadataID=args.sIDName, sLastMetadata=args.sLastMetadataName)
 
-    #Do not produce a plot for summed or normalized data
-    if totalData.funcIsSummed() or totalData.funcIsNormalized():
-        logging.error("MicropitaPaperCollectionCurve. Will not produce a refraction curve on normalized or summed data.")
+    ##Certain metrics need different data states, check for them.
+    #Do not produce a plot for summed data for any metric.
+    if totalData.funcIsSummed():
+        logging.error("MicropitaPaperCollectionCurve. Will not produce a refraction curve on summed data.")
         return False
+    #Do not produce a plot for richness for normalized data
+    if mCC.c_sMeasurement == mCC.c_sRichness:
+        if totalData.funcIsNormalized():
+            logging.error("MicropitaPaperCollectionCurve. Will not produce a refraction curve on normalized.")
+            return False
+    #If diversity or evennness is measured, normalize
+    if (mCC.c_sMeasurement == mCC.c_sDiversity) or (mCC.c_sMeasurement == mCC.c_sEvenness):
+        totalData.funcNormalize()
 
     rawAbundance = totalData.funcGetAbundanceCopy()
 
@@ -311,11 +326,11 @@ def _main( ):
                     ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
                     #Get measurement
-                    if self.c_sMeasurement == self.c_sRichness:
+                    if mCC.c_sMeasurement == mCC.c_sRichness:
                         dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
-                    if self.c_sMeasurement == self.c_sEvenness:
-                        dictCurStudyMethod[iSampleCount]=Diversity.funcGetPieulou(ldSampleAbundances=ldSummedSubSet)
-                    if self.c_sMeasurement == self.c_sDiversity:
+                    elif mCC.c_sMeasurement == mCC.c_sEvenness:
+                        dictCurStudyMethod[iSampleCount]=Diversity.funcGetPielouEvenness(ldSampleTaxaAbundancies=ldSummedSubSet)
+                    elif mCC.c_sMeasurement == mCC.c_sDiversity:
                         dictCurStudyMethod[iSampleCount]=Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
@@ -324,7 +339,7 @@ def _main( ):
     #Update the plot name with the run metric
     strPlotNamePieces = filter(None,re.split(Constants.PATH_SEP,args.strOutFigure))
     strPlotName = Constants.PATH_SEP.join(strPlotNamePieces[0:-1])
-    strPlotName = Constants.PATH_SEP.join([strPlotName,mCC.c_strMetricCategory+"-"+strPlotNamePieces[-1:][0]])
+    strPlotName = Constants.PATH_SEP.join([strPlotName,mCC.c_sMeasurement+"-"+strPlotNamePieces[-1:][0]])
 
     #Plot line graph
     sortedCounts = list(setiSampleCounts)

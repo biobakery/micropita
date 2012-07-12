@@ -973,10 +973,22 @@ class MicroPITA:
 
         #Generate alpha metrics and get most diverse
         if(fRunDiversity):
-            #Get Alpha metrics matrix
-            #Expects Observations (Taxa (row) x sample (column))
-            #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-            internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+            #If the table is summed get just the terminal taxa
+            internalAlphaMatrix = None
+            if abndData.funcIsSummed():
+                lsFileElements = os.path.splitext(abndData.funcGetName())
+                abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcWriteToFile(strOutputFile=lsFileElements[0]+"-Diversity-out"+lsFileElements[1])
+                npaTerminalAbundance = abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcGetAbundanceCopy()
+                #Get Alpha metrics matrix
+                #Expects Observations (Taxa (row) x sample (column))
+                #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+                internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = npaTerminalAbundance, lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+            else:
+                #Get Alpha metrics matrix
+                #Expects Observations (Taxa (row) x sample (column))
+                #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+                internalAlphaMatrix = Diversity.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+
             #Get top ranked alpha diversity by most diverse
             #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
             #Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
@@ -1203,6 +1215,9 @@ class MicroPITA:
 
         if fSumData:
             totalAbundanceTable.funcSumClades()
+
+#TODO remove
+        totalAbundanceTable.funcReduceFeaturesToCladeLevel(6)
 
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
