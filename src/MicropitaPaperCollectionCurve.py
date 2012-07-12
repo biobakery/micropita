@@ -34,6 +34,14 @@ from Utility_Math import Utility_Math
 
 class MicropitaPaperCollectionCurve:
 
+    #Measurement modes to use
+    c_sRichness = "RICHNESS"
+    c_sDiversity = "DIVERSITY"
+    c_sEvenness = "EVENNESS"
+
+    #Which measurement method to use
+    c_sMeasurement = c_sRichness
+    
     #Bootstrap interations
     c_BootstrapItr = 1000
 
@@ -63,7 +71,12 @@ class MicropitaPaperCollectionCurve:
         imgFigure.set_facecolor(objColors.c_strBackgroundColorWord)
         imgSubplot = imgFigure.add_subplot(111,axisbg=objColors.c_strBackgroundColorLetter)
         imgSubplot.set_xlabel('Number of samples sampled from study (n)')
-        imgSubplot.set_ylabel("".join(["Sampled Diversity (",strMetric,")"]))
+        if self.c_sMeasurement == self.c_sRichness:
+            imgSubplot.set_ylabel("".join(["Sampled Richness (",strMetric,")"]))
+        if self.c_sMeasurement == self.c_sEvenness:
+            imgSubplot.set_ylabel("".join(["Sampled Evenness (",strMetric,")"]))
+        if self.c_sMeasurement == self.c_sDiversity:
+            imgSubplot.set_ylabel("".join(["Sampled Diversity (",strMetric,")"]))
         imgSubplot.spines['top'].set_color(objColors.c_strDetailsColorLetter)
         imgSubplot.spines['bottom'].set_color(objColors.c_strDetailsColorLetter)
         imgSubplot.spines['left'].set_color(objColors.c_strDetailsColorLetter)
@@ -170,7 +183,12 @@ class MicropitaPaperCollectionCurve:
             if float(sum(ldPooledSample))==0.0:
                 ldMeasurePerIteration.append(0.0)
             else:
-                ldMeasurePerIteration.append(Diversity.funcGetObservedCount(ldSampleAbundances=ldPooledSample))
+                if self.c_sMeasurement == self.c_sRichness:
+                    ldMeasurePerIteration.append(Diversity.funcGetObservedCount(ldSampleAbundances=ldPooledSample))
+                if self.c_sMeasurement == self.c_sEvenness:
+                    ldMeasurePerIteration.append(Diversity.funcGetPieulou(ldSampleAbundances=ldPooledSample))
+                if self.c_sMeasurement == self.c_sDiversity:
+                    ldMeasurePerIteration.append(Diversity.funcGetInverseSimpson(ldSampleAbundances=ldPooledSample))
         logging.info("Stop MicropitaPaperCollectionCurve.getMedianBootstrappedObservedCount")
         return ldMeasurePerIteration
 
@@ -188,6 +206,7 @@ argp.add_argument(Constants_Arguments.c_strIsNormalizedArgument, dest="fIsNormal
                   help= Constants_Arguments.c_strIsNormalizedHelp)
 argp.add_argument(Constants_Arguments.c_strIsSummedArgument, dest="fIsSummed", action = "store", metavar= "flagIndicatingSummation", help= Constants_Arguments.c_strIsSummedHelp)
 argp.add_argument(Constants_Arguments.c_strInvertArgument, dest = "fInvert", action = "store", default="False", help = Constants_Arguments.c_strLoggingHelp)
+argp.add_argument(Constants_Arguments.c_strEcologicalMeasurementArgument, dest = "sEcologicalMeasurement", action = "store", metavar="ecologicalMeasurementToMeasureSamples", help = Constants_Arguments.c_strEcologicalMeasurementHelp)
 
 #Select file
 argp.add_argument( "strAbundanceFile", metavar = "Abundance_file", help = Constants_Arguments.c_strAbundanceFileHelp)
@@ -224,7 +243,8 @@ def _main( ):
 
     #Instance of plot collection curve script
     mCC = MicropitaPaperCollectionCurve()
-
+    mCC.c_strMetricCategory = args.sEcologicalMeasurement
+    
     #Instance of microPITA; used to generate diversity matrices
     microPITA = MicroPITA()
 
@@ -290,8 +310,13 @@ def _main( ):
                     #And if so that the same method at the same count will give the same results which is currently true
                     ldSummedSubSet = np.array(Utility_Math.funcSumRowsOfColumns(rawAbundance,lsCurSampleSelections))
 
-                    #Get measurement (observed count)
-                    dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
+                    #Get measurement
+                    if self.c_sMeasurement == self.c_sRichness:
+                        dictCurStudyMethod[iSampleCount]=Diversity.funcGetObservedCount(ldSampleAbundances=ldSummedSubSet)
+                    if self.c_sMeasurement == self.c_sEvenness:
+                        dictCurStudyMethod[iSampleCount]=Diversity.funcGetPieulou(ldSampleAbundances=ldSummedSubSet)
+                    if self.c_sMeasurement == self.c_sDiversity:
+                        dictCurStudyMethod[iSampleCount]=Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldSummedSubSet)
 
     logging.debug("dictMetricsBySampleN")
     logging.debug(dictMetricsBySampleN)
