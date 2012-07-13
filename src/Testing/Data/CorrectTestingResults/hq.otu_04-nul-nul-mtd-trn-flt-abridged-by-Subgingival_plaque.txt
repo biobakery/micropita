@@ -1,7 +1,0 @@
-"TID"	700098980
-"STSite"	"Subgingival_plaque"
-"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"	12
-"Bacteria|unclassified|4904"	43
-"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"	29
-"Bacteria|3417"	34
-"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"	2

@@ -1216,9 +1216,6 @@ class MicroPITA:
         if fSumData:
             totalAbundanceTable.funcSumClades()
 
-#TODO remove
-        totalAbundanceTable.funcReduceFeaturesToCladeLevel(6)
-
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
         #Log metadata keys

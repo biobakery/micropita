@@ -1,2 +1,0 @@
-TID	700098986	700098984	700098982	700098980	700098988	700037470	700037472	700037474	700037476	700037478
-STSite	L_Antecubital_fossa	R_Retroauricular_crease	L_Retroauricular_crease	Subgingival_plaque	R_Antecubital_fossa	L_Retroauricular_crease	R_Retroauricular_crease	L_Antecubital_fossa	R_Antecubital_fossa	Anterior_nares

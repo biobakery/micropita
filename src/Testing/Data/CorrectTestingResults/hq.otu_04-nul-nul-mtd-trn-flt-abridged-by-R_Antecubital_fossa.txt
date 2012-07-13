@@ -1,7 +1,0 @@
-"TID"	700098988	700037476
-"STSite"	"R_Antecubital_fossa"	"R_Antecubital_fossa"
-"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"	0	1
-"Bacteria|unclassified|4904"	6	1
-"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"	0	1
-"Bacteria|3417"	3	1
-"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"	0	1

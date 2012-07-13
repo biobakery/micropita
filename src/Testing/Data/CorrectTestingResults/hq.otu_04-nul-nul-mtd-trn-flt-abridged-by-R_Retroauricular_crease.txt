@@ -1,7 +1,0 @@
-"TID"	700098984	700037472
-"STSite"	"R_Retroauricular_crease"	"R_Retroauricular_crease"
-"Bacteria|Firmicutes|Clostridia|Clostridiales|Clostridiaceae|Clostridium|72"	0	0
-"Bacteria|unclassified|4904"	10	23
-"Bacteria|Firmicutes|Bacilli|Lactobacillales|Lactobacillaceae|Lactobacillus|1361"	0	0
-"Bacteria|3417"	45	0
-"Bacteria|Firmicutes|Bacilli|Bacillales|Bacillaceae|unclassified|1368"	0	0
