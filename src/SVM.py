@@ -16,7 +16,6 @@ __status__ = "Development"
 #Libraries
 from AbundanceTable import AbundanceTable
 from Constants import Constants
-from CommandLine import CommandLine
 import math
 import operator
 import os

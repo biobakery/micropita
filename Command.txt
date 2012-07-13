@@ -1,0 +1,2 @@
+python MicroPITA.py --id ID --lastmeta Label --nosum --nun 6 --target ../input/Unbalanced48-GenNoise-0-SignalNoise-5.taxa --label Label --nsup 3 ../input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl ../Unbalanced48-GenNoise-0-SignalNoise-5.txt Diversity Extreme Representative Taxa_Defined Distinct Discriminant
+
