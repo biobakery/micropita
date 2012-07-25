@@ -70,7 +70,7 @@ class EcologyMetric:
         :return	Double:	Diversity metric
         """
 
-        simpsons = Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies)
+        simpsons = EcologyMetric.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies)
         #Return False if the diversity is 0 before inverting it
         if(simpsons == 0):
             return False
@@ -183,23 +183,10 @@ class EcologyMetric:
         :return	Double	1 - Bray-Curtis dissimilarity.	
         """
 
-        bcValue = Diversity.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = ldSampleTaxaAbundancies)
+        bcValue = EcologyMetric.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies = ldSampleTaxaAbundancies)
         if(not ValidateData.funcIsFalse(bcValue)):
             return 1.0-bcValue
         return False
-
-#    @staticmethod
-#    def funcGetPielouEvenness(ldSampleTaxaAbundancies=None):
-#        """
-#        Calculates the evenness of a sample using Pieulou's metric.
-#        This is equivalent to shannon/log(len(ldSampleTaxaAbundancies))
-#
-#        :param	ldSampleTaxaAbundancies:	An np.array of samples (rows) x measurements (columns) in which diversity is measured between rows
-#        :type	List	List of doubles
-#        :return	Double:	measurement of evennness
-#        """
-#
-#        return Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies)#/(math.log(Diversity.funcGetObservedCount(ldSampleTaxaAbundancies)))
 
     @staticmethod
     def funcGetAlphaMetric(ldAbundancies=None, strMetric=None):
@@ -215,17 +202,17 @@ class EcologyMetric:
 
         if(not ValidateData.funcIsValidString(strMetric)):
             return False
-        elif(strMetric == Diversity.c_strShannonRichness):
-            return Diversity.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_strSimpsonDiversity):
-            return Diversity.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_strInvSimpsonDiversity):
-            return Diversity.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
-        elif(strMetric == Diversity.c_strObservedCount):
-            return Diversity.funcGetObservedCount(npaSampleAbundances=ldAbundancies)
+        elif(strMetric == EcologyMetric.c_strShannonRichness):
+            return EcologyMetric.funcGetShannonRichnessIndex(ldSampleTaxaAbundancies=ldAbundancies)
+        elif(strMetric == EcologyMetric.c_strSimpsonDiversity):
+            return EcologyMetric.funcGetSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
+        elif(strMetric == EcologyMetric.c_strInvSimpsonDiversity):
+            return EcologyMetric.funcGetInverseSimpsonsDiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
+        elif(strMetric == EcologyMetric.c_strObservedCount):
+            return EcologyMetric.funcGetObservedCount(npaSampleAbundances=ldAbundancies)
         #Needs NOT Normalized Abundance
-        elif(strMetric == Diversity.c_strChao1Diversity):
-            return Diversity.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
+        elif(strMetric == EcologyMetric.c_strChao1Diversity):
+            return EcologyMetric.funcGetChao1DiversityIndex(ldSampleTaxaAbundancies=ldAbundancies)
         else:
             return False
 
@@ -261,5 +248,5 @@ class EcologyMetric:
         for sample in lsSampleNames:
             sampleAbundance = npaSampleAbundance[sample]
             for metricIndex in xrange(0,metricsCount):
-                returnMetricsMatrix[metricIndex].append(Diversity.funcGetAlphaMetric(ldAbundancies = sampleAbundance, strMetric = lsDiversityMetricAlpha[metricIndex]))
+                returnMetricsMatrix[metricIndex].append(EcologyMetric.funcGetAlphaMetric(ldAbundancies = sampleAbundance, strMetric = lsDiversityMetricAlpha[metricIndex]))
         return returnMetricsMatrix

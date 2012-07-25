@@ -67,3 +67,6 @@ class Constants():
     #Occurence filter [min abundance, min samples occuring in]
     #To turn off make == None
     c_liOccurenceFilter = [3,3]
+
+    #Break ties in targeted feature with diversity
+    c_fBreakRankTiesByDiversity = False

@@ -34,6 +34,7 @@ import re
 import scipy.cluster.hierarchy as hcluster
 from SVM import SVM
 import sys
+from types import *
 from Utility_Math import Utility_Math
 
 class MicroPITA:
@@ -106,7 +107,7 @@ class MicroPITA:
 	:type	List of strings	List of strings.
 	:param	iTopAmount:	The amount of top measured samples (assumes the higher measurements are better).
 	:type	integer	Integer amount of sample names/ indices to return.
-    :return	List:	List of samples to be selected.
+	:return	List:	List of samples to be selected.
 	"""
 
         topRankList = []
@@ -139,7 +140,7 @@ class MicroPITA:
 	:type	Numpy Array	Numpy array where row=samples and columns = features.
 	:param	sMetric:	String name of beta metric. Possibilities are listed in microPITA.
 	:type	String	String name of beta metric. Possibilities are listed in microPITA.
-    :return	Double:	Measurement indicated by metric for given abundance list
+	:return	Double:	Measurement indicated by metric for given abundance list
 	"""
 
         if sMetric == self.c_strBrayCurtisDissimilarity:
@@ -162,7 +163,7 @@ class MicroPITA:
 	:type	List	List of strings
 	:param	iNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
 	:type	Integer	Number of samples to return
-    :return	List:	List of selected samples.
+	:return	List:	List of selected samples.
 	"""
 
         #Validate parameters
@@ -185,9 +186,10 @@ class MicroPITA:
 
         #Get distance matrix
         distanceMatrix=self.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric)
-        if distanceMatrix == False:
-          logging.error("MicroPITA.funcGetCentralSamplesByKMedoids. Received false for betaMetrix matrix generation, returning false.")
-          return False
+        if type(distanceMatrix) is BooleanType:
+            if distanceMatrix == False:
+                logging.error("MicroPITA.funcGetCentralSamplesByKMedoids. Received false for betaMetrix matrix generation, returning false.")
+            return False
 
         #Log distance matrix
         logging.debug("".join(["Distance matrix for representative selection using metric=",str(sMetric)]))
@@ -230,7 +232,7 @@ class MicroPITA:
 	:type	List	List of strings.
 	:param	iSelectSampleCount:	Number of samples to select (return).
 	:type	Integer	Integer number of samples returned.
-    :return	Samples:	List of samples.
+	:return	Samples:	List of samples.
 	"""
 
         #If they want all the sample count, return all sample names
@@ -300,9 +302,9 @@ class MicroPITA:
 	:type	AbundanceTable	Abundance Table
 	:param	lsTargetedFeature:	String names
 	:type	list	list of string names of features (bugs) which are measured after ranking against the full sample
-    :param  fRank:	Indicates to rank the abundance before getting the average abundance of the features (default false)
-    :type   boolean	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
-    :return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample,
+	:param  fRank:	Indicates to rank the abundance before getting the average abundance of the features (default false)
+	:type   boolean	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
+	:return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample,
             feature average abundance or ranked abundance. Lists will already be sorted.
             For not Ranked [[sample,average abundance of selected feature,1]]
         	For Ranked [[sample,average ranked abundance, average abundance of selected feature]]
@@ -346,7 +348,7 @@ class MicroPITA:
                              for llist in llRetAbundance]
 
         #Sort first for ties and then for the main feature
-        if Constants.fBreakRankTiesByDiversity:
+        if Constants.c_fBreakRankTiesByDiversity:
             llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[2], reverse = True)
         if fRank:
             llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[1], reverse = False)
@@ -409,7 +411,7 @@ class MicroPITA:
 	:type	list	list of strings
 	:param	iNumberOfSamplesToReturn:	Number of samples to select
 	:type	integer	integer.
-    :return	List:	List of selected samples (strings).
+	:return	List:	List of selected samples (strings).
 	"""
 
         #Input matrix sample count
@@ -446,9 +448,9 @@ class MicroPITA:
 	:type	string	string
 	:param	strInputSVMFile:	File name for the file generated to mock the input SVM file.
 	:type	string	string
-    :param	strPredictionFile	LIBSVM style output file of probabilistic predictions.
-    :type	string	File path
-    :return	Analysis Results:	Dictionary of files generated (input and prediction files)
+	:param	strPredictionFile	LIBSVM style output file of probabilistic predictions.
+	:type	string	File path
+	:return	Analysis Results:	Dictionary of files generated (input and prediction files)
                                 Return false on error.
 	"""
 
@@ -654,21 +656,21 @@ class MicroPITA:
                                        strOuputSVMFile, strSupervisedMetadata,
                                        iSampleSVMSelectionCount):
         """
-	    Runs supervised methods.
+	Runs supervised methods.
 	
-	    :param	abundanceTable:	AbundanceTable
-	    :type	AbudanceTable	Data to analyze
-	    :param	fRunDistinct:	Run distinct selection method
-	    :type	Boolean	boolean (true runs method)
-	    :param	fRunDiscriminant:	Run discriminant method
-	    :type	Boolean	boolean (true runs method)
-	    :param	strOutputSVMFile:	File output from  SVM
-	    :type	String	String
-	    :param	strTMPDirectory:	Directory to place temporary files
-	    :type	String	String
-	    :param	iSampleSVMSelectionCount:	Number of samples to select
-	    :type	Integer	int sample selection count
-        :return	Selected Samples:	A dictionary of selected samples by selection ID
+	:param	abundanceTable:	AbundanceTable
+	:type	AbudanceTable	Data to analyze
+	:param	fRunDistinct:	Run distinct selection method
+	:type	Boolean	boolean (true runs method)
+	:param	fRunDiscriminant:	Run discriminant method
+	:type	Boolean	boolean (true runs method)
+	:param	strOutputSVMFile:	File output from  SVM
+	:type	String	String
+	:param	strTMPDirectory:	Directory to place temporary files
+	:type	String	String
+	:param	iSampleSVMSelectionCount:	Number of samples to select
+	:type	Integer	int sample selection count
+	:return	Selected Samples:	A dictionary of selected samples by selection ID
             Dictionary	{"Selection Method":["SampleID","SampleID"...]}
 	    """
 
@@ -961,8 +963,8 @@ class MicroPITA:
 	:type	String	String path to existing file.
 	:param	strTemporaryDirectory:	Directory that will be used to store secondary files important to analysis but not the direct deliverable.
 	:type	String	String directory path.
-    :param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
-    :type	String String file path.
+	:param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
+	:type	String String file path.
 	:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods.
 	:type	Integer	integer.
 	:param	iSupervisedSampleCount:	Number of samples to select with supervised methods.
@@ -979,7 +981,7 @@ class MicroPITA:
 	:type	String	String metadata id.
 	:param	sFeatureSelectionMethod:	Which method to use to select features in a targeted manner (Using average ranked abundance or abundance).
 	:type	String	String (specific values indicated in microPITA).
-    :return	Selected Samples:	Samples selected by methods.
+	:return	Selected Samples:	Samples selected by methods.
             Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 	"""
 
@@ -1246,7 +1248,7 @@ class MicroPITA:
 	:param	strInputFile:	String path to file to read and translate into a dictionary.
                                 {"method":["sample selected","sample selected"...]}
 	:type	String	String path to file to read and translate.
-    :return    Dictionary:    Samples selected by methods.
+	:return    Dictionary:    Samples selected by methods.
                 Dictionary    {"Selection Method":["SampleID","SampleID","SampleID",...]}
 	"""
 
