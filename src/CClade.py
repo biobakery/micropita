@@ -1,49 +1,70 @@
+"""
+Author: Curtis Huttenhower
+Description: Used to create tree structures to hierarchically normalize abundance tables.
+"""
+
+__author__ = "Curtis Huttenhower"
+__copyright__ = "Copyright 2012"
+__credits__ = ["Curtis Huttenhower"]
+__license__ = ""
+__version__ = ""
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
 
 import blist
 import sys
 
 class CClade:
-	
-        #Initialize CCClade
-        #Dictionary to hold children nodes in tree
-        #adValues is a list of the abundance values from the samples
+
 	def __init__( self ):
+		"""
+		Initialize CClade
+		Dictionary to hold the children nodes from feature consensus lineages.
+		adValues is a list of the abundance value.
+		"""
 		
 		self.m_hashChildren = {}
 		self.m_adValues = None
-	
-        #Recursively travel the length of a tree until you find the terminal node
-        #(where astrClade == Falseor actually [])
-        #or a dict key that matches the clade call.
-        #If at any time a clade is given that is not currently know, return a new clade
-        #which is set to the current Clade as a child.
+
 	def get( self, astrClade ):
+		"""
+		Recursively travel the length of a tree until you find the terminal node
+		(where astrClade == Falseor actually [])
+		or a dict key that matches the clade call.
+		If at any time a clade is given that is not currently know, return a new clade
+		which is set to the current Clade as a child.
+		"""
 		
 		return self.m_hashChildren.setdefault(
 			astrClade[0], CClade( ) ).get( astrClade[1:] ) if astrClade else self
 
-        #Set all the values given as a list in the same order given
 	def set( self, adValues ):
+		"""
+        Set all the values given as a list in the same order given.
+		"""
 		
 		self.m_adValues = blist.blist( [0] ) * len( adValues )
 		for i, d in enumerate( adValues ):
 			if d:
 				self.m_adValues[i] = d
 
-        #This allows you to recursively impute values for clades without values given their children counts.
-        #Assumably this should be called only once and after all clade abundances have been added.
-        #If the m_adValues already exist return the stored m_adValues. (No imputation needed).
-        #Otherwise call impute for all children and take the sum of the values from all the children by column
-        #Not a sum of a list but summing a list with lists by element.
 	def impute( self ):
+		"""
+		This allows you to recursively impute values for clades without values given their children counts.
+		Assumably this should be called only once and after all clade abundances have been added.
+		If the m_adValues already exist return the stored m_adValues. (No imputation needed).
+		Otherwise call impute for all children and take the sum of the values from all the children by column
+		Not a sum of a list but summing a list with lists by element.
+		"""
 		
-                #If values do not exist
+        #If values do not exist
 		if not self.m_adValues:
-                        #Call impute on all children
-                        #If the parent clade has no abundance values
-                        #Then take a copy of the child's
-                        #If they now have a copy of a child's but have other children
-                        #Sum their children with thier current values
+            #Call impute on all children
+            #If the parent clade has no abundance values
+            #Then take a copy of the child's
+            #If they now have a copy of a child's but have other children
+            #Sum their children with thier current values
 			for pChild in self.m_hashChildren.values( ):
 				adChild = pChild.impute( )
 				if self.m_adValues:
@@ -55,16 +76,18 @@ class CClade:
 		#If values exist return			
 		return self.m_adValues
 	
-        #Update the given hashValues dict with clade abundances given depth specifications
-        #Return a set of integers returning an indicator of the structure of the tree preserved in the dict/hash
-        #When the appropriate level of the tree is reached
-        #Hashvalue is updated with the clade (including lineage) and the abundance. looks like {"clade":blist(["0.0","0.1"...])}
 	def _freeze( self, hashValues, iTarget, astrClade, iDepth, fLeaves ):
+		"""
+		Update the given hashValues dict with clade abundances given depth specifications
+		Return a set of integers returning an indicator of the structure of the tree preserved in the dict/hash
+		When the appropriate level of the tree is reached
+		Hashvalue is updated with the clade (including lineage) and the abundance. looks like {"clade":blist(["0.0","0.1"...])}
+		"""
 		
-                #fHit is true on atleast one of the following conditions:
-                #iTarget is not 0 indicating no changes
-                #Leaves are indicated to be only given and the target depth for the leaves is reached.
-                #The required depth is reached.
+        #fHit is true on atleast one of the following conditions:
+        #iTarget is not 0 indicating no changes
+        #Leaves are indicated to be only given and the target depth for the leaves is reached.
+        #The required depth is reached.
 		fHit = ( not iTarget ) or ( ( fLeaves and ( iDepth == iTarget ) ) or ( ( not fLeaves ) and ( iDepth <= iTarget ) ) )
                 #Increment depth
 		iDepth += 1
@@ -94,14 +117,17 @@ class CClade:
 			hashValues["|".join( astrClade )] = self.m_adValues
 		return setiRet
 	
-        #Call helper function setting the clade and depth to defaults (start positions)
-        #The important result of this method is hashValues is updated with clade and abundance information
 	def freeze( self, hashValues, iTarget, fLeaves ):
-		
+		"""
+		Call helper function setting the clade and depth to defaults (start positions)
+		The important result of this method is hashValues is updated with clade and abundance information
+		"""
 		self._freeze( hashValues, iTarget, [], 0, fLeaves )
-	
-        #Represent tree clade for debugging
+
 	def _repr( self, strClade ):
+		"""
+		Represent tree clade for debugging. Helper function for recursive repr.
+		"""
 
 		strRet = "<"
 		if strClade:
@@ -114,7 +140,9 @@ class CClade:
 		return ( strRet + ">" )
 		
 	def __repr__( self ):
-		
+		"""
+		Represent tree clade for debugging.
+		"""
 		return self._repr( "" )
 
 """

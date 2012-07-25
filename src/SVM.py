@@ -1,8 +1,7 @@
-#######################################################
-# Author: Timothy Tickle
-# Description: Class to Allow Support Vector Machine 
-# analysis and to contain associated scripts.
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Class to Allow Support Vector Machine analysis and to contain associated scripts
+"""
 
 __author__ = "Timothy Tickle"
 __copyright__ = "Copyright 2012"
@@ -12,6 +11,7 @@ __version__ = ""
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
+
 
 #Libraries
 from AbundanceTable import AbundanceTable
@@ -33,12 +33,13 @@ class SVM:
         """
         Converts abundance files to input SVM files.
 
+        :param abndAbudnanceTable    AbudanceTable object to turn to input SVM file.
+        :type    AbundnanceTable
         :param strOutputSVMFile: File to save SVM data to when converted from the abundance table.
         :type	String
         :param	sMetadataLabel: The name of the last row in the abundance table representing metadata.
         :type	String
         :return	lsUniqueLabels:	List of unique labels.
-        :type	List	List of strings
         """
 
         #Validate parameters
@@ -86,8 +87,11 @@ class SVM:
     def funcMakeLabels(lsMetadata):
         """
         Given a list of metadata, labels are assigned. This is function represents a central location to make labels so all are consistent.
+
+        :param lsMetafdata:    List of metadata to turn into labels based on the metadata's values.
+        :type    List of labels:    List of integer labels
         """
-        #Do not use set to make elements unique. Need to preserve order.
+        #Do not use a set to make elements unique. Need to preserve order.
         #First label should be 0
         lsUniqueLabels = []
         for sElement in lsMetadata:
@@ -105,8 +109,8 @@ class SVM:
 
         :param	npdData:	Feature data to scale.
         :type	Numpy Array	Scaled feature data.
+        :return npaFloat:    A numpy array of floats.
         """
-
         if sum(npdData) == 0 or len(set(npdData))==1:
             return npdData
         dMin = min(npdData)
@@ -121,9 +125,7 @@ class SVM:
         :params	lLabels:	List of labels to use for measure how balanced the comparison is.
         :type	List
         :return	List:		[dictWeights ({"label":weight}),lUniqueLabels (unique occurences of original labels)]
-        :type	List
         """
-
         #Convert to dict
         #Do not use set to make elements unique. Need to preserve order.
         #First label should be 0
@@ -134,13 +136,13 @@ class SVM:
         dictLabels = dict(zip(lUniqueLabels, range(len(lUniqueLabels))))
 
         #Build a dict of weights per label {label:weight, label:weight}
-        #Get the occurence of each label
+        #Get the occurrence of each label
         dictWeights = dict()
         for sLabelKey in dictLabels:
             sCurLabel = dictLabels[sLabelKey]
             dictWeights[sCurLabel] = lLabels.count(sLabelKey)
 
-        #Divide the highest occurence each occurence
+        #Divide the highest occurrence each occurrence
         iMaxOccurence = max(dictWeights.values())
         for sWeightKey in dictWeights:
             dictWeights[sWeightKey]=iMaxOccurence/float(dictWeights[sWeightKey])
@@ -151,16 +153,15 @@ class SVM:
     def func10FoldCrossvalidation(self, iTotalSampleCount, fRandomise = False):
         """
         Generator.
-        Generates the indexes for a 10 fold crossvalidation given a sample count.
-        If there are less than 10 samples, it uses the sample count as the K-fold crossvalidation
+        Generates the indexes for a 10 fold cross validation given a sample count.
+        If there are less than 10 samples, it uses the sample count as the K-fold cross validation
         as a leave one out method.
 
-	:param	iTotalSampleCount:	Total Sample Count
-	:type	Integer	Sample Count
-	:param	fRandomise:	Random sample indices
-	:type	Boolean	True indicates randomise (Default False)
+        :param	iTotalSampleCount:	Total Sample Count
+	    :type	Integer	Sample Count
+	    :param	fRandomise:	Random sample indices
+	    :type	Boolean	True indicates randomise (Default False)
         """
-
         #Make indices and shuffle if needed
         liindices = range(iTotalSampleCount)
         if fRandomise:

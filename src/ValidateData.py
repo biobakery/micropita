@@ -1,11 +1,7 @@
-#######################################################
-#
-#	Title:		ValidateData
-#	Author:		Timothy Tickle 
-#	Date:		August 12, 2009
-#	Purpose:	Validate Data containing methods for testing variables
-#
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Validate Data containing methods for testing variables.
+"""
 
 __author__ = "Timothy Tickle"
 __copyright__ = "Copyright 2012"

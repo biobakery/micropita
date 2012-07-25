@@ -1,11 +1,7 @@
-#######################################################
-#
-#	Title:		Utility_Math
-#	Author:		Timothy Tickle
-#	Date:		03/26/2012
-#	Purpose:	Utility class for generic math functions.
-#
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Utility class for generic math functions.
+"""
 
 __author__ = "Timothy Tickle"
 __copyright__ = "Copyright 2012"
@@ -31,10 +27,6 @@ class Utility_Math():
     """
 
     ##
-    #Contructor
-    def __init__(): pass
-
-    ##
     #Happy path test 2
     @staticmethod
     def funcConvertToBHQValue(ldPValues, iNumberOfTests=None):
@@ -46,7 +38,6 @@ class Utility_Math():
         :param	iNumberOfTests:	Number of (multiple) tests if different than the ldValue length. If not set the length of ldPValues is used.
         :type	Integer
         :return	List:	List of Q-values made with a BH modification.
-        :type	List
         """
 
         #If the number of tests is not specified, use the number of pvalues
@@ -86,7 +77,7 @@ class Utility_Math():
         :param	iSelect:	Amount of data to select from the original data population.
         :type	Integer.
         :return	List:	List of sampled data.
-        :type	List	Returns an empty list on error.
+                        Returns an empty list on error.
         """
 
         if iSelect and aData:
@@ -109,7 +100,6 @@ class Utility_Math():
         :param	lsSampleNames:	List of sample names.
         :type	List	List of strings.
         :return	List	List of data summed at each row.
-        :type	List	
         """
 
         #Compress by data name
@@ -130,7 +120,7 @@ class Utility_Math():
         :param	fRemoveAdornments:	Remove the first column before transposing.
         :type	Boolean	True indicates removing the column.
         :return	Boolean or Numpy Array:	Transposed array or a boolean indicating error.
-        :type	Transposed numpy array. Boolean	False is returned on error.
+                                   Boolean	False is returned on error.
         """
 
         #Validate parameters

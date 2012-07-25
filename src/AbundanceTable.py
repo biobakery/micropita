@@ -1,13 +1,13 @@
-#######################################################
-# Author: Timothy Tickle
-# Description: Class to Run analysis for the microPITA paper
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Class to abstract an abundance table and methods to run on such a table.
+"""
 
 __author__ = "Timothy Tickle"
 __copyright__ = "Copyright 2012"
 __credits__ = ["Timothy Tickle"]
 __license__ = ""
-__version__ = ""
+__version__ = "1.0"
 __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
@@ -16,7 +16,6 @@ __status__ = "Development"
 import blist
 from CClade import CClade
 from Constants import Constants
-import csv
 import copy
 import numpy as np
 import os
@@ -123,7 +122,6 @@ class AbundanceTable:
                                         For example if they are consensus lineages and contain parent clade information.
         :type	Character	Delimiting letter
         :return	AbundanceTable:	Will return an AbundanceTable object on no error. Returns False on error.
-        :type	AbundanceTable or False
         """
 
 
@@ -139,7 +137,7 @@ class AbundanceTable:
 
     def __repr__(self):
         """
-        Represent or print object
+        Represent or print object.
         """
         return "AbundanceTable"
 
@@ -183,7 +181,7 @@ class AbundanceTable:
                                         Metadata is a dictionary as such {"ID", [value,value,values...]}
                                         Values are in the order thety are read in (and the order of the sample names).
                                         ID is the first column in each metadata row.
-        :type [Numpy structured Array, Dictionary]
+                                        [Numpy structured Array, Dictionary]
         """
 
         #Validate parameters
@@ -288,7 +286,7 @@ class AbundanceTable:
         Returns the sample names (IDs) contained in the abundance table.
 
         :return	Sample Name:	A List of sample names indicated by the metadata associated with the sMetadataId given in table creation.
-        :type	List of strings	A list tof string names or empty list on error as well as no underlying table.
+                            	A list of string names or empty list on error as well as no underlying table.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -302,7 +300,7 @@ class AbundanceTable:
         Returns the metadata id.
 
         :return	ID:	The metadata id (the sample Id).
-        :type	String	Returns none on error.
+                      Returns none on error.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -316,7 +314,7 @@ class AbundanceTable:
         Returns a deep copy of the abundance table.
 
         :return	Numpy Structured Array:	The measurement data in the Abundance table. Can use sample names to access each column of measurements.
-        :type	Numpy Structured Array	Returns none on error.
+                                       Returns none on error.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -330,8 +328,8 @@ class AbundanceTable:
 
 	:param	lsTargetedFeatures:	String names of features to average
 	:type	list	list of string names of features which are measured
-        :return	List: of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample and the feature's average abudance
-        :type	list	[[sample,average abundance of selected taxa]] or False on error
+    :return	List: of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample and the feature's average abudance
+                 [[sample,average abundance of selected taxa]] or False on error
 	"""
 
         #Sample rank averages [[sample,average abundance of selected taxa]]
@@ -402,7 +400,7 @@ class AbundanceTable:
         :param	lsFeatures:	String Feature IDs that are kept in the compressed abundance table.
         :type	List of strings	Feature IDs (found as the first entry of a filter in the input file.
         :return	AbundanceTable:	A compressed version of the abundance table.
-        :type	AbundanceTable	On an error None is returned.
+                  On an error None is returned.
         """
 
         if (not self._npaFeatureAbundance == None) and lsFeatures:
@@ -426,8 +424,7 @@ class AbundanceTable:
         """
         The delimiter of the feature names (For example to use on concensus lineages).
 
-        :return	Delimiter:	Delimiter for the feature name pieces if it is complex.
-        :type	Character	Delimiter.
+        :return	Character:	Delimiter for the feature name pieces if it is complex.
         """
 
         return self._cFeatureDelimiter
@@ -438,7 +435,7 @@ class AbundanceTable:
         Returns the current feature count.
 
         :return	Count:	Returns the int count of features in the abundance table.
-        :type	Int	Returns None on error.
+                        Returns None on error.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -453,8 +450,7 @@ class AbundanceTable:
 
         :param	sFeatureName:
         :type	String.
-        :return	Sum:	Sum of one feature across samples.
-        :type	Double
+        :return	Double:	Sum of one feature across samples.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -470,7 +466,7 @@ class AbundanceTable:
         Return the feature names as a list.
 
         :return	Feature Names:	List of feature names (or IDs) as strings.
-        :type	List of strings.	As an error returns empty list.
+                                As an error returns empty list.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -482,8 +478,7 @@ class AbundanceTable:
         """
         The delimiter of the file the data was read from and which is also the delimiter which would be used to write the data to a file.
 
-        :return	Delimiter:	Delimiter for the parsing and writing the file.
-        :type	Character	Delimiter.
+        :return	Character:	Delimiter for the parsing and writing the file.
         """
 
         return self._cDelimiter
@@ -496,7 +491,7 @@ class AbundanceTable:
         :param	sSampleName:	Name of sample to return.	
         :type	String	
         :return	Sample: Measurements	Feature measurements of a sample.
-        :type	Numpy Array	Empty numpy array returned on error.
+                                        Empty numpy array returned on error.
         """
 
         if (not self._npaFeatureAbundance == None):
@@ -511,7 +506,6 @@ class AbundanceTable:
         :param	strMetadataName:	String metadata ID to be returned
         :type	String	ID
         :return	Metadata:	List of metadata
-        :type	List	
         """
 
         if self._dictTableMetadata:
@@ -526,8 +520,7 @@ class AbundanceTable:
         """
         Returns a deep copy of the metadata.
 
-	:return	Metadata copy:	{"ID":[value,value...]}
-        :type	Dictionary
+	    :return	Metadata copy:	{"ID":[value,value...]}
         """
 
         if self._dictTableMetadata:
@@ -540,9 +533,9 @@ class AbundanceTable:
         Returns the name of the object which is the file name that generated it.
         If the object was generated from an Abundance Table (for instance through stratification)
         the name is still in the form of a file that could be written to which is informative
-        of the changes that have occured on the dataset.
+        of the changes that have occurred on the data set.
+        :return string: Name
         """
-
         return self._strOriginalName
 
     #Happy path tested. could do more
@@ -550,6 +543,7 @@ class AbundanceTable:
         """
         Returns the terminal nodes given the current feature names in the abundance table. The 
         features must contain a consensus lineage or all will be returned.
+        :return List:    List of strings of the terminal nodes given the abundance table.
         """
         return AbundanceTable.funcGetTerminalNodesFromList(lsNames=self.funcGetFeatureNames(),cNameDelimiter=self.funcGetFeatureDelimiter())
 
@@ -563,6 +557,7 @@ class AbundanceTable:
         :type	List of strings
         :param	cNameDelimiter:	The delimiter for the name of the features.
         :type	Character	Delimiter
+        :return list:    A list of terminal elements in the list (given only the list).
         """
 
         #Return list
@@ -611,7 +606,7 @@ class AbundanceTable:
         Returns if the data has been normalized.
 
         :return	Boolean:	Indicates if the data is normalized.
-        :type	Boolean	True indicates it the data is normalized.
+                           True indicates it the data is normalized.
         """
 
         return self._fIsNormalized
@@ -625,7 +620,7 @@ class AbundanceTable:
         :param	sMetadataName:	ID of metadata to check for uniqueness.
         :type	String	Metadata ID.
         :return	Boolean:	Returns indicator of uniqueness.
-        :type	Boolean	True indicates unique.
+                            True indicates unique.
         """
 
         lMetadata = self.funcGetMetadata(sMetadataName)
@@ -639,7 +634,7 @@ class AbundanceTable:
         Return is the data is summed.
 
         :return	Boolean:	Indicator of being summed. 
-        :type	Boolean	True indicates summed.
+                            True indicates summed.
         """
 
         return self._fIsSummed
@@ -655,7 +650,7 @@ class AbundanceTable:
         :param	dPercentageAbovePercentile:	The percentage above the given percentile (dPercentileCutOff) that must exist to keep the feature.
         :type	double	Between 0.0 and 100.0
         :return	Boolean:	Indicator of filtering occuring without error.	
-        :type	Boolean	True indicates filtering occuring.
+                            True indicates filtering occuring.
         """
 
         #No need to do anything
@@ -704,7 +699,7 @@ class AbundanceTable:
         :param	iMinSamples:	Minimum samples to occur in.
         :type	Integer	Number greater than 1.
         :return	Boolean:	Indicator of the filter running without error.
-        :type	Boolean	False indicates error.
+                              False indicates error.
         """
 
         #No need to do anything
@@ -740,7 +735,7 @@ class AbundanceTable:
         :param	dMinSDCuttOff:	Standard deviation threshold.
         :type	Double	A double greater than 0.0.
         :return	Boolean:	Indicator of success.
-        :type	Boolean	False indicates error.
+                            False indicates error.
         """
 
         #No need to do anything
@@ -767,6 +762,7 @@ class AbundanceTable:
     def funcNormalize(self):
         """
         Convenience method which will call which ever normalization is approriate on the data.
+        :return Boolean:    Indicator of success (true).
         """
 
         if self._fIsSummed:
@@ -783,7 +779,7 @@ class AbundanceTable:
         Will not act on summed tables.
 
         :return	Boolean:	Indicator of success.
-        :type	Boolean	False indicates error.
+                            False indicates error.
         """
 
         if self._fIsNormalized:
@@ -816,7 +812,7 @@ class AbundanceTable:
         If already normalized, the current normalization is kept.
 
         :return	Boolean:	Indicator of success.
-        :type	Boolean	False indicates error.
+                             False indicates error.
         """
 
         if self._fIsNormalized:
@@ -860,7 +856,7 @@ class AbundanceTable:
         Rank abundances of features with in a sample.
 
         :return	AbundanceTable:	Abundance table data ranked (Features with in samples).
-        :type	AbundanceTable	None is returned on error.
+                              None is returned on error.
         """
 
         if not self._npaFeatureAbundance == None:
@@ -988,7 +984,7 @@ class AbundanceTable:
         Sums abundance data by clades indicated in the feature name (as consensus lineages).
 
         :return	Boolean:	Indicator of success.
-        :type	Boolean	False indicates an error.
+        :type	Boolean    False indicates an error.
         """
 
         if not self.funcIsSummed():
@@ -1064,7 +1060,7 @@ class AbundanceTable:
         :param	fWriteToFile:	Indicator to write to file.
         :type	Boolean	True indicates to write to file.
         :return	List:	List of AbundanceTables which are deep copies of the original.
-        :type	List	List of AbundanceTables. Empty list on error.
+                        Empty list on error.
         """
 
         retlAbundanceTables = []
@@ -1139,6 +1135,7 @@ class AbundanceTable:
         :type	String	ID for the metadata.
         :param	fFromPrimaryIds:	The metadata that are in the from metadata list must be unique in each sample.
         :type	Boolean	True indicates the metadata list should be unique in each sample. Otherwise a false will return.
+        :return List:    List of new values or False on error.
         """
 
         #Get metadata
@@ -1172,7 +1169,7 @@ class AbundanceTable:
         Made of lists, not tuples.
 
         :return Numpy Array:	np.array([[float,float,...],[float,float,...],[float,float,...]])
-        :type	Numpy Array	None is returned on error.
+                                None is returned on error.
         """
 
         if not self._npaFeatureAbundance == None:
@@ -1232,7 +1229,7 @@ class AbundanceTable:
         :param	lsIgnoreValues:	These values are ignored even if common IDs between the two files.
         :type	List	List of strings.
         :return	Boolean:	Indicator of no errors.
-        :type	Boolean	False indicates errors.
+                              False indicates errors.
         """
 
         #Validate parameters
@@ -1319,7 +1316,7 @@ class AbundanceTable:
         :param	cDelimiter:	Character delimiter for reading and writing files.
         :type	Character	Delimiter.
         :return	Output Path:	Output path for written checked file.
-        :type	String	File Path.
+                             File Path.
         """
 
         #Validate parameters
@@ -1437,7 +1434,7 @@ class AbundanceTable:
                                 If you know what "1" and "3" also together you would give [["1","3"],["4","5"]]
         :type	List	List of list of strings
         :return	Boolean:	Indicator of NO error.
-        :type	Booelan	False indicates an error.
+                            False indicates an error.
         """
 
         #Validate parameters

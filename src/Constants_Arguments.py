@@ -1,11 +1,16 @@
-#######################################################
-#
-#	Title:		Constants_Arguments
-#	Author:		Timothy Tickle
-#	Date:		03/29/2012
-#	Purpose:	Class to hold Constants associated with args parsing and arguments
-#
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Class to hold commanline argument information.
+"""
+
+__author__ = "Timothy Tickle"
+__copyright__ = "Copyright 2012"
+__credits__ = ["Timothy Tickle"]
+__license__ = ""
+__version__ = ""
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
 
 class Constants_Arguments():
     #afc Abundance filter cut off

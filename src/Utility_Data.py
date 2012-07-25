@@ -1,18 +1,23 @@
-#######################################################
-#
-#	Title:		Utility_Data
-#	Author:		Timothy Tickle
-#	Date:		12/12/2011
-#	Purpose:	Utility class for Data generation.
-#
-#######################################################
+"""
+Author: Timothy Tickle
+Description: Utility class for data generation.
+"""
+
+__author__ = "Timothy Tickle"
+__copyright__ = "Copyright 2012"
+__credits__ = ["Timothy Tickle"]
+__license__ = ""
+__version__ = ""
+__maintainer__ = "Timothy Tickle"
+__email__ = "ttickle@sph.harvard.edu"
+__status__ = "Development"
 
 #Import libaries
 from Constants import Constants
 from Constants_Arguments import Constants_Arguments
 from CommandLine import CommandLine
 import csv
-from Diversity import Diversity
+from EcologyMetric import EcologyMetric
 import math
 from MicroPITA import MicroPITA
 import numpy as np
@@ -439,11 +444,11 @@ class Utility_Data():
             for iTaxonPosition in liSelection:
                 dataMatrix[iTaxonPosition,iDiversitySampleIndex] = 50+random.randint(0,5)
             #Estimate diversity and set as a label
-            lsChaoLabels.append(str(Diversity.getChao1DiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+            lsChaoLabels.append(str(EcologyMetric.getChao1DiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
             if(sum(dataMatrix[:,iDiversitySampleIndex])==0):
                 lsISLabels.append("0")
             else:
-                lsISLabels.append(str(Diversity.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+                lsISLabels.append(str(EcologyMetric.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
 
         #Write to file
         #Delete current file before writing
