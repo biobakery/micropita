@@ -653,7 +653,7 @@ class MicroPITA:
 
     #Run the supervised methods
     def funcRunSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
-                                       strOuputSVMFile, strSupervisedMetadata,
+                                       strOuputSVMFile, strPredictSVMFile, strSupervisedMetadata,
                                        iSampleSVMSelectionCount):
         """
 	Runs supervised methods.
@@ -664,9 +664,9 @@ class MicroPITA:
 	:type	Boolean	boolean (true runs method)
 	:param	fRunDiscriminant:	Run discriminant method
 	:type	Boolean	boolean (true runs method)
-	:param	strOutputSVMFile:	File output from  SVM
+	:param	strOutputSVMFile:	File output from  SVM (scaled input file in the style of LIBSVM)
 	:type	String	String
-	:param	strTMPDirectory:	Directory to place temporary files
+	:param	strPredictSVMFile:	File label prediction from  SVM
 	:type	String	String
 	:param	iSampleSVMSelectionCount:	Number of samples to select
 	:type	Integer	int sample selection count
@@ -682,26 +682,19 @@ class MicroPITA:
         svmRelatedData = None
 
         #Remove all files associated with supervised methods
-        #Create file names and delete if they exist
-        fileNamePrefix = os.path.splitext(strOuputSVMFile)[0]
-        fileDirectory = os.path.split(strOuputSVMFile)[0]
-        scaledFile,rangeFile,cvOutFile,modelFile,scaledPredictFile,predictFile = ["".join([fileNamePrefix,strExtension]) for strExtension in
-                   [Constants.c_PREDICT_FILE_EXT,Constants.c_SCALING_PARAMETERS,Constants.c_CV_FILE_EXT,Constants.c_MODEL_FILE_EXT,
-                    Constants.c_SCALED_FOR_PREDICTION_FILE_EXT,Constants.c_PREDICT_FILE_EXT]]
-        for f in [scaledFile,rangeFile,cvOutFile,modelFile,scaledPredictFile,predictFile]:
+        for f in [strOuputSVMFile,strPredictSVMFile]:
             if os.path.exists(f):
                 os.remove(f)
 
         #Run MLPY SVM
         svmRelatedData = self.funcRunMLPYSVM(abndAbundanceTable=abundanceTable, sMetadataForLabel=strSupervisedMetadata,
-                                             strInputSVMFile=strOuputSVMFile, strPredictionFile=predictFile)
+                                             strInputSVMFile=strOuputSVMFile, strPredictionFile=strPredictSVMFile)
 
         #Read in prediction file and select samples
         if svmRelatedData:
             dictSelectedSamples = self._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=svmRelatedData[Constants.c_strKeywordInputFile],
                                                       strPredictFilePath=svmRelatedData[Constants.c_strKeywordPredFile], lsSampleNames=abundanceTable.funcGetSampleNames(),
-                                                      iSelectCount=iSampleSVMSelectionCount,
-                                                      fSelectDiscriminant = fRunDiscriminant, fSelectDistinct = fRunDistinct)
+                                                      iSelectCount=iSampleSVMSelectionCount, fSelectDiscriminant = fRunDiscriminant, fSelectDistinct = fRunDistinct)
         return dictSelectedSamples
 
     #Testing: Happy path tested
@@ -940,9 +933,9 @@ class MicroPITA:
 
     #Start micropita selection
     def funcRun(self, fIsAlreadyNormalized, fCladesAreSummed, sMetadataID, sLastMetadataName, strInputAbundanceFile,
-                      strCheckedAbndFile = None, strOutputFile="MicroPITAOutput.txt",
+                      strInputPredictFile, strPredictPredictFile, strCheckedAbndFile, strOutputFile="MicroPITAOutput.txt",
                       cDelimiter = Constants.TAB, cFeatureNameDelimiter = "|",
-                      strUserDefinedTaxaFile=None, strTemporaryDirectory="./TMP", iSampleSelectionCount=0, iSupervisedSampleCount=0,
+                      strUserDefinedTaxaFile=None, iSampleSelectionCount=0, iSupervisedSampleCount=0,
                       strSelectionTechnique=None, strLabel=None, strStratify=None, fSumData=True, sFeatureSelectionMethod=None):
 	"""
 	Writes the selection of samples by method to an output file.
@@ -961,8 +954,6 @@ class MicroPITA:
 	:type	String	String path to abundance table file.
 	:param	strUserDefinedTaxaFile:	File containing features to select for.
 	:type	String	String path to existing file.
-	:param	strTemporaryDirectory:	Directory that will be used to store secondary files important to analysis but not the direct deliverable.
-	:type	String	String directory path.
 	:param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
 	:type	String String file path.
 	:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods.
@@ -990,9 +981,6 @@ class MicroPITA:
         selectedSamples = dict()
 
         #Check parameters
-        if not strOutputFile or not strTemporaryDirectory:
-          logging.error("MicroPITA.funcRun. Please specify output file and temporary directory. Stopped.")
-          return False
         if not sMetadataID or not sLastMetadataName or not cDelimiter or not cFeatureNameDelimiter:
           if not sMetadataID:
             logging.error("MicroPITA.funcRun. Please specify Metadata ID. Stopped.")
@@ -1010,8 +998,19 @@ class MicroPITA:
           logging.error("MicroPITA.funcRun. Please specify a selection technique. Stopped.")
           return False
 
+        #Create file paths if not already given
         if not strCheckedAbndFile:
           strCheckedAbndFile = os.path.splitext(strInputAbundanceFile)[0]+"-checked.pcl"
+        if not strInputPredictFile:
+          strInputPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",strLabel,"-SVM.txt"])
+        if not strPredictPredictFile:
+          strPredictPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",strLabel,"-SVM.predict"])
+
+        #If the directories do not already exist, create
+        for f in [strInputAbundanceFile, strInputPredictFile, strPredictPredictFile, strCheckedAbndFile, strOutputFile]:
+            strDir = os.path.dirname(f)
+            if not os.path.exists(strDir):
+                os.makedirs(strDir)
 
         #microPITA object
         microPITA = MicroPITA()
@@ -1206,7 +1205,7 @@ class MicroPITA:
         if fRemoveSuccess:
             if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
                 selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
-                                       strOuputSVMFile="".join([strTemporaryDirectory,"/",os.path.splitext(os.path.basename(totalAbundanceTable.funcGetName()))[0],"-select-",str(sampleSVMSelectionCount),"-",strLabel,"-SVM.txt"]),
+                                       strOuputSVMFile=strInputPredictFile,strPredictSVMFile=strPredictPredictFile,
                                        strSupervisedMetadata=strLabel, iSampleSVMSelectionCount=sampleSVMSelectionCount))
                 logging.info("Selected Samples Unsupervised")
                 logging.info(selectedSamples)
@@ -1306,9 +1305,11 @@ argp.add_argument(Constants_Arguments.c_strSupervisedLabelArgument, dest="sLabel
 argp.add_argument(Constants_Arguments.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
                   help= Constants_Arguments.c_strSupervisedLabelCountHelp)
 
-#Output
-argp.add_argument(Constants_Arguments.c_strTemporaryDirectoryArgument, dest="strTMPDir", metavar = "Temporary Directory", default=None, help = Constants_Arguments.c_genericTMPDirLocationHelp)
-argp.add_argument(Constants_Arguments.c_strCheckedAbundanceFileArgument, dest="strCheckedFile", metavar = "Checked Abundance File Name", default="", help = Constants_Arguments.c_strCheckedAbundanceFileHelp)
+#Files
+argp.add_argument(Constants_Arguments.c_strCheckedAbundanceFileArgument, dest="strCheckedFile", metavar = "Checked Abundance File Path", default="", help = Constants_Arguments.c_strCheckedAbundanceFileHelp)
+argp.add_argument(Constants_Arguments.c_strLoggingFileArgument, dest="strLoggingFile", metavar = "Logging File Path.", default="", help = Constants_Arguments.c_strLoggingFileHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedInputFile, dest="strInputPredictFile", metavar = "Output File Path of the Scaled Values for Supervised Predictions.", default="", help = Constants_Arguments.c_strSupervisedInputFileHelp)
+argp.add_argument(Constants_Arguments.c_strSupervisedPredictedFile, dest="strPredictFile", metavar = "Output File Path of the Supervised Predictions.", default="", help = Constants_Arguments.c_strSupervisedPredictedFileHelp)
 
 #Required
 #Input
@@ -1329,7 +1330,15 @@ def _main( ):
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
     if not isinstance(iLogLevel, int):
         raise ValueError('Invalid log level: %s. Try DEBUG, INFO, WARNING, ERROR, or CRITICAL.' % strLogLevel)
-    logging.basicConfig(filename="".join([os.path.splitext(args.strOutFile)[0],".log"]), filemode = 'w', level=iLogLevel)
+    if not args.strLoggingFile:
+        args.strLoggingFile = "".join([os.path.splitext(args.strOutFile)[0],".log"])
+
+    #If the logging directory does not already exist, create
+    for f in [args.strLoggingFile]:
+        strDir = os.path.dirname(f)
+        if not os.path.exists(strDir):
+            os.makedirs(strDir)
+    logging.basicConfig(filename = args.strLoggingFile, filemode = 'w', level=iLogLevel)
 
     #TODO does this stop the full analysis process? Not if the selection file already exists...
     if not args.sIDName:
@@ -1368,17 +1377,26 @@ def _main( ):
                                    str(args.iUnsupervisedSelectionCount),". Did not continue analysis."]))
             return -3
 
-    #If the tmp directory is not made, make
-    if not args.strTMPDir:
-        args.strTMPDir = "."
-
-    dictSelectedSamples = microPITA.funcRun(fIsAlreadyNormalized=args.fIsNormalized, fCladesAreSummed=args.fIsSummed, sMetadataID=args.sIDName, sLastMetadataName=args.sLastMetadataName,
-                                        strOutputFile=args.strOutFile, cDelimiter=args.cFileDelimiter, cFeatureNameDelimiter = args.cFeatureNameDelimiter,
-                                        strInputAbundanceFile=args.strFileAbund, strUserDefinedTaxaFile=args.strFileTaxa, strTemporaryDirectory=args.strTMPDir,
-                                        strCheckedAbndFile = args.strCheckedFile, iSampleSelectionCount=args.iUnsupervisedSelectionCount,
-                                        iSupervisedSampleCount=args.iSupervisedCount, strLabel=args.sLabel,
-                                        strStratify=args.sUnsupervisedStratify, strSelectionTechnique=args.strSelection, fSumData=args.fSumData,
+    dictSelectedSamples = microPITA.funcRun(fIsAlreadyNormalized=args.fIsNormalized,
+                                        fCladesAreSummed=args.fIsSummed,
+                                        sMetadataID=args.sIDName,
+                                        sLastMetadataName=args.sLastMetadataName,
+                                        strInputAbundanceFile=args.strFileAbund,
+                                        strInputPredictFile=args.strInputPredictFile,
+                                        strPredictPredictFile=args.strPredictFile,
+                                        strCheckedAbndFile=args.strCheckedFile,
+                                        strOutputFile=args.strOutFile,
+                                        cDelimiter=args.cFileDelimiter,
+                                        cFeatureNameDelimiter = args.cFeatureNameDelimiter,
+                                        strUserDefinedTaxaFile=args.strFileTaxa,
+                                        iSampleSelectionCount=args.iUnsupervisedSelectionCount,
+                                        iSupervisedSampleCount=args.iSupervisedCount,
+                                        strSelectionTechnique=args.strSelection,
+                                        strLabel=args.sLabel,
+                                        strStratify=args.sUnsupervisedStratify,
+                                        fSumData=args.fSumData,
                                         sFeatureSelectionMethod=args.sFeatureSelection)
+
     if dictSelectedSamples == False:
         logging.error("".join(["MicroPITA::Error, did not get a result from analysis."]))
         return -1
