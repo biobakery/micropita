@@ -1,6 +1,6 @@
 """
 Author: Timothy Tickle
-Description: Class to hold commanline argument information.
+Description: Constants.
 """
 
 __author__ = "Timothy Tickle"
@@ -12,8 +12,65 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
-class Constants_Arguments():
+##
+#Used to test the FileIO class
+class Constants_Micropita():
+    """
+    Class to hold project constants.
+    """
 
+    #References to other projects
+    c_strBreadcrumbsProject = "../breadcrumbs/src/"
+
+    #Character Constants
+    COLON = ":"
+    COMMA = ","
+    ENDLINE = "\n"
+    FASTA_ID_LINE_START = ">"
+    PATH_SEP = "/"
+    QUOTE = "\""
+    TAB = '\t'
+    WHITE_SPACE = " "
+    PIPE = "|"
+
+    #SVM related
+    c_COST_RANGE_KEY = "range"
+    c_lCostRange = [-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10]
+    c_SCALED_FILE_EXT = ".scaled"
+    c_intScaleLowerBound = 0
+    #LIBSVM file extensions
+    c_SCALING_PARAMETERS = ".range"
+    c_CV_FILE_EXT = ".cv.out"
+    c_CV_IMAGE_EXT = ".cv.png"
+    c_MODEL_FILE_EXT = ".model"
+    c_PREDICT_FILE_EXT = ".predict"
+    c_fProbabilitistic = True
+    c_SCALED_FOR_PREDICTION_FILE_EXT = ".scaledForpredict"
+
+    #SVM output Dictionary keywords for files
+    c_strKeywordInputFile = "INPUT"
+    c_strKeywordScaledFile = "SCALED"
+    c_strKeywordRangeFile = "RANGE"
+    c_strKeywordCVOutFile = "CV_OUT"
+    c_strKeywordModelFile = "MODEL"
+    c_strKeywordScaledPredFile = "SCALED_FOR_PREDICTION"
+    c_strKeywordPredFile = "PREDICTION"
+    c_strKeywordCostValue = "C"
+    c_strKeywordAccuracy = "ACCURACY"
+
+    #Default values for missing data in the Abundance Table
+    c_strEmptyAbundanceData = "0"
+    c_strEmptyDataMetadata = "NA"
+    lNAs = list(set(["NA","na","Na","nA",c_strEmptyDataMetadata]))
+
+    #Occurence filter [min abundance, min samples occuring in]
+    #To turn off make == None
+    c_liOccurenceFilter = [3,3]
+
+    #Break ties in targeted feature with diversity
+    c_fBreakRankTiesByDiversity = False
+
+    ####Commandline arguments
     #checked Checked abundance file
     c_strCheckedAbundanceFileArgument = "--checked"
     c_strCheckedAbundanceFileHelp = "Before analysis abundance files are checked and a new file results which analysis is perfromed on. The name fo the checked file can be specified of the default will will be used (appending a -Checked to the end of the file name)."
