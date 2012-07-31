@@ -13,29 +13,27 @@ __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
 #Import libaries
-from Constants_Micropita import Constants_Micropita
-from CommandLine import CommandLine
+from ConstantsMicropita import ConstantsMicropita
+from breadcrumbs.CommandLine import CommandLine
 import csv
-from EcologyMetric import EcologyMetric
+from breadcrumbs.Metric import Metric
 import math
-from MicroPITA import MicroPITA
+#from MicroPITA import MicroPITA
 import numpy as np
 import os
 import random
-##
-#Utility function for data generation
-class Utility_Data():
+
+class UtilityData():
+    """
+    Utility function for data generation.
+    """
 
     ##
     #Contructor
     def __init__(): pass
 
-    ##
-    #Generate matrix for microPITA
-    #@param tempOutPutFile
     @staticmethod
     def generateAbundanceTable(strOutputFile, strSampleClassification, iScalingFactorForSampleAmount=1, dMaxGeneralNoise = 0.0, dMaxSignalNoise=5.0, dSimpleNoise=0.0):
-
         """
         dMaxGeneralNoise is an absolute number of reads for noise a number starting with 1
         dMaxSignalNoise is an absolute number of reads for noise a number starting with 1
@@ -346,18 +344,18 @@ class Utility_Data():
         #Data to output
         outputContents = []
         #Output sample id header
-        outputContents.append(Constants_Micropita.TAB.join(lsSampleNames))
+        outputContents.append(ConstantsMicropita.TAB.join(lsSampleNames))
         #Output sample labels
-        outputContents.append(Constants_Micropita.TAB.join(lsLabels))
+        outputContents.append(ConstantsMicropita.TAB.join(lsLabels))
         #Write rows/taxa data to file
         for row in xrange(0,iTaxaCount):
             taxaData = []
             for sampleAbundance in npDataMatrix[row]:
                 taxaData.append(str(sampleAbundance))
-            taxaData = Constants_Micropita.TAB.join(taxaData)
-            outputContents.append(Constants_Micropita.TAB.join([lsTaxaNames[row],taxaData]))
+            taxaData = ConstantsMicropita.TAB.join(taxaData)
+            outputContents.append(ConstantsMicropita.TAB.join([lsTaxaNames[row],taxaData]))
         with open(strOutputFile,'a') as f:
-            f.write(Constants_Micropita.ENDLINE.join(outputContents))
+            f.write(ConstantsMicropita.ENDLINE.join(outputContents))
         f.close()
 
         #Write to file the "Actual file" which defines the classes
@@ -374,7 +372,7 @@ class Utility_Data():
     #Generate matrix of random data
     #
     @staticmethod
-    def generateRandomMatrix(tempFilePath,iNumberRows,iNumberColumns, iMinValue, iMaxValue, charDelimiter = Constants_Micropita.TAB):
+    def generateRandomMatrix(tempFilePath,iNumberRows,iNumberColumns, iMinValue, iMaxValue, charDelimiter = ConstantsMicropita.TAB):
         dataMatrix = np.zeros([iNumberRows,iNumberColumns])
 
         #Generate random data
@@ -443,11 +441,11 @@ class Utility_Data():
             for iTaxonPosition in liSelection:
                 dataMatrix[iTaxonPosition,iDiversitySampleIndex] = 50+random.randint(0,5)
             #Estimate diversity and set as a label
-            lsChaoLabels.append(str(EcologyMetric.getChao1DiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+            lsChaoLabels.append(str(Metric.getChao1DiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
             if(sum(dataMatrix[:,iDiversitySampleIndex])==0):
                 lsISLabels.append("0")
             else:
-                lsISLabels.append(str(EcologyMetric.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
+                lsISLabels.append(str(Metric.getInverseSimpsonsDiversityIndex(tempSampleTaxaAbundancies=dataMatrix[:,iDiversitySampleIndex])))
 
         #Write to file
         #Delete current file before writing
@@ -457,22 +455,22 @@ class Utility_Data():
         #Data to output
         outputContents = []
         #Output sample id header
-        outputContents.append(Constants_Micropita.TAB.join(lsSampleNames))
+        outputContents.append(ConstantsMicropita.TAB.join(lsSampleNames))
         #Output Chao labels
-        outputContents.append(Constants_Micropita.TAB.join(lsChaoLabels))
+        outputContents.append(ConstantsMicropita.TAB.join(lsChaoLabels))
         #Output InvSimpson labels
-        outputContents.append(Constants_Micropita.TAB.join(lsISLabels))
+        outputContents.append(ConstantsMicropita.TAB.join(lsISLabels))
         #Write rows/taxa
         for row in xrange(0,iTaxaCount):
             taxaData = []
             for sampleAbundance in dataMatrix[row]:
                 taxaData.append(str(sampleAbundance))
-            taxaData = Constants_Micropita.TAB.join(taxaData)
-            outputContents.append(Constants_Micropita.TAB.join([lsTaxaNames[row],taxaData]))
+            taxaData = ConstantsMicropita.TAB.join(taxaData)
+            outputContents.append(ConstantsMicropita.TAB.join([lsTaxaNames[row],taxaData]))
 
         #Write to file
         with open(tempFilePath,'w') as f:
-            sFileContents = f.write(Constants_Micropita.ENDLINE.join(outputContents))
+            sFileContents = f.write(ConstantsMicropita.ENDLINE.join(outputContents))
             f.close()
 
         #Return file name
@@ -508,8 +506,8 @@ class Utility_Data():
 #            dCurrentFeatureScale = math.pow(2.0,feature)
 #
 #        #Update contents to a line
-#        sContents = "FeatureID"+Constants_Micropita.TAB+Constants_Micropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
-#        sContents = Constants_Micropita.ENDLINE.join([sContents]+[Constants_Micropita.TAB.join(feature) for feature in lsCorrelation])
+#        sContents = "FeatureID"+ConstantsMicropita.TAB+ConstantsMicropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
+#        sContents = ConstantsMicropita.ENDLINE.join([sContents]+[ConstantsMicropita.TAB.join(feature) for feature in lsCorrelation])
 #
 #        #Write line to a file
 #        with open(sOutputFile,'w') as f:
@@ -550,8 +548,8 @@ class Utility_Data():
             iIndexFeatureName =iIndexFeatureName + 2
 
         #Update contents to a line
-        sContents = "FeatureID"+Constants_Micropita.TAB+Constants_Micropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dMaxSampleCount*2)])
-        sContents = Constants_Micropita.ENDLINE.join([sContents]+[Constants_Micropita.TAB.join(dFeature) for dFeature in lsCorrelation])
+        sContents = "FeatureID"+ConstantsMicropita.TAB+ConstantsMicropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dMaxSampleCount*2)])
+        sContents = ConstantsMicropita.ENDLINE.join([sContents]+[ConstantsMicropita.TAB.join(dFeature) for dFeature in lsCorrelation])
 
         #Write line to a file
         with open(sOutputFile,'w') as f:

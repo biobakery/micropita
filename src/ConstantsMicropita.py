@@ -14,7 +14,7 @@ __status__ = "Development"
 
 ##
 #Used to test the FileIO class
-class Constants_Micropita():
+class ConstantsMicropita():
     """
     Class to hold project constants.
     """

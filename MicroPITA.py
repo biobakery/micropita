@@ -13,32 +13,27 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
-#Reference other projects
-from Constants_Micropita import Constants_Micropita
-import sys
-sys.path.append(Constants_Micropita.c_strBreadcrumbsProject)
-
-#External libraries
-from AbundanceTable import AbundanceTable
 import argparse
+from src.breadcrumbs.AbundanceTable import AbundanceTable
+from src.breadcrumbs.Metric import Metric
+from src.breadcrumbs.KMedoids import Kmedoids
+from src.breadcrumbs.MLPYDistanceAdaptor import MLPYDistanceAdaptor
+from src.breadcrumbs.SVM import SVM
+from src.breadcrumbs.UtilityMath import UtilityMath
+from src.ConstantsMicropita import ConstantsMicropita
 import csv
-from EcologyMetric import EcologyMetric
-import itertools
-from KMedoids import Kmedoids
+#import itertools
 import logging
 import math
 import mlpy
-from MLPYDistanceAdaptor import MLPYDistanceAdaptor
 import numpy as np
 import operator
 import os
 import random
-import re
+#import re
 import scipy.cluster.hierarchy as hcluster
-from SVM import SVM
-import sys
+#import sys
 from types import *
-from Utility_Math import Utility_Math
 
 class MicroPITA:
     """
@@ -51,14 +46,14 @@ class MicroPITA:
 
     #Constants
     #Diversity metrics Alpha
-    c_strInverseSimpsonDiversity = EcologyMetric.c_strInvSimpsonDiversity
-    c_strChao1Diversity = EcologyMetric.c_strChao1Diversity
+    c_strInverseSimpsonDiversity = Metric.c_strInvSimpsonDiversity
+    c_strChao1Diversity = Metric.c_strChao1Diversity
 
     #Diversity metrics Beta
-    c_strBrayCurtisDissimilarity = EcologyMetric.c_strBrayCurtisDissimilarity
+    c_strBrayCurtisDissimilarity = Metric.c_strBrayCurtisDissimilarity
 
     #Additive inverses of diversity metrics beta
-    c_strInvBrayCurtisDissimilarity = EcologyMetric.c_strInvBrayCurtisDissimilarity
+    c_strInvBrayCurtisDissimilarity = Metric.c_strInvBrayCurtisDissimilarity
 
     #Selection methods
     c_strDiversity = "Diversity"
@@ -81,8 +76,8 @@ class MicroPITA:
     c_strSVMFar = c_strDistinct
 
     #Targeted feature settings
-    c_strTargetedRanked = Constants_Micropita.c_strTargetedRanked
-    c_strTargetedAbundance = Constants_Micropita.c_strTargetedAbundance
+    c_strTargetedRanked = ConstantsMicropita.c_strTargetedRanked
+    c_strTargetedAbundance = ConstantsMicropita.c_strTargetedAbundance
 
     #Technique groupings
     c_lsDiversityMethods = [c_strDiversity1,c_strDiversity2]
@@ -147,9 +142,9 @@ class MicroPITA:
 	"""
 
         if sMetric == self.c_strBrayCurtisDissimilarity:
-            return EcologyMetric.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
+            return Metric.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
         elif(sMetric == self.c_strInvBrayCurtisDissimilarity):
-            return EcologyMetric.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
+            return Metric.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
         else:
             return False
 
@@ -351,7 +346,7 @@ class MicroPITA:
                              for llist in llRetAbundance]
 
         #Sort first for ties and then for the main feature
-        if Constants_Micropita.c_fBreakRankTiesByDiversity:
+        if ConstantsMicropita.c_fBreakRankTiesByDiversity:
             llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[2], reverse = True)
         if fRank:
             llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[1], reverse = False)
@@ -470,10 +465,10 @@ class MicroPITA:
         #Although these files are not necessary for MLPY Libsvm, they are made to mirror the LIBSVM process and
         #and can be used to troubleshoot.
         dictSVMReturn = {}
-        dictSVMReturn[Constants_Micropita.c_strKeywordInputFile] = strInputSVMFile
+        dictSVMReturn[ConstantsMicropita.c_strKeywordInputFile] = strInputSVMFile
 
         #Cost values to optimize to
-        liCost = Constants_Micropita.c_lCostRange
+        liCost = ConstantsMicropita.c_lCostRange
 
         #Get labels
         lsLabels = abndAbundanceTable.funcGetMetadata(sMetadataForLabel)
@@ -601,14 +596,14 @@ class MicroPITA:
         logging.debug("".join(["funcRunMLPYSVM::Best Cost=", str(iBestCost)]))
 
         #Create output prediction file
-        strPredictionOutput = " ".join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+Constants_Micropita.ENDLINE
-        strPredictionOutput = strPredictionOutput + Constants_Micropita.ENDLINE.join([" ".join([str(dProb) for dProb in dictAllProbabilities[sSampleName]])
+        strPredictionOutput = " ".join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+ConstantsMicropita.ENDLINE
+        strPredictionOutput = strPredictionOutput + ConstantsMicropita.ENDLINE.join([" ".join([str(dProb) for dProb in dictAllProbabilities[sSampleName]])
             for sSampleName in lsSampleNames])
 
         #Write prediction file to file
         with open(strPredictionFile, 'w') as f:
             f.write(strPredictionOutput)
-        dictSVMReturn[Constants_Micropita.c_strKeywordPredFile] = strPredictionFile
+        dictSVMReturn[ConstantsMicropita.c_strKeywordPredFile] = strPredictionFile
 
         #Return
         return dictSVMReturn
@@ -695,8 +690,8 @@ class MicroPITA:
 
         #Read in prediction file and select samples
         if svmRelatedData:
-            dictSelectedSamples = self._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=svmRelatedData[Constants_Micropita.c_strKeywordInputFile],
-                                                      strPredictFilePath=svmRelatedData[Constants_Micropita.c_strKeywordPredFile], lsSampleNames=abundanceTable.funcGetSampleNames(),
+            dictSelectedSamples = self._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=svmRelatedData[ConstantsMicropita.c_strKeywordInputFile],
+                                                      strPredictFilePath=svmRelatedData[ConstantsMicropita.c_strKeywordPredFile], lsSampleNames=abundanceTable.funcGetSampleNames(),
                                                       iSelectCount=iSampleSVMSelectionCount, fSelectDiscriminant = fRunDiscriminant, fSelectDistinct = fRunDistinct)
         return dictSelectedSamples
 
@@ -730,13 +725,13 @@ class MicroPITA:
         lsOriginalLabels = None
         #Open prediction file and input file and get labels to compare to the predictions
         with open(strOriginalInputFile,'r') as f, open(strPredictFilePath,'r') as g:
-            reader = csv.reader(f, delimiter=Constants_Micropita.WHITE_SPACE, quoting=csv.QUOTE_NONE)
+            reader = csv.reader(f, delimiter=ConstantsMicropita.WHITE_SPACE, quoting=csv.QUOTE_NONE)
             lsOriginalLabels = [row[0] for row in reader]
             predictionLists = g.read()
-            predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(Constants_Micropita.ENDLINE)]
+            predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(ConstantsMicropita.ENDLINE)]
 
         #Get label count (meaning the number of label categories)(-1 to not count the predicted first entry)
-        labelCount = len(predictionLists[0].split(Constants_Micropita.WHITE_SPACE))-1
+        labelCount = len(predictionLists[0].split(ConstantsMicropita.WHITE_SPACE))-1
 
         #Central probability
         centralProbability = 1.0 / float(labelCount)
@@ -760,7 +755,7 @@ class MicroPITA:
                 continue
 
             #Get label and probabilities
-            lineElements = lineElements.split(Constants_Micropita.WHITE_SPACE)
+            lineElements = lineElements.split(ConstantsMicropita.WHITE_SPACE)
             iCurLabel = str(lineElements[0])
             lineElements = lineElements[1:]
 
@@ -868,12 +863,12 @@ class MicroPITA:
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = EcologyMetric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = npaTerminalAbundance, lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+                internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = npaTerminalAbundance, lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
             else:
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
                 #Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-                internalAlphaMatrix = EcologyMetric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+                internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
 
             #Get top ranked alpha diversity by most diverse
             #Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
@@ -894,7 +889,7 @@ class MicroPITA:
         if((fRunRepresentative)or(fRunExtreme)):
 
             #Abundance matrix transposed
-            npaTransposedAbundance = Utility_Math.funcTransposeDataMatrix(abndData.funcGetAbundanceCopy(), fRemoveAdornments=True)
+            npaTransposedAbundance = UtilityMath.funcTransposeDataMatrix(abndData.funcGetAbundanceCopy(), fRemoveAdornments=True)
 
             #Get center selection using clusters/tiling
             #This will be for beta metrics in normalized space
@@ -937,7 +932,7 @@ class MicroPITA:
     #Start micropita selection
     def funcRun(self, fIsAlreadyNormalized, fCladesAreSummed, sMetadataID, sLastMetadataName, strInputAbundanceFile,
                       strInputPredictFile, strPredictPredictFile, strCheckedAbndFile, strOutputFile="MicroPITAOutput.txt",
-                      cDelimiter = Constants_Micropita.TAB, cFeatureNameDelimiter = "|",
+                      cDelimiter = ConstantsMicropita.TAB, cFeatureNameDelimiter = "|",
                       strUserDefinedTaxaFile=None, iSampleSelectionCount=0, iSupervisedSampleCount=0,
                       strSelectionTechnique=None, strLabel=None, strStratify=None, fSumData=True, sFeatureSelectionMethod=None):
 	"""
@@ -1020,7 +1015,7 @@ class MicroPITA:
 
         #SVM parameters
         #Constants associated with the abundance to SVM input file conversion
-        c_ABUNDANCE_DELIMITER=Constants_Micropita.TAB
+        c_ABUNDANCE_DELIMITER=ConstantsMicropita.TAB
         c_NORMALIZE_RELATIVE_ABUNDANCY=True
         c_SKIP_FIRST_COLUMN=True
 
@@ -1060,7 +1055,7 @@ class MicroPITA:
             if c_RUN_RANK_AVERAGE_USER_4:
                 #Read in taxa list, break down to lines and filter out empty strings
                 with open(strUserDefinedTaxaFile,'r') as fhndlTaxaInput:
-                    userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(Constants_Micropita.ENDLINE))
+                    userDefinedTaxa = filter(None,fhndlTaxaInput.read().split(ConstantsMicropita.ENDLINE))
                 if not sFeatureSelectionMethod:
                     sFeatureSelectionMethod = MicroPITA.c_strTargetedRanked
 
@@ -1089,7 +1084,7 @@ class MicroPITA:
 
         #Check/reduce raw abundance data
         #If already normalized you cant run the occrunce filter so make None to turn off.
-        liOccurenceFilter = Constants_Micropita.c_liOccurenceFilter
+        liOccurenceFilter = ConstantsMicropita.c_liOccurenceFilter
         if fIsAlreadyNormalized:
             liOccurenceFilter = None
 
@@ -1136,7 +1131,7 @@ class MicroPITA:
             #Check to make sure the stratification is not just NA values which can happen
             #If so skip them
             if (not strStratify == None) and (not strStratify == "None"):
-                if len(set(stratAbundanceTable.funcGetMetadata(strStratify)) & set(Constants_Micropita.lNAs)) > 0:
+                if len(set(stratAbundanceTable.funcGetMetadata(strStratify)) & set(ConstantsMicropita.lNAs)) > 0:
                     continue
 
             logging.info("Running abundance block:"+stratAbundanceTable.funcGetName())
@@ -1203,7 +1198,7 @@ class MicroPITA:
         ##Any analysis after the point may be working with a subset of samples
         #This is valid for running supervised methods on 1 label but not multiple labels
         #Or adding additional downstream analysis after this point (unless it is contengent on the supervised label).
-        fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,Constants_Micropita.lNAs)
+        fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,ConstantsMicropita.lNAs)
 
         if fRemoveSuccess:
             if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
@@ -1233,7 +1228,7 @@ class MicroPITA:
         strOutputContent = ""
         #Create output content from dictionary
         for sKey in dictSelection:
-            strOutputContent = "".join([strOutputContent,sKey,Constants_Micropita.COLON,", ".join(dictSelection[sKey]),Constants_Micropita.ENDLINE])
+            strOutputContent = "".join([strOutputContent,sKey,ConstantsMicropita.COLON,", ".join(dictSelection[sKey]),ConstantsMicropita.ENDLINE])
 
         #Write to file
         if(not strOutputContent == ""):
@@ -1266,9 +1261,9 @@ class MicroPITA:
 
         #Dictionary to hold selection data
         dictSelection = dict()
-        for strSelectionLine in filter(None,strSelection.split(Constants_Micropita.ENDLINE)):
-            astrSelectionMethod = strSelectionLine.split(Constants_Micropita.COLON)
-            dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(Constants_Micropita.COMMA))]
+        for strSelectionLine in filter(None,strSelection.split(ConstantsMicropita.ENDLINE)):
+            astrSelectionMethod = strSelectionLine.split(ConstantsMicropita.COLON)
+            dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(ConstantsMicropita.COMMA))]
 
         #Return dictionary
         return dictSelection
@@ -1280,48 +1275,48 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 #Arguments
 #Optional parameters
 #Logging
-argp.add_argument(Constants_Micropita.c_strLoggingArgument, dest="strLogLevel", metavar= "Log level", default="INFO", 
-                  choices=Constants_Micropita.c_lsLoggingChoices, help= Constants_Micropita.c_strLoggingHelp)
+argp.add_argument(ConstantsMicropita.c_strLoggingArgument, dest="strLogLevel", metavar= "Log level", default="INFO", 
+                  choices=ConstantsMicropita.c_lsLoggingChoices, help= ConstantsMicropita.c_strLoggingHelp)
 
 #Abundance associated
-argp.add_argument(Constants_Micropita.c_strIDNameArgument, dest="sIDName", metavar= "Sample ID Metadata Name", default="ID", help= Constants_Micropita.c_strIDNameHelp)
-argp.add_argument(Constants_Micropita.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "Last Metadata Name",
-                  help= Constants_Micropita.c_strLastMetadataNameHelp)
-argp.add_argument(Constants_Micropita.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store_true", default=False,
-                  help= Constants_Micropita.c_strIsNormalizedHelp)
-argp.add_argument(Constants_Micropita.c_strIsSummedArgument, dest="fIsSummed", action = "store_true", default= False, help= Constants_Micropita.c_strIsSummedHelp)
-argp.add_argument(Constants_Micropita.c_strSumDataArgument, dest="fSumData", action = "store_false", default = True, help= Constants_Micropita.c_strSumDataHelp)
-argp.add_argument(Constants_Micropita.c_strTargetedFeatureMethodArgument, dest="sFeatureSelection", metavar= "Feature Selection Method", default=Constants_Micropita.lsTargetedFeatureMethodValues[0], 
-                  choices=Constants_Micropita.lsTargetedFeatureMethodValues, help= Constants_Micropita.c_strTargetedFeatureMethodHelp)
-argp.add_argument(Constants_Micropita.c_strFileDelimiterArgument, dest= "cFileDelimiter", action= "store", metavar="File Delimiter", default=Constants_Micropita.TAB, help=Constants_Micropita.c_strFileDelimiterHelp) 
-argp.add_argument(Constants_Micropita.c_strFeatureNameDelimiterArgument, dest= "cFeatureNameDelimiter", action= "store", metavar="Feature Name Delimiter", default=Constants_Micropita.PIPE, help=Constants_Micropita.c_strFeatureNameDelimiterHelp) 
+argp.add_argument(ConstantsMicropita.c_strIDNameArgument, dest="sIDName", metavar= "Sample ID Metadata Name", default="ID", help= ConstantsMicropita.c_strIDNameHelp)
+argp.add_argument(ConstantsMicropita.c_strLastMetadataNameArgument, dest="sLastMetadataName", metavar= "Last Metadata Name",
+                  help= ConstantsMicropita.c_strLastMetadataNameHelp)
+argp.add_argument(ConstantsMicropita.c_strIsNormalizedArgument, dest="fIsNormalized", action = "store_true", default=False,
+                  help= ConstantsMicropita.c_strIsNormalizedHelp)
+argp.add_argument(ConstantsMicropita.c_strIsSummedArgument, dest="fIsSummed", action = "store_true", default= False, help= ConstantsMicropita.c_strIsSummedHelp)
+argp.add_argument(ConstantsMicropita.c_strSumDataArgument, dest="fSumData", action = "store_false", default = True, help= ConstantsMicropita.c_strSumDataHelp)
+argp.add_argument(ConstantsMicropita.c_strTargetedFeatureMethodArgument, dest="sFeatureSelection", metavar= "Feature Selection Method", default=ConstantsMicropita.lsTargetedFeatureMethodValues[0], 
+                  choices=ConstantsMicropita.lsTargetedFeatureMethodValues, help= ConstantsMicropita.c_strTargetedFeatureMethodHelp)
+argp.add_argument(ConstantsMicropita.c_strFileDelimiterArgument, dest= "cFileDelimiter", action= "store", metavar="File Delimiter", default=ConstantsMicropita.TAB, help=ConstantsMicropita.c_strFileDelimiterHelp) 
+argp.add_argument(ConstantsMicropita.c_strFeatureNameDelimiterArgument, dest= "cFeatureNameDelimiter", action= "store", metavar="Feature Name Delimiter", default=ConstantsMicropita.PIPE, help=ConstantsMicropita.c_strFeatureNameDelimiterHelp) 
 
 #Select count
-argp.add_argument(Constants_Micropita.c_strUnsupervisedCountArgument, dest="iUnsupervisedSelectionCount", metavar = "Number Samples To Select (Unsupervised)", default=0, type = int, help = Constants_Micropita.c_strUnsupevisedCountHelp)
-argp.add_argument(Constants_Micropita.c_strTargetedSelectionFileArgument, dest="strFileTaxa", metavar = "Targeted Feature File", default=None, help = Constants_Micropita.c_strTargetedSelectionFileHelp)
-argp.add_argument(Constants_Micropita.c_strUnsupervisedStratifyMetadataArgument, dest="sUnsupervisedStratify", metavar= "Metadata to Stratify Unsupervised Selection", default=None, 
-                  help= Constants_Micropita.c_strUnsupervisedStratifyMetadataHelp)
+argp.add_argument(ConstantsMicropita.c_strUnsupervisedCountArgument, dest="iUnsupervisedSelectionCount", metavar = "Number Samples To Select (Unsupervised)", default=0, type = int, help = ConstantsMicropita.c_strUnsupevisedCountHelp)
+argp.add_argument(ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="strFileTaxa", metavar = "Targeted Feature File", default=None, help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
+argp.add_argument(ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, dest="sUnsupervisedStratify", metavar= "Metadata to Stratify Unsupervised Selection", default=None, 
+                  help= ConstantsMicropita.c_strUnsupervisedStratifyMetadataHelp)
 
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument(Constants_Micropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="Label", help= Constants_Micropita.c_strSupervisedLabelCountHelp)
-argp.add_argument(Constants_Micropita.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
-                  help= Constants_Micropita.c_strSupervisedLabelCountHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="Label", help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
+                  help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
 
 #Files
-argp.add_argument(Constants_Micropita.c_strCheckedAbundanceFileArgument, dest="strCheckedFile", metavar = "Checked Abundance File Path", default="", help = Constants_Micropita.c_strCheckedAbundanceFileHelp)
-argp.add_argument(Constants_Micropita.c_strLoggingFileArgument, dest="strLoggingFile", metavar = "Logging File Path.", default="", help = Constants_Micropita.c_strLoggingFileHelp)
-argp.add_argument(Constants_Micropita.c_strSupervisedInputFile, dest="strInputPredictFile", metavar = "Output File Path of the Scaled Values for Supervised Predictions.", default="", help = Constants_Micropita.c_strSupervisedInputFileHelp)
-argp.add_argument(Constants_Micropita.c_strSupervisedPredictedFile, dest="strPredictFile", metavar = "Output File Path of the Supervised Predictions.", default="", help = Constants_Micropita.c_strSupervisedPredictedFileHelp)
+argp.add_argument(ConstantsMicropita.c_strCheckedAbundanceFileArgument, dest="strCheckedFile", metavar = "Checked Abundance File Path", default="", help = ConstantsMicropita.c_strCheckedAbundanceFileHelp)
+argp.add_argument(ConstantsMicropita.c_strLoggingFileArgument, dest="strLoggingFile", metavar = "Logging File Path.", default="", help = ConstantsMicropita.c_strLoggingFileHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedInputFile, dest="strInputPredictFile", metavar = "Output File Path of the Scaled Values for Supervised Predictions.", default="", help = ConstantsMicropita.c_strSupervisedInputFileHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedPredictedFile, dest="strPredictFile", metavar = "Output File Path of the Supervised Predictions.", default="", help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
 #Required
 #Input
 #Abundance file
-argp.add_argument("strFileAbund", metavar = "Abundance file", help = Constants_Micropita.c_strAbundanceFileHelp)
+argp.add_argument("strFileAbund", metavar = "Abundance file", help = ConstantsMicropita.c_strAbundanceFileHelp)
 #Outputfile
-argp.add_argument("strOutFile", metavar = "Selection Output File", help = Constants_Micropita.c_strGenericOutputDataFileHelp)
+argp.add_argument("strOutFile", metavar = "Selection Output File", help = ConstantsMicropita.c_strGenericOutputDataFileHelp)
 #Selection parameter
-argp.add_argument("strSelection", metavar = "Selection Methods", help = Constants_Micropita.c_strSelectionTechniquesHelp, nargs="*")
+argp.add_argument("strSelection", metavar = "Selection Methods", help = ConstantsMicropita.c_strSelectionTechniquesHelp, nargs="*")
 
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
