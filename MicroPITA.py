@@ -1116,7 +1116,7 @@ class MicroPITA:
         if len(set(dictTotalMetadata.get(strLabel,[]))) < 2:
             c_RUN_DISCRIMINANT = False
             c_RUN_DISTINCT = False
-            logging.error("".join(["The label ",str(strLabel)," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
+            logging.debug("".join(["The label ",str(strLabel)," did not have 2 or more values. Labels found="]+dictTotalMetadata.get(strLabel,[])))
 
         logging.debug(" ".join(["Micropita:funcRun.","Received metadata=",str(dictTotalMetadata)]))
 
@@ -1200,20 +1200,23 @@ class MicroPITA:
         ##Remove NA entries from the abundance table for the metadata label
         ##Warning this modifies the table itself and does NOT return a copy
         ##Any analysis after the point may be working with a subset of samples
+        ##ALL UNSUPERVISED SELECTION SHOULD HAPPEN BEFORE HERE
         #This is valid for running supervised methods on 1 label but not multiple labels
         #Or adding additional downstream analysis after this point (unless it is contengent on the supervised label).
-        fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,ConstantsMicropita.lNAs)
+        if strLabel:
+            fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,ConstantsMicropita.lNAs)
 
-        if fRemoveSuccess:
-            if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
-                selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
+            if fRemoveSuccess:
+                if(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
+                    selectedSamples.update(self.funcRunSupervisedMethods(abundanceTable=totalAbundanceTable,fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
                                        strOuputSVMFile=strInputPredictFile,strPredictSVMFile=strPredictPredictFile,
                                        strSupervisedMetadata=strLabel, iSampleSVMSelectionCount=sampleSVMSelectionCount))
-                logging.info("Selected Samples Unsupervised")
-                logging.info(selectedSamples)
-        else:
-            logging.error("MicroPITA.funcRun. Error occured when cleaning up table for metadata label values. Supervised methods not ran.")
-
+                    logging.info("Selected Samples Unsupervised")
+                    logging.info(selectedSamples)
+            else:
+                logging.error("MicroPITA.funcRun. Error occured when cleaning up table for metadata label values. Supervised methods not ran.")
+        elif(c_RUN_DISTINCT or c_RUN_DISCRIMINANT):
+            logging.error("MicroPITA.funcRun. strLabel was not given so supervised methods were not ran.")
         return selectedSamples
 
     #Testing: Happy path tested
