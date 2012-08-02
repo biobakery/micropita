@@ -15,6 +15,7 @@ __status__ = "Development"
 
 import argparse
 from src.breadcrumbs.AbundanceTable import AbundanceTable
+from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
 from src.breadcrumbs.Metric import Metric
 from src.breadcrumbs.KMedoids import Kmedoids
 from src.breadcrumbs.MLPYDistanceAdaptor import MLPYDistanceAdaptor
@@ -596,8 +597,8 @@ class MicroPITA:
         logging.debug("".join(["funcRunMLPYSVM::Best Cost=", str(iBestCost)]))
 
         #Create output prediction file
-        strPredictionOutput = " ".join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+ConstantsMicropita.ENDLINE
-        strPredictionOutput = strPredictionOutput + ConstantsMicropita.ENDLINE.join([" ".join([str(dProb) for dProb in dictAllProbabilities[sSampleName]])
+        strPredictionOutput = ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace.join(["labels"]+[str(iLabel) for iLabel in lSVMLabels])+ConstantsMicropita.ENDLINE
+        strPredictionOutput = strPredictionOutput + ConstantsMicropita.ENDLINE.join([ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace.join([str(dProb) for dProb in dictAllProbabilities[sSampleName]])
             for sSampleName in lsSampleNames])
 
         #Write prediction file to file
@@ -725,13 +726,13 @@ class MicroPITA:
         lsOriginalLabels = None
         #Open prediction file and input file and get labels to compare to the predictions
         with open(strOriginalInputFile,'r') as f, open(strPredictFilePath,'r') as g:
-            reader = csv.reader(f, delimiter=ConstantsMicropita.WHITE_SPACE, quoting=csv.QUOTE_NONE)
+            reader = csv.reader(f, delimiter=ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace, quoting=csv.QUOTE_NONE)
             lsOriginalLabels = [row[0] for row in reader]
             predictionLists = g.read()
             predictionLists = [filter(None,strPredictionList) for strPredictionList in predictionLists.split(ConstantsMicropita.ENDLINE)]
 
         #Get label count (meaning the number of label categories)(-1 to not count the predicted first entry)
-        labelCount = len(predictionLists[0].split(ConstantsMicropita.WHITE_SPACE))-1
+        labelCount = len(predictionLists[0].split(ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace))-1
 
         #Central probability
         centralProbability = 1.0 / float(labelCount)
@@ -755,7 +756,7 @@ class MicroPITA:
                 continue
 
             #Get label and probabilities
-            lineElements = lineElements.split(ConstantsMicropita.WHITE_SPACE)
+            lineElements = lineElements.split(ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace)
             iCurLabel = str(lineElements[0])
             lineElements = lineElements[1:]
 
@@ -1023,7 +1024,7 @@ class MicroPITA:
         diversityMetricsAlpha = [microPITA.c_strInverseSimpsonDiversity]
         diversityMetricsBeta = [microPITA.c_strBrayCurtisDissimilarity]
         inverseDiversityMetricsBeta = [microPITA.c_strInvBrayCurtisDissimilarity]
-        diversityMetricsAlphaNoNormalize = [microPITA.c_strChao1Diversity]
+        diversityMetricsAlphaNoNormalize = []#microPITA.c_strChao1Diversity]
         diversityMetricsBetaNoNormalize = []
         inverseDiversityMetricsBetaNoNormalize = []
 
@@ -1083,7 +1084,7 @@ class MicroPITA:
         randomlySelectedSamples = None
 
         #Check/reduce raw abundance data
-        #If already normalized you cant run the occrunce filter so make None to turn off.
+        #If already normalized you cant run the occurence filter so make None to turn off.
         liOccurenceFilter = ConstantsMicropita.c_liOccurenceFilter
         if fIsAlreadyNormalized:
             liOccurenceFilter = None
@@ -1102,6 +1103,9 @@ class MicroPITA:
 
         if fSumData:
             totalAbundanceTable.funcSumClades()
+
+###TODO REMOVE
+#        totalAbundanceTable.funcReduceFeaturesToCladeLevel(6)   
 
         dictTotalMetadata = totalAbundanceTable.funcGetMetadataCopy()
 
