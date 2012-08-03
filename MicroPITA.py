@@ -859,7 +859,6 @@ class MicroPITA:
             internalAlphaMatrix = None
             if abndData.funcIsSummed():
                 lsFileElements = os.path.splitext(abndData.funcGetName())
-                abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcWriteToFile(strOutputFile=lsFileElements[0]+"-Diversity-out"+lsFileElements[1])
                 npaTerminalAbundance = abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcGetAbundanceCopy()
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
