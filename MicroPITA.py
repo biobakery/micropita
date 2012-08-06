@@ -309,7 +309,6 @@ class MicroPITA:
         	For Ranked [[sample,average ranked abundance, average abundance of selected feature]]
 			Error Returns false
 	"""
-
         llAbundance = abndTable.funcGetAverageAbundancePerSample(lsTargetedFeature)
         if not llAbundance:
             logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not get average abundance, returned false. Make sure the features (bugs) are spelled correctly and in the abundance table."]))
@@ -324,7 +323,7 @@ class MicroPITA:
         #Rank if needed
         if fRank:
             abndRanked = abndTable.funcRankAbundance()
-            if abndTable == None:
+            if abndRanked == None:
                 logging.error("".join(["MicroPITA.funcGetAverageAbundanceSamples. Could not rank the abundance table, returned false."]))
                 return False
             dictRankedAbundance = dict([tuple(lRankedItem) for lRankedItem in abndRanked.funcGetAverageAbundancePerSample(lsTargetedFeature)])
@@ -334,18 +333,12 @@ class MicroPITA:
 
             #Check for the case where all features are 0
             #Rank could be 1 and these could be selected
-            #Make them the worst ranked by giving them feature count + feature count-rank
-            #The ideas that if the sample is choosen then the samples with the most occurences of other features
-            #Should be the ones with the 0 features having the highest ranks (assuming minimal tieing)
-            #So this amount is subtracted from the total featurecount and added to featurecount
-            #To make the 0 feature samples at the end of the list but ranked by how much abundance are in the
-            #OTHER features.....This could be done by ranking 0s by total sample abundance
-            #Also add in the rank information as the second element and move the abundance information to the 3rd element
+            #Give any sample with an average feature abundance of 0 the worst rank
             iWorstRank = float(abndRanked.funcGetFeatureCount())
-            llRetAbundance = [[llist[0],iWorstRank+iWorstRank-dictRankedAbundance[llist[0]],llist[1]] if llist[1] == 0.0 
+            llRetAbundance = [[llist[0],iWorstRank] if llist[1] == 0.0 
                              else [llist[0],dictRankedAbundance[llist[0]],llist[1]]
                              for llist in llRetAbundance]
-
+            
         #Sort first for ties and then for the main feature
         if ConstantsMicropita.c_fBreakRankTiesByDiversity:
             llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[2], reverse = True)
@@ -859,7 +852,6 @@ class MicroPITA:
             internalAlphaMatrix = None
             if abndData.funcIsSummed():
                 lsFileElements = os.path.splitext(abndData.funcGetName())
-                abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcWriteToFile(strOutputFile=lsFileElements[0]+"-Diversity-out"+lsFileElements[1])
                 npaTerminalAbundance = abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcGetAbundanceCopy()
                 #Get Alpha metrics matrix
                 #Expects Observations (Taxa (row) x sample (column))
@@ -1168,6 +1160,9 @@ class MicroPITA:
                                                  lsInverseBetaMetrics=inverseDiversityMetricsBeta,
                                                  fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
                                                  fRunExtreme=c_RUN_MAX_DISSIMILARITY_3)
+
+            #Write file For debugging
+#TODO REMOVE            stratAbundanceTable.funcWriteToFile(os.path.split(strOutputFile)[0]+"-sumnorm.pcl")
 
             #Generate selection by the rank average of user defined taxa
             #Expects (Taxa (row) by Samples (column))
