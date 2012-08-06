@@ -13,6 +13,7 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
+import sys
 import argparse
 from src.breadcrumbs.AbundanceTable import AbundanceTable
 from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
@@ -21,6 +22,7 @@ from src.breadcrumbs.KMedoids import Kmedoids
 from src.breadcrumbs.MLPYDistanceAdaptor import MLPYDistanceAdaptor
 from src.breadcrumbs.SVM import SVM
 from src.breadcrumbs.UtilityMath import UtilityMath
+
 from src.ConstantsMicropita import ConstantsMicropita
 import csv
 #import itertools
@@ -1301,7 +1303,7 @@ argp.add_argument(ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, 
 
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="Label", help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="", help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
 argp.add_argument(ConstantsMicropita.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
                   help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
 
