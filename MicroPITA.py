@@ -1200,7 +1200,9 @@ class MicroPITA:
         ##ALL UNSUPERVISED SELECTION SHOULD HAPPEN BEFORE HERE
         #This is valid for running supervised methods on 1 label but not multiple labels
         #Or adding additional downstream analysis after this point (unless it is contengent on the supervised label).
-        if strLabel:
+        print "strLabel:", strLabel
+        print strLabel
+        if not strLabel is None:
             fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,ConstantsMicropita.lNAs)
 
             if fRemoveSuccess:
@@ -1232,7 +1234,7 @@ class MicroPITA:
         strOutputContent = ""
         #Create output content from dictionary
         for sKey in dictSelection:
-            strOutputContent = "".join([strOutputContent,sKey,ConstantsMicropita.COLON,", ".join(dictSelection[sKey]),ConstantsMicropita.ENDLINE])
+            strOutputContent = "".join([strOutputContent,sKey,ConstantsMicropita.TAB,ConstantsMicropita.TAB.join(dictSelection[sKey]),ConstantsMicropita.ENDLINE])
 
         #Write to file
         if(not strOutputContent == ""):
@@ -1266,8 +1268,8 @@ class MicroPITA:
         #Dictionary to hold selection data
         dictSelection = dict()
         for strSelectionLine in filter(None,strSelection.split(ConstantsMicropita.ENDLINE)):
-            astrSelectionMethod = strSelectionLine.split(ConstantsMicropita.COLON)
-            dictSelection[astrSelectionMethod[0].split()[0]] = [strSample.split()[0] for strSample in filter(None,astrSelectionMethod[1].split(ConstantsMicropita.COMMA))]
+            astrSelectionMethod = strSelectionLine.split(ConstantsMicropita.TAB)
+            dictSelection[astrSelectionMethod[0]] = astrSelectionMethod[1:]
 
         #Return dictionary
         return dictSelection
@@ -1303,7 +1305,7 @@ argp.add_argument(ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, 
 
 #SVM label
 #Label parameter to be used with SVM
-argp.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default="", help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
+argp.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="sLabel", metavar= "Supervised Label Metadata Name", default=None, help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
 argp.add_argument(ConstantsMicropita.c_strSupervisedLabelCountArgument, dest="iSupervisedCount", metavar= "Supervised Sample Selection Count", default=0, type=int,
                   help= ConstantsMicropita.c_strSupervisedLabelCountHelp)
 
@@ -1327,6 +1329,7 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
+    print "args:", args
 
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
