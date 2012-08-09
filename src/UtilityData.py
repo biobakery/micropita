@@ -306,9 +306,9 @@ class UtilityData():
         #Add in noise by shuffling a percentage of the reads to other features
         if dSimpleNoise > 0:
             #For each sample get a percentage of the abundance and add to a random group
-            print "iSampleCount", iSampleCount
+
             for iSample in xrange(iSampleCount):
-                print "iSample", iSample
+
                 #Holds the noise adjustment and then after all the features in the sample are looked at
                 #The noise adjustment is added to the sample.
                 #If I added on the noise to features as I went through the sample if the feature with added
@@ -316,13 +316,13 @@ class UtilityData():
                 #Added noise and so skews the noise model
                 #Noise is calculated seperately and then added at once.
                 npaNoise = np.array([0]*iTaxaCount)
-                print "npaNoise ", npaNoise
+
                 #Calculate noise and shuffle to other features
-                print "iTaxaCount", iTaxaCount
+
                 for iFeature in xrange(iTaxaCount):
                     dCurrentAbundance = npDataMatrix[iFeature,iSample]
                     iShuffle = int(dCurrentAbundance*dSimpleNoise)
-                    print "dCurrentAbundance, iShuffle ",dCurrentAbundance," ",iShuffle 
+ 
                     #Some of the features will have a measurement of 0 and so this can be skipped
                     if(iShuffle>0):
                         npaNoise[iFeature] = npaNoise[iFeature]-iShuffle
@@ -330,7 +330,6 @@ class UtilityData():
                         for iShuffleInstance in xrange(iShuffle):
                             iLocation = random.randint(0,iTaxaCount-1)
                             npaNoise[iLocation] = npaNoise[iLocation] + 1
-                print "npaNoise After ", npaNoise
 
                 #Add noise to sample
                 for iindexNoise, iNoise in enumerate(npaNoise):

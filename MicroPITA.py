@@ -968,7 +968,7 @@ class MicroPITA:
 	:return	Selected Samples:	Samples selected by methods.
             Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 	"""
-        print "strSelectionTechnique:",strSelectionTechnique
+
         #Holds the top ranked samples from different metrics
         #dict[metric name] = [samplename,samplename...]
         selectedSamples = dict()
@@ -1378,7 +1378,6 @@ __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
 def _main( ):
     args = argp.parse_args( )
-    print "args:", args
 
     #Set up logger
     iLogLevel = getattr(logging, args.strLogLevel.upper(), None)
