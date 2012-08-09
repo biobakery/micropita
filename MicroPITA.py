@@ -968,7 +968,7 @@ class MicroPITA:
 	:return	Selected Samples:	Samples selected by methods.
             Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 	"""
-
+        print "strSelectionTechnique:",strSelectionTechnique
         #Holds the top ranked samples from different metrics
         #dict[metric name] = [samplename,samplename...]
         selectedSamples = dict()
@@ -984,6 +984,51 @@ class MicroPITA:
           if not cFeatureNameDelimiter:
             logging.error("MicroPITA.funcRun. Please specify feature name delimiter. Stopped.")
           return False
+
+        #If a target feature file is given make sure that targeted feature is in the selection methods, if not add
+        if strUserDefinedTaxaFile or self.c_strTaxa in strSelectionTechnique:
+          if not (strUserDefinedTaxaFile and sFeatureSelectionMethod):
+            logging.error("MicroPITA::Did not receive both the Targeted feature file and the feature selection method. MicroPITA did not run.")
+            return False
+          elif self.c_strTaxa not in strSelectionTechnique:
+            strSelectionTechnique.append(self.c_strTaxa)
+
+        #Check supervised related arguments
+        #If there is a superversied count or a label or a supervised method, all three previously mentioned variables must be valid.
+        #Otherwise stop
+        iActualSupervisedMethodCount = len(set(self.c_lsAllSupervisedMethods)&set(strSelectionTechnique))
+        if ((iActualSupervisedMethodCount > 0 or strLabel or iSupervisedSampleCount)):
+          if not strLabel:
+            logging.error("MicroPITA::Did not received a value for sLabel. MiroPITA did not run. Received="+str(strLabel))
+            return False
+          if iSupervisedSampleCount < 1:
+            logging.error("".join(["MicroPITA::Did not receive a selection count for supervised selection above 0, received=",
+                          str(iSupervisedSampleCount),". Did not continue analysis."]))
+            return False
+          if iActualSupervisedMethodCount < 1:
+            logging.error("MicroPITA::Did not receive a supervised method even though a supervised count or label was given.")
+            return False
+
+        #Check unsupervised methods
+        #If an unsupervised count is specified so should a method.
+        #Otherwise stop
+        iActualUnsupervisedMethodCount = len(set(self.c_lsAllUnsupervisedMethods)&set(strSelectionTechnique))
+        if ((iActualUnsupervisedMethodCount > 0) or (iSampleSelectionCount)):
+          if iSampleSelectionCount < 1:
+            logging.error("".join(["MicroPITA::Did not receive a selection count for unsupervised selection above 0, received=",
+                                   str(iSampleSelectionCount),". Did not continue analysis."]))
+            return False
+          if iActualUnsupervisedMethodCount < 1:
+            logging.error("MicroPITA::Did not receive a selection count but did receive selection methods. MicroPITA did not run.")
+            return False
+
+        #If unsupervised stratify is given, make sure an unsupervised method is given
+        if strStratify:
+           if iActualUnsupervisedMethodCount < 1:
+              logging.error("MicroPITA::Did not receive an unsupervised method when aske dto stratify an unsupervised method. MicroPITA did not run.")
+              return False
+
+        #After checking parameters, if still no selection counts or methods are indicated return
         if iSampleSelectionCount+iSupervisedSampleCount < 1:
           logging.error("MicroPITA.funcRun. Please specify a selection amount. Stopped.")
           return False
@@ -992,15 +1037,21 @@ class MicroPITA:
           return False
 
         #Create file paths if not already given
+        lsFilesToMake = []
         if not strCheckedAbndFile:
           strCheckedAbndFile = os.path.splitext(strInputAbundanceFile)[0]+"-checked.pcl"
-        if not strInputPredictFile:
-          strInputPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",strLabel,"-SVM.txt"])
-        if not strPredictPredictFile:
-          strPredictPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",strLabel,"-SVM.predict"])
+          lsFilesToMake.append(strCheckedAbndFile)
+
+        if strLabel and iSupervisedSampleCount:
+          if not strInputPredictFile:
+            strInputPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",str(strLabel),"-SVM.txt"])
+            lsFilesToMake.append(strInputPredictFile)
+          if not strPredictPredictFile:
+            strPredictPredictFile = "".join([os.path.splitext(strCheckedAbndFile)[0],"-select-",str(iSupervisedSampleCount),"-",str(strLabel),"-SVM.predict"])
+            lsFilesToMake.append(strPredictPredictFile)
 
         #If the directories do not already exist, create
-        for f in [strInputAbundanceFile, strInputPredictFile, strPredictPredictFile, strCheckedAbndFile, strOutputFile]:
+        for f in [strInputAbundanceFile,strOutputFile] + lsFilesToMake:
             strDir = os.path.dirname(f)
             if not os.path.exists(strDir):
                 os.makedirs(strDir)
@@ -1027,16 +1078,16 @@ class MicroPITA:
 
         #Perform different flows flags
         c_RUN_MAX_DIVERSITY_1 = False
-        if microPITA.c_strDiversity in strSelectionTechnique:
+        if microPITA.c_strDiversity in strSelectionTechnique and iSampleSelectionCount:
             c_RUN_MAX_DIVERSITY_1 = True
         c_RUN_REPRESENTIVE_DISSIMILARITY_2 = False
-        if microPITA.c_strRepresentativeDissimilarity in strSelectionTechnique:
+        if microPITA.c_strRepresentativeDissimilarity in strSelectionTechnique and iSampleSelectionCount:
             c_RUN_REPRESENTIVE_DISSIMILARITY_2 = True
         c_RUN_MAX_DISSIMILARITY_3 = False
-        if microPITA.c_strExtremeDissimilarity in strSelectionTechnique:
+        if microPITA.c_strExtremeDissimilarity in strSelectionTechnique and iSampleSelectionCount:
             c_RUN_MAX_DISSIMILARITY_3 = True
         c_RUN_RANK_AVERAGE_USER_4 = False
-        if microPITA.c_strTaxa in strSelectionTechnique:
+        if microPITA.c_strTaxa in strSelectionTechnique and iSampleSelectionCount:
             c_RUN_RANK_AVERAGE_USER_4 = True
             if not strUserDefinedTaxaFile:
                 logging.error("MicroPITA.funcRun. No taxa file was given for taxa selection.") 
@@ -1058,10 +1109,10 @@ class MicroPITA:
         if microPITA.c_strRandom in strSelectionTechnique:
             c_RUN_RANDOM_5 = True
         c_RUN_DISTINCT = False
-        if (microPITA.c_strDistinct in strSelectionTechnique) and (not strLabel == None):
+        if (microPITA.c_strDistinct in strSelectionTechnique) and strLabel and iSupervisedSampleCount:
             c_RUN_DISTINCT = True
         c_RUN_DISCRIMINANT = False
-        if (microPITA.c_strDiscriminant in strSelectionTechnique) and (not strLabel == None):
+        if (microPITA.c_strDiscriminant in strSelectionTechnique) and strLabel and iSupervisedSampleCount:
             c_RUN_DISCRIMINANT = True
 
         #Input file path components
@@ -1200,8 +1251,6 @@ class MicroPITA:
         ##ALL UNSUPERVISED SELECTION SHOULD HAPPEN BEFORE HERE
         #This is valid for running supervised methods on 1 label but not multiple labels
         #Or adding additional downstream analysis after this point (unless it is contengent on the supervised label).
-        print "strLabel:", strLabel
-        print strLabel
         if not strLabel is None:
             fRemoveSuccess = totalAbundanceTable.funcRemoveSamplesByMetadata(strLabel,ConstantsMicropita.lNAs)
 
@@ -1345,42 +1394,9 @@ def _main( ):
             os.makedirs(strDir)
     logging.basicConfig(filename = args.strLoggingFile, filemode = 'w', level=iLogLevel)
 
-    #TODO does this stop the full analysis process? Not if the selection file already exists...
-    if not args.sIDName:
-        logging.error("MicroPITA::Did not received a value for sIDName. MiroPITA did not run. Received="+str(args.sIDName))
-        return False
-    if not args.sLastMetadataName:
-        logging.error("MicroPITA::Did not received a value for sLastMetadataName. MiroPITA did not run. Received="+str(args.sLastMetadataName))
-        return False
-
     #Run micropita
     logging.info("Start microPITA")
     microPITA = MicroPITA()
-
-    #Check inputs
-    #If a target feature file is given make sure that targeted feature is in the selection methods, if not add
-    if args.strFileTaxa:
-        if microPITA.c_strTaxa not in args.strSelection:
-            args.strSelection.append(microPITA.c_strTaxa)
-
-    #If a supervised selection method is indicated make sure supervised selection count is indicated and above 0
-    #Otherwise stop
-    if len(set(microPITA.c_lsAllSupervisedMethods)&set(args.strSelection))>0:
-        if not args.sLabel:
-            logging.error("MicroPITA::Did not received a value for sLabel. MiroPITA did not run. Received="+str(args.sLabel))
-            return -1
-        if args.iSupervisedCount < 1:
-            logging.error("".join(["MicroPITA::Did not receive a selection count for supervised selection above 0, received=",
-                                   str(args.iSupervisedCount),". Did not continue analysis."]))
-            return -2
-
-    #If an unsupervised selection method is indicated make sure the unsupervised selection count is above 0
-    #Otherwise stop
-    if len(set(microPITA.c_lsAllUnsupervisedMethods)&set(args.strSelection))>0:
-        if args.iUnsupervisedSelectionCount < 1:
-            logging.error("".join(["MicroPITA::Did not receive a selection count for unsupervised selection above 0, received=",
-                                   str(args.iUnsupervisedSelectionCount),". Did not continue analysis."]))
-            return -3
 
     dictSelectedSamples = microPITA.funcRun(fIsAlreadyNormalized=args.fIsNormalized,
                                         fCladesAreSummed=args.fIsSummed,
