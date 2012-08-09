@@ -445,7 +445,7 @@ class MicroPITA:
 	:param	strPredictionFile	LIBSVM style output file of probabilistic predictions.
 	:type	string	File path
 	:return	Analysis Results:	Dictionary of files generated (input and prediction files)
-                                Return false on error.
+         Return false on error.
 	"""
 
         #SVM general class
