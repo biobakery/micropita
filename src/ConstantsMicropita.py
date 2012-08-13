@@ -63,12 +63,23 @@ class ConstantsMicropita():
     c_strEmptyDataMetadata = "NA"
     lNAs = list(set(["NA","na","Na","nA",c_strEmptyDataMetadata]))
 
+    ####Process adjustments
     #Occurence filter [min abundance, min samples occuring in]
     #To turn off make == None
     c_liOccurenceFilter = [3,3]
 
     #Break ties in targeted feature with diversity
     c_fBreakRankTiesByDiversity = False
+
+    #Order is important, the first is the default
+    c_strTargetedRanked = "Targeted_Rank"
+    c_strTargetedAbundance = "Targeted_Abundance"
+    lsTargetedFeatureMethodValues = [c_strTargetedRanked, c_strTargetedAbundance]
+
+    #Indicates which supervised method is ran
+    #True indicates the SVMs will be used.
+    #Fase indicates distance from one label to the other's centroid will be used.
+    fRunSVM = False
 
     ####Commandline arguments
     #checked Checked abundance file
@@ -144,11 +155,6 @@ class ConstantsMicropita():
     #target Targeted feature file
     c_strTargetedSelectionFileArgument = "--target"
     c_strTargetedSelectionFileHelp = "A file containing taxa/otu/clades to be used in targeted feature selection."
-
-    #Order is important, the first is the default
-    c_strTargetedRanked = "Targeted_Rank"
-    c_strTargetedAbundance = "Targeted_Abundance"
-    lsTargetedFeatureMethodValues = [c_strTargetedRanked, c_strTargetedAbundance]
 
     ####################################
     #Arguments without commandline flags

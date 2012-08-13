@@ -452,7 +452,7 @@ class MicroPITA:
         svm = SVM()
 
         #Convert abundancies file to SVM file
-        lsUniqueLabelOrder = svm.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abndAbundanceTable, strOutputSVMFile=strInputSVMFile, sMetadataLabel=sMetadataForLabel)
+        lsUniqueLabelOrder = SVM.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abndAbundanceTable, strOutputSVMFile=strInputSVMFile, sMetadataLabel=sMetadataForLabel)
         if not lsUniqueLabelOrder:
             logging.error("MicroPITA.funcRunMLPYSVM: Received an error when creating the input SVM file in the MLPY LIBSVM analysis pipeline.")
             return False
@@ -645,6 +645,230 @@ class MicroPITA:
 
         return [dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions]
 
+    def funcMeasureDistanceFromLabelToAverageOtherLabel(self, abndTable, lfGroup, lfGroupOther):
+        """
+        Get the distance of samples from one label from the average sample of not the label.
+        Note: This assumes 2 classes.  
+
+        :param abndTable: Table of data to work out of.
+        :type: Abundace Table
+        :param lfGroup: Boolean indicator of the sample being in the frist group
+        :type: It is assumed that False is the other label and there is not 3rd class (like misclassfied).
+        """
+        #Hold data for combined boxplots
+        llBoxplotData = []
+        lsBoxplotLabels = []
+
+        #Get all sample names
+        lsAllSamples = abndTable.funcGetSampleNames()
+
+        #Get average populations
+        lAverage = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroup)
+        lAverageOther = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroupOther)
+
+        #Get the distance from the average of the other label (label 1)
+        ldSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable, ldAverage = lAverageOther,
+                                                    lsSamples = lsAllSamples, lfSelected = lfGroup)
+        ldNotSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable,ldAverage = lAverage,
+                                                    lsSamples = lsAllSamples, lfSelected = lfGroupOther)
+
+        ldSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroup in enumerate(lfGroup) if fGroup],ldSelectedDistances)
+        ldNotSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroupOther in enumerate(lfGroupOther) if fGroupOther],ldNotSelectedDistances)
+        return [ldSelectedDistances,ldNotSelectedDistances]
+
+    def funcGetAveragePopulation(self, abndTable, lfCompress):
+        """
+        Get the average row per column in the abndtable.
+
+        :param abndTable: AbundanceTable of data to be averaged
+        :type AbudanceTable
+        :param lfCompress: List of boolean flags (false means to remove sample before averaging
+        :type List of floats
+        :return List of doubles: 
+        """
+        #Get the average populations
+        lAverage = []
+
+        for sFeature in abndTable.funcGetAbundanceCopy():
+            sFeature = list(sFeature)[1:]
+            sFeature=np.compress(lfCompress,sFeature,axis=0)
+            #If there are no samples then return empty list.
+            if len(sFeature) == 0:
+                lAverage.append(0.0)
+            #Return average of feature
+            else:
+                lAverage.append(sum(sFeature)/float(len(sFeature)))
+        return lAverage
+
+    def funcGetDistanceFromAverage(self, abndTable,ldAverage,lsSamples,lfSelected):
+        """
+        Given an abundance table and an average sample, this returns the distance of each sample
+        (measured using brays-curtis dissimilarity) from the average.
+        The distances are reduced by needing to be in the lsSamples and being a true in the lfSelected
+        (which is associated with the samples in the order of the samples in the abundance table;
+        use abundancetable.funcGetSampleNames() to see the order if needed).
+
+        :param abndTable: Abundance table holding the data to be analyzed.
+        :type AbundanceTable
+        :param ldAverage: Average population (Average features of the abundance table of samples)
+        :type List of doubles which represent the average population
+        :param lsSamples: These are the only samples used in the analysis
+        :type List of strings (sample ids)
+        :param lfSelected: Samples to be included in the analysis
+        :type List of boolean (true means include)
+        :return: List of distances (doubles)
+        """
+        #Get the distance from label 1 of all samples in label0 splitting into selected and not selected lists
+        ldSelectedDistances = []
+        ldNotSelectedDistances = []
+
+        for sSampleName in [sSample for iindex, sSample in enumerate(lsSamples) if lfSelected[iindex]]:
+            #Get the sample measurements
+            ldSelectedDistances.append(Metric.funcGetBrayCurtisDissimilarity(np.array([abndTable.funcGetSample(sSampleName),ldAverage]))[0])
+        return ldSelectedDistances
+
+    def funcMeasureDistanceFromLabelToAverageOtherLabel(self, abndTable, lfGroup, lfGroupOther):
+        """
+        Get the distance of samples from one label from the average sample of not the label.
+        Note: This assumes 2 classes.  
+
+        :param abndTable: Table of data to work out of.
+        :type: Abundace Table
+        :param lfGroup: Boolean indicator of the sample being in the frist group
+        :type: It is assumed that False is the other label and there is not 3rd class (like misclassfied).
+        """
+        #Hold data for combined boxplots
+        llBoxplotData = []
+        lsBoxplotLabels = []
+
+        #Get all sample names
+        lsAllSamples = abndTable.funcGetSampleNames()
+
+        #Get average populations
+        lAverage = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroup)
+        lAverageOther = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroupOther)
+
+        #Get the distance from the average of the other label (label 1)
+        ldSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable, ldAverage = lAverageOther,
+                                                    lsSamples = lsAllSamples, lfSelected = lfGroup)
+        ldNotSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable,ldAverage = lAverage,
+                                                    lsSamples = lsAllSamples, lfSelected = lfGroupOther)
+
+        ldSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroup in enumerate(lfGroup) if fGroup],ldSelectedDistances)
+        ldNotSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroupOther in enumerate(lfGroupOther) if fGroupOther],ldNotSelectedDistances)
+        return [ldSelectedDistances,ldNotSelectedDistances]
+
+    def funcPerformDistanceSelection(self, abndTable, iSelectionCount, sLabel):
+        """
+        Given labels, labels from one label are measured from the average (centroid) value of another group.
+        Currently runs on 2 labels.
+
+        :params  abndTable: Abundance of measurements
+        :type AbundanceTable: 
+        :params iSelectionCount: The number of samples selected per sample.
+        :type Integer: Integer greater than 0
+        :params sLabel: Label used by supervised methods.
+        :type String: 
+        """
+        llBoxplotData = []
+
+        #Get labels
+        liLabels = SVM.funcMakeLabels(abndTable.funcGetMetadata(sLabel))
+        #Check labels
+        if not len(set(liLabels)) == 2:
+           print "Did not get two labels, errors"
+           return False
+        liUniqueLabels = list(set(liLabels))
+  
+        #Get boolean indicator of labels
+        lfLabels1 = [liUniqueLabels[0] == iLabel for iLabel in liLabels]
+        lfLabels2 = [not fLabel for fLabel in lfLabels1]
+
+        #Selection in 16S
+        #Get the distances for 16S data from two different groups to the average of the other
+        ldLabel1Distances, ldLabel2Distances = self.funcMeasureDistanceFromLabelToAverageOtherLabel(abndTable, lfLabels1, lfLabels2)
+        ldLabel1Distances = sorted(ldLabel1Distances,key=operator.itemgetter(1))
+        ldLabel2Distances = sorted(ldLabel2Distances,key=operator.itemgetter(1))
+
+        #Get the closest and farthest distances
+        ltupleDiscriminantSamples0 = ldLabel1Distances[:iSelectionCount]
+        ltupleDiscriminantSamples1 = ldLabel2Distances[:iSelectionCount]
+        ltupleDistinctSamples0 = ldLabel1Distances[iSelectionCount*-1:]
+        ltupleDistinctSamples1 = ldLabel2Distances[iSelectionCount*-1:]
+
+        #Remove the selected samples from the larger population of distances (better visualization)
+        ldSelected = [tpleSelected[0] for tpleSelected in ltupleDiscriminantSamples0+ltupleDiscriminantSamples1+ltupleDistinctSamples0+ltupleDistinctSamples1]
+
+        #Set up data and labels (label 0)
+        return [ltupleDiscriminantSamples0, ltupleDistinctSamples0,
+               [tplData for tplData in ldLabel1Distances if tplData[0] not in ldSelected],
+               ltupleDiscriminantSamples1, ltupleDistinctSamples1,
+               [tplData for tplData in ldLabel2Distances if tplData[0] not in ldSelected]]
+
+
+    #Run the supervised methods
+    def funcRunSupervisedDistancesFromCentroids(self, abundanceTable, fRunDistinct, fRunDiscriminant,
+                                       strOuputSVMFile, strPredictSVMFile, strSupervisedMetadata,
+                                       iSampleSVMSelectionCount):
+        """
+	Runs supervised methods based on measuring distances of one label from the centroid of another.
+        This does make output files like the other supervised methods excluding one difference,
+        the output "prediction" file which is where one would find the list of differences for each sample
+        in the order of the sample names (after trimming away samples with invalid metadata values), has
+        only one label listed in the header "other". This is because the method only generates one distance
+        for a sample, it's distance from the other label centroid.
+	
+	:param	abundanceTable:	AbundanceTable
+	:type	AbudanceTable	Data to analyze
+	:param	fRunDistinct:	Run distinct selection method
+	:type	Boolean	boolean (true runs method)
+	:param	fRunDiscriminant:	Run discriminant method
+	:type	Boolean	boolean (true runs method)
+	:param	strOutputSVMFile:	File output from  SVM (scaled input file in the style of LIBSVM)
+	:type	String	String
+	:param	strPredictSVMFile:	File label prediction from  SVM
+	:type	String	String
+	:param	iSampleSVMSelectionCount:	Number of samples to select
+	:type	Integer	int sample selection count
+	:return	Selected Samples:	A dictionary of selected samples by selection ID
+        Dictionary	{"Selection Method":["SampleID","SampleID"...]}
+	"""
+
+        #Run supervised blocks
+        #Select supervised (using SVM)
+        #Will contain the samples selected to return
+        dictSelectedSamples = dict()
+
+        #For now perform the selection here, should eventually be performed in micropta
+        ltupleDisc0, ltupleDist0, ltpleNotSelected0, ltupleDisc1, ltupleDist1, ltpleNotSelected1 = self.funcPerformDistanceSelection(abndTable=abundanceTable,
+                                                                                                      iSelectionCount=iSampleSVMSelectionCount,
+                                                                                                      sLabel=strSupervisedMetadata)
+
+        #Make expected output files for supervised methods
+        #1. Output file which is similar to an input file for SVMs
+        #2. Output file that is similar to the probabilitic output of a SVM (LibSVM)
+        #Manly for making output of supervised methods (SVM and Distince from Centroid) similar
+        #MicropitaVis needs some of these files
+        lsAllSampleNames = abundanceTable.funcGetSampleNames()
+        lsUniqueLabels = SVM.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abundanceTable, strOutputSVMFile=strOuputSVMFile, sMetadataLabel=strSupervisedMetadata)
+        lsLabels = SVM.funcReadLabelsFromFile(sSVMFile=strOuputSVMFile, lsAllSampleNames=lsAllSampleNames, isPredictFile=False)
+        lsLabels = [(sSample,sLabel) for sLabel in lsLabels.keys() for sSample in lsLabels[sLabel]]
+        dictDistances = dict(ltupleDisc0+ltupleDist0+ltpleNotSelected0+ltupleDisc1+ltupleDist1+ltpleNotSelected1)
+        dictLabels = dict(lsLabels)
+
+        strPredictionOutput = ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace.join(["labels"]+["Other"])+ConstantsMicropita.ENDLINE
+        strPredictionOutput = strPredictionOutput + ConstantsMicropita.ENDLINE.join([ConstantsBreadCrumbs.c_strBreadCrumbsSVMSpace.join([str(dictLabels[sSample]),str(dictDistances[sSample])]) for sSample in lsAllSampleNames])
+
+        #Write prediction file to file
+        with open(strPredictSVMFile, 'w') as f:
+            f.write(strPredictionOutput)
+
+        if fRunDistinct:
+            dictSelectedSamples[self.c_strDistinct] = [ltple[0] for ltple in ltupleDist0 + ltupleDist1]
+        if fRunDiscriminant:
+            dictSelectedSamples[self.c_strDiscriminant] = [ltple[0] for ltple in ltupleDisc0 + ltupleDisc1]
+        return dictSelectedSamples
+
     #Run the supervised methods
     def funcRunSupervisedMethods(self, abundanceTable, fRunDistinct, fRunDiscriminant,
                                        strOuputSVMFile, strPredictSVMFile, strSupervisedMetadata,
@@ -662,14 +886,15 @@ class MicroPITA:
 	:type	String	String
 	:param	strPredictSVMFile:	File label prediction from  SVM
 	:type	String	String
+        :param  strSupervisedMetadata:	Label for supervised method
+        :type   String:	String
 	:param	iSampleSVMSelectionCount:	Number of samples to select
 	:type	Integer	int sample selection count
 	:return	Selected Samples:	A dictionary of selected samples by selection ID
-            Dictionary	{"Selection Method":["SampleID","SampleID"...]}
-	    """
+        Dictionary	{"Selection Method":["SampleID","SampleID"...]}
+	"""
 
         #Run supervised blocks
-        #Select supervised (using SVM)
         #Will contain the samples selected to return
         dictSelectedSamples = dict()
         #SVM related output from the SVM call
@@ -680,16 +905,26 @@ class MicroPITA:
             if os.path.exists(f):
                 os.remove(f)
 
-        #Run MLPY SVM
-        svmRelatedData = self.funcRunMLPYSVM(abndAbundanceTable=abundanceTable, sMetadataForLabel=strSupervisedMetadata,
+        #True = Select supervised (using SVM)
+        #False = Select supervised (using distances)
+        if ConstantsMicropita.fRunSVM:
+            #Run MLPY SVM
+            svmRelatedData = self.funcRunMLPYSVM(abndAbundanceTable=abundanceTable, sMetadataForLabel=strSupervisedMetadata,
                                              strInputSVMFile=strOuputSVMFile, strPredictionFile=strPredictSVMFile)
 
-        #Read in prediction file and select samples
-        if svmRelatedData:
-            dictSelectedSamples = self._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=svmRelatedData[ConstantsMicropita.c_strKeywordInputFile],
+            #Read in prediction file and select samples
+            if svmRelatedData:
+                dictSelectedSamples = self._funcSelectSupervisedSamplesFromPredictFile(strOriginalInputFile=svmRelatedData[ConstantsMicropita.c_strKeywordInputFile],
                                                       strPredictFilePath=svmRelatedData[ConstantsMicropita.c_strKeywordPredFile], lsSampleNames=abundanceTable.funcGetSampleNames(),
                                                       iSelectCount=iSampleSVMSelectionCount, fSelectDiscriminant = fRunDiscriminant, fSelectDistinct = fRunDistinct)
-        return dictSelectedSamples
+            return dictSelectedSamples
+
+        else:
+            #Run supervised blocks
+            #Select supervised (using distances from the centroid other label)
+            return self.funcRunSupervisedDistancesFromCentroids(abundanceTable=abundanceTable, fRunDistinct=fRunDistinct, fRunDiscriminant=fRunDiscriminant,
+                                       strOuputSVMFile=strOuputSVMFile, strPredictSVMFile=strPredictSVMFile, strSupervisedMetadata=strSupervisedMetadata,
+                                       iSampleSVMSelectionCount=iSampleSVMSelectionCount)
 
     #Testing: Happy path tested
     def _funcSelectSupervisedSamplesFromPredictFile(self, strOriginalInputFile, strPredictFilePath, lsSampleNames, iSelectCount, fSelectDiscriminant, fSelectDistinct):
