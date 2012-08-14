@@ -598,37 +598,7 @@ class MicroPITA:
 
         return [dictdProbability,dictAllProbabilities,dictiPrediction,dictAllPredictions]
 
-    def funcMeasureDistanceFromLabelToAverageOtherLabel(self, abndTable, lfGroup, lfGroupOther):
-        """
-        Get the distance of samples from one label from the average sample of not the label.
-        Note: This assumes 2 classes.  
-
-        :param abndTable: Table of data to work out of.
-        :type: Abundace Table
-        :param lfGroup: Boolean indicator of the sample being in the frist group
-        :type: It is assumed that False is the other label and there is not 3rd class (like misclassfied).
-        """
-        #Hold data for combined boxplots
-        llBoxplotData = []
-        lsBoxplotLabels = []
-
-        #Get all sample names
-        lsAllSamples = abndTable.funcGetSampleNames()
-
-        #Get average populations
-        lAverage = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroup)
-        lAverageOther = self.funcGetAveragePopulation(abndTable=abndTable, lfCompress=lfGroupOther)
-
-        #Get the distance from the average of the other label (label 1)
-        ldSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable, ldAverage = lAverageOther,
-                                                    lsSamples = lsAllSamples, lfSelected = lfGroup)
-        ldNotSelectedDistances = self.funcGetDistanceFromAverage(abndTable = abndTable,ldAverage = lAverage,
-                                                    lsSamples = lsAllSamples, lfSelected = lfGroupOther)
-
-        ldSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroup in enumerate(lfGroup) if fGroup],ldSelectedDistances)
-        ldNotSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroupOther in enumerate(lfGroupOther) if fGroupOther],ldNotSelectedDistances)
-        return [ldSelectedDistances,ldNotSelectedDistances]
-
+    #Happy path tested (case 3)
     def funcGetAveragePopulation(self, abndTable, lfCompress):
         """
         Get the average row per column in the abndtable.
@@ -653,6 +623,7 @@ class MicroPITA:
                 lAverage.append(sum(sFeature)/float(len(sFeature)))
         return lAverage
 
+    #Happy path tested (2 cases)
     def funcGetDistanceFromAverage(self, abndTable,ldAverage,lsSamples,lfSelected):
         """
         Given an abundance table and an average sample, this returns the distance of each sample
@@ -680,6 +651,7 @@ class MicroPITA:
             ldSelectedDistances.append(Metric.funcGetBrayCurtisDissimilarity(np.array([abndTable.funcGetSample(sSampleName),ldAverage]))[0])
         return ldSelectedDistances
 
+    #Happy path tested (1 case)
     def funcMeasureDistanceFromLabelToAverageOtherLabel(self, abndTable, lfGroup, lfGroupOther):
         """
         Get the distance of samples from one label from the average sample of not the label.
@@ -689,6 +661,7 @@ class MicroPITA:
         :type: Abundace Table
         :param lfGroup: Boolean indicator of the sample being in the frist group
         :type: It is assumed that False is the other label and there is not 3rd class (like misclassfied).
+        :return List of List of doubles: [list of tuples (string sample name,double distance) for the selected population, list of tuples for the not selected population]
         """
         #Hold data for combined boxplots
         llBoxplotData = []
@@ -711,6 +684,7 @@ class MicroPITA:
         ldNotSelectedDistances = zip([lsAllSamples[iindex] for iindex, fGroupOther in enumerate(lfGroupOther) if fGroupOther],ldNotSelectedDistances)
         return [ldSelectedDistances,ldNotSelectedDistances]
 
+    #Happy path tested (1 test case)
     def funcPerformDistanceSelection(self, abndTable, iSelectionCount, sLabel):
         """
         Given labels, labels from one label are measured from the average (centroid) value of another group.
@@ -758,8 +732,9 @@ class MicroPITA:
                ltupleDiscriminantSamples1, ltupleDistinctSamples1,
                [tplData for tplData in ldLabel2Distances if tplData[0] not in ldSelected]]
 
-
-    #Run the supervised methods
+###
+    #Run the supervised method surrounding distance from centroids
+    #Happy path tested (3 test cases)
     def funcRunSupervisedDistancesFromCentroids(self, abundanceTable, fRunDistinct, fRunDiscriminant,
                                        strOuputSVMFile, strPredictSVMFile, strSupervisedMetadata,
                                        iSampleSVMSelectionCount):

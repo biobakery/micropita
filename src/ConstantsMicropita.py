@@ -12,8 +12,8 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
-from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
-from src.breadcrumbs.Metric import Metric
+from breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
+from breadcrumbs.Metric import Metric
 
 ##
 #Used to test the FileIO class
