@@ -12,26 +12,15 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
+from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
+from src.breadcrumbs.Metric import Metric
+
 ##
 #Used to test the FileIO class
-class ConstantsMicropita():
+class ConstantsMicropita(ConstantsBreadCrumbs):
     """
     Class to hold project constants.
     """
-
-    #References to other projects
-    c_strBreadcrumbsProject = "../breadcrumbs/src/"
-
-    #Character Constants
-    COLON = ":"
-    COMMA = ","
-    ENDLINE = "\n"
-    FASTA_ID_LINE_START = ">"
-    PATH_SEP = "/"
-    QUOTE = "\""
-    TAB = '\t'
-    WHITE_SPACE = " "
-    PIPE = "|"
 
     #SVM related
     c_COST_RANGE_KEY = "range"
@@ -80,6 +69,48 @@ class ConstantsMicropita():
     #True indicates the SVMs will be used.
     #Fase indicates distance from one label to the other's centroid will be used.
     fRunSVM = False
+
+    #Extreme selection clustering used in selecting extreme samples
+    c_strHierarchicalClusterMethod = 'average'
+
+    #Diversity metrics Alpha
+    c_strInverseSimpsonDiversity = Metric.c_strInvSimpsonDiversity
+    c_strChao1Diversity = Metric.c_strChao1Diversity
+
+    #Diversity metrics Beta
+    c_strBrayCurtisDissimilarity = Metric.c_strBrayCurtisDissimilarity
+
+    #Additive inverses of diversity metrics beta
+    c_strInvBrayCurtisDissimilarity = Metric.c_strInvBrayCurtisDissimilarity
+
+    #Selection methods
+    c_strDiversity = "Diversity"
+    c_strExtremeDissimilarity = "Extreme"
+    c_strDiscriminant = "Discriminant"
+    c_strDistinct = "Distinct"
+    c_strRandom = "Random"
+    c_strRepresentativeDissimilarity = "Representative"
+    c_strTaxa = "Taxa_Defined"
+    c_lsAllUnsupervisedMethods = [c_strDiversity,c_strExtremeDissimilarity,c_strRandom,c_strRepresentativeDissimilarity,c_strTaxa]
+    c_lsAllSupervisedMethods = [c_strDiscriminant,c_strDistinct]
+
+    #Technique Names
+    c_strDiversity1 = "".join([c_strDiversity,"_I"])
+    c_strDiversity2 = "".join([c_strDiversity,"_C"])
+    c_strExtremeDissimiarity1 = "".join([c_strExtremeDissimilarity,"_B"])
+    c_strRepresentativeDissimilarity1 = "".join([c_strRepresentativeDissimilarity,"_B"])
+    c_strUserRanked = c_strTaxa
+    c_strSVMClose = c_strDiscriminant
+    c_strSVMFar = c_strDistinct
+
+    #Technique groupings
+    c_lsDiversityMethods = [c_strDiversity1,c_strDiversity2]
+
+    #Converts ecology metrics into standardized method selection names
+    dictConvertAMetricDiversity = {c_strInverseSimpsonDiversity:c_strDiversity1, c_strChao1Diversity:c_strDiversity2}
+    dictConvertMicroPITAToAMetric = {c_strDiversity1:c_strInverseSimpsonDiversity, c_strDiversity2:c_strChao1Diversity}
+    dictConvertBMetricRepresentative = {c_strBrayCurtisDissimilarity:c_strRepresentativeDissimilarity1}
+    dictConvertBMetricExtreme = {c_strInvBrayCurtisDissimilarity:c_strExtremeDissimiarity1}
 
     ####Commandline arguments
     #checked Checked abundance file
@@ -161,3 +192,8 @@ class ConstantsMicropita():
     c_strAbundanceFileHelp = "An abundance table."
     c_strSelectionTechniquesHelp = "Select techniques listed one after another."
     c_strGenericOutputDataFileHelp = "The generated output data file."
+
+    #Simple constructor
+    def __init__(self):
+      ConstantsBreadCrumbs.__init__()
+      pass
