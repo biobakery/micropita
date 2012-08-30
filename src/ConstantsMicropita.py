@@ -30,6 +30,9 @@ class ConstantsMicropita():
     TAB = '\t'
     WHITE_SPACE = " "
     PIPE = "|"
+    c_outputFileDelim = '\t'
+
+    c_sEmptyPredictFileValue = 'NA'
 
     #SVM related
     c_COST_RANGE_KEY = "range"
@@ -132,7 +135,6 @@ class ConstantsMicropita():
     c_strTargetedAbundance = "abundance"
     lsTargetedFeatureMethodValues = [c_strTargetedRanked, c_strTargetedAbundance]
 
-
     #Selection methods
     c_strDiversity = "diverse"
     c_strExtreme = "extreme"
@@ -144,6 +146,9 @@ class ConstantsMicropita():
     c_lsAllUnsupervisedMethods = [c_strRepresentative,c_strDiversity,c_strExtreme,c_strFeature,c_strRandom]
     c_lsAllSupervisedMethods = [c_strDiscriminant,c_strDistinct]
     c_lsAllMethods = c_lsAllUnsupervisedMethods + c_lsAllSupervisedMethods
+
+    #Technique Names
+    c_strDiversity2 = c_strDiversity+"_C"
 
     ####################################
     #Arguments without commandline flags
