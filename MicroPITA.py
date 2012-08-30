@@ -527,7 +527,7 @@ class MicroPITA:
 					sMetadataLabel=strSupervisedMetadata, lsSampleOrdering=lsOriginalSampleNames)
 
 		#Will contain the samples selected to return
-		#One or more of the methods may be active so this is why i am extending instead of just returning the result of each me type
+		#One or more of the methods may be active so this is why I am extending instead of just returning the result of each me type
 		dictSelectedSamplesRet = dict()
 		for sKey, ltplDistances in dictlltpleDistanceMeasurements.items():
 			if fRunDistinct:
@@ -788,7 +788,7 @@ class MicroPITA:
 		if strLabel and ( len(set(dictTotalMetadata.get(strLabel,[]))) < 2 ):
 			logging.error("The label " + strLabel + " did not have 2 or more values. Labels found=" + str(dictTotalMetadata.get(strLabel,[])))
 			return False
-	
+
 		#Run unsupervised methods###
 		#Stratify the data if need be and drop the old data
 		lStratifiedAbundanceTables = totalAbundanceTable.funcStratifyByMetadata(strStratify) if strStratify else [totalAbundanceTable]
