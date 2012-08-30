@@ -1,1 +1,0 @@
-python MicroPITA.py --id ID --lastmeta Label -n 6 -m representative --targets ./input/Unbalanced48-GenNoise-0-SignalNoise-5.taxa --label Label ./input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl ./test/Unbalanced48-GenNoise-0-SignalNoise-5.txt
