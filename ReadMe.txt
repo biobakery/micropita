@@ -23,24 +23,24 @@ diverse (maximum diversity), extreme (most dissimilar), representative (represen
 
 The first three methods are performed as follows (selecting a default 10 samples):
 
-python MicroPITA.py --lastmeta Label -m representative input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label -m representative input/Test.pcl output.txt
 
-python MicroPITA.py --lastmeta Label -m diverse input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label -m diverse input/Test.pcl output.txt
 
-python MicroPITA.py --lastmeta Label -m extreme input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label -m extreme input/Test.pcl output.txt
 
 Each of the previous methods are made up of the following pieces:
 1. python MicroPITA.py to call the MicroPITA script.
 2. --lastmeta which indicates the keyword (first column value) of the last row that contains metadata.
 3. -m which indicates the method to use in selection.
-4. input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl which is the first positional argument indicating an input file
+4. input/Test.pcl which is the first positional argument indicating an input file
 5. output.txt which is the second positional argument indicating the location to write to the output file.
 
 Selecting specific features has additional arguments to consider --targets (required) and --feature_method (optional).
 
-python MicroPITA.py --lastmeta Label -m features --targets input/Unbalanced48-GenNoise-0-SignalNoise-5.taxa input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label -m features --targets input/TestFeatures.taxa input/Test.pcl output.txt
 
-python MicroPITA.py --lastmeta Label -m features --targets --feature_method abundance input/Unbalanced48-GenNoise-0-SignalNoise-5.taxa input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label -m features --feature_method abundance --targets input/TestFeatures.taxa input/Test.pcl output.txt
 
 These additional arguments are described as:
 1. --targets The path to the file that has the features (bugs or clades) of interest. Make sure they are written as they appear in your input file!
@@ -57,9 +57,9 @@ distinct and discriminant
 These methods require an additional argument --label which is the first column keyword of the row used to classify samples for the supervised methods.
 These methods can be performed as follows:
 
-python MicroPITA.py --lastmeta Label --label Label -n 6 -m distinct input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label --label Label -m distinct input/Test.pcl output.txt
 
-python MicroPITA.py --lastmeta Label --label Label -n 6 -m discriminant input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label --label Label -m discriminant input/Test.pcl output.txt
 
 
 C. Changing defaults.
@@ -70,24 +70,24 @@ To change the number of selected samples for any method use the -n argument. Thi
 Stratification:
 To stratify any method use the --stratify argument which is the first column keyword of the metadata row used to stratify samples before selection occurs. (Selection will occur independently within each strata). This example stratifies diverse selection by the "Label".
 
-python MicroPITA.py --lastmeta Label --stratify Label -m representative input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label --stratify Label -m representative input/Test.pcl output.txt
 
-python MicroPITA.py --lastmeta Label --label Label --stratify Group -m distinct input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --lastmeta Label --label Label --stratify StratifyLabel -m distinct input/Test.pcl output.txt
 
 Sample ID header:
 MicroPITA assumes the first row of the input file is the sample IDs, if it is not you may use --id to indicate the row.
 --id expects the entry in the first column of your input file that matches the row used as Sample Ids. See the input file and the following command as an example.
 
-python MicroPITA.py --id Sample --lastmeta Label -m representative input/Unbalanced48-GenNoise-0-SignalNoise-5.pcl output.txt
+$ python MicroPITA.py --id Sample --lastmeta Label -m representative input/Test.pcl output.txt
 
 MicroPITA assumes the input file is TAB delimited, we strongly recommend you use this convention. If not, you can use --delim to change the delimiter used to read in the file.
 Here is an example of reading the comma delimited file micropita/input/CommaDelim.pcl
 
-python MicroPITA.py --delim , --lastmeta Label -m representative input/CommaDelim.pcl output.txt
+$ python MicroPITA.py --delim , --lastmeta Label -m representative input/CommaDelim.pcl output.txt
 
 MicroPITA assumes the input file has feature names in which, if the name contains the consensus lineage or full taxonomic hierarchy, it is delimited with a pipe "|". We strongly recommend you use this default. The delimiter of the feature name can be changed using --featdelim. Here is an example of reading in a file with periods as the delimiter.
 
-python MicroPITA.py --featdelim . --lastmeta Label -m representative input/PeriodDelim.pcl output.txt
+$ python MicroPITA.py --featdelim . --lastmeta Label -m representative input/PeriodDelim.pcl output.txt
 
 
 This covers how to use microPITA. Thank you for using this software and good luck with all your endeavors!
