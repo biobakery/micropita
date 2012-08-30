@@ -950,9 +950,9 @@ args.add_argument(ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPr
 args.add_argument(ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
 argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("r"), help = ConstantsMicropita.c_strAbundanceFileHelp,
-	default = sys.stdin, nargs = "?")
+	default = sys.stdin)
 argp.add_argument("ostmOutput", metavar = "output.txt", type = argparse.FileType("w"), help = ConstantsMicropita.c_strGenericOutputDataFileHelp,
-	default = sys.stdout, nargs = "?")
+	default = sys.stdout)
 
 __doc__ = "::\n\n\t" + argp.format_help( ).replace( "\n", "\n\t" ) + __doc__
 
