@@ -288,8 +288,11 @@ class MicroPITA:
 			llRetAbundance = [[a[0],dictRanks[a[0]],a[2]] for a in llRetAbundance]
 			
 		#Sort first for ties and then for the main feature
-		return sorted(llRetAbundance, key = lambda sampleData: sampleData[2 if ConstantsMicropita.c_fBreakRankTiesByDiversity else 1],
-			reverse = not fRank)
+ 		if not fRank or ConstantsMicropita.c_fBreakRankTiesByDiversity:
+			llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[2], reverse = not fRank)
+		if fRank:
+			llRetAbundance = sorted(llRetAbundance, key = lambda sampleData: sampleData[1], reverse = not fRank)
+		return llRetAbundance
 	
 	#Testing: Happy Path Tested
 	def funcSelectTargetedTaxaSamples(self, abndMatrix, lsTargetedTaxa, iSampleSelectionCount, sMethod = ConstantsMicropita.lsTargetedFeatureMethodValues[0]):
@@ -503,7 +506,6 @@ class MicroPITA:
 		:return	Selected Samples:	A dictionary of selected samples by selection ID
 		Dictionary	{"Selection Method":["SampleID","SampleID"...]}
 		"""
-
 		#Get labels and run one label against many
 		lstrMetadata = abundanceTable.funcGetMetadata(strSupervisedMetadata)
 		dictlltpleDistanceMeasurements = {}
@@ -636,7 +638,10 @@ class MicroPITA:
 			#Get Alpha metrics matrix
 			#Expects Observations (Taxa (row) x sample (column))
 			#Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-			internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy(), lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
+			internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy()
+							if not abndData.funcIsSummed()
+							else abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcGetAbundanceCopy(),
+							lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
 	
 			#Get top ranked alpha diversity by most diverse
 			#Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
@@ -803,7 +808,6 @@ class MicroPITA:
 			#Only perform if the data is not yet normalized
 			if not stratAbundanceTable.funcIsNormalized( ):
 				#Need to first work with unnormalized data
-###Hold				ASDF
 				if c_RUN_MAX_DIVERSITY_1 or c_RUN_REPRESENTIVE_DISSIMILARITY_2 or c_RUN_MAX_DISSIMILARITY_3:
 					self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
 													 dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlphaNoNormalize,
@@ -812,27 +816,23 @@ class MicroPITA:
 													 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
 													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3)
 
+
 			#Generate selection by the rank average of user defined taxa
 			#Expects (Taxa (row) by Samples (column))
 			#Expects a column 0 of taxa id that is skipped
 			#Returns [(sample name,average,rank)]
 			#SUMMED AND NORMALIZED
+			stratAbundanceTable.funcSumClades()
+			#Normalize data at this point
+			stratAbundanceTable.funcNormalize()
 			if c_RUN_RANK_AVERAGE_USER_4:
-				stratAbundanceTable.funcSumClades()
-				stratAbundanceTable.funcNormalize()
 				selectedSamples[ConstantsMicropita.c_strFeature] = self.funcSelectTargetedTaxaSamples(abndMatrix=stratAbundanceTable,
 						lsTargetedTaxa=userDefinedTaxa, iSampleSelectionCount=iCount, sMethod=strFeatureSelection)
 				logging.info("MicroPITA.funcRun:: Selected Samples Rank")
 				logging.info(selectedSamples)
-				#Return the table to not summed but normalized
-				stratAbundanceTable = stratAbundanceTable.funcGetFeatureAbundanceTable(stratAbundanceTable.funcGetTerminalNodes())
-			else:
-				#Normalize data at this point
-				if not stratAbundanceTable.funcNormalize():
-					logging.error("MicroPITA.funcRun:: Error occured during normalizing data. Stopped.")
-					return False
-			
- 			###NOT SUMMED BUT NORMALIZED analysis block
+
+ 			###SUMMED AND NORMALIZED analysis block
+			#Diversity based metric will move reduce to terminal taxa as needed
 			#Need to first work with unnormalized data
 			if c_RUN_MAX_DIVERSITY_1 or c_RUN_REPRESENTIVE_DISSIMILARITY_2 or c_RUN_MAX_DISSIMILARITY_3:
 				self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
@@ -841,9 +841,7 @@ class MicroPITA:
 												 lsInverseBetaMetrics=inverseDiversityMetricsBeta,
 												 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
 												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3)
-			
-#HOLD			FDSA
-	
+
 			#5::Select randomly
 			#Expects sampleNames = List of sample names [name, name, name...]
 			if(c_RUN_RANDOM_5):
@@ -854,7 +852,7 @@ class MicroPITA:
 
 			#Perform supervised selection
 			if c_RUN_DISTINCT or c_RUN_DISCRIMINANT:
-				if strLabel:
+ 				if strLabel:
 					dictSelectionRet = self.funcRunSupervisedDistancesFromCentroids(abundanceTable=stratAbundanceTable,
 								fRunDistinct=c_RUN_DISTINCT, fRunDiscriminant=c_RUN_DISCRIMINANT,
 								xOutputSupFile=ostmInputPredictFile,xPredictSupFile=ostmPredictFile,

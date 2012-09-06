@@ -20,7 +20,7 @@ class ConstantsMicropita():
     """
 
     #References to other projects
-    c_strBreadcrumbsProject = "../breadcrumbs/src/"
+#    c_strBreadcrumbsProject = "../breadcrumbs/src/"
 
     #Character Constants
     COLON = ":"
@@ -65,8 +65,8 @@ class ConstantsMicropita():
     lNAs = list(set(["NA","na","Na","nA",c_strEmptyDataMetadata]))
 
     #Occurence filter [min abundance, min samples occuring in]
-    #To turn off make == None
-    c_liOccurenceFilter = [0, 0] # [3,3]
+    #To turn off make == [0,0]
+    c_liOccurenceFilter = [0,0]
 
     #Break ties in targeted feature with diversity
     c_fBreakRankTiesByDiversity = False

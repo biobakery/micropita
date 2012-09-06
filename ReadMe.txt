@@ -1,10 +1,13 @@
-1. Using MicroPITA commandline
+Using MicroPITA commandline
 
 These common commands can be used on the default data set obtained when downloading MicroPITA, simply cut and paste them into a commandline in the downloaded micropita directory.
 
+
 A. Expected input file.
 
-I. Although some defaults can be changed, microPITA expects a PCL file as an input file. A PCL file is a TEXT delimited file similar to an excel spread sheet with the following characteristics.
+I. PCL file
+Although some defaults can be changed, microPITA expects a PCL file as an input file. A PCL file is a TEXT delimited file similar to an excel spread sheet with the following characteristics.
+
 1. Rows represent metadata and features (bugs), columns represent samples.
 2. The first row by default should be the sample ids.
 3. Metadata rows should be next.
@@ -13,10 +16,11 @@ I. Although some defaults can be changed, microPITA expects a PCL file as an inp
 5. By default the file is expected to be TAB delimited.
 6. If a consensus lineage or hierachy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
 
-II. If using the targeted feature methodology, you will need to provide a txt file listing the feature(s) of interest. Each feature should be on it's own line and should be written as found in the input PCL file.
+II. Targeted feature file
+If using the targeted feature methodology, you will need to provide a txt file listing the feature(s) of interest. Each feature should be on it's own line and should be written as found in the input PCL file.
 
 
-A. Basic unsupervised methods.
+B. Basic unsupervised methods.
 
 There are four unsupervised methods which can be performed:
 diverse (maximum diversity), extreme (most dissimilar), representative (representative dissimilarity) and features (targeted feature).
@@ -49,7 +53,7 @@ To differentiate the methods, rank tends to select samples in which the feature 
 Abundance tends to select samples in which the feature is most abundant without a guarentee that the feature is the most abundant feature in the sample. 
 
 
-B. Basic supervised methods.
+C. Basic supervised methods.
 
 Two supervised methods are also available:
 distinct and discriminant
@@ -62,10 +66,14 @@ $ python MicroPITA.py --lastmeta Label --label Label -m distinct input/Test.pcl 
 $ python MicroPITA.py --lastmeta Label --label Label -m discriminant input/Test.pcl output.txt
 
 
-C. Changing defaults.
+D. Changing defaults.
 
 Sample Selection:
-To change the number of selected samples for any method use the -n argument. This example selects 6 representative samples instead of the default 10. When using a supervised method this indicates how many samples will be selected per class of sample. For example if you are performing supervised selection of 6 samples (-n 6) on a dataset with 2 classes (values) in it's label row, you will get 6 x 2 = 12 samples. If a class does not have 6 samples in it, you will get the max possible for that class. In a scenario where you are selecting 6 samples (-n 6) and have two classes but one class has only 3 samples then you will get 6 + 3 = 9 selected samples.
+To change the number of selected samples for any method use the -n argument. This example selects 6 representative samples instead of the default 10.
+
+$ python MicroPITA.py --lastmeta Label -m representative -n 6 input/Test.pcl output.txt
+
+When using a supervised method this indicates how many samples will be selected per class of sample. For example if you are performing supervised selection of 6 samples (-n 6) on a dataset with 2 classes (values) in it's label row, you will get 6 x 2 = 12 samples. If a class does not have 6 samples in it, you will get the max possible for that class. In a scenario where you are selecting 6 samples (-n 6) and have two classes but one class has only 3 samples then you will get 6 + 3 = 9 selected samples.
 
 Stratification:
 To stratify any method use the --stratify argument which is the first column keyword of the metadata row used to stratify samples before selection occurs. (Selection will occur independently within each strata). This example stratifies diverse selection by the "Label".
