@@ -475,87 +475,6 @@ class UtilityData():
         #Return file name
         return tempFilePath
 
-#    @staticmethod
-#    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dFeatureScale, dSampleScale):
-#
-#        #Make sure scales are ints
-#        dFeatureScale = int(dFeatureScale)
-#        dSampleScale = int(dSampleScale)
-#
-#        lsCorrelation = []
-#
-#        dSampleCount = 10*dSampleScale
-#        dFeatureCount = 9*dFeatureScale
-#
-#        iFeatureIndex = 1
-#
-#        #Create correlated, anticorrelated, and flat but scaled features
-#        for feature in xrange(dFeatureCount):
-#            ldFeature = []
-#            dCurrentFeatureScale = math.pow(2.0,feature)
-#            for dSample in xrange(dSampleCount):
-#                ldFeature.append(dSample*dCurrentFeatureScale)
-#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
-#            iFeatureIndex = iFeatureIndex + 1
-#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+([str(feature)]*dSampleCount))
-#            ldFeature.reverse()
-#            iFeatureIndex = iFeatureIndex + 1
-#            lsCorrelation.append(["Feature_"+str(iFeatureIndex)]+[str(feature) for feature in ldFeature[:]])
-#            iFeatureIndex = iFeatureIndex + 1
-#            dCurrentFeatureScale = math.pow(2.0,feature)
-#
-#        #Update contents to a line
-#        sContents = "FeatureID"+ConstantsMicropita.TAB+ConstantsMicropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dSampleCount)])
-#        sContents = ConstantsMicropita.ENDLINE.join([sContents]+[ConstantsMicropita.TAB.join(feature) for feature in lsCorrelation])
-#
-#        #Write line to a file
-#        with open(sOutputFile,'w') as f:
-#            f.write(sContents)
-#        f.close()
-#        return
-
-    @staticmethod
-    def funcGenerateCorrelatedFeaturesDataSet(sOutputFile, dScale=1):
-
-        #Make sure scales are ints
-        dScale = int(dScale)
-
-        lsCorrelation = []
-        dMaxSampleCount = 10*dScale
-        dFeatureCount = dMaxSampleCount
-        iIndexFeatureName = 0
-
-        #The mean value the data will center around
-        cCenter = math.pow(2.0,dFeatureCount)*dMaxSampleCount/2
-
-        #Create correlated, anticorrelated, and flat but scaled features
-        #Need to make sure the sum of the features through the samples are = 1 or you
-        #Impose unintented structure
-        #Here both the samples and the features sum to same number
-        for iFeature in xrange(dFeatureCount):
-            ldFeature1 = []
-            ldFeature2 = []
-            for dSample in xrange(dMaxSampleCount):
-                dCurrentFeatureScale = math.pow(2.0,iFeature)*dSample
-                ldFeature1.append(cCenter+dCurrentFeatureScale)
-                ldFeature2.append(cCenter-dCurrentFeatureScale)
-            ldFeature1.reverse()
-            ldFeature1 = ldFeature1+ldFeature2
-            lsCorrelation.append(["Feature_"+str(iIndexFeatureName)]+[str(dFeature) for dFeature in ldFeature1])
-            ldFeature1.reverse()
-            lsCorrelation.append(["Feature_"+str(iIndexFeatureName+1)]+[str(dFeature) for dFeature in ldFeature1])
-            iIndexFeatureName =iIndexFeatureName + 2
-
-        #Update contents to a line
-        sContents = "FeatureID"+ConstantsMicropita.TAB+ConstantsMicropita.TAB.join(["".join(["Sample_",str(iSampleIndex)]) for iSampleIndex in xrange(dMaxSampleCount*2)])
-        sContents = ConstantsMicropita.ENDLINE.join([sContents]+[ConstantsMicropita.TAB.join(dFeature) for dFeature in lsCorrelation])
-
-        #Write line to a file
-        with open(sOutputFile,'w') as f:
-            f.write(sContents)
-        f.close()
-        return
-
 #for iGeneralRandom in [5.0]:
 #  for iSignalRandom in [5.0,10.0,15.0,20.0,25.0]:
 #    for i in xrange(1,11):
@@ -568,6 +487,3 @@ for dSimpleNoise in [.05,.1]:#[.05,.10,.15,.20,.25]:
   for i in xrange(1,11):
     Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced96-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 2, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)
     Utility_Data.generateAbundanceTable(strOutputFile="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"v"+str(i)+".pcl", strSampleClassification="Unbalanced48-SimpleNoise-"+str(int(dSimpleNoise*100))+"-Actual.txt", iScalingFactorForSampleAmount = 1, dMaxGeneralNoise = iGeneralRandom, dMaxSignalNoise=iSignalRandom, dSimpleNoise=dSimpleNoise)
-
-
-#Utility_Data.funcGenerateCorrelatedFeaturesDataSet("TestCor.pcl", 1)
