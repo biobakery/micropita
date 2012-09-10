@@ -82,11 +82,11 @@ class MicroPITA:
 			names associated with the indices.
 		
 		:param	lldMatrix:	List of lists [[value,value,value,value],[value,value,value,value]].
-		:type	List of lists	List of measurements. Each list is a different measurement. Each measurement in possionally related to a sample.
+		:type:	List of lists	List of measurements. Each list is a different measurement. Each measurement in positionally related to a sample.
 		:param	lsSampleNames:	List of sample names positionally related (the same) to each list (Optional).
-		:type	List of strings	List of strings.
+		:type:	List of strings	List of strings.
 		:param	iTopAmount:	The amount of top measured samples (assumes the higher measurements are better).
-		:type	integer	Integer amount of sample names/ indices to return.
+		:type:	integer	Integer amount of sample names/ indices to return.
 		:return	List:	List of samples to be selected.
 		"""
 
@@ -110,9 +110,9 @@ class MicroPITA:
 		Takes a matrix of values and returns a beta metric matrix. The metric returned is indicated by name (sMetric).
 		
 		:param	npadAbundancies:	Numpy array of sample abundances to measure against.
-		:type	Numpy Array	Numpy array where row=samples and columns = features.
+		:type:	Numpy Array	Numpy array where row=samples and columns = features.
 		:param	sMetric:	String name of beta metric. Possibilities are listed in microPITA.
-		:type	String	String name of beta metric. Possibilities are listed in microPITA.
+		:type:	String	String name of beta metric. Possibilities are listed in microPITA.
 		:return	Double:	Measurement indicated by metric for given abundance list
 		"""
 	
@@ -129,13 +129,13 @@ class MicroPITA:
 		Gets centroid samples by k-medoids clustering of a given matrix.
 		
 		:param	npaMatrix:	Numpy array where row=features and columns=samples
-		:type	Numpy array	Abundance Data.
+		:type:	Numpy array	Abundance Data.
 		:param	sMetric:	String name of beta metric used as the distance metric.
-		:type	String	String name of beta metric. Possibilities are listed in microPITA.
+		:type:	String	String name of beta metric.
 		:param	lsSampleNames:	The names of the sample
-		:type	List	List of strings
+		:type:	List	List of strings
 		:param	iNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
-		:type	Integer	Number of samples to return
+		:type:	Integer	Number of samples to return
 		:return	List:	List of selected samples.
 		"""
 
@@ -185,13 +185,13 @@ class MicroPITA:
 		Select extreme samples from HClustering.
 		
 		:param	strBetaMetric:	The beta metric to use for distance matrix generation.
-		:type	String	The name of the beta metric to use.
+		:type:	String	The name of the beta metric to use.
 		:param	npaAbundanceMatrix:	Numpy array where row=samples and columns=features.
-		:type	Numpy Array	Abundance data.
+		:type:	Numpy Array	Abundance data.
 		:param	lsSampleNames:	The names of the sample.
-		:type	List	List of strings.
+		:type:	List	List of strings.
 		:param	iSelectSampleCount:	Number of samples to select (return).
-		:type	Integer	Integer number of samples returned.
+		:type:	Integer	Integer number of samples returned.
 		:return	Samples:	List of samples.
 		"""
 	
@@ -253,11 +253,11 @@ class MicroPITA:
 		Averages feature abundance or ranked abundance. Expects a column 0 of taxa id that is skipped.
 		
 		:param	abndTable:	Abundance Table to analyse
-		:type	AbundanceTable	Abundance Table
+		:type:	AbundanceTable	Abundance Table
 		:param	lsTargetedFeature:	String names
-		:type	list	list of string names of features (bugs) which are measured after ranking against the full sample
+		:type:	list	list of string names of features (bugs) which are measured after ranking against the full sample
 		:param  fRank:	Indicates to rank the abundance before getting the average abundance of the features (default false)
-		:type   boolean	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
+		:type:   boolean	Flag indicating ranking abundance before calculating average feature measurement (false= no ranking)
 		:return	List of lists or boolean:	List of lists or False on error. One internal list per sample indicating the sample,
 				feature average abundance or ranked abundance. Lists will already be sorted.
 				For not Ranked [[sample,average abundance of selected feature,1]]
@@ -301,13 +301,13 @@ class MicroPITA:
 	  If ranked, select the highest abundance for tie breaking
 	
 	  :param	abndMatrix:	Abundance table to analyse 
-	  :type	AbundanceTable	Abundance table
+	  :type:	AbundanceTable	Abundance table
 	  :param	lsTargetedTaxa:	List of features
-	  :type	list	list of strings
+	  :type:	list	list of strings
 	  :param	iSampleSelectionCount:	Number of samples to select
-	  :type	integer	integer
+	  :type:	integer	integer
 	  :param	sMethod:	Method to select targeted features
-	  :type	string	String (Can be values found in microPITA)
+	  :type:	string	String (Can be values found in ConstantsMicropita.lsTargetedFeatureMethodValues)
 	  :return	List of strings:	List of sample names which were selected
 	  List of strings	Empty list is returned on an error.
 	  """
@@ -334,9 +334,9 @@ class MicroPITA:
 		Returns random sample names of the number given. No replacement.
 		
 		:param	lsSamples:	List of sample names 
-		:type	list	list of strings
+		:type:	list	list of strings
 		:param	iNumberOfSamplesToReturn:	Number of samples to select
-		:type	integer	integer.
+		:type:	integer	integer.
 		:return	List:	List of selected samples (strings).
 		"""
 
@@ -359,9 +359,9 @@ class MicroPITA:
 		Get the average row per column in the abndtable.
 
 		:param abndTable: AbundanceTable of data to be averaged
-		:type AbudanceTable
+		:type: AbudanceTable
 		:param lfCompress: List of boolean flags (false means to remove sample before averaging
-		:type List of floats
+		:type: List of floats
 		:return List of doubles: 
 		"""
 		if sum(lfCompress) == 0:
@@ -386,13 +386,13 @@ class MicroPITA:
 		use abundancetable.funcGetSampleNames() to see the order if needed).
 
 		:param abndTable: Abundance table holding the data to be analyzed.
-		:type AbundanceTable
+		:type: AbundanceTable
 		:param ldAverage: Average population (Average features of the abundance table of samples)
-		:type List of doubles which represent the average population
+		:type: List of doubles which represent the average population
 		:param lsSamples: These are the only samples used in the analysis
-		:type List of strings (sample ids)
+		:type: List of strings (sample ids)
 		:param lfSelected: Samples to be included in the analysis
-		:type List of boolean (true means include)
+		:type: List of boolean (true means include)
 		:return: List of distances (doubles)
 		"""
 		#Get the distance from label 1 of all samples in label0 splitting into selected and not selected lists
@@ -411,8 +411,10 @@ class MicroPITA:
 
 		:param abndTable: Table of data to work out of.
 		:type: Abundace Table
-		:param lfGroupOfInterest: Boolean indicator of the sample being in the first group
-		:type: It is assumed that False is the other label and there is not 3rd class (like misclassfied).
+		:param lfGroupOfInterest: Boolean indicator of the sample being in the first group.
+		:type: List of floats, true indicating an individual in the group of interest.
+		:param lfGroupOther:	Boolean indicator of the sample being in the other group.
+		:type:	List of floats, true indicating an individual in the 
 		:return List of List of doubles: [list of tuples (string sample name,double distance) for the selected population, list of tuples for the not selected population]
 		"""
 		#Get all sample names
@@ -430,15 +432,18 @@ class MicroPITA:
 	#Happy path tested (1 test case)
 	def funcPerformDistanceSelection(self, abndTable, iSelectionCount, sLabel, sValueOfInterest):
 		"""
-		Given metadata, metadata of one value is measured from the average (centroid) value of another label group.
-		If multiple labels exist then 
+		Given metadata, metadata of one value (sValueOfInterest) is measured from the average (centroid) value of another label group.
+		An iSelectionCount of samples is selected from the group of interest closest to and furthest from the centroid of the other group.
 
 		:params  abndTable: Abundance of measurements
-		:type AbundanceTable: 
+		:type: AbundanceTable
 		:params iSelectionCount: The number of samples selected per sample.
-		:type Integer: Integer greater than 0
+		:type: Integer Integer greater than 0
 		:params sLabel: ID of the metadata which is the supervised label
-		:type String: 
+		:type: String
+		:params sValueOfInterest: Metadata value in the sLabel metadta row of the abundance table which defines the group of interest.
+		:type: String found in the abundance table metadata row indicated by sLabel.
+		:return list list of tuples (samplename, distance) [[iSelectionCount of tuples closest to the other centroid], [iSelectionCount of tuples farthest from the other centroid], [all tuples of samples not selected]]
 		"""
 
 		lsMetadata = abndTable.funcGetMetadata(sLabel)
@@ -477,32 +482,32 @@ class MicroPITA:
 		return [ltupleDiscriminantSamples, ltupleDistinctSamples,
 			   [tplData for tplData in ltpleAverageDistances if tplData[0] not in ldSelected]]
 
-###
 	#Run the supervised method surrounding distance from centroids
 	#Happy path tested (3 test cases)
 	def funcRunSupervisedDistancesFromCentroids(self, abundanceTable, fRunDistinct, fRunDiscriminant,
 						xOutputSupFile, xPredictSupFile, strSupervisedMetadata,
 						iSampleSupSelectionCount, lsOriginalSampleNames, lsOriginalLabels, fAppendFiles = False):
 		"""
-		Runs supervised methods based on measuring distances of one label from the centroid of another.
-		This does make output files like the other supervised methods excluding one difference,
-		the output "prediction" file which is where one would find the list of differences for each sample
-		in the order of the sample names (after trimming away samples with invalid metadata values), has
-		only one label listed in the header "other". This is because the method only generates one distance
-		for a sample, it's distance from the other label centroid.
-	
+		Runs supervised methods based on measuring distances of one label from the centroid of another. NAs are evaluated as theirown group.
+
 		:param	abundanceTable:	AbundanceTable
-		:type	AbudanceTable	Data to analyze
+		:type:	AbudanceTable	Data to analyze
 		:param	fRunDistinct:	Run distinct selection method
-		:type	Boolean	boolean (true runs method)
+		:type:	Boolean	boolean (true runs method)
 		:param	fRunDiscriminant:	Run discriminant method
-		:type	Boolean	boolean (true runs method)
-		:param	strOutputSupFile:	File output from  Sup (scaled input file in the style of LIBSup)
-		:type	String	String
-		:param	strPredictSupFile:	File label prediction from  Sup
-		:type	String	String
+		:type:	Boolean	boolean (true runs method)
+		:param	xOutputSupFile:	File output from supervised methods detailing data going into the method.
+		:type:	String or FileStream
+		:param	xPredictSupFile:	File output from supervised methods distance results from supervised methods.
+		:type:	String or FileStream
+		:param strSupervisedMetadata:	The metadata that will be used to group samples.
+		:type:	String
 		:param	iSampleSupSelectionCount:	Number of samples to select
-		:type	Integer	int sample selection count
+		:type:	Integer	int sample selection count
+		:param lsOriginalSampleNames:	List of the sample names, order is important and should be preserved from the abundanceTable.
+		:type:	List of samples	
+		:param	fAppendFiles:	Indicates that output files already exist and appending is occuring.
+		:type:	Boolean
 		:return	Selected Samples:	A dictionary of selected samples by selection ID
 		Dictionary	{"Selection Method":["SampleID","SampleID"...]}
 		"""
@@ -529,7 +534,7 @@ class MicroPITA:
 					sMetadataLabel=strSupervisedMetadata, lsSampleOrdering=lsOriginalSampleNames)
 
 		#Will contain the samples selected to return
-		#One or more of the methods may be active so this is why I am extending instead of just returning the result of each me type
+		#One or more of the methods may be active so this is why I am extending instead of just returning the result of each method type
 		dictSelectedSamplesRet = dict()
 		for sKey, ltplDistances in dictlltpleDistanceMeasurements.items():
 			if fRunDistinct:
@@ -551,6 +556,17 @@ class MicroPITA:
 		return dictSelectedSamplesRet
 
 	def _updatePredictFile(self, xPredictSupFile, xInputLabelsFile, dictltpleDistanceMeasurements, abundanceTable, lsOriginalSampleNames):
+		"""
+		Manages updating the predict file.
+
+		:param	xPredictSupFile: File that has predictions (distances) from the supervised method.
+		:type:	FileStream or String File path
+		:param	xInputLabelsFile: File that as input to the supervised methods.
+		:type:	FileStream or String File path
+		:param	dictltpleDistanceMeasurements: 
+		:type:	Dictionary of lists of tuples {"SelectionMethod":[("SampleName",dDistance)...], "SelectionMethod":[("SampleName",dDistance)...]}
+		"""
+
 		if not isinstance(xPredictSupFile, str):
 			xPredictSupFile.close()
 			xPredictSupFile = xPredictSupFile.name
@@ -577,6 +593,23 @@ class MicroPITA:
 			lsOriginalSampleNames=lsOriginalSampleNames, fFromUpdate=True)
 
         def _writeToPredictFile(self, xPredictSupFile, xInputLabelsFile, dictltpleDistanceMeasurements, abundanceTable, lsOriginalSampleNames, fFromUpdate=False):
+		"""
+		Writed to the predict file.
+
+		:param	xPredictSupFile: File that has predictions (distances) from the supervised method.
+		:type:	FileStream or String File path
+		:param	xInputLabelsFile: File that as input to the supervised methods.
+		:type:	FileStream or String File path
+		:param	dictltpleDistanceMeasurements: 
+		:type:	Dictionary of lists of tuples {"SelectionMethod":[("SampleName",dDistance)...], "SelectionMethod":[("SampleName",dDistance)...]}
+		:param	abundanceTable: An abundance table of the sample data.
+		:type:	AbundanceTable
+		:param	lsOriginalSampleNames: Used if the file is being updated as the sample names so that it may be passed in and consistent with other writing.
+			Otherwise will use the sample names from the abundance table.
+		:type:	List of strings
+		:param	fFromUpdate:	Indicates if this is part of an update to the file or not.
+		:type:	Boolean
+		"""
 
 		xInputLabelsFileName = xInputLabelsFile
 		if not isinstance(xInputLabelsFile,str):
@@ -610,24 +643,26 @@ class MicroPITA:
 		for the set that should be normalized.
 	
 		:param	abndData:	Abundance table object holding the samples to be measured.
-		:type	AbundanceTable
+		:type:	AbundanceTable
 		:param	iSampleSelectionCount	The number of samples to select per method.
-		:type	Integer
+		:type:	Integer
 		:param	dictSelectedSamples	Will be added to as samples are selected {"Method:["strSelectedSampleID","strSelectedSampleID"...]}.
-		:type	Dictionary
+		:type:	Dictionary
 		:param	lsAlphaMetrics:	List of alpha metrics to use on alpha metric dependent assays (like highest diversity).
-		:type	List of strings
+		:type:	List of strings
 		:param	lsBetaMetrics:	List of beta metrics to use on beta metric dependent assays (like most representative).
-		:type	List of strings
+		:type:	List of strings
 		:param	lsInverseBetaMetrics:	List of inverse beta metrics to use on inverse beta metric dependent assays (like most dissimilar).
-		:type	List of strings
+		:type:	List of strings
 		:return	Dictionary:	Returns dictSelectedSamples with the addition of any newly measured samples.
 		:param	fRunDiversity:	Run Diversity based methods (true indicates run).
-		:type	Boolean	
+		:type:	Boolean	
 		:param	fRunRepresentative:	Run Representative based methods (true indicates run).
-		:type	Boolean	
+		:type:	Boolean	
 		:param	fRunExtreme:	Run Extreme based methods (true indicates run).
-		:type	Boolean		
+		:type:	Boolean	
+		:return	Selected Samples:	Samples selected by methods.
+				Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
 
 		#Sample ids/names
@@ -692,48 +727,47 @@ class MicroPITA:
 			logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 2,3b")
 			logging.info(dictSelectedSamples)
 			return dictSelectedSamples
-	
-	#Start micropita selection
+
 	def funcRun(self, strIDName, strLastMetadataName, istmInput,
 					  ostmInputPredictFile, ostmPredictFile, ostmCheckedFile, ostmOutput,
 					  cDelimiter, cFeatureNameDelimiter, strFeatureSelection,
 					  istmFeatures, iCount, lstrMethods, strLabel, strStratify,
 					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1]):
 		"""
-		Writes the selection of samples by method to an output file.
-		
-		:param	fIsAlreadyNormalized:	Indicates if the abundance table is normalized.
-		:type	boolean	boolean indicator if the table is normalized (true= normalized).
-		:param	fCladesAreSummed:	Indicates if the abundance table is summed.
-		:type	boolean	boolean indicator if the table is summed (true= summed).
-		:param	strOutputFile:	File to store selection data.
-		:type	String	String file path.
-		:param	cDelimiter:	Delimiter of abundance table.
-		:type	Character	Char (default TAB).
-		:param	cFeatureNameDelimiter:	Delimiter of the name of features (for instance if they contain consensus lineages indicating clades).
-		:type	Character	Char (default |).
-		:param	strInputAbundanceFile:	Abundance table data file.
-		:type	String	String path to abundance table file.
-		:param	strUserDefinedTaxaFile:	File containing features to select for.
-		:type	String	String path to existing file.
-		:param	strCheckedAbndFile:	After the input file is checked it will be saved as this file name.
-		:type	String String file path.
-		:param	iSampleSelectionCount:	Number of samples to select with unsupervised methods.
-		:type	Integer	integer.
-		:param	iSupervisedSampleCount:	Number of samples to select with supervised methods.
-		:type	Integer	integer.
-		:param	strSelectionTechnique:	List of strings indicating selection techniques.
-		:type	String	List of strings each a selection technique.
-		:param	strLabel:	The metadata used for supervised labels.
-		:type	String	String (metadata id).
-		:param	strStratify:	The metadata used to stratify unsupervised data.
-		:type	String	String (metadata id).
-		:param	sMetadataID:	The id of the metadata used as an id for each sample.
-		:type	String	String metadata id.
-		:param	sLastMetadataName:	The id of the metadata positioned last in the abundance table.
-		:type	String	String metadata id.
-		:param	sFeatureSelectionMethod:	Which method to use to select features in a targeted manner (Using average ranked abundance or abundance).
-		:type	String	String (specific values indicated in microPITA).
+		Manages the selection of samples given different metrics.
+
+		:param	strIDName: Sample Id metadata row
+		:type:	String
+		:param	strLastMetadataName: The id of the metadata positioned last in the abundance table.
+		:type:	String	String metadata id.
+		:param	istmInput: File to store input data to supervised methods.
+		:type:	FileStream of String File Path
+		:param	ostmInputPredictFile: File to store distances from supervised methods.
+		:type:	FileStream or String File Path
+		:param	ostmCheckedFile: File to store the AbundanceTable data after it is being checked.
+		:type:	FileStream or String File Path
+		:param	ostmOutPut: File to store sample selection by methods of interest.
+		:type:	FileStream or String File Path
+		:param	cDelimiter: Delimiter of abundance table.
+		:type:	Character Char (default TAB).
+		:param	cFeatureNameDelimiter: Delimiter of the name of features (for instance if they contain consensus lineages indicating clades).
+		:type:	Character (default |).
+		:param	stFeatureSelectionMethod: Which method to use to select features in a targeted manner (Using average ranked abundance or average abundance).
+		:type:	String (specific values indicated in ConstantsMicropita.lsTargetedFeatureMethodValues).
+		:param	istmFeatures: File which holds the features of interest if using targeted feature methodology.
+		:type:	FileStream or String File Path
+		:param	iCount:	Number of samples to select in each methods, supervised methods select this amount per label if possible.
+		:type:	Integer	integer.
+		:param	lstrMethods: List of strings indicating selection techniques.
+		:type:	List of string method names
+		:param	strLabel: The metadata used for supervised labels.
+		:type:	String
+		:param	strStratify: The metadata used to stratify unsupervised data.
+		:type:	String
+		:param	iMinSeqs: Minimum sequence in the occurence filter which filters all features not with a minimum number of sequences in each of a minimum number of samples.
+		:type:	Integer
+		:param	iMinSamples: Minimum sample count for the occurence filter.
+		:type:	Integer
 		:return	Selected Samples:	Samples selected by methods.
 				Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
@@ -782,7 +816,10 @@ class MicroPITA:
 								   cDelimiter=cDelimiter, sMetadataID=strIDName, sLastMetadata=strLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter,
 								   xOutputFile=ostmCheckedFile)
 		if not totalAbundanceTable:
-			logging.error("MicroPITA.funcRun:: Could not read abundance table. Stopped.")
+			logging.error("MicroPITA.funcRun:: Could not read in the abundance table. Analysis was not performed."+
+				" This often occurs when the Last Metadata is not specified correctly."+
+				" Please check to make sure the Last Metadata selection is the row of the last metadata,"+
+				" all values after this selection should be microbial measurements and should be numeric.")
 			return False
 
 		lsOriginalLabels = SVM.funcMakeLabels(totalAbundanceTable.funcGetMetadata(strLabel)) if strLabel else strLabel
@@ -876,9 +913,9 @@ class MicroPITA:
 		Writes the selection of samples by method to an output file.
 		
 		:param	dictSelection:	The dictionary of selections by method to be written to a file.
-		:type	Dictionary	The dictionary of selections by method {"method":["sample selected","sample selected"...]}
-		:param	strOutputFilePath:	String path to file to output dictionary.
-		:type	String	String path to file to write to
+		:type:	Dictionary	The dictionary of selections by method {"method":["sample selected","sample selected"...]}
+		:param	xOutputFilePath:	FileStream or String path to file inwhich the dictionary is written.
+		:type:	String	FileStream or String path to file
 		"""
 	
 		if not dictSelection:
@@ -900,7 +937,7 @@ class MicroPITA:
 		
 		:param	xInputFile:	String path to file or file stream to read and translate into a dictionary.
 									{"method":["sample selected","sample selected"...]}
-		:type	String	String path to file to read and translate.
+		:type:	FileStream or String Path to file
 		:return	Dictionary:	Samples selected by methods.
 					Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
@@ -936,8 +973,6 @@ args.add_argument(ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, 
 args = argp.add_argument_group( "File formatting", "Rarely modified file formatting options" )
 args.add_argument(ConstantsMicropita.c_strFileDelimiterArgument, dest="cFileDelimiter", metavar="column_delimiter", default="\t", help=ConstantsMicropita.c_strFileDelimiterHelp) 
 args.add_argument(ConstantsMicropita.c_strFeatureNameDelimiterArgument, dest="cFeatureNameDelimiter", metavar="taxonomy_delimiter", default="|", help=ConstantsMicropita.c_strFeatureNameDelimiterHelp) 
-#args.add_argument("--min_seqs", dest="iMinSeqs", type = int, metavar="min_seqs", default=ConstantsMicropita.c_liOccurenceFilter[0], help="Minimum sequence count for non-normalized data filtering.") 
-#args.add_argument("--min_samples", dest="iMinSamples", type = int, metavar="min_samples", default=ConstantsMicropita.c_liOccurenceFilter[1], help="Minimum sample count for non-normalized data filtering.") 
 
 args = argp.add_argument_group( "Debugging", "Debugging options - modify at your own risk!" )
 args.add_argument(ConstantsMicropita.c_strLoggingArgument, dest="strLogLevel", metavar = "log_level", default="WARNING", 
@@ -984,9 +1019,7 @@ def _main( ):
 		iCount					= args.iCount,
 		strLabel				= args.strLabel,
 		strStratify				= args.strUnsupervisedStratify,
-		lstrMethods				= args.lstrMethods,
-#		iMinSeqs				= args.iMinSeqs,
-#		iMinSamples				= args.iMinSamples,
+		lstrMethods				= args.lstrMethods
 	)
 
 	if not dictSelectedSamples:
