@@ -598,7 +598,7 @@ class MicroPITA:
 
 		#Call writer
 		self._writeToPredictFile(xPredictSupFile=xPredictSupFile, xInputLabelsFile=xInputLabelsFile,
-			dictltpleDistanceMeasurements=dictltpleDistanceMeasurements, abundanceTable=abundanceTable,
+			dictltpleDistanceMeasurements=dictNew, abundanceTable=abundanceTable,
 			lsOriginalSampleNames=lsOriginalSampleNames, fFromUpdate=True)
 
 	#2 happy path test cases
