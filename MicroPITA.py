@@ -564,7 +564,7 @@ class MicroPITA:
 		:param	xInputLabelsFile: File that as input to the supervised methods.
 		:type:	FileStream or String File path
 		:param	dictltpleDistanceMeasurements: 
-		:type:	Dictionary of lists of tuples {"SelectionMethod":[("SampleName",dDistance)...], "SelectionMethod":[("SampleName",dDistance)...]}
+		:type:	Dictionary of lists of tuples {"labelgroup":[("SampleName",dDistance)...], "labelgroup":[("SampleName",dDistance)...]}
 		"""
 
 		if not isinstance(xPredictSupFile, str):
@@ -585,7 +585,15 @@ class MicroPITA:
 			iSampleIndex += 1
 
 		#Combine dictltpleDistanceMeasurements with new data
-		dictltpleDistanceMeasurements.update(dictlltpleRead)
+		#If they share a key then merge keeping parameter data
+		#If they do not share the key, keep the full data
+		dictNew = {}
+		for sKey in dictltpleDistanceMeasurements.keys():
+			lsSamples = [tple[0] for tple in dictltpleDistanceMeasurements[sKey]]
+			dictNew[sKey] = dictltpleDistanceMeasurements[sKey]+[tple for tple in dictlltpleRead[sKey] if tple[0] not in lsSamples] if sKey in dictlltpleRead.keys() else dictltpleDistanceMeasurements[sKey]
+                for sKey in dictlltpleRead:
+			if sKey not in dictltpleDistanceMeasurements.keys():
+				dictNew[sKey] = dictlltpleRead[sKey]
 
 		#Call writer
 		self._writeToPredictFile(xPredictSupFile=xPredictSupFile, xInputLabelsFile=xInputLabelsFile,
@@ -601,7 +609,7 @@ class MicroPITA:
 		:param	xInputLabelsFile: File that as input to the supervised methods.
 		:type:	FileStream or String File path
 		:param	dictltpleDistanceMeasurements: 
-		:type:	Dictionary of lists of tuples {"SelectionMethod":[("SampleName",dDistance)...], "SelectionMethod":[("SampleName",dDistance)...]}
+		:type:	Dictionary of lists of tuples {"labelgroup":[("SampleName",dDistance)...], "labelgroup":[("SampleName",dDistance)...]}
 		:param	abundanceTable: An abundance table of the sample data.
 		:type:	AbundanceTable
 		:param	lsOriginalSampleNames: Used if the file is being updated as the sample names so that it may be passed in and consistent with other writing.
