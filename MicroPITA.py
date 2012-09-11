@@ -531,7 +531,7 @@ class MicroPITA:
 					lsOriginalLabels=lsOriginalLabels, lsSampleOrdering=lsOriginalSampleNames)
 			else:
 				SVM.funcConvertAbundanceTableToSVMFile(abndAbundanceTable=abundanceTable, xOutputSVMFile=xOutputSupFile,
-					sMetadataLabel=strSupervisedMetadata, lsSampleOrdering=lsOriginalSampleNames)
+					sMetadataLabel=strSupervisedMetadata, lsOriginalLabels=lsOriginalLabels, lsSampleOrdering=lsOriginalSampleNames)
 
 		#Will contain the samples selected to return
 		#One or more of the methods may be active so this is why I am extending instead of just returning the result of each method type
