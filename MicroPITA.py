@@ -555,6 +555,7 @@ class MicroPITA:
 					dictltpleDistanceMeasurements=dictFlattenedDistances, abundanceTable=abundanceTable, lsOriginalSampleNames=lsOriginalSampleNames)
 		return dictSelectedSamplesRet
 
+	#Two happy path test cases
 	def _updatePredictFile(self, xPredictSupFile, xInputLabelsFile, dictltpleDistanceMeasurements, abundanceTable, lsOriginalSampleNames):
 		"""
 		Manages updating the predict file.
@@ -600,9 +601,10 @@ class MicroPITA:
 			dictltpleDistanceMeasurements=dictltpleDistanceMeasurements, abundanceTable=abundanceTable,
 			lsOriginalSampleNames=lsOriginalSampleNames, fFromUpdate=True)
 
+	#2 happy path test cases
         def _writeToPredictFile(self, xPredictSupFile, xInputLabelsFile, dictltpleDistanceMeasurements, abundanceTable, lsOriginalSampleNames, fFromUpdate=False):
 		"""
-		Writed to the predict file.
+		Write to the predict file.
 
 		:param	xPredictSupFile: File that has predictions (distances) from the supervised method.
 		:type:	FileStream or String File path
