@@ -66,7 +66,7 @@ class ConstantsMicropita():
 
     #Occurence filter [min abundance, min samples occuring in]
     #To turn off make == [0,0]
-    c_liOccurenceFilter = [2,2]
+    c_liOccurenceFilter = [0,0]
 
     #Break ties in targeted feature with diversity
     c_fBreakRankTiesByDiversity = False

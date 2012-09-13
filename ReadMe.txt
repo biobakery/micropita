@@ -1,6 +1,6 @@
-Using MicroPITA commandline
+Using microPITA commandline
 
-These common commands can be used on the default data set obtained when downloading MicroPITA, simply cut and paste them into a commandline in the downloaded micropita directory.
+These common commands can be used on the default data set obtained when downloading microPITA, simply cut and paste them into a commandline in the downloaded microPITA directory.
 
 
 A. Expected input file.
@@ -14,7 +14,7 @@ Although some defaults can be changed, microPITA expects a PCL file as an input 
 4. Lastly, rows containing features (bugs) measurements (like abundance) should be after metadata rows.
 5. The first column should contain the ID describing the column. For metadata this may be, for example, "Age" for a row containing the age of the patients donating the samples. For measurements, this should be the feature name (bug name).
 5. By default the file is expected to be TAB delimited.
-6. If a consensus lineage or hierachy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
+6. If a consensus lineage or hierarchy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
 
 II. Targeted feature file
 If using the targeted feature methodology, you will need to provide a txt file listing the feature(s) of interest. Each feature should be on it's own line and should be written as found in the input PCL file.
@@ -34,7 +34,7 @@ $ python MicroPITA.py --lastmeta Label -m diverse input/Test.pcl output.txt
 $ python MicroPITA.py --lastmeta Label -m extreme input/Test.pcl output.txt
 
 Each of the previous methods are made up of the following pieces:
-1. python MicroPITA.py to call the MicroPITA script.
+1. python MicroPITA.py to call the microPITA script.
 2. --lastmeta which indicates the keyword (first column value) of the last row that contains metadata.
 3. -m which indicates the method to use in selection.
 4. input/Test.pcl which is the first positional argument indicating an input file
@@ -98,4 +98,4 @@ MicroPITA assumes the input file has feature names in which, if the name contain
 $ python MicroPITA.py --featdelim . --lastmeta Label -m representative input/PeriodDelim.pcl output.txt
 
 
-This covers how to use microPITA. Thank you for using this software and good luck with all your endeavors!
+This covers how to use MicroPITA. Thank you for using this software and good luck with all your endeavors!
