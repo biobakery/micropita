@@ -1,0 +1,124 @@
+<tool id="micropita" name="Run" version="1.0.1">
+<code file="micropita_format_input_selector.py"/> 
+<description>micropita</description>
+<command interpreter="python">micropita_prepare.py 
+--lastmeta $cls_x 
+-m $cond.method_sel
+-n $selected_samples
+--input $inp_data
+--output $out_file1
+--stratify_value $cls_s
+
+#if $cond.method_sel  == "features":
+	--feature_method $cond.feature_method
+	--targets $cond.cls_f
+#end if
+#if $cond.method_sel  == "distinct" or   $cond.method_sel  == "discriminant" :
+	--label_value $cond.cls_L
+#end if
+
+</command>
+  <inputs>
+	<param format="micropita" name="inp_data" type="data" label="Input file"/>
+
+	<param name="cls_x" type="select" label="Last metadata row"  multiple="False" size ="70"  dynamic_options="get_cols(inp_data,'0')"/>
+
+
+	<param name="cond" type="data_column" data_ref="inp_data" accept_default="true" /> 
+		<conditional name="cond" type="data_column" data_ref="inp_data" accept_default="true">
+		      	<param name="method_sel" type="select" data_ref="inp_data" label="Select method">
+		         	<option value="representative" selected="True">Representative</option>
+				<option value="diverse">Diverse</option>
+				<option value="extreme" >Extreme</option>
+				<option value="features" >Features</option>
+				<option value="distinct" >Distinct (Supervised)</option>
+				<option value="discriminant" >Discriminant (Supervised)</option>
+			</param>
+		     	<when value="representative">
+			</when>
+		      	<when value="diverse">
+		       	</when>
+		      	<when value="extreme">
+		       	</when>
+		      	<when value="features">
+				<param name="cls_f" type="select" label="Targeted feature(s)"  multiple="True" size ="70"  dynamic_options="get_cols_features(inp_data,'0',cls_x)"/>
+				<param name="feature_method" type="select" format="text">
+					<label>Selection type</label>
+						<option value="rank">Rank</option>
+						<option value="abundance">Abundance</option>
+				</param>
+		       	</when>
+		      	<when value="distinct">
+				<param name="cls_L" type="select" label="Label"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+		       	</when>
+	
+		      	<when value="discriminant">
+				<param name="cls_L" type="select" label="Label"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+		       	</when>
+
+               	</conditional>
+
+	
+	<param name="cls_s" type="select" label="Stratify by (optional)"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+
+	<param name="selected_samples" type="integer" size="4" value="10"  label="Number of samples to select"/>
+
+	
+
+  </inputs>
+
+  <outputs>
+    <data format="text" name="out_file1" />
+  </outputs>
+
+  <help>
+Run microPITA
+-------------
+
+A brief description of the Run micropita module.
+
+**Input file:**
+This should be populated by the Load microPITA module.
+
+**Last metadata row:**
+The row on the input pcl file that is the last metadata. All microbial measurements should follow this row.
+
+**Select method:**
+Select which method to use for sample selection. Selection methods include:
+
+1. Representative. Samples with microbial communities representative of the survey (representative dissimilarity);
+2. Diverse. Samples with the most diverse community (maximum diversity);
+3. Extreme. Samples with the most extreme microbial communities in the survey (most dissimilar);
+4. Features. Samples dominated by specific microbes (targeted feature);
+5. Distinct. Given a phenotype (like disease state), samples typical of each phenotype (Distinct). 
+6. Discriminant. Given a phenotype (like disease state), samples at the border of phenotypes (Discriminant). 
+
+**Targeted feature(s):** (visible with Features method selection only)
+Select 1 or more features to target in sample selection.
+
+**Selection type:** (visible with Features method selection only)
+Rank or Abundance. 
+
+1. Rank indicates selecting samples that have the highest rank of the Targeted features(s), this tends to select sample in which these feature dominant the sample.
+2. Abundance indicates selecting samples that have the highest average abundance of the Targeted features(s), this selects samples where features are most abundant but not necessarily dominant in the community.
+
+**Label:** (visible with supervised method selection only)
+The row which contains the label used to classify the samples from supervised methods.
+
+**Stratify by (optional):**
+The row which contains the groupings the samples will first be placed in before running the selection method on each group. If no grouping is selected, selection methods will be performed on the data set as a whole.
+
+**Number of samples to select:**
+The number of samples to select. If samples are stratified, this is per stratification (or group). If supervised methods are used, this is the number of samples selected per classification group (as defined by the label).
+
+For more information please visit http://huttenhower.sph.harvard.edu/micropita
+
+Citation and Contacts
+---------------------
+
+When using MicroPITA please cite:
+Tickle T, Segata N, Waldron L, Weingart G, Huttenhower C. Tiered study design of microbial communities and the human microbiome. (Under review)
+
+Please feel free to contact us at ttickle@hsph.harvard.edu for any questions or comments!
+ </help>
+</tool>
