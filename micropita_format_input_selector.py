@@ -1,16 +1,46 @@
 #!/usr/bin/env python
+
+"""
+Author: George Weingart
+Description: Dynamically read columns from input file for UI
+"""
+
+#####################################################################################
+#Copyright (C) <2012>
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy of
+#this software and associated documentation files (the "Software"), to deal in the
+#Software without restriction, including without limitation the rights to use, copy,
+#modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+#and to permit persons to whom the Software is furnished to do so, subject to
+#the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all copies
+#or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+#INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+#PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+#HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#####################################################################################
+
+__author__ = "George Weingart"
+__copyright__ = "Copyright 2012"
+__credits__ = ["George Weingart"]
+__license__ = "MIT"
+__maintainer__ = "George Weingart"
+__email__ = "george.weingart@gmail.com"
+__status__ = "Development"
+
 import sys,string,time
 from pprint import pprint
-
-
-
-
 
 def red(st,l):
 	if len(st) <= l: return st 
 	l1,l2 = l/2,l/2
 	return st[:l1]+".."+st[len(st)-l2:]
-
 
 def get_cols(data,full_names):
 	if data == "": return []
@@ -37,8 +67,6 @@ def get_cols(data,full_names):
 		MyList = [l1,l2,l3]
 		lines.append(MyList)
 	return opt+lines
-
-
 
 def get_cols_add_line(data,full_names,lastmeta):
 	if data == "": return []
@@ -76,7 +104,6 @@ def get_cols_add_line(data,full_names,lastmeta):
 		lines.append(MyList)
 	return opt+lines
 
-
 def get_cols_features(data,full_names,lastmeta):
 	if data == "": return []
 	display_from = 1
@@ -108,8 +135,3 @@ def get_cols_features(data,full_names,lastmeta):
 		MyList = [l1,l2,l3]
 		lines.append(MyList)
 	return opt+lines
-
-
-
-
-
