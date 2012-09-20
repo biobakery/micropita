@@ -101,17 +101,10 @@ LabelValueInt = 0
 if results.label_value and not results.label_value == "None":
 	LabelValueInt = int(results.label_value) - 1
 
-
-
-
-
 stratify_string = ""
 q = '"'
 if  not results.stratify_value == '1':
 	stratify_string = " --stratify " + q + table_lines[StratifyValueInt] + q + " "
-
-
-
 
 if results.MParameter == "features":
 	TBTargets = list()
@@ -144,8 +137,6 @@ if results.MParameter == "features":
 	#print os_command
 	os.system(os_command)
 
-
-
 if results.MParameter == "representative"\
 or results.MParameter == "diverse"\
 or results.MParameter == "extreme": 
@@ -175,10 +166,3 @@ or results.MParameter == "discriminant":
 	results.outputname
 	#print os_command
 	os.system(os_command)
-
-
-
-
-
-
-
