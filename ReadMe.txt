@@ -49,8 +49,8 @@ $ python MicroPITA.py --lastmeta Label -m features --feature_method abundance --
 These additional arguments are described as:
 1. --targets The path to the file that has the features (bugs or clades) of interest. Make sure they are written as they appear in your input file!
 2. --feature_method is the method of selection used and can be based on ranked abundance ("rank") or abundance ("abundance"). The default value is rank.
-To differentiate the methods, rank tends to select samples in which the feature dominates the samples reguardless of it's abundance.
-Abundance tends to select samples in which the feature is most abundant without a guarentee that the feature is the most abundant feature in the sample. 
+To differentiate the methods, rank tends to select samples in which the feature dominates the samples regardless of it's abundance.
+Abundance tends to select samples in which the feature is most abundant without a guarantee that the feature is the most abundant feature in the sample. 
 
 
 C. Basic supervised methods.
@@ -97,5 +97,15 @@ MicroPITA assumes the input file has feature names in which, if the name contain
 
 $ python MicroPITA.py --featdelim . --lastmeta Label -m representative input/PeriodDelim.pcl output.txt
 
+
+E. Dependencies
+Please note the following dependencies need to be installed for micropita to run.
+1. Python 2.x	http://www.python.org/download/
+2. blist	http://pypi.python.org/pypi/blist/
+3. NumPy	http://numpy.scipy.org/
+4. SciPy	http://www.scipy.org/
+5. PyCogent	http://pycogent.sourceforge.net/install.html
+6. mlpy		http://mlpy.sourceforge.net/
+7. mpi4py	http://mpi4py.scipy.org/
 
 This covers how to use MicroPITA. Thank you for using this software and good luck with all your endeavors!

@@ -2,7 +2,7 @@ Installation instructions for microPITA in a galaxy environment.
 These instructions require the Mercurial versioning system, galaxy, and an internet connection.
 
 1. In the  "galaxy-dist/tools" directory install micropita by typing in a terminal:
-hg clone https://timothyltickle@bitbucket.org/timothyltickle/micropita
+hg clone https://bitbucket.org/timothyltickle/micropita
 
 2. Update member tool_conf.xml  in the galaxy directory adding the following: 
   <section name="micropita" id="micropita">
