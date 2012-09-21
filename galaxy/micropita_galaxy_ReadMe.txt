@@ -12,5 +12,8 @@ hg clone https://timothyltickle@bitbucket.org/timothyltickle/micropita
 
 3. Update member datatypes_conf.xml  in the galaxy directory adding the following:
 	<datatype extension="micropita" type="galaxy.datatypes.data:Text" subclass="true" display_in_upload="true"/>
-4. Recycle galaxy
+
+4. Copy member HMPStool10PCoA.png  to /galaxy/static/images/HMPStool10PCoA.png
+
+5. Recycle galaxy
 
