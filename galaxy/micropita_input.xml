@@ -5,7 +5,7 @@
   </description>
   <action module="galaxy.tools.actions.upload" class="UploadToolAction"/>
   <command interpreter="python">
-      upload.py $GALAXY_ROOT_DIR $GALAXY_DATATYPES_CONF_FILE $paramfile
+      $GALAXY_ROOT_DIR/tools/micropita/galaxy/upload.py $GALAXY_ROOT_DIR $GALAXY_DATATYPES_CONF_FILE $paramfile
     #set $outnum = 0
     #while $varExists('output%i' % $outnum):
         #set $output = $getVar('output%i' % $outnum)

@@ -1,7 +1,7 @@
 <tool id="micropita" name="Run" version="1.0.1">
 <code file="micropita_format_input_selector.py"/> 
 <description>micropita</description>
-<command interpreter="python">micropita_prepare.py 
+<command interpreter="python">$GALAXY_ROOT_DIR/tools/micropita/galaxy/micropita_prepare.py 
 --lastmeta $cls_x 
 -m $cond.method_sel
 -n $selected_samples
