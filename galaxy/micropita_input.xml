@@ -22,7 +22,7 @@
     <param name="file_type" type="hidden" label="File Format" value="micropita" />
     <param name="async_datasets" type="hidden" value="None"/>
     <upload_dataset name="files" title="Specify Files for Dataset" file_type_name="file_type" metadata_ref="files_metadata">
-      <param name="file_data" type="file" size="30" label="Input PCL file" ajax-upload="true" help="TIP: A example file can be found at the URL http://huttenhower.sph.harvard.edu/sites/default/files/micropita_sample_PCL.txt ">
+      <param name="file_data" type="file" size="30" label="Input PCL file" ajax-upload="true" help="TIP: A example file can be found at the URL https://bytebucket.org/timothyltickle/micropita/wiki/micropita_sample_PCL.txt">
         <validator type="expression" message="You will need to reselect the file you specified (%s)." substitute_value_in_message="True">not ( ( isinstance( value, unicode ) or isinstance( value, str ) ) and value != "" )</validator> <!-- use validator to post message to user about needing to reselect the file, since most browsers won't accept the value attribute for file inputs -->
       </param>
       <param name="url_paste" type="text" area="true" size="5x35" label="Enter URL or file text here" help="Here you may specify a list of URLs (one per line) or paste the contents of a file."/> 
@@ -65,7 +65,7 @@ microPITA requires an input pcl file of metadata and microbial community measure
 6. The file is expected to be TAB delimited.
 7. If a consensus lineage or hierarchy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
 
-An example can be found at http://huttenhower.sph.harvard.edu/sites/default/files/micropita_sample_PCL.txt
+An example can be found at https://bytebucket.org/timothyltickle/micropita/wiki/micropita_sample_PCL.txt
 
 
 Outputs

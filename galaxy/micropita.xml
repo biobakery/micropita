@@ -21,7 +21,7 @@
   <inputs>
 	<param format="micropita" name="inp_data" type="data" label="Input file"/>
 
-	<param name="cls_x" type="select" label="Last metadata row"  multiple="False" size ="70"  dynamic_options="get_cols(inp_data,'0')"/>
+	<param name="cls_x" type="select" label="Last metadata row (Use 'Label' for demo data)"  multiple="False" size ="70"  dynamic_options="get_cols(inp_data,'0')"/>
 
 
 	<param name="cond" type="data_column" data_ref="inp_data" accept_default="true" /> 
