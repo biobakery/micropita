@@ -92,63 +92,83 @@ class ConstantsMicropita():
     c_fBreakRankTiesByDiversity = False
 
     ####Commandline arguments
-    #checked Checked abundance file
+    #a Custom diversity metrics found in cogent
+    c_strCustomAlphaDiversityHelp = "A key word for any PyCogent supplied alpha diveristy metric (Richness, evenness, or diversity)."
+
+    #b Custom diversity metrics found in cogent
+    c_strCustomBetaDiversityHelp = "A key word for any PyCogent supplied beta diveristy metric."
+
+    #c,checked Checked abundance file
     c_strCheckedAbundanceFileArgument = "--checked"
     c_strCheckedAbundanceFileHelp = "Before analysis abundance files are checked and a new file results which analysis is perfromed on. The name fo the checked file can be specified of the default will will be used (appending a -Checked to the end of the file name)."
 
-    #delim File delimiter
-    c_strFileDelimiterArgument = "--delim"
-    c_strFileDelimiterHelp = "The delimiter for the abundance table (default = TAB)"
-
-    #featdelim Feature delimiter
-    c_strFeatureNameDelimiterArgument = "--featdelim"
-    c_strFeatureNameDelimiterHelp = "The delimiter for a feature name if it contains a consensus sequence."
-
-    #id Name of the sample id row
+    #d,id Name of the sample id row
     c_strIDNameArgument = "--id"
     c_strIDNameHelp = "The row in the abundance file that is the sample name/id row. Should be the sample name/Id in first column of the row."
 
-    #label Supervised Label
+    #e,label Supervised Label
     c_strSupervisedLabelArgument = "--label"
     c_strSupervisedLabelHelp = "The name of the metadata on which to perform supervised methods"
 
-    #lastmeta The name of the last metadata
+    #g,logging Path of the logging file
+    c_strLoggingFileArgument = "--logfile"
+    c_strLoggingFileHelp = "File path to save the logging file."
+
+    #h
+
+    #j,delim File delimiter
+    c_strFileDelimiterArgument = "--delim"
+    c_strFileDelimiterHelp = "The delimiter for the abundance table (default = TAB)"
+
+    #k,featdelim Feature delimiter
+    c_strFeatureNameDelimiterArgument = "--featdelim"
+    c_strFeatureNameDelimiterHelp = "The delimiter for a feature name if it contains a consensus sequence."
+
+    #l,lastmeta The name of the last metadata
     c_strLastMetadataNameArgument = "--lastmeta"
     c_strLastMetadataNameHelp = "The row in the abundance file that is the sample name/id row. Should be the metadata name/Id in first column of the metadta row."
 
-    #logging String for logging level
+    #m,method
+    c_strSelectionTechniquesHelp = "Select techniques listed one after another."
+
+    #n,num The Number of unsupervised sample selection
+    c_strCountArgument = "-n"
+    c_strCountHelp = "The number of samples to select with unsupervised methodology. (An integer greater than 0.)."
+
+    #o,tree
+    c_strCustomPhylogeneticTreeHelp = "Tree for phylogenetic when selecting custom beta-diversities in the representative sampling criteria."
+
+    #p,suppredfile File path fo the predict file for the supervised methods
+    c_strSupervisedPredictedFile = "--suppredfile"
+    c_strSupervisedPredictedFileHelp = "The file path for the predict file."
+
+    #q,alphameta
+    c_strCustomAlphaDiversityMetadataHelp = "Metric in the pcl file which has custom alpha diversity measurements to use with the highest diversity sampling criteria."
+
+    #r,targetmethod Taxa selection method
+    c_strTargetedFeatureMethodArgument = "--feature_method"
+    c_strTargetedFeatureMethodHelp = "The ranking method used to select targeted features."
+
+    #s,stratify Unsupervised stratify metadata
+    c_strUnsupervisedStratifyMetadataArgument = "--stratify"
+    c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
+
+    #t,target Targeted feature file
+    c_strTargetedSelectionFileArgument = "--targets"
+    c_strTargetedSelectionFileHelp = "A file containing taxa/OTUs/clades to be used in targeted feature sampling criteria."
+
+    #u,supinputfile File path for the input file for the supervised methods
+    c_strSupervisedInputFile = "--supinputfile"
+    c_strSupervisedInputFileHelp = "The file path for the input file for supervised methods."
+
+    #v,logging String for logging level
     c_strLoggingArgument = "--logging"
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
     c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
 
-    #logging Path of the logging file
-    c_strLoggingFileArgument = "--logfile"
-    c_strLoggingFileHelp = "File path to save the logging file."
-
-    #n The Number of unsupervised sample selection
-    c_strCountArgument = "-n"
-    c_strCountHelp = "The number of samples to select with unsupervised methodology. (An integer greater than 0.)."
-
-    #stratify Unsupervised stratify metadata
-    c_strUnsupervisedStratifyMetadataArgument = "--stratify"
-    c_strUnsupervisedStratifyMetadataHelp = "The metatdata to stratify unsupervised analysis."
-
-    #supinputfile File path for the input file for the supervised methods
-    c_strSupervisedInputFile = "--supinputfile"
-    c_strSupervisedInputFileHelp = "The file path for the input file for supervised methods."
-
-    #suppredfile File path fo the predict file for the supervised methods
-    c_strSupervisedPredictedFile = "--suppredfile"
-    c_strSupervisedPredictedFileHelp = "The file path for the predict file."
-
-    #targetmethod Taxa selection method
-    c_strTargetedFeatureMethodArgument = "--feature_method"
-    c_strTargetedFeatureMethodHelp = "The ranking method used to select targeted features."
-
-    #target Targeted feature file
-    c_strTargetedSelectionFileArgument = "--targets"
-    c_strTargetedSelectionFileHelp = "A file containing taxa/OTUs/clades to be used in targeted feature selection."
+    #x,betamatrix
+    c_strCustomBetaDiversityMatrixHelp = "Precalculated beta-diversity matrix to be used in the representative sampling criteria."
 
     #Order is important, the first is the default
     c_strTargetedRanked = "rank"
@@ -173,5 +193,4 @@ class ConstantsMicropita():
     ####################################
     #Arguments without commandline flags
     c_strAbundanceFileHelp = "An abundance table."
-    c_strSelectionTechniquesHelp = "Select techniques listed one after another."
     c_strGenericOutputDataFileHelp = "The generated output data file."

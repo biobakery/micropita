@@ -123,28 +123,8 @@ class MicroPITA:
 		return topRankListRet
 	
 	####Group 2## Representative Dissimilarity
-	
-		#Testing: Happy Path Tested for BrayCurtis and Inverse BrayCurtis
-	def funcGetBetaMetric(self, npadAbundancies=None, sMetric=None):
-		"""
-		Takes a matrix of values and returns a beta metric matrix. The metric returned is indicated by name (sMetric).
-		
-		:param	npadAbundancies:	Numpy array of sample abundances to measure against.
-		:type:	Numpy Array	Numpy array where row=samples and columns = features.
-		:param	sMetric:	String name of beta metric. Possibilities are listed in microPITA.
-		:type:	String	String name of beta metric. Possibilities are listed in microPITA.
-		:return	Double:	Measurement indicated by metric for given abundance list
-		"""
-	
-		if sMetric == self.c_strBrayCurtisDissimilarity:
-			return Metric.funcGetBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
-		elif sMetric == self.c_strInvBrayCurtisDissimilarity:
-			return Metric.funcGetInverseBrayCurtisDissimilarity(ldSampleTaxaAbundancies=npadAbundancies)
-		else:
-			return False
-	
 	#Testing: Happy path tested 1
-	def funcGetCentralSamplesByKMedoids(self, npaMatrix=None, sMetric=None, lsSampleNames=None, iNumberSamplesReturned=0):
+	def funcGetCentralSamplesByKMedoids(self, npaMatrix=None, sMetric=None, lsSampleNames=None, iNumberSamplesReturned=0, istmBetaMatrix=None, istrmTree=None, istrmEnvr=None):
 		"""
 		Gets centroid samples by k-medoids clustering of a given matrix.
 		
@@ -157,6 +137,8 @@ class MicroPITA:
 		:param	iNumberSamplesReturned:	Number of samples to return, each will be a centroid of a sample.
 		:type:	Integer	Number of samples to return
 		:return	List:	List of selected samples.
+		:param	istmBetaMatrix: File with beta-diversity matrix
+		:type:	File stream or file path string
 		"""
 
 		#Count of how many rows
@@ -170,7 +152,7 @@ class MicroPITA:
 			return list(lsSampleNames)
 
 		#Get distance matrix
-		distanceMatrix=self.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric)
+		distanceMatrix=Metric.funcReadBetaMatrixFile(istmBetaMatrix) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 		if type(distanceMatrix) is BooleanType:
 			logging.error("MicroPITA.funcGetCentralSamplesByKMedoids:: Did not receive a matrix for betaMetrix matrix generation, returning false.")
 			return False
@@ -200,7 +182,7 @@ class MicroPITA:
 	
 	####Group 3## Highest Dissimilarity
 	#Testing: Happy path tested
-	def funcSelectExtremeSamplesFromHClust(self, strBetaMetric, npaAbundanceMatrix, lsSampleNames, iSelectSampleCount):
+	def funcSelectExtremeSamplesFromHClust(self, strBetaMetric, npaAbundanceMatrix, lsSampleNames, iSelectSampleCount, istmBetaMatrix=None, istrmTree=None, istrmEnvr=None):
 		"""
 		Select extreme samples from HClustering.
 		
@@ -213,6 +195,8 @@ class MicroPITA:
 		:param	iSelectSampleCount:	Number of samples to select (return).
 		:type:	Integer	Integer number of samples returned.
 		:return	Samples:	List of samples.
+		:param	istmBetaMatrix: File with beta-diversity matrix
+		:type:	File stream or file path string
 		"""
 	
 		#If they want all the sample count, return all sample names
@@ -225,7 +209,9 @@ class MicroPITA:
 	
 		#Generate beta matrix
 		#Returns condensed matrix
-		tempDistanceMatrix = self.funcGetBetaMetric(npadAbundancies=npaAbundanceMatrix, sMetric=strBetaMetric)
+		tempDistanceMatrix = Metric.funcReadBetaMatrixFile(istmBetaMatrix) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=strBetaMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+		if tempDistanceMatrix:
+			tempDistanceMatrix = 1-tempDIstanceMatrix
 
 		#Feed beta matrix to linkage to cluster
 		#Send condensed matrix
@@ -581,9 +567,9 @@ class MicroPITA:
 		Manages updating the predict file.
 
 		:param	xPredictSupFile: File that has predictions (distances) from the supervised method.
-		:type:	FileStream or String File path
+		:type:	FileStream or String file path
 		:param	xInputLabelsFile: File that as input to the supervised methods.
-		:type:	FileStream or String File path
+		:type:	FileStream or String file path
 		:param	dictltpleDistanceMeasurements: 
 		:type:	Dictionary of lists of tuples {"labelgroup":[("SampleName",dDistance)...], "labelgroup":[("SampleName",dDistance)...]}
 		"""
@@ -627,9 +613,9 @@ class MicroPITA:
 		Write to the predict file.
 
 		:param	xPredictSupFile: File that has predictions (distances) from the supervised method.
-		:type:	FileStream or String File path
+		:type:	FileStream or String file path
 		:param	xInputLabelsFile: File that as input to the supervised methods.
-		:type:	FileStream or String File path
+		:type:	FileStream or String file path
 		:param	dictltpleDistanceMeasurements: 
 		:type:	Dictionary of lists of tuples {"labelgroup":[("SampleName",dDistance)...], "labelgroup":[("SampleName",dDistance)...]}
 		:param	abundanceTable: An abundance table of the sample data.
@@ -667,7 +653,7 @@ class MicroPITA:
 				for sKey in lsMeasurementKeys])
 
 	def _funcRunNormalizeSensitiveMethods(self, abndData, iSampleSelectionCount, dictSelectedSamples, lsAlphaMetrics, lsBetaMetrics, lsInverseBetaMetrics,
-												fRunDiversity, fRunRepresentative, fRunExtreme):
+												fRunDiversity, fRunRepresentative, fRunExtreme, istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr):
 		"""
 		Manages running methods that are sensitive to normalization. This is called twice, once for the set of methods which should not be normalized and the other
 		for the set that should be normalized.
@@ -691,6 +677,8 @@ class MicroPITA:
 		:type:	Boolean	
 		:param	fRunExtreme:	Run Extreme based methods (true indicates run).
 		:type:	Boolean	
+		:param	istmBetaMatrix:	File that has a precalculated beta matrix
+		:type:	File stream or File path string
 		:return	Selected Samples:	Samples selected by methods.
 				Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
@@ -700,23 +688,31 @@ class MicroPITA:
 	
 		#Generate alpha metrics and get most diverse
 		if fRunDiversity:
+
 			#Get Alpha metrics matrix
-			#Expects Observations (Taxa (row) x sample (column))
-			#Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
-			internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy()
+			internalAlphaMatrix = None
+
+			#If given an alpha-diversity metadata
+			if strAlphaMetadata:
+				internalAlphaMatrix = abndData.funcGetMetadata(strAlphaMetadata)
+			else:
+				#Expects Observations (Taxa (row) x sample (column))
+				#Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
+				internalAlphaMatrix = Metric.funcBuildAlphaMetricsMatrix(npaSampleAbundance = abndData.funcGetAbundanceCopy()
 							if not abndData.funcIsSummed()
 							else abndData.funcGetFeatureAbundanceTable(abndData.funcGetTerminalNodes()).funcGetAbundanceCopy(),
 							lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
 	
-			#Get top ranked alpha diversity by most diverse
-			#Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
-			#Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
-			mostDiverseAlphaSamplesIndexes = self.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
+			if internalAlphaMatrix:
+				#Get top ranked alpha diversity by most diverse
+				#Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
+				#Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
+				mostDiverseAlphaSamplesIndexes = self.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
 	
-			#Add to results
-			for index in xrange(0,len(lsAlphaMetrics)):
-				strSelectionMethod = self.dictConvertAMetricDiversity[lsAlphaMetrics[index]]
-				dictSelectedSamples.setdefault(strSelectionMethod,[]).extend(mostDiverseAlphaSamplesIndexes[index])
+				#Add to results
+				for index in xrange(0,len(lsAlphaMetrics)):
+					strSelectionMethod = self.dictConvertAMetricDiversity[lsAlphaMetrics[index]]
+					dictSelectedSamples.setdefault(strSelectionMethod,[]).extend(mostDiverseAlphaSamplesIndexes[index])
 
 		logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 1b")
 		logging.info(dictSelectedSamples)
@@ -733,7 +729,7 @@ class MicroPITA:
 				logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Performing representative selection on normalized data.")
 				for bMetric in lsBetaMetrics:
 					#Get representative dissimilarity samples
-					medoidSamples=self.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount)
+					medoidSamples=self.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 	
 					if medoidSamples:
 						dictSelectedSamples.setdefault(self.dictConvertBMetricToMethod[bMetric],[]).extend(medoidSamples)
@@ -744,24 +740,25 @@ class MicroPITA:
 				#Run KMedoids with inverse custom distance metric in normalized space
 				for bMetric in lsInverseBetaMetrics:
 	
-					#Samples for repersentative dissimilarity
+					#Samples for representative dissimilarity
 					#This involves inverting the distance metric,
 					#Taking the dendrogram level of where the number cluster == the number of samples to select
 					#Returning a repersentative sample from each cluster
-					extremeSamples = self.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount)
+					extremeSamples = self.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 	
 					#Add selected samples
 					if extremeSamples:
 						dictSelectedSamples.setdefault(self.dictConvertBMetricToMethod[bMetric],[]).extend(extremeSamples)
 
-			logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 2,3b")
-			logging.info(dictSelectedSamples)
-			return dictSelectedSamples
+		logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 2,3b")
+		logging.info(dictSelectedSamples)
+		return dictSelectedSamples
 
 	def funcRun(self, strIDName, strLastMetadataName, istmInput,
 					  ostmInputPredictFile, ostmPredictFile, ostmCheckedFile, ostmOutput,
 					  cDelimiter, cFeatureNameDelimiter, strFeatureSelection,
-					  istmFeatures, iCount, lstrMethods, strLabel, strStratify,
+					  istmFeatures, iCount, lstrMethods, strLabel = None, strStratify = None,
+					  strCustomAlpha = None, strCustomBeta = None, istmTree = None, strAlphaMetadata = None, istmBetaMatrix = None, 
 					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1]):
 		"""
 		Manages the selection of samples given different metrics.
@@ -771,13 +768,13 @@ class MicroPITA:
 		:param	strLastMetadataName: The id of the metadata positioned last in the abundance table.
 		:type:	String	String metadata id.
 		:param	istmInput: File to store input data to supervised methods.
-		:type:	FileStream of String File Path
+		:type:	FileStream of String file path
 		:param	ostmInputPredictFile: File to store distances from supervised methods.
-		:type:	FileStream or String File Path
+		:type:	FileStream or String file path
 		:param	ostmCheckedFile: File to store the AbundanceTable data after it is being checked.
-		:type:	FileStream or String File Path
+		:type:	FileStream or String file path
 		:param	ostmOutPut: File to store sample selection by methods of interest.
-		:type:	FileStream or String File Path
+		:type:	FileStream or String file path
 		:param	cDelimiter: Delimiter of abundance table.
 		:type:	Character Char (default TAB).
 		:param	cFeatureNameDelimiter: Delimiter of the name of features (for instance if they contain consensus lineages indicating clades).
@@ -785,7 +782,7 @@ class MicroPITA:
 		:param	stFeatureSelectionMethod: Which method to use to select features in a targeted manner (Using average ranked abundance or average abundance).
 		:type:	String (specific values indicated in ConstantsMicropita.lsTargetedFeatureMethodValues).
 		:param	istmFeatures: File which holds the features of interest if using targeted feature methodology.
-		:type:	FileStream or String File Path
+		:type:	FileStream or String file path
 		:param	iCount:	Number of samples to select in each methods, supervised methods select this amount per label if possible.
 		:type:	Integer	integer.
 		:param	lstrMethods: List of strings indicating selection techniques.
@@ -794,6 +791,20 @@ class MicroPITA:
 		:type:	String
 		:param	strStratify: The metadata used to stratify unsupervised data.
 		:type:	String
+		:param	strCustomAlpha: Custom alpha diversity metric
+		:type:	String
+		:param	strCustomBeta: Custom beta diversity metric
+		:type:	String
+		:param	istmTree: Phylogenetic tree for beta-diversities based on phylogeny
+		:type:	FileStream or String file path
+		:param	strAlphaMetadata: Metadata id which is a diveristy metric to use in highest diversity sampling
+		:type:	String
+		:param	istmBetaMatrix: File containing precalculated beta-diversity matrix for representative sampling
+		:type:	FileStream or String file path
+		:param	istrmTree: File containing tree for phylogentic beta-diversity analysis
+		:type:	FileStream or String file path
+		:param	istrmEnvr: File containing environment for phylogentic beta-diversity analysis
+		:type:	FileStream or String file path
 		:param	iMinSeqs: Minimum sequence in the occurence filter which filters all features not with a minimum number of sequences in each of a minimum number of samples.
 		:type:	Integer
 		:param	iMinSamples: Minimum sample count for the occurence filter.
@@ -813,12 +824,13 @@ class MicroPITA:
 			return False
 	
 		#Diversity metrics to run
-		diversityMetricsAlpha = [MicroPITA.c_strInverseSimpsonDiversity]
-		diversityMetricsBeta = [MicroPITA.c_strBrayCurtisDissimilarity]
-		inverseDiversityMetricsBeta = [MicroPITA.c_strInvBrayCurtisDissimilarity]
-		diversityMetricsAlphaNoNormalize = []#MicroPITA.c_strChao1Diversity]
-		diversityMetricsBetaNoNormalize = []
-		inverseDiversityMetricsBetaNoNormalize = []
+		#Use custom metrics if specified
+		diversityMetricsAlpha = [] if not strCustomAlpha else [MicroPITA.c_strInverseSimpsonDiversity]
+		diversityMetricsBeta = [] if not strCustomBeta else [[MicroPITA.c_strBrayCurtisDissimilarity]
+#		inverseDiversityMetricsBeta = [MicroPITA.c_strInvBrayCurtisDissimilarity]
+		diversityMetricsAlphaNoNormalize = [] if not strCustomAlpha else [set(strCustomAlpha) & Metric.setCogentAlphaDiversities]
+		diversityMetricsBetaNoNormalize = [] if not strCustomBeta else [set(strCustomBeta]) & Metric.setCogentBetaDiversities]
+#		inverseDiversityMetricsBetaNoNormalize = []
 	
 		#Targeted taxa
 		userDefinedTaxa = []
@@ -879,9 +891,9 @@ class MicroPITA:
 					self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
 													 dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlphaNoNormalize,
 													 lsBetaMetrics=diversityMetricsBetaNoNormalize,
-													 lsInverseBetaMetrics=inverseDiversityMetricsBetaNoNormalize,
+													 lsInverseBetaMetrics=diversityMetricsBetaNoNormalize,
 													 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
-													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3)
+													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 
 
 			#Generate selection by the rank average of user defined taxa
@@ -905,9 +917,9 @@ class MicroPITA:
 				self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
 												 dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlpha,
 												 lsBetaMetrics=diversityMetricsBeta,
-												 lsInverseBetaMetrics=inverseDiversityMetricsBeta,
+												 lsInverseBetaMetrics=diversityMetricsBeta,
 												 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
-												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3)
+												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, istmBetaMatrix=istmBetaMatrix)
 
 			#5::Select randomly
 			#Expects sampleNames = List of sample names [name, name, name...]
@@ -983,34 +995,41 @@ argp = argparse.ArgumentParser( prog = "MicroPITA.py",
 	description = """Selects samples from abundance tables based on various selection schemes.""" )
 
 args = argp.add_argument_group( "Common", "Commonly modified options" )
-args.add_argument(ConstantsMicropita.c_strCountArgument, dest="iCount", metavar = "samples", default = 10, type = int, help = ConstantsMicropita.c_strCountHelp)
-args.add_argument("-m", dest = "lstrMethods", metavar = "method", default = [], help = ConstantsMicropita.c_strSelectionTechniquesHelp,
+args.add_argument(ConstantsMicropita.c_strCountArgument,"--num", dest="iCount", metavar = "samples", default = 10, type = int, help = ConstantsMicropita.c_strCountHelp)
+args.add_argument("-m","--method", dest = "lstrMethods", metavar = "method", default = [], help = ConstantsMicropita.c_strSelectionTechniquesHelp,
 	choices = ConstantsMicropita.c_lsAllMethods, action = "append")
 
+args = argp.add_argument_group( "Custom", "Selecting and inputing custom metrics" )
+args.add_argument("-a","--alpha", dest = strAlphaDiversity, metavar = "AlphaDiversity", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityHelp,  choices = Metric.setCogentAlphaDiversities)
+args.add_argument("-b","--beta", dest = strBetaDiversity, metavar = "BetaDiversity", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityHelp,  choices = Metric.setCogentBetaDiversities)
+args.add_argument("-q","--alphameta", dest = strAlphaMetadata, metavar = "AlphaDiversityMetadata", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityMetadataHelp)
+args.add_argument("-x","--betamatrix", dest = istmBetaMatrix, metavar = "BetaDiversityMatrix", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityMatrixHelp)
+args.add_argument("-o","--tree", dest = istmTree, metavar = "PhylogeneticTree", default = None, help = ConstantsMicropita.c_strCustomPhylogeneticTreeHelp)
+
 args = argp.add_argument_group( "Miscellaneous", "Row/column identifiers and feature targeting options" )
-args.add_argument(ConstantsMicropita.c_strIDNameArgument, dest="strIDName", metavar="sample_id", help= ConstantsMicropita.c_strIDNameHelp)
-args.add_argument(ConstantsMicropita.c_strLastMetadataNameArgument, dest="strLastMetadataName", metavar = "metadata_id",
+args.add_argument("-d",ConstantsMicropita.c_strIDNameArgument, dest="strIDName", metavar="sample_id", help= ConstantsMicropita.c_strIDNameHelp)
+args.add_argument("-l",ConstantsMicropita.c_strLastMetadataNameArgument, dest="strLastMetadataName", metavar = "metadata_id",
 				  help= ConstantsMicropita.c_strLastMetadataNameHelp)
-args.add_argument(ConstantsMicropita.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar="targeting_method", default=ConstantsMicropita.lsTargetedFeatureMethodValues[0],
+args.add_argument("-r",ConstantsMicropita.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar="targeting_method", default=ConstantsMicropita.lsTargetedFeatureMethodValues[0],
 				  choices=ConstantsMicropita.lsTargetedFeatureMethodValues, help= ConstantsMicropita.c_strTargetedFeatureMethodHelp)
-args.add_argument(ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar = "feature_file", type = argparse.FileType("r"), help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
+args.add_argument("-t",ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar = "feature_file", type = argparse.FileType("r"), help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
 
 args = argp.add_argument_group( "Data labeling", "Metadata IDs for strata and supervised label values" )
-args.add_argument(ConstantsMicropita.c_strSupervisedLabelArgument, dest="strLabel", metavar= "supervised_id", help= ConstantsMicropita.c_strSupervisedLabelHelp)
-args.add_argument(ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, dest="strUnsupervisedStratify", metavar= "stratify_id", 
+args.add_argument("-e",ConstantsMicropita.c_strSupervisedLabelArgument, dest="strLabel", metavar= "supervised_id", help= ConstantsMicropita.c_strSupervisedLabelHelp)
+args.add_argument("-s",ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, dest="strUnsupervisedStratify", metavar= "stratify_id", 
 				  help= ConstantsMicropita.c_strUnsupervisedStratifyMetadataHelp)
 
 args = argp.add_argument_group( "File formatting", "Rarely modified file formatting options" )
-args.add_argument(ConstantsMicropita.c_strFileDelimiterArgument, dest="cFileDelimiter", metavar="column_delimiter", default="\t", help=ConstantsMicropita.c_strFileDelimiterHelp) 
-args.add_argument(ConstantsMicropita.c_strFeatureNameDelimiterArgument, dest="cFeatureNameDelimiter", metavar="taxonomy_delimiter", default="|", help=ConstantsMicropita.c_strFeatureNameDelimiterHelp) 
+args.add_argument("-j",ConstantsMicropita.c_strFileDelimiterArgument, dest="cFileDelimiter", metavar="column_delimiter", default="\t", help=ConstantsMicropita.c_strFileDelimiterHelp) 
+args.add_argument("-k",ConstantsMicropita.c_strFeatureNameDelimiterArgument, dest="cFeatureNameDelimiter", metavar="taxonomy_delimiter", default="|", help=ConstantsMicropita.c_strFeatureNameDelimiterHelp) 
 
 args = argp.add_argument_group( "Debugging", "Debugging options - modify at your own risk!" )
-args.add_argument(ConstantsMicropita.c_strLoggingArgument, dest="strLogLevel", metavar = "log_level", default="WARNING", 
+args.add_argument("-v",ConstantsMicropita.c_strLoggingArgument, dest="strLogLevel", metavar = "log_level", default="WARNING", 
 				  choices=ConstantsMicropita.c_lsLoggingChoices, help= ConstantsMicropita.c_strLoggingHelp)
-args.add_argument(ConstantsMicropita.c_strCheckedAbundanceFileArgument, dest="ostmCheckedFile", metavar = "output_qc", type = argparse.FileType("w"), help = ConstantsMicropita.c_strCheckedAbundanceFileHelp)
-args.add_argument(ConstantsMicropita.c_strLoggingFileArgument, dest="ostmLoggingFile", metavar = "output_log", type = argparse.FileType("w"), help = ConstantsMicropita.c_strLoggingFileHelp)
-args.add_argument(ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPredictFile", metavar = "output_scaled", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedInputFileHelp)
-args.add_argument(ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
+args.add_argument("-c",ConstantsMicropita.c_strCheckedAbundanceFileArgument, dest="ostmCheckedFile", metavar = "output_qc", type = argparse.FileType("w"), help = ConstantsMicropita.c_strCheckedAbundanceFileHelp)
+args.add_argument("-g",ConstantsMicropita.c_strLoggingFileArgument, dest="ostmLoggingFile", metavar = "output_log", type = argparse.FileType("w"), help = ConstantsMicropita.c_strLoggingFileHelp)
+args.add_argument("-u",ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPredictFile", metavar = "output_scaled", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedInputFileHelp)
+args.add_argument("-p",ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
 argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("r"), help = ConstantsMicropita.c_strAbundanceFileHelp,
 	default = sys.stdin)
@@ -1030,26 +1049,33 @@ def _main( ):
 	logging.info("MicroPITA:: Start microPITA")
 	microPITA = MicroPITA()
 
-	#Argparse will append tothe default but will not remove the default so I do this here
+	#Argparse will append to the default but will not remove the default so I do this here
 	if not len(args.lstrMethods):
 		args.lstrMethods = [ConstantsMicropita.c_strRepresentative]
 
 	dictSelectedSamples = microPITA.funcRun(
-		strIDName				= args.strIDName,
-		strLastMetadataName		= args.strLastMetadataName,
-		istmInput				= args.istmInput,
+		strIDName		= args.strIDName,
+		strLastMetadataName	= args.strLastMetadataName,
+		istmInput		= args.istmInput,
 		ostmInputPredictFile	= args.ostmInputPredictFile,
-		ostmPredictFile			= args.ostmPredictFile,
-		ostmCheckedFile			= args.ostmCheckedFile,
-		ostmOutput				= args.ostmOutput,
-		cDelimiter				= args.cFileDelimiter,
+		ostmPredictFile		= args.ostmPredictFile,
+		ostmCheckedFile		= args.ostmCheckedFile,
+		ostmOutput		= args.ostmOutput,
+		cDelimiter		= args.cFileDelimiter,
 		cFeatureNameDelimiter	= args.cFeatureNameDelimiter,
-		istmFeatures			= args.istmFeatures,
-		strFeatureSelection		= args.strFeatureSelection,
-		iCount					= args.iCount,
-		strLabel				= args.strLabel,
-		strStratify				= args.strUnsupervisedStratify,
-		lstrMethods				= args.lstrMethods
+		istmFeatures		= args.istmFeatures,
+		strFeatureSelection	= args.strFeatureSelection,
+		iCount			= args.iCount,
+		strLabel		= args.strLabel,
+		strStratify		= args.strUnsupervisedStratify,
+		strCustomAlpha		= args.strCustomAlpha,
+		strCustomBeta		= args.strCustomBeta,
+		istmTree		= args.istmTree,
+		strAlphaMetadata	= args.strAlphaMetadata,
+		istmBetaMatrix		= args.istmBetaMatrix,
+		istrmTree		= args.istrmTree,
+		istrmEnvr		= args.istrmEnvr,
+		lstrMethods		= args.lstrMethods
 	)
 
 	if not dictSelectedSamples:

@@ -6,7 +6,7 @@ These common commands can be used on the default data set obtained when download
 A. Expected input file.
 
 I. PCL file
-Although some defaults can be changed, microPITA expects a PCL file as an input file. A PCL file is a TEXT delimited file similar to an excel spread sheet with the following characteristics.
+Although some defaults can be changed, microPITA expects a PCL file as an input file. Several PCL files are supplied by default in the input directory. A PCL file is a TEXT delimited file similar to an excel spread sheet with the following characteristics.
 
 1. Rows represent metadata and features (bugs), columns represent samples.
 2. The first row by default should be the sample ids.
