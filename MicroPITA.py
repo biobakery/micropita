@@ -659,7 +659,8 @@ class MicroPITA:
 				for sKey in lsMeasurementKeys])
 
 	def _funcRunNormalizeSensitiveMethods(self, abndData, iSampleSelectionCount, dictSelectedSamples, lsAlphaMetrics, lsBetaMetrics, lsInverseBetaMetrics,
-												fRunDiversity, fRunRepresentative, fRunExtreme, strAlphaMetadata=None, istmBetaMatrix=None, istrmTree=None, istrmEnvr=None):
+												fRunDiversity, fRunRepresentative, fRunExtreme, strAlphaMetadata=None,
+												istmBetaMatrix=None, istrmTree=None, istrmEnvr=None, fInvertDiversity=False):
 		"""
 		Manages running methods that are sensitive to normalization. This is called twice, once for the set of methods which should not be normalized and the other
 		for the set that should be normalized.
@@ -711,6 +712,12 @@ class MicroPITA:
 							lsSampleNames = lsSampleNames, lsDiversityMetricAlpha = lsAlphaMetrics)
 	
 			if internalAlphaMatrix:
+				#Invert measurments
+				if fInvertDiversity:
+					lldNewDiversity = []
+					for lsLine in internalAlphaMatrix:
+						lldNewDiversity.append([1/max(dValue,ConstantsMicropita.c_smallNumber) for dValue in lsLine])
+					internalAlphaMatrix = lldNewDiversity
 				#Get top ranked alpha diversity by most diverse
 				#Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
 				#Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
@@ -788,7 +795,7 @@ class MicroPITA:
 					  cDelimiter, cFeatureNameDelimiter, strFeatureSelection,
 					  istmFeatures, iCount, lstrMethods, strLabel = None, strStratify = None,
 					  strCustomAlpha = None, strCustomBeta = None, strAlphaMetadata = None, istmBetaMatrix = None, istrmTree = None, istrmEnvr = None, 
-					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1]):
+					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1], fInvertDiversity = False):
 		"""
 		Manages the selection of samples given different metrics.
 
@@ -836,6 +843,8 @@ class MicroPITA:
 		:type:	Integer
 		:param	iMinSamples: Minimum sample count for the occurence filter.
 		:type:	Integer
+		:param	fInvertDiversity: When true will invert diversity measurements before using.
+		:type:	boolean
 		:return	Selected Samples:	Samples selected by methods.
 				Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
@@ -923,7 +932,7 @@ class MicroPITA:
 													 lsInverseBetaMetrics=diversityMetricsBetaNoNormalize,
 													 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
 													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, strAlphaMetadata=strAlphaMetadata, 
-                                                                                                         istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+                                                                                                         istrmTree=istrmTree, istrmEnvr=istrmEnvr, fInvertDiversity=fInvertDiversity)
 
 
 			#Generate selection by the rank average of user defined taxa
@@ -950,7 +959,7 @@ class MicroPITA:
 												 lsInverseBetaMetrics=diversityMetricsBeta,
 												 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
 												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3,
-                                                                                                 istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+                                                                                                 istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr, fInvertDiversity=fInvertDiversity)
 
 			#5::Select randomly
 			#Expects sampleNames = List of sample names [name, name, name...]
@@ -1037,6 +1046,7 @@ args.add_argument("-q","--alphameta", dest = "strAlphaMetadata", metavar = "Alph
 args.add_argument("-x","--betamatrix", dest = "istmBetaMatrix", metavar = "BetaDiversityMatrix", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityMatrixHelp)
 args.add_argument("-o","--tree", dest = "istrmTree", metavar = "PhylogeneticTree", default = None, help = ConstantsMicropita.c_strCustomPhylogeneticTreeHelp)
 args.add_argument("-i","--envr", dest = "istrmEnvr", metavar = "EnvironmentFile", default = None, help = ConstantsMicropita.c_strCustomEnvironmentFileHelp)
+args.add_argument("-f","--invertDiversity", dest = "fInvertDiversity", action="store_true", default = False, help = ConstantsMicropita.c_strInvertDiversityHelp)
 
 args = argp.add_argument_group( "Miscellaneous", "Row/column identifiers and feature targeting options" )
 args.add_argument("-d",ConstantsMicropita.c_strIDNameArgument, dest="strIDName", metavar="sample_id", help= ConstantsMicropita.c_strIDNameHelp)
@@ -1106,7 +1116,8 @@ def _main( ):
 		istmBetaMatrix		= args.istmBetaMatrix,
 		istrmTree		= args.istrmTree,
 		istrmEnvr		= args.istrmEnvr,
-		lstrMethods		= args.lstrMethods
+		lstrMethods		= args.lstrMethods,
+		fInvertDiversity	= args.fInvertDiversity
 	)
 
 	if not dictSelectedSamples:

@@ -39,9 +39,6 @@ class ConstantsMicropita():
     Class to hold project constants.
     """
 
-    #References to other projects
-#    c_strBreadcrumbsProject = "../breadcrumbs/src/"
-
     #Character Constants
     COLON = ":"
     COMMA = ","
@@ -53,6 +50,9 @@ class ConstantsMicropita():
     c_outputFileDelim = '\t'
 
     c_sEmptyPredictFileValue = 'NA'
+
+    #Used to stop divide by zero errors
+    c_smallNumber = 0.00000000001
 
     #SVM related
     c_COST_RANGE_KEY = "range"
@@ -109,6 +109,10 @@ class ConstantsMicropita():
     #e,label Supervised Label
     c_strSupervisedLabelArgument = "--label"
     c_strSupervisedLabelHelp = "The name of the metadata on which to perform supervised methods"
+
+    #f, invertDiversity
+    c_strInvertDiversityHelp = "".join(["When using this flag, the diversity will be inverted (multiplicative inverse) before ranking in the highest diversity method. ",
+			       "Recommended to use with dominance, menhinick, reciprocal_simpson, berger_parker_d, mcintosh_e, simpson_e, strong and any metric where 0 indicates most diverse."])
 
     #g,logging Path of the logging file
     c_strLoggingFileArgument = "--logfile"
