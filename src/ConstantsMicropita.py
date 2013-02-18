@@ -93,7 +93,7 @@ class ConstantsMicropita():
 
     ####Commandline arguments
     #a Custom diversity metrics found in cogent
-    c_strCustomAlphaDiversityHelp = "A key word for any PyCogent supplied alpha diveristy metric (Richness, evenness, or diversity)."
+    c_strCustomAlphaDiversityHelp = "A key word for any PyCogent supplied alpha diveristy metric (Richness, evenness, or diversity). Please supply an unnormalized (counts) abundance table for these metrics."
 
     #b Custom diversity metrics found in cogent
     c_strCustomBetaDiversityHelp = "A key word for any PyCogent supplied beta diveristy metric."
@@ -114,7 +114,10 @@ class ConstantsMicropita():
     c_strLoggingFileArgument = "--logfile"
     c_strLoggingFileHelp = "File path to save the logging file."
 
-    #h
+    #h help
+
+    #i,tree
+    c_strCustomEnvironmentFileHelp = "File describing the smaple environments; for use with Unifrac distance metrics."
 
     #j,delim File delimiter
     c_strFileDelimiterArgument = "--delim"
@@ -143,7 +146,7 @@ class ConstantsMicropita():
     c_strSupervisedPredictedFileHelp = "The file path for the predict file."
 
     #q,alphameta
-    c_strCustomAlphaDiversityMetadataHelp = "Metric in the pcl file which has custom alpha diversity measurements to use with the highest diversity sampling criteria."
+    c_strCustomAlphaDiversityMetadataHelp = "Metric in the pcl file which has custom alpha diversity measurements to use with the highest diversity sampling criteria. Should be a number between 0.0 and 1.0 with 1.0 meaning most diverse."
 
     #r,targetmethod Taxa selection method
     c_strTargetedFeatureMethodArgument = "--feature_method"
@@ -168,7 +171,7 @@ class ConstantsMicropita():
     c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
 
     #x,betamatrix
-    c_strCustomBetaDiversityMatrixHelp = "Precalculated beta-diversity matrix to be used in the representative sampling criteria."
+    c_strCustomBetaDiversityMatrixHelp = "Precalculated beta-diversity matrix to be used in the representative sampling criteria. Should be a number between 0.0 and 1.0 with 1.0 meaning most dissimilar."
 
     #Order is important, the first is the default
     c_strTargetedRanked = "rank"
@@ -183,6 +186,7 @@ class ConstantsMicropita():
     c_strRandom = "random"
     c_strRepresentative = "representative"
     c_strFeature = "features"
+    c_custom = "custom"
     c_lsAllUnsupervisedMethods = [c_strRepresentative,c_strDiversity,c_strExtreme,c_strFeature,c_strRandom]
     c_lsAllSupervisedMethods = [c_strDiscriminant,c_strDistinct]
     c_lsAllMethods = c_lsAllUnsupervisedMethods + c_lsAllSupervisedMethods

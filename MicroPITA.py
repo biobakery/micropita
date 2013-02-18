@@ -53,6 +53,7 @@ import operator
 import os
 import random
 import scipy.cluster.hierarchy as hcluster
+import scipy.spatial.distance
 from types import *
 
 class MicroPITA:
@@ -83,12 +84,13 @@ class MicroPITA:
 	c_strTargetedAbundance = ConstantsMicropita.c_strTargetedAbundance
 
 	#Technique groupings
-	c_lsDiversityMethods = [ConstantsMicropita.c_strDiversity,ConstantsMicropita.c_strDiversity2]
+#	c_lsDiversityMethods = [ConstantsMicropita.c_strDiversity,ConstantsMicropita.c_strDiversity2]
 
 	#Converts ecology metrics into standardized method selection names
 	dictConvertAMetricDiversity = {c_strInverseSimpsonDiversity:ConstantsMicropita.c_strDiversity, c_strChao1Diversity:ConstantsMicropita.c_strDiversity2}
-	dictConvertMicroPITAToAMetric = {ConstantsMicropita.c_strDiversity:c_strInverseSimpsonDiversity, ConstantsMicropita.c_strDiversity2:c_strChao1Diversity}
-	dictConvertBMetricToMethod = {c_strBrayCurtisDissimilarity:ConstantsMicropita.c_strRepresentative,c_strInvBrayCurtisDissimilarity:ConstantsMicropita.c_strExtreme}
+#	dictConvertMicroPITAToAMetric = {ConstantsMicropita.c_strDiversity:c_strInverseSimpsonDiversity, ConstantsMicropita.c_strDiversity2:c_strChao1Diversity}
+	dictConvertBMetricToMethod = {c_strBrayCurtisDissimilarity:ConstantsMicropita.c_strRepresentative}
+	dictConvertInvBMetricToMethod = {c_strBrayCurtisDissimilarity:ConstantsMicropita.c_strExtreme}
 
 	#Linkage used in the Hierarchical clustering
 	c_strHierarchicalClusterMethod = 'average'
@@ -109,12 +111,12 @@ class MicroPITA:
 		:type:	integer	Integer amount of sample names/ indices to return.
 		:return	List:	List of samples to be selected.
 		"""
-
 		topRankListRet = []
 		for rowMetrics in lldMatrix:
 			#Create 2 d array to hold value and index and sort
 			liIndexX = [rowMetrics,range(len(rowMetrics))]
 			liIndexX[1].sort(key = liIndexX[0].__getitem__,reverse = True)
+
 			if lsSampleNames:
 				topRankListRet.append([lsSampleNames[iIndex] for iIndex in liIndexX[1][:iTopAmount]])
 			else:
@@ -152,9 +154,9 @@ class MicroPITA:
 			return list(lsSampleNames)
 
 		#Get distance matrix
-		distanceMatrix=Metric.funcReadBetaMatrixFile(istmBetaMatrix) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+		distanceMatrix=scipy.spatial.distance.squareform(Metric.funcReadMatrixFile(istmMatrixFile=istmBetaMatrix,lsSampleOrder=lsSampleNames)[0]) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=sMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr, lsSampleOrder=lsSampleNames)
 		if type(distanceMatrix) is BooleanType:
-			logging.error("MicroPITA.funcGetCentralSamplesByKMedoids:: Did not receive a matrix for betaMetrix matrix generation, returning false.")
+			logging.error("MicroPITA.funcGetCentralSamplesByKMedoids:: Could not read in the supplied distance matrix, returning false.")
 			return False
 	
 		#Log distance matrix
@@ -209,9 +211,13 @@ class MicroPITA:
 	
 		#Generate beta matrix
 		#Returns condensed matrix
-		tempDistanceMatrix = Metric.funcReadBetaMatrixFile(istmBetaMatrix) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaMatrix, sMetric=strBetaMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
-		if tempDistanceMatrix:
-			tempDistanceMatrix = 1-tempDIstanceMatrix
+		tempDistanceMatrix = scipy.spatial.distance.squareform(Metric.funcReadMatrixFile(istmMatrixFile=istmBetaMatrix,lsSampleOrder=lsSampleNames)[0]) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaAbundanceMatrix, sMetric=strBetaMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr, lsSampleOrder=lsSampleNames, fAdditiveInverse = True)
+
+		if type(tempDistanceMatrix) is BooleanType:
+			logging.error("MicroPITA.funcSelectExtremeSamplesFromHClust:: Could not read in the supplied distance matrix, returning false.")
+			return False
+		if istmBetaMatrix:
+			tempDistanceMatrix = 1-tempDistanceMatrix
 
 		#Feed beta matrix to linkage to cluster
 		#Send condensed matrix
@@ -653,7 +659,7 @@ class MicroPITA:
 				for sKey in lsMeasurementKeys])
 
 	def _funcRunNormalizeSensitiveMethods(self, abndData, iSampleSelectionCount, dictSelectedSamples, lsAlphaMetrics, lsBetaMetrics, lsInverseBetaMetrics,
-												fRunDiversity, fRunRepresentative, fRunExtreme, istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr):
+												fRunDiversity, fRunRepresentative, fRunExtreme, strAlphaMetadata=None, istmBetaMatrix=None, istrmTree=None, istrmEnvr=None):
 		"""
 		Manages running methods that are sensitive to normalization. This is called twice, once for the set of methods which should not be normalized and the other
 		for the set that should be normalized.
@@ -670,7 +676,6 @@ class MicroPITA:
 		:type:	List of strings
 		:param	lsInverseBetaMetrics:	List of inverse beta metrics to use on inverse beta metric dependent assays (like most dissimilar).
 		:type:	List of strings
-		:return	Dictionary:	Returns dictSelectedSamples with the addition of any newly measured samples.
 		:param	fRunDiversity:	Run Diversity based methods (true indicates run).
 		:type:	Boolean	
 		:param	fRunRepresentative:	Run Representative based methods (true indicates run).
@@ -691,10 +696,12 @@ class MicroPITA:
 
 			#Get Alpha metrics matrix
 			internalAlphaMatrix = None
+			#Name of technique
+			strMethod = [strAlphaMetadata] if strAlphaMetadata else lsAlphaMetrics
 
 			#If given an alpha-diversity metadata
 			if strAlphaMetadata:
-				internalAlphaMatrix = abndData.funcGetMetadata(strAlphaMetadata)
+				internalAlphaMatrix = [[float(strNum) for strNum in abndData.funcGetMetadata(strAlphaMetadata)]]
 			else:
 				#Expects Observations (Taxa (row) x sample (column))
 				#Returns [[metric1-sample1, metric1-sample2, metric1-sample3],[metric1-sample1, metric1-sample2, metric1-sample3]]
@@ -708,10 +715,10 @@ class MicroPITA:
 				#Expects [[sample1,sample2,sample3...],[sample1,sample2,sample3..],...]
 				#Returns [[sampleName1, sampleName2, sampleNameN],[sampleName1, sampleName2, sampleNameN]]
 				mostDiverseAlphaSamplesIndexes = self.funcGetTopRankedSamples(lldMatrix=internalAlphaMatrix, lsSampleNames=lsSampleNames, iTopAmount=iSampleSelectionCount)
-	
+
 				#Add to results
-				for index in xrange(0,len(lsAlphaMetrics)):
-					strSelectionMethod = self.dictConvertAMetricDiversity[lsAlphaMetrics[index]]
+				for index in xrange(0,len(strMethod)):
+					strSelectionMethod = self.dictConvertAMetricDiversity.get(strMethod[index],ConstantsMicropita.c_strDiversity+"="+strMethod[index])
 					dictSelectedSamples.setdefault(strSelectionMethod,[]).extend(mostDiverseAlphaSamplesIndexes[index])
 
 		logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 1b")
@@ -719,36 +726,58 @@ class MicroPITA:
 	
 		#Generate beta metrics and 
 		if fRunRepresentative or fRunExtreme:
-	
+
 			#Abundance matrix transposed
 			npaTransposedAbundance = UtilityMath.funcTransposeDataMatrix(abndData.funcGetAbundanceCopy(), fRemoveAdornments=True)
 	
 			#Get center selection using clusters/tiling
 			#This will be for beta metrics in normalized space
 			if fRunRepresentative:
-				logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Performing representative selection on normalized data.")
-				for bMetric in lsBetaMetrics:
+
+				if istmBetaMatrix:
 					#Get representative dissimilarity samples
-					medoidSamples=self.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
-	
+					medoidSamples=self.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedAbundance, sMetric=ConstantsMicropita.c_custom, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+
 					if medoidSamples:
-						dictSelectedSamples.setdefault(self.dictConvertBMetricToMethod[bMetric],[]).extend(medoidSamples)
+						dictSelectedSamples.setdefault(ConstantsMicropita.c_strRepresentative+"="+ConstantsMicropita.c_custom,[]).extend(medoidSamples)
+				else:
+					logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Performing representative selection on normalized data.")
+					for bMetric in lsBetaMetrics:
+
+						#Get representative dissimilarity samples
+						medoidSamples=self.funcGetCentralSamplesByKMedoids(npaMatrix=npaTransposedAbundance, sMetric=bMetric, lsSampleNames=lsSampleNames, iNumberSamplesReturned=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+
+						if medoidSamples:
+							dictSelectedSamples.setdefault(self.dictConvertBMetricToMethod.get(bMetric,ConstantsMicropita.c_strRepresentative+"="+bMetric),[]).extend(medoidSamples)
 
 			#Get extreme selection using clusters, tiling
 			if fRunExtreme:
 				logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Performing extreme selection on normalized data.")
-				#Run KMedoids with inverse custom distance metric in normalized space
-				for bMetric in lsInverseBetaMetrics:
-	
+				if istmBetaMatrix:
+
 					#Samples for representative dissimilarity
 					#This involves inverting the distance metric,
 					#Taking the dendrogram level of where the number cluster == the number of samples to select
 					#Returning a repersentative sample from each cluster
-					extremeSamples = self.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+					extremeSamples = self.funcSelectExtremeSamplesFromHClust(strBetaMetric=ConstantsMicropita.c_custom, npaAbundanceMatrix=npaTransposedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 	
 					#Add selected samples
 					if extremeSamples:
-						dictSelectedSamples.setdefault(self.dictConvertBMetricToMethod[bMetric],[]).extend(extremeSamples)
+						dictSelectedSamples.setdefault(ConstantsMicropita.c_strExtreme+"="+ConstantsMicropita.c_custom,[]).extend(extremeSamples)
+
+				else:
+					#Run KMedoids with inverse custom distance metric in normalized space
+					for bMetric in lsInverseBetaMetrics:
+
+						#Samples for representative dissimilarity
+						#This involves inverting the distance metric,
+						#Taking the dendrogram level of where the number cluster == the number of samples to select
+						#Returning a repersentative sample from each cluster
+						extremeSamples = self.funcSelectExtremeSamplesFromHClust(strBetaMetric=bMetric, npaAbundanceMatrix=npaTransposedAbundance, lsSampleNames=lsSampleNames, iSelectSampleCount=iSampleSelectionCount, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+	
+						#Add selected samples
+						if extremeSamples:
+							dictSelectedSamples.setdefault(self.dictConvertInvBMetricToMethod.get(bMetric,ConstantsMicropita.c_strExtreme+"="+bMetric),[]).extend(extremeSamples)
 
 		logging.info("MicroPITA.funcRunNormalizeSensitiveMethods:: Selected Samples 2,3b")
 		logging.info(dictSelectedSamples)
@@ -758,7 +787,7 @@ class MicroPITA:
 					  ostmInputPredictFile, ostmPredictFile, ostmCheckedFile, ostmOutput,
 					  cDelimiter, cFeatureNameDelimiter, strFeatureSelection,
 					  istmFeatures, iCount, lstrMethods, strLabel = None, strStratify = None,
-					  strCustomAlpha = None, strCustomBeta = None, istmTree = None, strAlphaMetadata = None, istmBetaMatrix = None, 
+					  strCustomAlpha = None, strCustomBeta = None, strAlphaMetadata = None, istmBetaMatrix = None, istrmTree = None, istrmEnvr = None, 
 					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1]):
 		"""
 		Manages the selection of samples given different metrics.
@@ -795,8 +824,6 @@ class MicroPITA:
 		:type:	String
 		:param	strCustomBeta: Custom beta diversity metric
 		:type:	String
-		:param	istmTree: Phylogenetic tree for beta-diversities based on phylogeny
-		:type:	FileStream or String file path
 		:param	strAlphaMetadata: Metadata id which is a diveristy metric to use in highest diversity sampling
 		:type:	String
 		:param	istmBetaMatrix: File containing precalculated beta-diversity matrix for representative sampling
@@ -812,7 +839,7 @@ class MicroPITA:
 		:return	Selected Samples:	Samples selected by methods.
 				Dictionary	{"Selection Method":["SampleID","SampleID","SampleID",...]}
 		"""
-	
+
 		#Holds the top ranked samples from different metrics
 		#dict[metric name] = [samplename,samplename...]
 		selectedSamples = dict()
@@ -822,16 +849,17 @@ class MicroPITA:
 		  if not istmFeatures:
 			logging.error("MicroPITA.funcRun:: Did not receive both the Targeted feature file and the feature selection method. MicroPITA did not run.")
 			return False
-	
+
 		#Diversity metrics to run
 		#Use custom metrics if specified
-		diversityMetricsAlpha = [] if not strCustomAlpha else [MicroPITA.c_strInverseSimpsonDiversity]
-		diversityMetricsBeta = [] if not strCustomBeta else [[MicroPITA.c_strBrayCurtisDissimilarity]
+                #Custom beta metrics set to normalized only, custom alpha metrics set to count only
+		diversityMetricsAlpha = [] if strCustomAlpha or strAlphaMetadata else [MicroPITA.c_strInverseSimpsonDiversity]
+		diversityMetricsBeta = [] if istmBetaMatrix else [strCustomBeta] if strCustomBeta else [MicroPITA.c_strBrayCurtisDissimilarity]
 #		inverseDiversityMetricsBeta = [MicroPITA.c_strInvBrayCurtisDissimilarity]
-		diversityMetricsAlphaNoNormalize = [] if not strCustomAlpha else [set(strCustomAlpha) & Metric.setCogentAlphaDiversities]
-		diversityMetricsBetaNoNormalize = [] if not strCustomBeta else [set(strCustomBeta]) & Metric.setCogentBetaDiversities]
+		diversityMetricsAlphaNoNormalize = [strAlphaMetadata] if strAlphaMetadata else [strCustomAlpha] if strCustomAlpha else []
+		diversityMetricsBetaNoNormalize = []
 #		inverseDiversityMetricsBetaNoNormalize = []
-	
+
 		#Targeted taxa
 		userDefinedTaxa = []
 	
@@ -888,12 +916,14 @@ class MicroPITA:
 			if not stratAbundanceTable.funcIsNormalized( ):
 				#Need to first work with unnormalized data
 				if c_RUN_MAX_DIVERSITY_1 or c_RUN_REPRESENTIVE_DISSIMILARITY_2 or c_RUN_MAX_DISSIMILARITY_3:
+
 					self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
 													 dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlphaNoNormalize,
 													 lsBetaMetrics=diversityMetricsBetaNoNormalize,
 													 lsInverseBetaMetrics=diversityMetricsBetaNoNormalize,
 													 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
-													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
+													 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, strAlphaMetadata=strAlphaMetadata, 
+                                                                                                         istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 
 
 			#Generate selection by the rank average of user defined taxa
@@ -912,14 +942,15 @@ class MicroPITA:
 
  			###SUMMED AND NORMALIZED analysis block
 			#Diversity based metric will move reduce to terminal taxa as needed
-			#Need to first work with unnormalized data
 			if c_RUN_MAX_DIVERSITY_1 or c_RUN_REPRESENTIVE_DISSIMILARITY_2 or c_RUN_MAX_DISSIMILARITY_3:
+
 				self._funcRunNormalizeSensitiveMethods(abndData=stratAbundanceTable, iSampleSelectionCount=iCount,
 												 dictSelectedSamples=selectedSamples, lsAlphaMetrics=diversityMetricsAlpha,
 												 lsBetaMetrics=diversityMetricsBeta,
 												 lsInverseBetaMetrics=diversityMetricsBeta,
 												 fRunDiversity=c_RUN_MAX_DIVERSITY_1,fRunRepresentative=c_RUN_REPRESENTIVE_DISSIMILARITY_2,
-												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3, istmBetaMatrix=istmBetaMatrix)
+												 fRunExtreme=c_RUN_MAX_DISSIMILARITY_3,
+                                                                                                 istmBetaMatrix=istmBetaMatrix, istrmTree=istrmTree, istrmEnvr=istrmEnvr)
 
 			#5::Select randomly
 			#Expects sampleNames = List of sample names [name, name, name...]
@@ -1000,11 +1031,12 @@ args.add_argument("-m","--method", dest = "lstrMethods", metavar = "method", def
 	choices = ConstantsMicropita.c_lsAllMethods, action = "append")
 
 args = argp.add_argument_group( "Custom", "Selecting and inputing custom metrics" )
-args.add_argument("-a","--alpha", dest = strAlphaDiversity, metavar = "AlphaDiversity", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityHelp,  choices = Metric.setCogentAlphaDiversities)
-args.add_argument("-b","--beta", dest = strBetaDiversity, metavar = "BetaDiversity", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityHelp,  choices = Metric.setCogentBetaDiversities)
-args.add_argument("-q","--alphameta", dest = strAlphaMetadata, metavar = "AlphaDiversityMetadata", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityMetadataHelp)
-args.add_argument("-x","--betamatrix", dest = istmBetaMatrix, metavar = "BetaDiversityMatrix", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityMatrixHelp)
-args.add_argument("-o","--tree", dest = istmTree, metavar = "PhylogeneticTree", default = None, help = ConstantsMicropita.c_strCustomPhylogeneticTreeHelp)
+args.add_argument("-a","--alpha", dest = "strAlphaDiversity", metavar = "AlphaDiversity", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityHelp,  choices = Metric.setAlphaDiversities)
+args.add_argument("-b","--beta", dest = "strBetaDiversity", metavar = "BetaDiversity", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityHelp,  choices = list(Metric.setBetaDiversities)+[Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted])
+args.add_argument("-q","--alphameta", dest = "strAlphaMetadata", metavar = "AlphaDiversityMetadata", default = None, help = ConstantsMicropita.c_strCustomAlphaDiversityMetadataHelp)
+args.add_argument("-x","--betamatrix", dest = "istmBetaMatrix", metavar = "BetaDiversityMatrix", default = None, help = ConstantsMicropita.c_strCustomBetaDiversityMatrixHelp)
+args.add_argument("-o","--tree", dest = "istrmTree", metavar = "PhylogeneticTree", default = None, help = ConstantsMicropita.c_strCustomPhylogeneticTreeHelp)
+args.add_argument("-i","--envr", dest = "istrmEnvr", metavar = "EnvironmentFile", default = None, help = ConstantsMicropita.c_strCustomEnvironmentFileHelp)
 
 args = argp.add_argument_group( "Miscellaneous", "Row/column identifiers and feature targeting options" )
 args.add_argument("-d",ConstantsMicropita.c_strIDNameArgument, dest="strIDName", metavar="sample_id", help= ConstantsMicropita.c_strIDNameHelp)
@@ -1068,9 +1100,8 @@ def _main( ):
 		iCount			= args.iCount,
 		strLabel		= args.strLabel,
 		strStratify		= args.strUnsupervisedStratify,
-		strCustomAlpha		= args.strCustomAlpha,
-		strCustomBeta		= args.strCustomBeta,
-		istmTree		= args.istmTree,
+		strCustomAlpha		= args.strAlphaDiversity,
+		strCustomBeta		= args.strBetaDiversity,
 		strAlphaMetadata	= args.strAlphaMetadata,
 		istmBetaMatrix		= args.istmBetaMatrix,
 		istrmTree		= args.istrmTree,
