@@ -1054,7 +1054,7 @@ args.add_argument("-l",ConstantsMicropita.c_strLastMetadataNameArgument, dest="s
 				  help= ConstantsMicropita.c_strLastMetadataNameHelp)
 args.add_argument("-r",ConstantsMicropita.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar="targeting_method", default=ConstantsMicropita.lsTargetedFeatureMethodValues[0],
 				  choices=ConstantsMicropita.lsTargetedFeatureMethodValues, help= ConstantsMicropita.c_strTargetedFeatureMethodHelp)
-args.add_argument("-t",ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar = "feature_file", type = argparse.FileType("r"), help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
+args.add_argument("-t",ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar = "feature_file", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
 
 args = argp.add_argument_group( "Data labeling", "Metadata IDs for strata and supervised label values" )
 args.add_argument("-e",ConstantsMicropita.c_strSupervisedLabelArgument, dest="strLabel", metavar= "supervised_id", help= ConstantsMicropita.c_strSupervisedLabelHelp)
@@ -1073,7 +1073,7 @@ args.add_argument("-g",ConstantsMicropita.c_strLoggingFileArgument, dest="ostmLo
 args.add_argument("-u",ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPredictFile", metavar = "output_scaled", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedInputFileHelp)
 args.add_argument("-p",ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
-argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("r"), help = ConstantsMicropita.c_strAbundanceFileHelp,
+argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strAbundanceFileHelp,
 	default = sys.stdin)
 argp.add_argument("ostmOutput", metavar = "output.txt", type = argparse.FileType("w"), help = ConstantsMicropita.c_strGenericOutputDataFileHelp,
 	default = sys.stdout)
