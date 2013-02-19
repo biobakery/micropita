@@ -32,6 +32,8 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
+from breadcrumbs.Metric import Metric
+
 ##
 #Used to test the FileIO class
 class ConstantsMicropita():
@@ -93,10 +95,10 @@ class ConstantsMicropita():
 
     ####Commandline arguments
     #a Custom diversity metrics found in cogent
-    c_strCustomAlphaDiversityHelp = "A key word for any PyCogent supplied alpha diveristy metric (Richness, evenness, or diversity). Please supply an unnormalized (counts) abundance table for these metrics."
+    c_strCustomAlphaDiversityHelp = "A key word for any PyCogent supplied alpha diveristy metric (Richness, evenness, or diversity). Please supply an unnormalized (counts) abundance table for these metrics. Metrics include "+" ".join(Metric.setAlphaDiversities)+"."
 
     #b Custom diversity metrics found in cogent
-    c_strCustomBetaDiversityHelp = "A key word for any PyCogent supplied beta diveristy metric."
+    c_strCustomBetaDiversityHelp = "A key word for any PyCogent supplied beta diversity metric. Metrics include "+" ".join(list(Metric.setBetaDiversities)+[Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted])+"."
 
     #c,checked Checked abundance file
     c_strCheckedAbundanceFileArgument = "--checked"

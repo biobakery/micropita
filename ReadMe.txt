@@ -72,8 +72,7 @@ The default alpha diversity for the maximum diversity sampling method is inverse
 selection is bray-curtis dissimilarity. There are several mechanisms that allow one to change this. You may: 
 
 1. Choose from a selection of alpha-diveristy metrics.
-Note when supplying an alpha diversity. This will affect the maximum diveristy sampling method only. Please make sure to use a diveristy metric where the larger number indicates a higher diversity. If this is not the case
-make sure to use the -f or --invertDiversity flag to invert the metric. The inversion is multiplicative (1/alpha-metric).
+Note when supplying an alpha diversity. This will affect the maximum diveristy sampling method only. Please make sure to use a diversity metric where the larger number indicates a higher diversity. If this is not the case make sure to use the -f or --invertDiversity flag to invert the metric. The inversion is multiplicative (1/alpha-metric).
 
 $ python MicroPITA.py --lastmeta Label -m diverse -a simpson input/Test.pcl output.txt
 
@@ -82,8 +81,7 @@ A case where inserting the metric is needed.
 $ python MicroPITA.py --lastmeta Label -m diverse -a dominance -f input/Test.pcl output.txt
 
 2. Choose from a selection of beta-diversity metrics.
-Note when supplying a beta-diversity. This will effect both the representative and most dissimilar sampling methods. The metric as given will be used for the
-representative method while 1-beta-metric is used for the most dissimilar.
+Note when supplying a beta-diversity. This will effect both the representative and most dissimilar sampling methods. The metric as given will be used for the representative method while 1-beta-metric is used for the most dissimilar.
 
 $ python MicroPITA.py --lastmeta Label -m representative -b euclidean input/Test.pcl output.txt
 
@@ -101,7 +99,7 @@ $ python MicroPITA.py --lastmeta Label -m representative -b unifrac_unweighted -
 
 $ python MicroPITA.py --lastmeta Label -m diverse -q alpha_custom input/Test.pcl output.txt
 
-4. Supply your own custom beta diversity as a matrix.
+4. Supply your own custom beta diversity as a matrix (provided in a seperte file).
 
 $ python MicroPITA.py --lastmeta Label -m representative -x input/Test_Matrix.txt input/Test.pcl output.txt
 $ python MicroPITA.py --lastmeta Label -m extreme -x input/Test_Matrix.txt input/Test.pcl output.txt
