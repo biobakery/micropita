@@ -65,6 +65,8 @@ microPITA requires an input pcl file of metadata and microbial community measure
 6. The file is expected to be TAB delimited.
 7. If a consensus lineage or hierarchy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
 
+.. image:: ../galaxy/static/images/pcl_diagram.png
+
 An example can be found at https://bytebucket.org/timothyltickle/micropita/wiki/micropita_sample_PCL.txt
 
 
@@ -76,12 +78,17 @@ The Run MicroPITA module will create one output text file. The output will consi
 representative	sample_1	sample_2	sample_3	sample_4	sample_5	sample_6
 
 
+Acknowledgments
+---------------
+Special thanks to Eric Franzosa for developing the above PCL figure!
+
+
 Citation and Contacts
 ---------------------
 For more information please visit http://huttenhower.sph.harvard.edu/micropita
 
 When using MicroPITA please cite:
-Tickle T, Segata N, Waldron L, Weingart G, Huttenhower C. Tiered study design of microbial communities and the human microbiome. (Under review)
+Tickle T, Segata N, Waldron L, Weingart G, Huttenhower C. Two-stage microbial community experimental design. (Under review)
 
 Please feel free to contact us at ttickle@hsph.harvard.edu  for any questions or comments!
   </help>
