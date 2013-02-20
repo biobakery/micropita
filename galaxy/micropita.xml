@@ -49,17 +49,17 @@
 				</param>
 		       	</when>
 		      	<when value="distinct">
-				<param name="cls_L" type="select" label="Label"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+				<param name="cls_L" type="select" label="Label (Use 'Group' for demo data)"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
 		       	</when>
 	
 		      	<when value="discriminant">
-				<param name="cls_L" type="select" label="Label"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+				<param name="cls_L" type="select" label="Label (Use 'Group' for demo data)"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
 		       	</when>
 
                	</conditional>
 
 	
-	<param name="cls_s" type="select" label="Stratify by (optional)"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
+	<param name="cls_s" type="select" label="Stratify by (optional) (Use 'StratifyLabel' for demo data)"  multiple="False" size ="70"  dynamic_options="get_cols_add_line(inp_data,'0',cls_x)"/>
 
 	<param name="selected_samples" type="integer" size="4" value="10"  label="Number of samples to select"/>
 
