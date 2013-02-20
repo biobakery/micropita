@@ -64,6 +64,7 @@ microPITA requires an input pcl file of metadata and microbial community measure
 5. The **first column** should contain the ID describing the column. For metadata this may be, for example, "Age" for a row containing the age of the patients donating the samples. For measurements, this should be the feature name (bug name).
 6. The file is expected to be TAB delimited.
 7. If a consensus lineage or hierarchy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
+
 **Note** MAC users, please save file as windows formatted text.
 
 .. image:: ../galaxy/static/images/pcl_diagram.png
