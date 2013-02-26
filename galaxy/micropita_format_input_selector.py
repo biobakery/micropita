@@ -46,7 +46,7 @@ def get_cols(data,full_names):
 	if data == "": return []
 	max_len =32 
         fname = data.dataset.file_name
-	input_file = open(fname)
+	input_file = open(fname,'rU')
 	input_lines = input_file.readlines()
 	input_file.close()
 	table_lines = []
@@ -78,7 +78,7 @@ def get_cols_add_line(data,full_names,lastmeta):
 
 	max_len = 32 
         fname = data.dataset.file_name
-	input_file = open(fname)
+	input_file = open(fname,'rU')
 	input_lines = input_file.readlines()
 	input_file.close()
 	table_lines = []
@@ -113,7 +113,8 @@ def get_cols_features(data,full_names,lastmeta):
 		pass
 	max_len = 32 
         fname = data.dataset.file_name
-	input_file = open(fname)
+	input_file = open(fname,'rU')
+
 	input_lines = input_file.readlines()
 	input_file.close()
 	table_lines = []

@@ -78,7 +78,7 @@ parser = read_params( sys.argv )
 results = parser.parse_args()
 
 fname =  results.inputname
-input_file = open(fname)
+input_file = open(fname,'rU')
 input_lines = input_file.readlines()
 input_file.close()
 table_lines = []
