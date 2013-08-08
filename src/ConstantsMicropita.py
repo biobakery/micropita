@@ -32,7 +32,7 @@ __maintainer__ = "Timothy Tickle"
 __email__ = "ttickle@sph.harvard.edu"
 __status__ = "Development"
 
-from breadcrumbs.Metric import Metric
+from breadcrumbs.src.Metric import Metric
 
 ##
 #Used to test the FileIO class
@@ -202,5 +202,5 @@ class ConstantsMicropita():
 
     ####################################
     #Arguments without commandline flags
-    c_strAbundanceFileHelp = "An abundance table."
+    c_strAbundanceFileHelp = "Input file as either a PCL or Biome file."
     c_strGenericOutputDataFileHelp = "The generated output data file."

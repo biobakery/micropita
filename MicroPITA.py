@@ -35,13 +35,13 @@ __status__ = "Development"
 
 import sys
 import argparse
-from src.breadcrumbs.AbundanceTable import AbundanceTable
-from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
-from src.breadcrumbs.Metric import Metric
-from src.breadcrumbs.KMedoids import Kmedoids
-from src.breadcrumbs.MLPYDistanceAdaptor import MLPYDistanceAdaptor
-from src.breadcrumbs.SVM import SVM
-from src.breadcrumbs.UtilityMath import UtilityMath
+from src.breadcrumbs.src.AbundanceTable import AbundanceTable
+from src.breadcrumbs.src.ConstantsBreadCrumbs import ConstantsBreadCrumbs
+from src.breadcrumbs.src.Metric import Metric
+from src.breadcrumbs.src.KMedoids import Kmedoids
+from src.breadcrumbs.src.MLPYDistanceAdaptor import MLPYDistanceAdaptor
+from src.breadcrumbs.src.SVM import SVM
+from src.breadcrumbs.src.UtilityMath import UtilityMath
 
 from src.ConstantsMicropita import ConstantsMicropita
 import csv
@@ -158,6 +158,10 @@ class MicroPITA:
 		if type(distanceMatrix) is BooleanType:
 			logging.error("MicroPITA.funcGetCentralSamplesByKMedoids:: Could not read in the supplied distance matrix, returning false.")
 			return False
+
+		# Handle unifrac output
+		if sMetric in [Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted]:
+			distanceMatrix = distanceMatrix[0]
 	
 		#Log distance matrix
 		logging.debug("MicroPITA.funcGetCentralSamplesByKMedoids:: Distance matrix for representative selection using metric="+str(sMetric))
@@ -213,9 +217,13 @@ class MicroPITA:
 		#Returns condensed matrix
 		tempDistanceMatrix = scipy.spatial.distance.squareform(Metric.funcReadMatrixFile(istmMatrixFile=istmBetaMatrix,lsSampleOrder=lsSampleNames)[0]) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaAbundanceMatrix, sMetric=strBetaMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr, lsSampleOrder=lsSampleNames, fAdditiveInverse = True)
 
+		if strBetaMetric in [Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted]:
+			tempDistanceMatrix = tempDistanceMatrix[0]
+
 		if type(tempDistanceMatrix) is BooleanType:
 			logging.error("MicroPITA.funcSelectExtremeSamplesFromHClust:: Could not read in the supplied distance matrix, returning false.")
 			return False
+
 		if istmBetaMatrix:
 			tempDistanceMatrix = 1-tempDistanceMatrix
 
@@ -1073,7 +1081,7 @@ args.add_argument("-g",ConstantsMicropita.c_strLoggingFileArgument, dest="ostmLo
 args.add_argument("-u",ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPredictFile", metavar = "output_scaled", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedInputFileHelp)
 args.add_argument("-p",ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
-argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strAbundanceFileHelp,
+argp.add_argument("istmInput", metavar = "input.pcl/biome", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strAbundanceFileHelp,
 	default = sys.stdin)
 argp.add_argument("ostmOutput", metavar = "output.txt", type = argparse.FileType("w"), help = ConstantsMicropita.c_strGenericOutputDataFileHelp,
 	default = sys.stdout)
