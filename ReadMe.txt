@@ -6,6 +6,8 @@ These common commands can be used on the default data set obtained when download
 ## Expected input file. ##
 
 I. PCL file or BIOME file
+
+BIOME file definition:
 For BIOME file definition please see http://biom-format.org/
 
 PCL file definition:
