@@ -34,8 +34,6 @@ __status__ = "Development"
 
 from breadcrumbs.src.Metric import Metric
 
-##
-#Used to test the FileIO class
 class ConstantsMicropita():
     """
     Class to hold project constants.
