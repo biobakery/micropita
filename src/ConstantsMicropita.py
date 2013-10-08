@@ -100,7 +100,7 @@ class ConstantsMicropita():
 
     #c,checked Checked abundance file
     c_strCheckedAbundanceFileArgument = "--checked"
-    c_strCheckedAbundanceFileHelp = "Before analysis abundance files are checked and a new file results which analysis is perfromed on. The name fo the checked file can be specified of the default will will be used (appending a -Checked to the end of the file name)."
+    c_strCheckedAbundanceFileHelp = "Before analysis abundance files are checked and a new file results which analysis is perfromed on. The name of the checked file can be specified of the default will will be used (appending a -Checked to the end of the file name)."
 
     #d,id Name of the sample id row
     c_strIDNameArgument = "--id"
@@ -173,6 +173,10 @@ class ConstantsMicropita():
     c_strLoggingHelp = "".join(["Logging level which will be logged to a .log file with the",
          " same name as the strOutFile (but with a .log extension). Valid values are DEBUG, INFO, WARNING, ERROR, or CRITICAL."])
     c_lsLoggingChoices = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
+
+    #w, Last Feature Metadata indicator
+    c_strFeatureMetadataArgument = "--lastFeatureMetadata"
+    c_strFeatureMetadataHelp = "The last metadata describing a (bug) feature (not sample). Not all studies have feature metadata, if so this can be ignored and not used. See doc for PCL-Description.txt"
 
     #x,betamatrix
     c_strCustomBetaDiversityMatrixHelp = "Precalculated beta-diversity matrix to be used in the representative sampling criteria. Should be a number between 0.0 and 1.0 with 1.0 meaning most dissimilar."
