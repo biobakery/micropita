@@ -8,6 +8,7 @@
 --input $inp_data
 --output $out_file1
 --stratify_value $cls_s
+--root_dir $GALAXY_ROOT_DIR
 
 #if $cond.method_sel  == "features":
 	--feature_method $cond.feature_method
@@ -72,6 +73,63 @@
   </outputs>
 
   <help>
+	  
+
+microbiome: Picking Interesting Taxonomic Abundance
+---------------------------------------------------
+
+
+
+microPITA is a computational tool enabling sample selection in tiered studies. Using tiered-study designs can more efficiently allocate resources, reducing study costs, and maximizing the use of samples. From a survey study, selection of samples can be performed to target various microbial communities including:
+
+1. Samples with the most diverse community (maximum diversity);
+2. Samples dominated by specific microbes (targeted feature);
+3. Samples with microbial communities representative of the survey (representative dissimilarity);
+4. Samples with the most extreme microbial communities in the survey (most dissimilar);
+5. Given a phenotype (like disease state), samples at the border of phenotypes (discriminant) or samples typical of each phenotype (distinct). 
+
+Additionally, methods can leverage clinical metadata by stratifying samples into groups in which samples are subsequently selected. This enables the use of microPITA in cohort studies.
+
+
+.. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/HMPStool10PCoA.png
+
+MicroPITA unsupervised method selection in the HMP 16S Gut Microbiome. Selection of 10 samples using targeted feature targeting *Bacteroides* (blue), maximum diversity (orange), representative dissimilarity (purple), and most dissimilar (pink) using Principle Covariance Analysis (PCoA) for ordination. Targeted feature selects samples dominated by *Bacteroides* (upper left) while maximum diversity select more diverse samples away from *Bacteroides* dominant samples. Representative selection selects samples covering the range of samples in the PCoA plot focusing on the higher density central region while maximum dissimilarity selects samples at the periphery of the plot.
+
+
+Intructions to run:
+-------------------
+
+Before running microPita,  you must upload your data using Glaxay's **Get Data -  Upload File**
+Please make sure that you choose **File Format Micropita**
+An example can be found at https://bytebucket.org/biobakery/micropita/wiki/micropita_sample_PCL.txt
+
+Required inputs
+---------------
+
+microPITA requires an input pcl file of metadata and microbial community measurements. Although some defaults can be changed, microPITA expects a PCL file as an input file. A PCL file is a text delimited file similar to an excel spread sheet with the following characteristics.
+
+1. **Rows** represent metadata and features (bugs), **columns** represent samples.
+2. The **first row** by default should be the sample ids.
+3. Metadata rows should be next.
+4. Lastly, rows containing features (bugs) measurements (like abundance) should be after metadata rows.
+5. The **first column** should contain the ID describing the column. For metadata this may be, for example, "Age" for a row containing the age of the patients donating the samples. For measurements, this should be the feature name (bug name).
+6. The file is expected to be TAB delimited.
+7. If a consensus lineage or hierarchy of taxonomy is contained in the feature name, the default delimiter between clades is the pipe ("|").
+
+**Note** MAC users, please save file as windows formatted text.
+
+.. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/pcl_diagram.png
+
+Outputs
+-------
+
+The Run MicroPITA module will create one output text file. The output will consist of one line starting with a key word for the selection method and then followed by selected samples delimited by tabs. An example of 6 samples selected by the representative:
+
+representative	sample_1	sample_2	sample_3	sample_4	sample_5	sample_6
+
+
+	  
+	  
 Run microPITA
 -------------
 
@@ -113,12 +171,20 @@ The number of samples to select. If samples are stratified, this is per stratifi
 
 For more information please visit http://huttenhower.sph.harvard.edu/micropita
 
+
+Acknowledgments
+---------------
+Special thanks to Eric Franzosa for developing the above PCL figure!
+
 Citation and Contacts
 ---------------------
 
+For more information please visit http://huttenhower.sph.harvard.edu/micropita
 When using MicroPITA please cite:
 Tickle T, Segata N, Waldron L, Weingart G, Huttenhower C. Two-stage microbial community experimental design. (Under review)
 
 Please feel free to contact us at ttickle@hsph.harvard.edu for any questions or comments!
+  
+	  
  </help>
 </tool>
