@@ -35,6 +35,8 @@ __status__ = "Development"
 
 import sys
 import argparse
+import warnings
+warnings.simplefilter(action = "ignore", category = FutureWarning)
 from src.breadcrumbs.src.AbundanceTable import AbundanceTable
 from src.breadcrumbs.src.ConstantsBreadCrumbs import ConstantsBreadCrumbs
 from src.breadcrumbs.src.Metric import Metric
