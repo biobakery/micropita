@@ -183,3 +183,7 @@ Please note the following dependencies need to be installed for micropita to run
 8. biome support 	http://biom-format.org/
 
 This covers how to use microPITA. Thank you for using this software and good luck with all your endeavors!
+
+
+## Contributions ## 
+Thanks go to these wonderful people:
